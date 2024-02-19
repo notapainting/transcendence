@@ -17,7 +17,7 @@ services:
 volumes:
   app_data:
     driver: local
-    name: app_data
+    name: app_data 
     driver_opts:
       type: none
       device: django/app/
@@ -27,3 +27,9 @@ networks:
   app_network:
     driver: bridge
     name: app_network
+
+
+    # https://stackoverflow.com/questions/57591111/file-permission-in-docker-container-with-volume-mount
+    # https://docs.docker.com/storage/volumes/
+# https://stackoverflow.com/questions/29245216/write-in-shared-volumes-docker
+
