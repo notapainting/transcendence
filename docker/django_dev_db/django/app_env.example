@@ -1,5 +1,0 @@
-HOST=0.0.0.0
-PORT=8000
-NETWORK=app_network
-APP_NAME=default_app
-APP_VOlUME=${APP_DATA}_data
