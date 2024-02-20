@@ -1,0 +1,6 @@
+HOST=0.0.0.0
+PORT=8000
+NETWORK=dev_network
+DB_NAME=default_db_name
+VERSION=alpha
+DB_VOLUME=${DB_NAME}_data

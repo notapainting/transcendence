@@ -22,6 +22,29 @@ services:
     stdin_open: true 
     tty: true
 
+  database:
+    container_name: ${DB_NAME}
+    build:
+      context: django/
+      args: 
+        PORT: ${PORT}
+    image: ${DB_NAME}_image:${VERSION}
+    environment:
+      DB_NAME: ${DB_NAME}
+      HOST: ${HOST}
+      PORT: ${PORT}
+    volumes:
+    - app_data:/app
+    ports:
+    - "${PORT}:${PORT}"
+    networks: 
+      - app_network
+    restart: unless-stopped
+    stdin_open: true 
+    tty: true
+
+
+
 volumes:
   app_data:
     name: ${APP_VOLUME} 
@@ -35,5 +58,4 @@ networks:
   app_network:
     name: dev_network
     driver: bridge
-
 
