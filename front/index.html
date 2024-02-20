@@ -6,6 +6,7 @@
     <title>Transcentest</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 	<link rel="stylesheet" href="style.css"> 
+
 </head>
 <body>
     <header>
@@ -33,12 +34,24 @@
 
 	<main id="content">
 		<!-- Contenu dynamique -->
+		<!-- ACCUEIL -->
 		<div id="accueil-content" class="page-content" style="display: block;">
 			<h1>Bienvenue sur notre Transcendence !</h1>
 		</div>
+
+		<!-- JEU -->
 		<div id="jeu-content" class="page-content" style="display: none;">
-			<h1 id="jeu-text" class="text-center" >Jeu Pong in progress...</h1>
-		</div>
+			<h1 id="scoreMessage"></h1>
+			<div class="container">
+				<canvas id="canvas" width="900" height="600">
+			</div>
+			<div id="gameButton">
+				<button id="startButton" class="button" type="button">Start</button> 
+				<button id="stopButton" class="button" type="button">Stop</button> 
+			</div>
+		</div> 
+
+		<!-- CHAT -->
 		<div id="chat-content" style="display: none;">
 			<h1 id="chat-text" class="text-center"> Chat in progress .. </h1>
 		</div>
@@ -55,5 +68,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 	<script src="app.js"></script>
+	<script src="game.js"></script>
 </body>
 </html>
