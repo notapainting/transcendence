@@ -23,7 +23,7 @@ var paddleSpeed = 10;
 // score properties
 var leftPlayerScore = 0;
 var rightPlayerScore = 0;
-var maxScore = 1;
+var maxScore = 5;
 
 // Listen for keyboard events
 document.addEventListener("keydown", keyDownHandler);
