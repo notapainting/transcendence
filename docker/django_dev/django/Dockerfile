@@ -33,12 +33,3 @@ RUN echo >> /root/.bashrc \
 EXPOSE ${PORT}
 
 # no entrypoint because it's dev environnement, use make enter to start container shell
-# ENTRYPOINT ["bash"]
-
-# first launch container
-# pip install what needed
-# pip freeze > requirements.txt
-# django-admin startproject app .
-# python manage.py migrate
-# python manage.py runserver 0.0.0.0:8000
-
