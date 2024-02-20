@@ -10,39 +10,131 @@
 </head>
 <body>
     <header>
-		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-			<a class="navbar-brand" href="#">Transcendence</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-	
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-				<ul class="navbar-nav mr-auto">
-					<li class="nav-item">
-						<a class="nav-link" href="#accueil">Accueil</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="#jeu">Jeu</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="#chat">Chat</a>
-					</li>
-				</ul>
-			</div>
-		</nav>
-    </header>
+		<div id="navbar" style="display: none;">
+			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+				<a class="navbar-brand" href="#">Transcendence</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+		
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item">
+							<a class="nav-link" href="#accueil">Accueil</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#jeu">Jeu</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#chat">Chat</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+		</div>
+	</header>
 
 	<main id="content">
 		<!-- Contenu dynamique -->
+
+		<!-- CONNEXION PAGE -->
+		<div id="connexion-content" class="page-content" style="display: block;">
+			<section class="container forms">
+				<div class="form login">
+					<div class="form-content">
+						<header>Login</header>
+						<form action="#">
+							<div class="field input-field">
+								<input type="email" placeholder="Email" class="input">
+							</div>
+	
+							<div class="field input-field">
+								<input type="password" placeholder="Password" class="password">
+								<i class='bx bx-hide eye-icon'></i>
+							</div>
+	
+							<div class="form-link">
+								<a href="#" class="forgot-pass">Forgot password?</a>
+							</div>
+	
+							<div class="field button-field">
+								<button>Login</button>
+							</div>
+						</form>
+	
+						<div class="form-link">
+							<span>Don't have an account? <a href="#" class="link signup-link">Signup</a></span>
+						</div>
+					</div>
+	
+					<div class="line"></div>
+	
+					<div class="media-options">
+						<div class="field button-field">
+							<button id="anon">Login without an Account</button>
+						</div>
+					</div>
+	
+					<div class="media-options">
+						<div class="field button-field">
+							<button id="google">Login with Google</button>
+						</div>
+					</div>
+	
+				</div>
+	
+				<!-- Signup Form -->
+	
+				<div class="form signup">
+					<div class="form-content">
+						<header>Signup</header>
+						<form action="#">
+							<div class="field input-field">
+								<input type="email" placeholder="Email" class="input">
+							</div>
+	
+							<div class="field input-field">
+								<input type="password" placeholder="Create password" class="password">
+							</div>
+	
+							<div class="field input-field">
+								<input type="password" placeholder="Confirm password" class="password">
+								<i class='bx bx-hide eye-icon'></i>
+							</div>
+	
+							<div class="field button-field">
+								<button>Signup</button>
+							</div>
+						</form>
+	
+						<div class="form-link">
+							<span>Already have an account? <a href="#" class="link login-link">Login</a></span>
+						</div>
+					</div>
+	
+					<div class="line"></div>
+	
+					<div class="media-options">
+						<p>Login without an Account</span>
+					</div>
+	
+					<div class="media-options">
+						<p>Login with Google</p>
+					</div>
+	
+				</div>
+			</section>
+		</div>
+
 		<!-- ACCUEIL -->
-		<div id="accueil-content" class="page-content" style="display: block;">
+		<div id="accueil-content" class="page-content" style="display: none;">
 			<h1>Bienvenue sur notre Transcendence !</h1>
 		</div>
 
 		<!-- JEU -->
 		<div id="jeu-content" class="page-content" style="display: none;">
 			<h1 id="scoreMessage"></h1>
-			<div class="container">
+			<div class="containerGame">
 				<canvas id="canvas" width="900" height="600">
 			</div>
 			<div id="gameButton">
@@ -59,7 +151,7 @@
 	
 
     <footer class="footer">
-        <div class="container">
+        <div class="containerFooter">
             <span class="text-muted">Transcendence &copy; 2024</span>
         </div>
     </footer>
