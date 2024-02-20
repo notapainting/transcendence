@@ -1,3 +1,6 @@
 asgiref==3.7.2
 Django==5.0.2
+psycopg2==2.9.9
+setuptools==69.1.0
 sqlparse==0.4.4
+wheel==0.42.0

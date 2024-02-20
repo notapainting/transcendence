@@ -6,52 +6,58 @@ services:
     build:
       context: django/
       args: 
-        PORT: ${PORT}
+        PORT: ${APP_PORT}
     image: ${APP_NAME}_image:${VERSION}
     environment:
       APP_NAME: ${APP_NAME}
-      HOST: ${HOST}
-      PORT: ${PORT}
+      HOST: ${APP_HOST}
+      PORT: ${APP_PORT}
     volumes:
-    - app_data:/app
+    - source_code:/app
     ports:
-    - "${PORT}:${PORT}"
+    - "${APP_PORT}:${APP_PORT}"
     networks: 
       - app_network
     restart: unless-stopped
+    depends_on:
+      - postgres
     stdin_open: true 
     tty: true
 
-  database:
+  postgres:
     container_name: ${DB_NAME}
     build:
-      context: django/
+      context: postgres/
       args: 
-        PORT: ${PORT}
+        PORT: ${DB_PORT}
     image: ${DB_NAME}_image:${VERSION}
     environment:
-      DB_NAME: ${DB_NAME}
-      HOST: ${HOST}
-      PORT: ${PORT}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PORT: ${DB_PORT}
     volumes:
-    - app_data:/app
-    ports:
-    - "${PORT}:${PORT}"
+    - pgdata:/var/lib/postgresql/data/
     networks: 
       - app_network
     restart: unless-stopped
-    stdin_open: true 
-    tty: true
-
 
 
 volumes:
-  app_data:
+  source_code:
     name: ${APP_VOLUME} 
     driver: local
     driver_opts:
       type: none
       device: django/src/
+      o: bind
+
+  pgdata:
+    name: ${DB_VOLUME} 
+    driver: local
+    driver_opts:
+      type: none
+      device: postgres/data/
       o: bind
 
 networks:
