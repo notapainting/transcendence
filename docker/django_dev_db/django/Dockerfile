@@ -1,30 +1,31 @@
 # image officielle python : python version : 3.12, base sur debian bookworm, slim pour petite image
 FROM python:3.12-slim-bookworm
 
-RUN apt update -y && apt upgrade -y curl git
+# update and install utilies
+RUN apt update -y && apt upgrade -y curl git vim
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 
 # ensure python output send straight to term and not buffered
 ENV PYTHONUNBUFFERED 1
 
-RUN mkdir /code
+# create directory for docker volume where app will be
+RUN mkdir /app
+WORKDIR /app
 
-COPY requirements.txt /code/requirements.txt
-
-WORKDIR /code
-
-# pip freeze > requirements.txt
+# install django requirements
+COPY requirements_base.txt /code/requirements.txt
 RUN pip install -r requirements.txt
-
-RUN django-admin startproject app .
 
 
 EXPOSE 8000
 
-ENTRYPOINT ["bash"]
+# no entrypoint because it's dev environnement, use make enter to start container shell
+# ENTRYPOINT ["bash"]
 
-# first launch contenair
+# first launch container
 # pip install what needed
 # pip freeze > requirements.txt
-# python startproject app 
+# django-admin startproject app .
+# python manage.py migrate
 # python manage.py runserver 0.0.0.0:8000
+

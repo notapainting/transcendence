@@ -1,0 +1,39 @@
+version: '3.7'
+
+
+
+services:
+  django:
+    container_name: django_app
+    env_file:
+      - django/app_env.example
+    build: django/
+    volumes:
+    - app_data:/app
+    ports:
+    - "8000:8000"
+    networks: 
+      - app_network
+    restart: unless-stopped
+    stdin_open: true 
+    tty: true
+
+volumes:
+  app_data:
+    name: app_data 
+    driver: local
+    driver_opts:
+      type: none
+      device: django/src/
+      o: bind
+
+networks:
+  app_network:
+    name: app_network
+    driver: bridge
+
+
+# https://stackoverflow.com/questions/57591111/file-permission-in-docker-container-with-volume-mount
+# https://docs.docker.com/storage/volumes/
+# https://stackoverflow.com/questions/29245216/write-in-shared-volumes-docker
+
