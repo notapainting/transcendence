@@ -1,4 +1,19 @@
 
+var connexion = document.getElementById("anon");
+
+connexion.addEventListener('click', launchSite);
+
+function launchSite()
+{
+    hideConnexionContent();
+    showNavBar();
+    showAccueilContent();
+}
+
+function hideConnexionContent() {
+    document.getElementById('connexion-content').style.display = 'none';
+}
+
 function hideJeuContent() {
     document.getElementById('jeu-content').style.display = 'none';
 }
@@ -22,6 +37,11 @@ function showChatContent() {
 function showAccueilContent() {
     document.querySelector('#accueil-content').style.display = 'block';
 }
+
+function showNavBar() {
+    document.querySelector('#navbar').style.display = 'block';
+}
+
 
 document.querySelector('a[href="#jeu"]').addEventListener('click', function(event) {
     event.preventDefault(); 
