@@ -1,5 +1,5 @@
 
-CMP = docker-compose --file compose.yml --env-file django/app_env.example
+CMP = docker-compose --file compose.yml --env-file env.example
 
 all :	up
 
@@ -26,3 +26,7 @@ enter:	up
 
 volume:
 	mkdir -p django/src/
+	mkdir -p postgres/data/
+
+logs:
+	${CMP} logs 

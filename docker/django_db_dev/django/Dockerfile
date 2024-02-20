@@ -2,7 +2,7 @@
 FROM python:3.12-slim-bookworm
 
 # update and install utilies
-RUN apt update -y && apt upgrade -y curl git vim
+RUN apt update -y && apt upgrade -y && apt install -y curl git vim build-essential python3-dev libpq-dev
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 
 ARG PORT
@@ -20,7 +20,7 @@ WORKDIR /app
 
 # install django requirements
 COPY requirements_base.txt /app/requirements.txt
-RUN pip install -r /app/requirements.txt
+RUN pip install -r /app/requirements.txt && rm -f /app/requirements.txt
 
 # setup alias 
 RUN echo >> /root/.bashrc \
@@ -33,12 +33,5 @@ RUN echo >> /root/.bashrc \
 EXPOSE ${PORT}
 
 # no entrypoint because it's dev environnement, use make enter to start container shell
-# ENTRYPOINT ["bash"]
 
-# first launch container
-# pip install what needed
-# pip freeze > requirements.txt
-# django-admin startproject app .
-# python manage.py migrate
-# python manage.py runserver 0.0.0.0:8000
 
