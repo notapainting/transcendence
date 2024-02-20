@@ -1,0 +1,52 @@
+images 
+- django dev : 1 volume : vscode sur host, shell dans container
+file arch : 
+at first
+	django/ 
+		--src/				empty
+		--.dockerignore
+		--Dockerfile
+		--requirements.txt
+
+
+
+set via env: app_name, db_app_name, port, entrypoint, network
+
+see if compose via multiple file
+
+check how to parameter postgres
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': 'postgras',
+        'PASSWORD': 'password',
+        'HOST': 'postgres',
+        'PORT': 5432,
+    }
+}
+
+DJANGO_ALLOWED_HOSTS='*'
+DATABASE_ENGINE=postgresql_psycopg2
+DATABASE_NAME=
+DATABASE_USERNAME=
+DATABASE_PASSWORD=
+DATABASE_HOST=
+DATABASE_PORT=
+
+# https://stackoverflow.com/questions/57591111/file-permission-in-docker-container-with-volume-mount
+# https://docs.docker.com/storage/volumes/
+# https://stackoverflow.com/questions/29245216/write-in-shared-volumes-docker
+
+docker inspect \
+  -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name_or_id
+
+
+healthcheck:
+       test: ["CMD-SHELL", "pg_isready -U postgres"]
+       interval: 5s
+       timeout: 5s
+       retries: 5
+
+
