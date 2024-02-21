@@ -13,14 +13,14 @@ services:
       HOST: ${APP_HOST}
       PORT: ${APP_PORT}
     volumes:
-    - source_code:/app
+      - source_code:/app
     ports:
-    - "${APP_PORT}:${APP_PORT}"
+      - "${APP_PORT}:${APP_PORT}"
     networks: 
       - app_network
     restart: unless-stopped
-    depends_on:
-      - postgres
+    # depends_on:
+    #   - postgres
     stdin_open: true 
     tty: true
 
@@ -37,7 +37,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       PORT: ${DB_PORT}
     volumes:
-    - pgdata:/var/lib/postgresql/data/
+      - pgdata:/var/lib/postgresql/data
     networks: 
       - app_network
     restart: unless-stopped
@@ -53,11 +53,10 @@ volumes:
       o: bind
 
   pgdata:
-    name: ${DB_VOLUME} 
+    name: test 
     driver: local
     driver_opts:
       type: none
-      device: postgres/data/
       o: bind
 
 networks:
