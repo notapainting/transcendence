@@ -38,6 +38,8 @@ services:
       PORT: ${DB_PORT}
     volumes:
     - /var/lib/postgresql/data/
+    ports:
+    - "${DB_PORT}:${DB_PORT}"
     networks: 
       - app_network
     restart: unless-stopped
