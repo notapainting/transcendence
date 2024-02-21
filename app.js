@@ -25,6 +25,14 @@ function hideAccueilContent() {
         document.getElementById("accID").classList.toggle('active');
 }
 
+function showSignUpContent() {
+    document.getElementById('signup-content').style.display = 'block';
+}
+
+function showSignInContent() {
+    document.getElementById('signin-content').style.display = 'block';
+}
+
 function showJeuContent() {
     document.getElementById('jeu-content').style.display = 'block';
     document.getElementById("jeuID").classList.add('active');
@@ -46,6 +54,8 @@ function showNavBar() {
 
 function showSelectedPage(page)
 {
+    hideSignUpContent();
+    hideSignInContent()
     hideJeuContent(); 
     hideChatContent(); 
     hideAccueilContent();
@@ -55,6 +65,10 @@ function showSelectedPage(page)
         showChatContent(); 
     else if (page === 'accueil')
         showAccueilContent();
+    else if (page === 'signup')
+        showSignUpContent();
+    else if (page === 'signin')
+        showSignInContent();
 }
 
 document.querySelector('a[href="#jeu"]').addEventListener('click', function(event) {
@@ -69,6 +83,14 @@ document.querySelector('a[href="#accueil"]').addEventListener('click', function(
     showSelectedPage("accueil");
 });
 
+document.querySelector('a[href="#signup"]').addEventListener('click', function(event) {
+    showSelectedPage("signup");
+});
+
+document.querySelector('a[href="#signin"]').addEventListener('click', function(event) {
+    showSelectedPage("signin");
+});
+
 function selectPage()
 {
     if (location.hash === "#jeu")
@@ -77,16 +99,24 @@ function selectPage()
         showSelectedPage("chat");
     else if (location.hash === "#accueil")
         showSelectedPage("accueil");
+    else if (location.hash === "#signup")
+        showSelectedPage("signup");
+    else if (location.hash === "#signin")
+        showSelectedPage("signin");
 }
 
 window.addEventListener('hashchange', function() {
     var hash = window.location.hash.substring(1); 
     if (hash === 'jeu')
-    showSelectedPage("jeu");
+        showSelectedPage("jeu");
     else if (hash === 'chat')
-    showSelectedPage("chat");
+        showSelectedPage("chat");
     else if (hash === 'accueil') 
-    showSelectedPage("accueil");
+        showSelectedPage("accueil");
+    else if (hash === 'signup') 
+        showSelectedPage("signup");
+    else if (hash === 'signin') 
+        showSelectedPage("signin");
 });
 
 selectPage();
