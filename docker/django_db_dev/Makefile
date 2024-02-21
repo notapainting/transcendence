@@ -29,3 +29,5 @@ volume:
 
 logs:
 	${CMP} logs 
+
+	# hostname: bd
