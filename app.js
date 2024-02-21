@@ -1,6 +1,4 @@
 
-console.log(location.hash)
-
 function hideConnexionContent() {
     document.getElementById('connexion-content').style.display = 'none';
 }
@@ -111,3 +109,25 @@ function selectPage()
 // });
 
 selectPage();
+
+window.addEventListener('hashchange', function() {
+    var hash = window.location.hash.substring(1); 
+    if (hash === 'jeu') {
+        hideJeuContent(); 
+        hideChatContent(); 
+        hideAccueilContent();
+        showJeuContent(); 
+    } 
+    else if (hash === 'chat') {
+        hideChatContent(); 
+        hideJeuContent();
+        hideAccueilContent();
+        showChatContent(); 
+    } 
+    else if (hash === 'accueil') {
+        hideChatContent(); 
+        hideJeuContent();
+        hideAccueilContent();
+        showAccueilContent();
+    }
+});
