@@ -4,131 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transcentest</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="style.css"> https://www.booking.com/hotel/it/moresco-venezia.fr.html?aid=2090949&ucfs=1&arphpl=1&checkin=2024-02-24&checkout=2024-02-25&dest_id=-132007&dest_type=city&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=20&hapos=20&sr_order=early_year_deals_upsorter&nflt=price%3DEUR-min-250-1%3Bmealplan%3D1%3Breview_score%3D90%3Breview_score%3D80&srpvid=bb5383ede8600447&srepoch=1708454912&all_sr_blocks=40679201_88461234_0_1_0&highlighted_blocks=40679201_88461234_0_1_0&matching_block_id=40679201_88461234_0_1_0&sr_pri_blocks=40679201_88461234_0_1_0__23900&from_sustainable_property_sr=1&from=searchresults#hotelTmpl
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="style.css"> 
 
 </head>
 <body>
-    <header>
-		<div id="navbar" style="display: none;">
-			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-				<a class="navbar-brand" href="#">Transcendence</a>
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-		
-				<div class="collapse navbar-collapse" id="navbarSupportedContent">
-					<ul class="navbar-nav mr-auto">
-						<li class="nav-item">
-							<a class="nav-link" href="#accueil">Accueil</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#jeu">Jeu</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#chat">Chat</a>
-						</li>
+	<div id="navbar">
+		<nav class="navbar navbar-inverse">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">Transcendence</a>
+				</div>
+				<ul class="nav navbar-nav">
+					<li id="accID" class="active"><a href="#accueil">Accueil</a></li>
+					<li id="jeuID" ><a href="#jeu">Jeu</a></li>
+					<li id="chatID" ><a href="#chat">Chat</a></li>
+				</ul>
+				<div id="connexion-content">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="#signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+						<li><a href="#signin"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
 					</ul>
 				</div>
-			</nav>
-		</div>
-	</header>
+			</div>
+		</nav>
+	</div>
 
 	<main id="content">
 		<!-- Contenu dynamique -->
 
 		<!-- CONNEXION PAGE -->
-		<div id="connexion-content" class="page-content" style="display: block;">
-			<section class="container forms">
-				<div class="form login">
-					<div class="form-content">
-						<header>Login</header>
-						<form action="#">
-							<div class="field input-field">
-								<input type="email" placeholder="Email" class="input">
-							</div>
+		<div id="signup-content" class="page-content" style="display: block;">
 	
-							<div class="field input-field">
-								<input type="password" placeholder="Password" class="password">
-								<i class='bx bx-hide eye-icon'></i>
-							</div>
-	
-							<div class="form-link">
-								<a href="#" class="forgot-pass">Forgot password?</a>
-							</div>
-	
-							<div class="field button-field">
-								<button>Login</button>
-							</div>
-						</form>
-	
-						<div class="form-link">
-							<span>Don't have an account? <a href="#" class="link signup-link">Signup</a></span>
-						</div>
-					</div>
-	
-					<div class="line"></div>
-	
-					<div class="media-options">
-						<div class="field button-field">
-							<button id="anon">Login without an Account</button>
-						</div>
-					</div>
-	
-					<div class="media-options">
-						<div class="field button-field">
-							<button id="google">Login with Google</button>
-						</div>
-					</div>
-	
+		</div>
+
+		<div id="signin-content" class="page-content" style="display: block;">
+			<div class="wrapper fadeInDown">
+				<div id="formContent">
+				  <form>
+					<input type="text" id="login" class="fadeIn second" name="login" placeholder="login">
+					<input type="text" id="password" class="fadeIn third" name="login" placeholder="password">
+					<input type="submit" class="fadeIn fourth" value="Log In">
+				  </form>
+			
+				  <div id="formFooter">
+					<a class="underlineHover" href="#">Forgot Password?</a>
+				  </div>
+			  
 				</div>
-	
-				<!-- Signup Form -->
-	
-				<div class="form signup">
-					<div class="form-content">
-						<header>Signup</header>
-						<form action="#">
-							<div class="field input-field">
-								<input type="email" placeholder="Email" class="input">
-							</div>
-	
-							<div class="field input-field">
-								<input type="password" placeholder="Create password" class="password">
-							</div>
-	
-							<div class="field input-field">
-								<input type="password" placeholder="Confirm password" class="password">
-								<i class='bx bx-hide eye-icon'></i>
-							</div>
-	
-							<div class="field button-field">
-								<button>Signup</button>
-							</div>
-						</form>
-	
-						<div class="form-link">
-							<span>Already have an account? <a href="#" class="link login-link">Login</a></span>
-						</div>
-					</div>
-	
-					<div class="line"></div>
-	
-					<div class="media-options">
-						<p>Login without an Account</span>
-					</div>
-	
-					<div class="media-options">
-						<p>Login with Google</p>
-					</div>
-	
-				</div>
-			</section>
+			  </div>
 		</div>
 
 		<!-- ACCUEIL -->
 		<div id="accueil-content" class="page-content" style="display: none;">
-			<h1>Bienvenue sur notre Transcendence !</h1>
+			<h1>Bienvenue sur Transcendence !</h1>
 		</div>
 
 		<!-- JEU -->
@@ -156,9 +87,6 @@
         </div>
     </footer>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 	<script src="app.js"></script>
 	<script src="game.js"></script>
 </body>
