@@ -35,3 +35,57 @@ DATABASES = {
 }
 
 The 'NAME' field is supposed to be the same as POSTGRES_DB in env.example but for now just ignore it and put POSTGRES_USER insteed
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+    }
+}
+
+'ENGINE': 'django.db.backends.postgresql'
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "OPTIONS": {
+            "service": "my_service",
+            "passfile": ".my_pgpass",
+        },
+    }
+}
+
+(file)
+
+my_service :
+[my_service]
+host=localhost
+user=USER
+dbname=NAME
+port=5432
+
+.my_pass:
+localhost:5432:NAME:USER:PASSWORD
+
+postgres cheatsheet :
+
+lists user : \du
+list db : \l
+connect db : \c <db_name>
+\conninfo
+drop == delete
+
+db init : django need a user with a pword 
+
+
+django -> use db 
+db has : a role for django + a db for django 
+
+add a "common error" section and tl;dr 
+
+https://stackoverflow.com/questions/26598738/how-to-create-user-database-in-script-for-docker-postgres#26599273

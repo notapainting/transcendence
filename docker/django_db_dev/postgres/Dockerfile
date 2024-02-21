@@ -1,17 +1,17 @@
 FROM postgres:15-bookworm
 
 ARG PORT
-ARG PGDIR 
+ARG PGDIR
 
 # RUN export PGDATA=${PGDIR}
-RUN echo >> ${PGDIR}/postgresql.conf "port = "${PORT}
-COPY pg_hba.conf ${PGDIR}/pg_hba.conf
+# RUN echo >> ${PGDIR}/postgresql.conf "port = "${PORT}
+# COPY pg_hba.conf ${PGDIR}/pg_hba.conf
 
-USER postgres
-RUN export PGDATA=${PGDIR}
+# USER postgres
+# RUN export PGDATA=${PGDIR}
 
-USER postgres
-RUN /usr/lib/postgresql/15/bin/pg_ctl reload
+# USER postgres
+# RUN /usr/lib/postgresql/15/bin/pg_ctl reload
 
 EXPOSE ${PORT}
 

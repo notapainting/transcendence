@@ -2,10 +2,15 @@
 FROM python:3.12-slim-bookworm
 
 # update and install utilies
-RUN apt update -y && apt upgrade -y && apt install -y curl git vim build-essential python3-dev libpq-dev
+RUN apt update -y \
+	&& apt upgrade -y \
+	&& apt install -y curl git vim \
+	build-essential python3-dev libpq-dev \
+	postgresql-client-15 
+
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 
-ARG PORT
+# ARG PORT
 
 # ensure python output send straight to term and not buffered
 ENV PYTHONUNBUFFERED 1
