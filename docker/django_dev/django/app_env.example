@@ -1,0 +1,6 @@
+HOST=0.0.0.0
+PORT=8000
+NETWORK=dev_network
+APP_NAME=default_name
+VERSION=alpha
+APP_VOLUME=${APP_NAME}_data
