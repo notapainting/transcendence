@@ -4,10 +4,7 @@ FROM nginx:1.18.0
 COPY ./conf/nginx-selfsigned.crt /etc/nginx/ssl/nginx-selfsigned.crt
 COPY ./conf/nginx-selfsigned.key /etc/nginx/ssl/nginx-selfsigned..key
 
-COPY ./conf/nginx.conf /etc/nginx/conf.d/nginx.conf
-
-# create directory for your website
-# RUN mkdir /var/www/trmdr.com/
+COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
 
 # copy our website
-# COPY ./front/* /var/www/trmdr.com
+COPY ./front /var/www/trmdr.com
