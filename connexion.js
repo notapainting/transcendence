@@ -18,15 +18,12 @@ document.getElementById("loginForm").addEventListener("submit", function(event){
 
 	fetch('https://localhost:8000', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: formDataJSON
         })
 		.then(response => {
-            if (!response.ok) {
+            if (!response.ok)
                 throw new Error('Error : Bad Network response :(');
-            }
             return response.json();
         })
 		.then(data => console.log(data))
