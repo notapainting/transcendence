@@ -1,6 +1,10 @@
 
-function hideConnexionContent() {
-    document.getElementById('connexion-content').style.display = 'none';
+function hideSignInContent() {
+    document.getElementById('signin-content').style.display = 'none';
+}
+
+function hideSignUpContent() {
+    document.getElementById('signup-content').style.display = 'none';
 }
 
 function hideJeuContent() {
@@ -40,94 +44,49 @@ function showNavBar() {
     document.querySelector('#navbar').style.display = 'block';
 }
 
-
-document.querySelector('a[href="#jeu"]').addEventListener('click', function(event) {
+function showSelectedPage(page)
+{
     hideJeuContent(); 
     hideChatContent(); 
     hideAccueilContent();
-    showJeuContent(); 
+    if (page === 'jeu')
+        showJeuContent(); 
+    else if (page === 'chat')
+        showChatContent(); 
+    else if (page === 'accueil')
+        showAccueilContent();
+}
+
+document.querySelector('a[href="#jeu"]').addEventListener('click', function(event) {
+    showSelectedPage("jeu");
 });
 
 document.querySelector('a[href="#chat"]').addEventListener('click', function(event) {
-    hideChatContent(); 
-    hideJeuContent();
-    hideAccueilContent();
-    showChatContent(); 
+    showSelectedPage("chat");
 });
 
 document.querySelector('a[href="#accueil"]').addEventListener('click', function(event) {
-    hideChatContent(); 
-    hideJeuContent();
-    hideAccueilContent();
-    showAccueilContent();
+    showSelectedPage("accueil");
 });
 
 function selectPage()
 {
     if (location.hash === "#jeu")
-    {
-        hideJeuContent(); 
-        hideChatContent(); 
-        hideAccueilContent();
-        showJeuContent(); 
-    }
+        showSelectedPage("jeu");
     else if (location.hash === "#chat")
-    {
-        hideChatContent(); 
-        hideJeuContent();
-        hideAccueilContent();
-        showChatContent(); 
-    }
+        showSelectedPage("chat");
     else if (location.hash === "#accueil")
-    {
-        hideChatContent(); 
-        hideJeuContent();
-        hideAccueilContent();
-        showAccueilContent();
-    }
+        showSelectedPage("accueil");
 }
-
-// document.querySelectorAll('.nav-link').forEach(link => {
-//     if (link.getAttribute('href') !== '#jeu') { 
-//         link.addEventListener('click', function(event) {
-//             // event.preventDefault(); 
-//             hideJeuContent(); 
-//         });
-//     }
-//     else if (link.getAttribute('href') !== '#chat') { 
-//         link.addEventListener('click', function(event) {
-//             // event.preventDefault(); 
-//             hideChatContent(); 
-//         });
-//     }
-//     else if (link.getAttribute('href') !== '#accueil') { 
-//         link.addEventListener('click', function(event) {
-//             // event.preventDefault(); 
-//             hideAccueilContent(); 
-//         });
-//     }
-// });
-
-selectPage();
 
 window.addEventListener('hashchange', function() {
     var hash = window.location.hash.substring(1); 
-    if (hash === 'jeu') {
-        hideJeuContent(); 
-        hideChatContent(); 
-        hideAccueilContent();
-        showJeuContent(); 
-    } 
-    else if (hash === 'chat') {
-        hideChatContent(); 
-        hideJeuContent();
-        hideAccueilContent();
-        showChatContent(); 
-    } 
-    else if (hash === 'accueil') {
-        hideChatContent(); 
-        hideJeuContent();
-        hideAccueilContent();
-        showAccueilContent();
-    }
+    if (hash === 'jeu')
+    showSelectedPage("jeu");
+    else if (hash === 'chat')
+    showSelectedPage("chat");
+    else if (hash === 'accueil') 
+    showSelectedPage("accueil");
 });
+
+selectPage();
