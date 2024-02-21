@@ -6,7 +6,7 @@ all :	up
 build :	
 	${CMP} build
 
-up :	volume
+up :	volume build
 	${CMP} up -d
 
 down :
@@ -26,7 +26,6 @@ enter:	up
 
 volume:
 	mkdir -p django/src/
-	mkdir -p postgres/data/
 
 logs:
 	${CMP} logs 
