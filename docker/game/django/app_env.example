@@ -1,0 +1,6 @@
+HOST=127.0.0.1
+PORT=8080
+NETWORK=dev_network
+APP_NAME=game
+VERSION=alpha
+APP_VOLUME=${APP_NAME}_data
