@@ -37,7 +37,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       PORT: ${DB_PORT}
     volumes:
-    - pgdata:/var/lib/postgresql/data/
+    - /var/lib/postgresql/data/
     networks: 
       - app_network
     restart: unless-stopped
@@ -52,13 +52,6 @@ volumes:
       device: django/src/
       o: bind
 
-  pgdata:
-    name: ${DB_VOLUME} 
-    driver: local
-    driver_opts:
-      type: none
-      device: postgres/data/
-      o: bind
 
 networks:
   app_network:
