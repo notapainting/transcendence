@@ -6,7 +6,7 @@ width = 900
 height = 600
 maxscore = 5
 
-gamerunning = False
+gameRunning = False
 
 # Create your views here.
 class Ball() :
@@ -24,3 +24,14 @@ class PlayerL() :
 
 def back_test_view(request):
     return JsonResponse({'message': 'bouton back test click!'})
+
+
+def start_game_view(request):
+    if request.method == 'POST':
+        gameRunning = request.POST.get('gameRunning')
+        if gameRunning == 'true':
+            return JsonResponse({'message': 'Le jeu a commencé'})
+        else:
+            return JsonResponse({'error': 'Paramètre de requête incorrect'}, status=400)
+    else:
+        return JsonResponse({'error': 'Méthode HTTP non autorisée'}, status=405)

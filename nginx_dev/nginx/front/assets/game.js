@@ -57,6 +57,18 @@ function backTest() {
 // Start game
 function startGame()
 {
+	fetch('http://127.0.0.1:8000/start-game/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: {"gameRunning": true}
+        })
+		.then(response => {
+            if (!response.ok)
+                throw new Error('Error : Bad Network response :(');
+            return response.json();
+        })
+		.then(data => console.log(data))
+		.catch(error => console.error(error));
 	gameRunning = true;
 }
 
