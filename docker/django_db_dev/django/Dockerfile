@@ -37,5 +37,3 @@ RUN echo >> /root/.bashrc \
 EXPOSE ${PORT}
 
 # no entrypoint because it's dev environnement, use make enter to start container shell
-
-
