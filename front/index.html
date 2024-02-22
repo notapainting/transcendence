@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transcentest</title>
+	{% load static %}
+	
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-	<link rel="stylesheet" href="style.css"> 
+	<link rel="stylesheet" href="../static/style.css"> 
 
 </head>
 <body>
@@ -89,8 +91,8 @@
         </div>
     </footer>
 
-	<script src="app.js"></script>
-	<script src="game.js"></script>
-	<script src="connexion.js"></script>
+	<script src="{% static '../static/app.js' %}"></script>
+	<script src="../static/game.js"></script>
+	<script src="../static/connexion.js"></script>
 </body>
 </html>
