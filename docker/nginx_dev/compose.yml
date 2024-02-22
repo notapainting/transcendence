@@ -1,0 +1,9 @@
+services:
+  nginx:
+    container_name: nginx-selfsigned
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+     - "8443:443"
+    restart: unless-stopped
