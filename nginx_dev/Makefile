@@ -23,3 +23,5 @@ config:
 
 enter:	up
 	${CMP} exec nginx bash
+
+re:	clear up
