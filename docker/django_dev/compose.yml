@@ -16,8 +16,6 @@ services:
     - app_data:/app
     ports:
     - "${PORT}:${PORT}"
-    networks: 
-      - app_network
     restart: unless-stopped
     stdin_open: true 
     tty: true
@@ -30,10 +28,4 @@ volumes:
       type: none
       device: django/src/
       o: bind
-
-networks:
-  app_network:
-    name: dev_network
-    driver: bridge
-
 
