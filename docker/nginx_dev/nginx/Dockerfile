@@ -1,5 +1,8 @@
 FROM nginx:1.18.0
 
+# update and install utilies
+RUN apt update -y && apt upgrade -y
+
 # copy nginx's configuration file and self signed certificate for https
 COPY ./conf/nginx-selfsigned.crt /etc/nginx/ssl/nginx-selfsigned.crt
 COPY ./conf/nginx-selfsigned.key /etc/nginx/ssl/nginx-selfsigned.key
