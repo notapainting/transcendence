@@ -46,36 +46,55 @@ function backTest() {
 	console.log("click");
     fetch('http://127.0.0.1:8000/game/')
         .then(response => response.json())
-        .then(data => {
-            console.log(data.message);
-        })
+        .then(data => console.log(data.message))
         .catch(error => {
             console.error('Error response:', error);
         });
-}
-
+	}
+	
 // Start game
-function startGame()
-{
-	fetch('http://127.0.0.1:8000/start-game/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: {"gameRunning": true}
-        })
-		.then(response => {
-            if (!response.ok)
-                throw new Error('Error : Bad Network response :(');
-            return response.json();
-        })
-		.then(data => console.log(data))
-		.catch(error => console.error(error));
-	gameRunning = true;
+function startGame() {
+    fetch('http://127.0.0.1:8000/start-game/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"gameRunning": true})
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+	gameRunning = true; // a enlever
 }
 
 // Stop game
 function stopGame()
 {
-	gameRunning = false;
+    fetch('http://127.0.0.1:8000/start-game/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"gameRunning": false})
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+	gameRunning = false; // a enlever
 }
 
 // Pong Functions

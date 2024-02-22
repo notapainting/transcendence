@@ -1,5 +1,5 @@
 
-DOCKER_COMPOSE := docker-compose
+DOCKER_COMPOSE := docker compose
 
 build:
 	$(DOCKER_COMPOSE) build
