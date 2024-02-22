@@ -15,23 +15,27 @@ HOW TO USE:
 	- Fill env.example with desired data
 	- Build your image with make Build
 	- Use make enter to launch the container and start a bash shell inside
+	- Django need you to change database parameters in settings.py in order to actually use postgresql
 	- You can use make down/up to stop/start the container
 
 CONTAINER SHELL:
 	- There is a fews alias to help you develop your app, try 'help'
 
 DJANGO SETTINGS:
-	- Template for databse settings:
+	- Database settings in settings.py:
+
+import os
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'postgres',
-        'PORT': 5432,
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
-The 'NAME' field is supposed to be the same as POSTGRES_DB in env.example but for now just ignore it and put POSTGRES_USER insteed
+# for development can be useful
+DJANGO_ALLOWED_HOSTS=['*']

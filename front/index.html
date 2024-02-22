@@ -4,45 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transcentest</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="style.css"> 
 
 </head>
 <body>
-    <header>
-		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-			<a class="navbar-brand" href="#">Transcendence</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-	
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-				<ul class="navbar-nav mr-auto">
-					<li class="nav-item">
-						<a class="nav-link" href="#accueil">Accueil</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="#jeu">Jeu</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="#chat">Chat</a>
-					</li>
+	<div id="navbar">
+		<nav class="navbar navbar-inverse">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">Transcendence</a>
+				</div>
+				<ul class="nav navbar-nav">
+					<li id="accID" class="active"><a href="#accueil">Accueil</a></li>
+					<li id="jeuID" ><a href="#jeu">Jeu</a></li>
+					<li id="chatID" ><a href="#chat">Chat</a></li>
 				</ul>
+				<div id="connexion-content">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="#signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+						<li><a href="#signin"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+					</ul>
+				</div>
 			</div>
 		</nav>
-    </header>
+	</div>
 
 	<main id="content">
 		<!-- Contenu dynamique -->
+
+		<!-- CONNEXION PAGE -->
+		<div id="signup-content" class="page-content" style="display: none;">
+	
+		</div>
+
+		<div id="signin-content" class="page-content" style="display: none;">
+			<div class="wrapper fadeInDown">
+				<div id="formContent">
+				  <form id="loginForm">
+					<input type="text" id="login" class="fadeIn second" name="login" placeholder="login">
+					<input type="email" id="email" class="fadeIn second" name="email" placeholder="email">
+					<input type="password" id="password" class="fadeIn third" name="login" placeholder="password">
+					<input type="submit" class="fadeIn fourth" value="Log In">
+				  </form>
+			
+				  <div id="formFooter">
+					<a class="underlineHover" href="#">Forgot Password?</a>
+				  </div>
+			  
+				</div>
+			</div>
+		</div>
+
+
 		<!-- ACCUEIL -->
-		<div id="accueil-content" class="page-content" style="display: block;">
-			<h1>Bienvenue sur notre Transcendence !</h1>
+		<div id="accueil-content" class="page-content" style="display: none;">
+			<h1>Bienvenue sur Transcendence !</h1>
 		</div>
 
 		<!-- JEU -->
 		<div id="jeu-content" class="page-content" style="display: none;">
 			<h1 id="scoreMessage"></h1>
-			<div class="container">
+			<div class="containerGame">
 				<canvas id="canvas" width="900" height="600">
 			</div>
 			<div id="gameButton">
@@ -59,15 +84,13 @@
 	
 
     <footer class="footer">
-        <div class="container">
+        <div class="containerFooter">
             <span class="text-muted">Transcendence &copy; 2024</span>
         </div>
     </footer>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 	<script src="app.js"></script>
 	<script src="game.js"></script>
+	<script src="connexion.js"></script>
 </body>
 </html>
