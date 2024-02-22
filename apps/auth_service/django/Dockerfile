@@ -5,8 +5,6 @@ FROM python:3.12-slim-bookworm
 RUN apt update -y && apt upgrade -y && apt install -y curl git vim build-essential python3-dev libpq-dev
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 
-ARG PORT
-
 # ensure python output send straight to term and not buffered
 ENV PYTHONUNBUFFERED 1
 ENV APP_NAME ${APP_NAME}
