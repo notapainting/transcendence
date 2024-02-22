@@ -3,8 +3,8 @@ FROM python:3.12-slim-bookworm
 
 # update and install utilies
 RUN apt update -y \
-	&& apt upgrade -y
-	&& apt install curl git vim
+	&& apt upgrade -y \
+	&& apt install -y curl git vim
 
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 
