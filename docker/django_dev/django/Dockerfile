@@ -2,13 +2,15 @@
 FROM python:3.12-slim-bookworm
 
 # update and install utilies
-RUN apt update -y && apt upgrade -y curl git vim
-RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
+RUN apt update -y \
+	&& apt upgrade -y
+	&& apt install curl git vim
 
-ARG PORT
+RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 
 # ensure python output send straight to term and not buffered
 ENV PYTHONUNBUFFERED 1
+
 ENV APP_NAME ${APP_NAME}
 ENV HOST ${HOST}
 ENV PORT ${PORT}
@@ -20,7 +22,7 @@ WORKDIR /app
 
 # install django requirements
 COPY requirements_base.txt /app/requirements.txt
-RUN pip install -r /app/requirements.txt
+RUN pip install -r /app/requirements.txt && rm -f /app/requirements.txt
 
 # setup alias 
 RUN echo >> /root/.bashrc \
