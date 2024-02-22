@@ -1,5 +1,6 @@
 
 CMP = docker-compose --file compose.yml --env-file env.example
+PATH_DATA_DB = ${HOME}/goinfre/docker_volume/
 
 all :	up
 
@@ -26,8 +27,10 @@ enter:	up
 
 volume:
 	mkdir -p django/src/
+	mkdir -p ${PATH_DATA_DB}db/
+
+deldb:
+	rm -rf ${PATH_DATA_DB}db/
 
 logs:
 	${CMP} logs 
-
-	# hostname: bd
