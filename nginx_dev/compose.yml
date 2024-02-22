@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  nginx:
+    build:
+      context: nginx/
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: always
