@@ -32,5 +32,6 @@ volume:
 deldb:
 	rm -rf ${PATH_DATA_DB}db/
 
+
 logs:
 	${CMP} logs 
