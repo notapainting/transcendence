@@ -19,18 +19,23 @@ services:
     restart: unless-stopped
     depends_on:
       - nginx
-    entrypoint: ["run"]
+    entrypoint: ["python", "/app/manage.py", "runserver", "0.0.0.0:8000"]
 
 
   nginx:
     container_name: nginx-selfsigned
     build:
-      context: apps/nginx_dev/nginx
-    image: my_nginx
+      context: server
+    image: nginx-proxy
     ports:
      - "8443:443"
+     - "8080:80"
     networks: 
       - app_network
+    volumes:
+      - ./server/certs/:/certs
+      - ./front:/var/www/static
+      - ./logs:/logs
     restart: unless-stopped
 
 volumes:

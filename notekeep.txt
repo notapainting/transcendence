@@ -12,3 +12,8 @@ wheel==0.42.0
 
 use multiple file (-f)
 app -
+
+https://dev.to/danielkun/nginx-everything-about-proxypass-2ona
+
+https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_http_version
+
