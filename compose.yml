@@ -23,10 +23,10 @@ services:
 
 
   nginx:
-    container_name: nginx-selfsigned
+    container_name: proxy-nginx
     build:
       context: server
-    image: nginx-proxy
+    image: proxy-nginx:alpha
     ports:
      - "8443:443"
      - "8080:80"
@@ -35,7 +35,7 @@ services:
     volumes:
       - ./server/certs/:/certs
       - ./front:/var/www/static
-      - ./logs:/logs
+      - ./logs:/var/log/nginx
     restart: unless-stopped
 
 volumes:
@@ -48,7 +48,3 @@ volumes:
       o: bind
 
 
-networks:
-  app_network:
-    name: dev_network
-    driver: bridge

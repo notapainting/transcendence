@@ -1,5 +1,5 @@
 
-CMP = docker-compose --file compose.yml --env-file apps/auth_service/env.example
+CMP = docker-compose --file compose.network.yml --file compose.yml --env-file apps/auth_service/env.example
 
 all :	up
 
@@ -13,7 +13,7 @@ down :
 	${CMP} down 
 
 clear:
-	${CMP} down --rmi all -v --remove-orphans
+	${CMP} down -v --remove-orphans
 
 ps:
 	${CMP} ps
@@ -24,3 +24,5 @@ config:
 
 logs:
 	${CMP} logs 
+
+.PHONY: logs
