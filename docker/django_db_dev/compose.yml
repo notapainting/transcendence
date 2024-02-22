@@ -5,16 +5,16 @@ services:
     container_name: ${APP_NAME}
     build:
       context: django/
-      args: 
-        PORT: ${APP_PORT}
     image: ${APP_NAME}_image:${VERSION}
     environment:
       APP_NAME: ${APP_NAME}
       HOST: ${APP_HOST}
       PORT: ${APP_PORT}
-      DJ_USER: ${DJ_USER}
-      DJ_PASSWORD: ${DJ_PASSWORD}
-      DJ_DB: ${DJ_DB}
+      DB_USER: ${DJ_USER}
+      DB_PASSWORD: ${DJ_PASSWORD}
+      DB_NAME: ${DJ_DB}
+      DB_HOST: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
     volumes:
       - source_code:/app
     ports:
@@ -24,6 +24,8 @@ services:
     restart: unless-stopped
     stdin_open: true 
     tty: true
+    depends_on:
+      - postgres
 
   postgres:
     container_name: ${DB_NAME}
@@ -38,8 +40,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_DB: ${POSTGRES_DB}
       PGDATA: ${PGDATA}
+      DB_USER: ${DJ_USER}
+      DB_PASSWORD: ${DJ_PASSWORD}
+      DB_NAME: ${DJ_DB}
     volumes:
-      - ${PGDATA}
+      - pgdata:${PGDATA}
     networks: 
       - app_network
     restart: unless-stopped
@@ -51,15 +56,16 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: django/src/
+      device: django/src
       o: bind
-  # pgdata:
-  #   name: ${DB_VOLUME}
-  #   driver: local
-  #   driver_opts:
-  #     type: volume
-  #     device: postgres/data
-      # o: bind
+
+  pgdata:
+    name: ${DB_VOLUME}
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOME}/goinfre/my_docker/${DB_VOLUME}_data
+      o: bind
 
 networks:
   app_network:
