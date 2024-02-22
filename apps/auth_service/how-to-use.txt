@@ -12,7 +12,7 @@ NOTE:
 
 HOW TO USE:
 	- First copy this directory and rename it with your app name
-	- Fill django/app_env.example with desired data
+	- Fill env.example with desired data
 	- Build your image with make Build
 	- Use make enter to launch the container and start a bash shell inside
 	- You can use make down/up to stop/start the container
@@ -20,3 +20,18 @@ HOW TO USE:
 CONTAINER SHELL:
 	- There is a fews alias to help you develop your app, try 'help'
 
+DJANGO SETTINGS:
+	- Template for databse settings:
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'password',
+        'HOST': 'postgres',
+        'PORT': 5432,
+    }
+}
+
+The 'NAME' field is supposed to be the same as POSTGRES_DB in env.example but for now just ignore it and put POSTGRES_USER insteed

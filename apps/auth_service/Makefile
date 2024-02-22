@@ -1,12 +1,12 @@
 
-CMP = docker compose --file compose.yml --env-file django/app_env.example
+CMP = docker-compose --file compose.yml --env-file env.example
 
 all :	up
 
 build :	
 	${CMP} build
 
-up :	volume
+up :	volume build
 	${CMP} up -d
 
 down :
@@ -26,3 +26,6 @@ enter:	up
 
 volume:
 	mkdir -p django/src/
+
+logs:
+	${CMP} logs 
