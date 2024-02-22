@@ -15,6 +15,7 @@ HOW TO USE:
 	- Fill env.example with desired data
 	- Build your image with make Build
 	- Use make enter to launch the container and start a bash shell inside
+	- Django need you to change database parameters in settings.py in order to actually use postgresql
 	- You can use make down/up to stop/start the container
 
 CONTAINER SHELL:
@@ -22,8 +23,6 @@ CONTAINER SHELL:
 
 DJANGO SETTINGS:
 	- Database settings in settings.py:
-
-DJANGO_ALLOWED_HOSTS=['*']
 
 import os
 
@@ -38,3 +37,5 @@ DATABASES = {
     }
 }
 
+# for development can be useful
+DJANGO_ALLOWED_HOSTS=['*']
