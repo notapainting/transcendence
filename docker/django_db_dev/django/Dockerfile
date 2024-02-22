@@ -2,13 +2,17 @@
 FROM python:3.12-slim-bookworm
 
 # update and install utilies
-RUN apt update -y && apt upgrade -y && apt install -y curl git vim build-essential python3-dev libpq-dev
-RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
+RUN apt update -y \
+	&& apt upgrade -y \
+	&& apt install -y curl git vim \
+	build-essential python3-dev libpq-dev \
+	postgresql-client-15 
 
-ARG PORT
+RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 
 # ensure python output send straight to term and not buffered
 ENV PYTHONUNBUFFERED 1
+
 ENV APP_NAME ${APP_NAME}
 ENV HOST ${HOST}
 ENV PORT ${PORT}
@@ -33,5 +37,3 @@ RUN echo >> /root/.bashrc \
 EXPOSE ${PORT}
 
 # no entrypoint because it's dev environnement, use make enter to start container shell
-
-
