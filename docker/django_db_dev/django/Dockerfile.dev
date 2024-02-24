@@ -3,7 +3,6 @@ FROM python:3.12-slim-bookworm
 
 # update and install utilies
 RUN apt update -y \
-	&& apt upgrade -y \
 	&& apt install -y curl git vim \
 	build-essential python3-dev libpq-dev \
 	postgresql-client-15 
@@ -14,12 +13,11 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 ENV PYTHONUNBUFFERED 1
 
 ENV APP_NAME ${APP_NAME}
-ENV HOST ${HOST}
 ENV PORT ${PORT}
 
 
 # create directory for docker volume where app will be
-RUN mkdir /app
+RUN mkdir /app /logs
 WORKDIR /app
 
 # install django requirements
@@ -36,4 +34,3 @@ RUN echo >> /root/.bashrc \
 
 EXPOSE ${PORT}
 
-# no entrypoint because it's dev environnement, use make enter to start container shell

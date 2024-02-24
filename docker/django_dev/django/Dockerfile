@@ -15,7 +15,7 @@ ENV PORT ${PORT}
 
 
 # create directory for docker volume where app will be
-RUN mkdir /app
+RUN mkdir /app /logs
 WORKDIR /app
 
 # install django requirements
@@ -32,4 +32,3 @@ RUN echo >> /root/.bashrc \
 
 EXPOSE ${PORT}
 
-# no entrypoint because it's dev environnement, use make enter to start container shell
