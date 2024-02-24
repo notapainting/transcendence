@@ -7,9 +7,8 @@ services:
       context: django/
       dockerfile: Dockerfile
     image: ${APP_NAME}_dev_image
-    environment:
-      APP_NAME: ${APP_NAME}
-      PORT: ${PORT}
+    env_file:
+      - app.env.example
     volumes:
     - source_code:/app
     ports:
@@ -20,7 +19,7 @@ services:
 
 volumes:
   source_code:
-    name: ${APP_VOLUME} 
+    name: ${APP_VOLUME}
     driver: local
     driver_opts:
       type: none
