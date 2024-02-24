@@ -1,19 +1,17 @@
-version: '3.7'
+version: '3.9'
 
 services:
   django:
     container_name: ${APP_NAME}
     build:
       context: django/
-      args: 
-        PORT: ${PORT}
-    image: ${APP_NAME}_image:${VERSION}
+      dockerfile: Dockerfile
+    image: ${APP_NAME}_dev_image
     environment:
       APP_NAME: ${APP_NAME}
-      HOST: ${HOST}
       PORT: ${PORT}
     volumes:
-    - app_data:/app
+    - source_code:/app
     ports:
     - "${PORT}:${PORT}"
     restart: unless-stopped
@@ -21,7 +19,7 @@ services:
     tty: true
 
 volumes:
-  app_data:
+  source_code:
     name: ${APP_VOLUME} 
     driver: local
     driver_opts:

@@ -1,5 +1,5 @@
 
-CMP = docker compose --file compose.yml --env-file django/app_env.example
+CMP = docker compose --file compose.dev.yml --env-file django/app_env.example
 
 all :	up
 
