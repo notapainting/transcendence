@@ -1,7 +1,9 @@
-FROM postgres:15-bookworm
+FROM postgres:16-alpine3.19
 
+RUN mkdir -p \
+	${PGDATA} \
+	/logs
 
-RUN mkdir -p ${PGDATA} /logs
 COPY init-script.sh /docker-entrypoint-initdb.d/
 
 EXPOSE ${PORT}

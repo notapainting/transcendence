@@ -5,7 +5,7 @@ services:
     container_name: ${APP_NAME}
     build:
       context: django/
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     image: ${APP_NAME}_dev_image
     env_file:
       - app.env.example

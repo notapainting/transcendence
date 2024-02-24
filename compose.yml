@@ -10,7 +10,8 @@ services:
     container_name: proxy-nginx
     build:
       context: server
-    image: proxy-nginx:alpha
+      dockerfile: Dockerfile.prod
+    image: proxy-nginx
     ports:
      - "8443:443"
      - "8080:80"

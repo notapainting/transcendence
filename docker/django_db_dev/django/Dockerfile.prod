@@ -1,0 +1,9 @@
+#image officiel de python, base sur alpine pour une taille minuscule
+FROM python:3.12-alpine3.19
+
+ENV PYTHONUNBUFFERED 1
+
+COPY src/ /logs
+RUN mkdir /app
+
+EXPOSE ${PORT}
