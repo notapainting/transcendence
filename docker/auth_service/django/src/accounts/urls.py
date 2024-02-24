@@ -1,6 +1,6 @@
 from django.urls import path
 from accounts.views import UserCreate, CustomTokenRefreshView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 urlpatterns = [
     path('api/signup/', UserCreate.as_view(), name='signup'),
