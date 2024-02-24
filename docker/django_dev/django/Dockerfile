@@ -10,8 +10,8 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 # ensure python output send straight to term and not buffered
 ENV PYTHONUNBUFFERED 1
 
-ENV APP_NAME ${APP_NAME}
-ENV PORT ${PORT}
+# ENV APP_NAME ${APP_NAME}
+# ENV PORT ${PORT}
 
 
 # create directory for docker volume where app will be
