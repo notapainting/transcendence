@@ -1,0 +1,25 @@
+version: '3.9'
+
+networks:
+  app_network:
+    name: full_app_test
+    driver: bridge
+
+services:
+  nginx:
+    container_name: proxy-nginx
+    build:
+      context: server
+    image: proxy-nginx:alpha
+    ports:
+     - "8443:443"
+     - "8080:80"
+    networks: 
+      - app_network
+    volumes:
+      - ./server/certs/:/certs
+      - ./front:/var/www/static
+      - ./logs:/var/log/nginx
+    restart: unless-stopped
+
+

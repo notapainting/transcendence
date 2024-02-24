@@ -1,0 +1,28 @@
+asgiref==3.7.2
+Django==5.0.2
+djangorestframework==3.14.0
+psycopg2==2.9.9
+pytz==2024.1
+setuptools==69.1.0
+sqlparse==0.4.4
+wheel==0.42.0
+
+
+
+
+use multiple file (-f)
+app -
+
+https://dev.to/danielkun/nginx-everything-about-proxypass-2ona
+
+https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_http_version
+
+
+debug - Debugging messages.
+info - Informational messages.
+notice - Notices.
+warn - Warnings.
+error - Errors while processing a request.
+crit - Critical issues. Requires a prompt action.
+alert - Alerts. Action must be taken immediately.
+emerg - Emergency situation. The system is in an unusable stat
