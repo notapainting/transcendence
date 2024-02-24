@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +25,10 @@ SECRET_KEY = 'django-insecure-1nyh3mrd0y28m&^yw2+0j&p_7e^w9mr5cvf@1rxqa11*jk1gaa
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -41,9 +43,12 @@ REST_FRAMEWORK = {
 }
 
 
+
+
 # Application definition
 
 INSTALLED_APPS = [
+	'accounts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,9 +57,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'rest_framework.authtoken',
 	'rest_framework', #framework rest
-	"corsheaders", #autorisation de connection du front
-	'accounts',
+	"corsheaders" #autorisation de connection du front
 ]
+
+
 
 CORS_ALLOW_ALL_ORIGINS = True
 
