@@ -1,5 +1,5 @@
 
-CMP = docker-compose --file compose.dev.yml --env-file env.example
+CMP = docker compose --file compose.dev.yml --env-file app.env.example
 
 
 all:	up

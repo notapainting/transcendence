@@ -1,5 +1,5 @@
 
-CMP = docker-compose --env-file env.dev \
+CMP = docker compose --env-file env.dev \
 	--file compose.yml \
 	--file compose/compose.app.yml \
 	--file compose/compose.test.yml 

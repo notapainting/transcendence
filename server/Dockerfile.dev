@@ -1,4 +1,4 @@
-FROM nginx:1.18.0
+FROM nginx:1.18
 
 # update and install utilies
 RUN apt update -y && apt upgrade -y
