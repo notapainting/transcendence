@@ -1,5 +1,5 @@
 
-CMP = docker-compose --file compose.yml --env-file env.example
+CMP = docker compose --file compose.yml --env-file env.example
 PATH_DATA_DB = ${HOME}/goinfre/docker_volume/
 
 all :	up
