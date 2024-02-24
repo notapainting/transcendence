@@ -3,8 +3,7 @@ FROM python:3.12-slim-bookworm
 
 # update and install utilies
 RUN apt update -y \
-	&& apt upgrade -y
-	&& apt install curl git vim
+	&& apt install -y curl git vim
 
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 
@@ -12,7 +11,6 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 ENV PYTHONUNBUFFERED 1
 
 ENV APP_NAME ${APP_NAME}
-ENV HOST ${HOST}
 ENV PORT ${PORT}
 
 
@@ -28,8 +26,8 @@ RUN pip install -r /app/requirements.txt && rm -f /app/requirements.txt
 RUN echo >> /root/.bashrc \
 	alias init="\"django-admin startproject \${APP_NAME} /app && echo django project created! || echo failed to create django project\"\n"\
 	alias mig="\"python /app/manage.py migrate\"\n" \
-	alias run="\"python /app/manage.py runserver \${HOST}:\${PORT}\"\n" \
-	alias conf="\"echo name: \${APP_NAME}, host: \${HOST}:\${PORT}\"\n" \
+	alias run="\"python /app/manage.py runserver 0.0.0.0:\${PORT}\"\n" \
+	alias conf="\"echo name: \${APP_NAME}, host: 0.0.0.0:\${PORT}\"\n" \
 	alias help="\"echo init: start django project\necho mig: migrate\n echo run: launch django testserver\n echo conf: print app info\necho try to 'type [alias]' for exact command\"\n"
 
 EXPOSE ${PORT}
