@@ -1,0 +1,4 @@
+Store here compose file for each service (format: compose.service_name.yml)
+File path need to be wrote in Makefile too.
+
+/!\	each `service` in the compose file need to be unique, same for `volume`	/!\
