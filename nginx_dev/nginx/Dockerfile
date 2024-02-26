@@ -1,7 +1,7 @@
 FROM nginx:1.18.0
 
 # update and install utilies
-# RUN apt update -y && apt upgrade -y
+RUN apt update -y && apt upgrade -y
 
 # copy nginx's configuration file and self signed certificate for https
 COPY ./conf/nginx-selfsigned.crt /etc/nginx/ssl/nginx-selfsigned.crt
@@ -13,7 +13,7 @@ COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
 COPY ./front /var/www/trmdr.com
 
 # install WAF: ModSecurity
-# RUN apt-get install -y m4 automake git g++
+# RUN apt-get install -y m4 automake git
 # RUN apt-get install -y bison build-essential ca-certificates curl dh-autoreconf doxygen
 # RUN apt-get install -y flex gawk git iputils-ping libcurl4-gnutls-dev libexpat1-dev libgeoip-dev liblmdb-dev
 # RUN apt-get install -y libpcre3-dev libpcre++-dev libssl-dev libtool libxml2 libxml2-dev libyajl-dev locales
