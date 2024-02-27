@@ -25,11 +25,11 @@ SECRET_KEY = 'django-insecure-1nyh3mrd0y28m&^yw2+0j&p_7e^w9mr5cvf@1rxqa11*jk1gaa
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
+#Change current User by CustomUser
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-# ALLOWED_HOSTS = []
 
+#REST FRAMEWORK CONFIG
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -42,8 +42,22 @@ REST_FRAMEWORK = {
     }
 }
 
+#TOKEN JWT DURATION
+from datetime import timedelta
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
 
+#e-mail config
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'jill.transcendance@gmail.com'
+EMAIL_HOST_PASSWORD = 'dnml pljr jdnn cxco'
 
 # Application definition
 
@@ -61,7 +75,7 @@ INSTALLED_APPS = [
 ]
 
 
-
+#dev mode allow all connexion (must be the proxy server after)
 CORS_ALLOW_ALL_ORIGINS = True
 
 MIDDLEWARE = [
@@ -102,12 +116,8 @@ WSGI_APPLICATION = 'auth_service.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
