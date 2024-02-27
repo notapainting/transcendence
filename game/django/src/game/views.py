@@ -4,10 +4,11 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import routers, serializers, viewsets
 
 width = 900
 height = 600
-maxscore = 5
+maxScore = 5
 
 game_running = False
 
