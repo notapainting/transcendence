@@ -44,3 +44,4 @@ volumes:
       type: none
       device: apps/django_db_dev/postgres/data
       o: bind
+      
