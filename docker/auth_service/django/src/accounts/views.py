@@ -65,6 +65,26 @@ class UserCreate(APIView):
 			)
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+     
+# class PasswordRequestReset(APIView):
+# 	def post(self, request):
+# 		email = request.data.get('email')
+# 		if not email:
+# 			return Response({"error": "L'adresse email est requise."}, status=status.HTTP_400_BAD_REQUEST)
+# 		try:
+# 			user = CustomUser.objects.get(email = email)
+# 			reset_url = GenerateVerificationUrl(request, user, 'password_reset_confirm')
+# 			send_mail(
+# 				'Vérifiez votre adresse email',
+# 				f'olalaaaaa sa marche : {reset_url}',
+# 				'jill.transcendance@gmail.com',
+# 				[user.email],
+# 				fail_silently=False,
+# 			)
+# 			return Response({"success": "Le lien de réinitialisaition de mot de passe à été envoyé avec succès."}, status=status.HTTP_200_OK)
+# 		except CustomUser.DoesNotExist:
+# 			return Response({"error": "L'adresse email est introuvable."}, status=status.HTTP_400_BAD_REQUEST)
+            
 
 class CustomTokenRefreshView(TokenRefreshView):
     throttle_classes = (AnonRateThrottle,)
