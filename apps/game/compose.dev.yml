@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  django:
+    container_name: ${APP_NAME}
+    build:
+      context: django/
+      dockerfile: Dockerfile.dev
+    image: ${APP_NAME}_dev_image
+    env_file:
+      - app.env.example
+    volumes:
+    - source_code:/app
+    ports:
+    - "${PORT}:${PORT}"
+    restart: unless-stopped
+    stdin_open: true 
+    tty: true
+
+volumes:
+  source_code:
+    name: ${APP_VOLUME}
+    driver: local
+    driver_opts:
+      type: none
+      device: django/src/
+      o: bind
