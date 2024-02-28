@@ -13,7 +13,6 @@ ENV PYTHONUNBUFFERED 1
 # create directory for docker volume where app will be
 RUN mkdir /app /logs
 
-COPY test/ /app
 WORKDIR /app
 
 # install django requirements

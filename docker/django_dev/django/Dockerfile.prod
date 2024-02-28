@@ -3,7 +3,7 @@ FROM python:3.12-alpine3.19
 
 ENV PYTHONUNBUFFERED 1
 
-COPY src/ /logs
-RUN mkdir /app 
+COPY src/ /app 
+RUN mkdir /logs
 
 EXPOSE ${PORT}
