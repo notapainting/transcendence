@@ -1,0 +1,7 @@
+asgiref==3.7.2
+Django==5.0.2
+djangorestframework==3.14.0
+pytz==2024.1
+setuptools==69.1.0
+sqlparse==0.4.4
+wheel==0.42.0
