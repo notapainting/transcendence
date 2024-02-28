@@ -1,0 +1,22 @@
+DISCLAIMER:
+	- This base container is for development, not production !
+	- This base container isn't connected to our global app Docker network, 
+		therefore it isn't ready to be used with other container
+
+NOTE:
+	- django/src/ is a mountpoint for a Docker volume, in short it's where you put your source code
+	- If you are running Docker as root, every file you create inside (example: with init alias)
+		will not be accessible writable outside (aka with vscode),
+		in this case just chmod 777 all your file from the container
+	- You'll use vscode on your host for editting source code and the container as a shell
+
+HOW TO USE:
+	- First copy this directory and rename it with your app name
+	- Fill django/app_env.example with desired data
+	- Build your image with make Build
+	- Use make enter to launch the container and start a bash shell inside
+	- You can use make down/up to stop/start the container
+
+CONTAINER SHELL:
+	- There is a fews alias to help you develop your app, try 'help'
+
