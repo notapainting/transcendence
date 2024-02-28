@@ -44,24 +44,27 @@ def verify_email(request, uidb64, token):
         return HttpResponse('Lien de vérification invalide ou expiré', status=400)
 
 
+def GenerateVerificationUrl(request, user, viewname):
+	token = default_token_generator.make_token(user)
+	uid = urlsafe_base64_encode(force_bytes(user.pk))
+	verification_url = reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
+	return request.build_absolute_uri(verification_url)
+
 class UserCreate(APIView):
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            verification_url = reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
-            full_verification_url = request.build_absolute_uri(verification_url)
-            send_mail(
+	def post(self, request):
+		serializer = UserSerializer(data=request.data)
+		if serializer.is_valid():
+			user = serializer.save()
+			full_verification_url = GenerateVerificationUrl(request, user, 'verify_email')
+			send_mail(
                 'Vérifiez votre adresse email',
                 f'olalaaaaa sa marche : {full_verification_url}',
                 'jill.transcendance@gmail.com',
                 [user.email],
                 fail_silently=False,
-            )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			)
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomTokenRefreshView(TokenRefreshView):
     throttle_classes = (AnonRateThrottle,)
