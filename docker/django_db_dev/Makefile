@@ -27,10 +27,6 @@ enter:
 
 volume:
 	mkdir -p django/src/
-	mkdir -p postgres/data/
-
-deldb:
-	rm -rf postgres/data/
 
 
 logs:

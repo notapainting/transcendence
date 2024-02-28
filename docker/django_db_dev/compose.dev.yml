@@ -50,10 +50,6 @@ volumes:
   pgdata:
     name: ${DB_VOLUME}
     driver: local
-    driver_opts:
-      type: none
-      device: postgres/data
-      o: bind
 
 networks:
   dev_network:
