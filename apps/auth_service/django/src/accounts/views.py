@@ -1,3 +1,4 @@
+from urllib.parse import urlparse, urlunparse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -43,15 +44,23 @@ def verify_email(request, uidb64, token):
     else:
         return HttpResponse('Lien de vérification invalide ou expiré', status=400)
 
-
 def GenerateVerificationUrl(request, user, viewname):
 	token = default_token_generator.make_token(user)
 	uid = urlsafe_base64_encode(force_bytes(user.pk))
-	verification_url = reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
-	return request.build_absolute_uri(verification_url)
+	path = reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
+	verification_url = request.build_absolute_uri(path)
+     
+	#pour le port 8443 TEMPORAIRE
+	if '8443' not in verification_url:
+		parts = list(urlparse(verification_url))
+		parts[1] = parts[1].replace('localhost', 'localhost:8443')  # Replace the domain part
+		verification_url = urlunparse(parts)
+	return verification_url
 
 class UserCreate(APIView):
 	def post(self, request):
+		client_ip = request.META.get('REMOTE_ADDR')
+		print(f"L'adresse IP du client est : {client_ip}")
 		serializer = UserSerializer(data=request.data)
 		if serializer.is_valid():
 			user = serializer.save()
