@@ -1,3 +1,6 @@
+#databse
+postgres/data
+
 # Logs
 logs
 *.log

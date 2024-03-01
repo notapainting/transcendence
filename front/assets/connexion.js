@@ -16,7 +16,7 @@ document.getElementById("loginForm").addEventListener("submit", function(event){
 	
 	// console.log(formDataJSON); // test, a supprimer
 
-	fetch('https://localhost:8000', {
+	fetch('https://localhost:8000/auth/account', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: formDataJSON

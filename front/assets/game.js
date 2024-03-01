@@ -3,6 +3,7 @@ var ctx = canvas.getContext("2d");
 
 var start = document.getElementById("startButton");
 var stop = document.getElementById("stopButton");
+var back = document.getElementById("backButton");
 
 var gameRunning = false;
 
@@ -32,6 +33,7 @@ document.addEventListener("keyup", keyUpHandler);
 // Listen for button events
 start.addEventListener('click', startGame);
 stop.addEventListener('click', stopGame);
+back.addEventListener('click', backTest);
 
 // Handle key press
 var upPressed = false;
@@ -39,16 +41,60 @@ var downPressed = false;
 let wPressed = false;
 let sPressed = false;
 
+//test backend connexion
+function backTest() {
+	console.log("click");
+    fetch('https://127.0.0.1:8443/game/')
+        .then(response => response.json())
+        .then(data => console.log(data.message))
+        .catch(error => {
+            console.error('Error response:', error);
+        });
+	}
+	
 // Start game
-function startGame()
-{
-	gameRunning = true;
+function startGame() {
+    fetch('https://127.0.0.1:8443/start-game/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"gameRunning": true})
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+	gameRunning = true; // a enlever
 }
 
 // Stop game
 function stopGame()
 {
-	gameRunning = false;
+    fetch('https://127.0.0.1:8443/start-game/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"gameRunning": false})
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+	gameRunning = false; // a enlever
 }
 
 // Pong Functions
