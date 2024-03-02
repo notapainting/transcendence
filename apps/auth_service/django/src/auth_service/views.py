@@ -15,6 +15,8 @@ from django.http import HttpResponse
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
 from django.contrib.auth import get_user_model
+from django.contrib.auth.views import PasswordResetConfirmView
+
 
 User = get_user_model()
 
@@ -47,7 +49,7 @@ def verify_email(request, uidb64, token):
 def GenerateVerificationUrl(request, user, viewname):
 	token = default_token_generator.make_token(user)
 	uid = urlsafe_base64_encode(force_bytes(user.pk))
-	path = reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
+	path = reverse(viewname, kwargs={'uidb64': uid, 'token': token})
 	verification_url = request.build_absolute_uri(path)
      
 	#pour le port 8443 TEMPORAIRE
@@ -74,25 +76,28 @@ class UserCreate(APIView):
 			)
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'password_reset_confirm.html'
      
-# class PasswordRequestReset(APIView):
-# 	def post(self, request):
-# 		email = request.data.get('email')
-# 		if not email:
-# 			return Response({"error": "L'adresse email est requise."}, status=status.HTTP_400_BAD_REQUEST)
-# 		try:
-# 			user = CustomUser.objects.get(email = email)
-# 			reset_url = GenerateVerificationUrl(request, user, 'password_reset_confirm')
-# 			send_mail(
-# 				'Vérifiez votre adresse email',
-# 				f'olalaaaaa sa marche : {reset_url}',
-# 				'jill.transcendance@gmail.com',
-# 				[user.email],
-# 				fail_silently=False,
-# 			)
-# 			return Response({"success": "Le lien de réinitialisaition de mot de passe à été envoyé avec succès."}, status=status.HTTP_200_OK)
-# 		except CustomUser.DoesNotExist:
-# 			return Response({"error": "L'adresse email est introuvable."}, status=status.HTTP_400_BAD_REQUEST)
+class PasswordRequestReset(APIView):
+	def post(self, request):
+		email = request.data.get('email')
+		if not email:
+			return Response({"error": "L'adresse email est requise."}, status=status.HTTP_400_BAD_REQUEST)
+		try:
+			user = CustomUser.objects.get(email = email)
+			reset_url = GenerateVerificationUrl(request, user, 'password_reset_confirm')
+			send_mail(
+				'Reinitialisation mot de passe',
+				f'Veuillez cliquer sur le lien pour reinitialise votre mot de passe : {reset_url}',
+				'jill.transcendance@gmail.com',
+				[user.email],
+				fail_silently=False,
+			)
+			return Response({"success": "Le lien de réinitialisaition de mot de passe à été envoyé avec succès."}, status=status.HTTP_200_OK)
+		except CustomUser.DoesNotExist:
+			return Response({"error": "L'adresse email est introuvable."}, status=status.HTTP_400_BAD_REQUEST)
             
 
 class CustomTokenRefreshView(TokenRefreshView):
