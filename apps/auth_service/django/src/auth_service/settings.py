@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-1nyh3mrd0y28m&^yw2+0j&p_7e^w9mr5cvf@1rxqa11*jk1gaa
 DEBUG = True
 
 #Change current User by CustomUser
-AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = 'auth_service.CustomUser'
 
 
 #REST FRAMEWORK CONFIG
@@ -62,7 +62,7 @@ EMAIL_HOST_PASSWORD = 'dnml pljr jdnn cxco'
 # Application definition
 
 INSTALLED_APPS = [
-	'accounts',
+    'auth_service',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -77,8 +77,6 @@ INSTALLED_APPS = [
 
 #dev mode allow all connexion (must be the proxy server after)
 CORS_ALLOW_ALL_ORIGINS = True
-
-
 
 MIDDLEWARE = [
 	"corsheaders.middleware.CorsMiddleware",  # Doit être en haut
