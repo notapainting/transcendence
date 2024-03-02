@@ -2,14 +2,14 @@ from urllib.parse import urlparse, urlunparse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from accounts.serializers import UserSerializer
+from auth_service.serializers import UserSerializer
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 from rest_framework.throttling import AnonRateThrottle
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from accounts.models import CustomUser
+from auth_service.models import CustomUser
 from django.urls import reverse
 from django.http import HttpResponse
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer

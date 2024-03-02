@@ -1,6 +1,6 @@
 
 from django.contrib.auth.models import User
-from accounts.models import CustomUser
+from auth_service.models import CustomUser
 	
 from rest_framework import serializers
 
@@ -16,7 +16,6 @@ class UserSerializer(serializers.ModelSerializer):
 		extra_kwargs = {'password' : {'write_only' :True , 'required': True}} 
 		#surcharge 
 	def create(self, validated_data): #post
-		
 		user = CustomUser.objects.create_user(
 			username = validated_data['username'],
 			email = validated_data['email'],

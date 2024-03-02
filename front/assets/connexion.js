@@ -24,10 +24,6 @@ document.getElementById("loginForm").addEventListener("submit", function(event){
 		.then(response => {
             if (!response.ok)
                 throw new Error('Error : Bad Network response :(');
-			var nouvelElement = document.createElement("p");
-			nouvelElement.textContent = "Vous etes connecté !";
-			nouvelElement.className = "green";
-			document.getElementById("loginForm").appendChild(nouvelElement);
             return response.json();
         })
 		.then(data => console.log(data))
