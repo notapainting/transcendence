@@ -16,6 +16,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import PasswordResetConfirmView
+from django.shortcuts import render
+from django.views.generic import View
 
 
 User = get_user_model()
@@ -78,7 +80,12 @@ class UserCreate(APIView):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
-    template_name = 'password_reset_confirm.html'
+	template_name = 'password_reset_confirm.html'
+	def form_valid(self, form):
+		response = super().form_valid(form)
+		return HttpResponse('Le mot de passe a ete modifier avec succes')
+	
+
      
 class PasswordRequestReset(APIView):
 	def post(self, request):
