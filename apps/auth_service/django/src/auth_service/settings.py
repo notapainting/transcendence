@@ -76,7 +76,8 @@ INSTALLED_APPS = [
 
 
 #dev mode allow all connexion (must be the proxy server after)
-CORS_ALLOW_ALL_ORIGINS = True
+
+
 
 MIDDLEWARE = [
 	"corsheaders.middleware.CorsMiddleware",  # Doit être en haut
@@ -88,6 +89,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8443']
 
 CSRF_COOKIE_SECURE = True
 
