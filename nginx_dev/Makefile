@@ -22,6 +22,6 @@ config:
 	${CMP} config
 
 enter:	up
-	${CMP} exec nginx bash
+	${CMP} exec nginx zsh
 
 re:	clear up
