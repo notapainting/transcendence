@@ -94,7 +94,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CSRF_TRUSTED_ORIGINS = ['https://localhost:8443']
 
-CSRF_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True #for https
 
 ROOT_URLCONF = 'auth_service.urls'
 
@@ -153,8 +153,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-USE_X_FORWARDED_HOST = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')#for https
+# USE_X_FORWARDED_HOST = True for https
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
