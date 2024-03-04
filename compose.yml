@@ -4,7 +4,6 @@ networks:
   app_network:
     name: full_app_test
     driver: bridge
-
 services:
   nginx:
     container_name: proxy-nginx
