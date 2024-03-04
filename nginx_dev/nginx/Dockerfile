@@ -4,14 +4,14 @@ FROM nginx:1.25.4
 SHELL ["/bin/bash", "-c"]
 RUN apt update -y && apt upgrade -y
 
-
-# Installation of the WAF: ModSecurity
-RUN apt-get install -y m4 automake git vim \
+RUN apt-get install -y m4 automake git vim zsh \
 	bison build-essential ca-certificates curl dh-autoreconf doxygen \
 	flex gawk git iputils-ping libcurl4-gnutls-dev libexpat1-dev libgeoip-dev liblmdb-dev \
 	libpcre3-dev libssl-dev libtool libxml2 libxml2-dev libyajl-dev locales \
 	lua5.3-dev pkg-config wget zlib1g-dev zlib1g libxslt1-dev libgd-dev
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
+# Installation of the WAF: ModSecurity
 	## Download ModSecurity
 RUN git clone https://github.com/SpiderLabs/ModSecurity /opt/ModSecurity
 
@@ -106,6 +106,7 @@ COPY ./front /var/www/trmdr.com
 
 # Copy our homemade Nginx's configuration
 COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
+RUN mkdir -p /certs /var/www/static /var/log/nginx
 
 
 # Ask Ngingx to load the ModSecurity's module while it configure itself
