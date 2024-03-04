@@ -1,0 +1,19 @@
+LEXICON:
+service: either a compose service or a microservice from our architecture (apps, DB, vault, etc)
+app : application we have coded ourself
+local (talking about app) : the scope where the app is launche with just his own server and his DB
+global (talking about app) : the scope where the app is used wit hour full network : proxy, other app, system metric, etc. 
+vault : short for Hashicorp Vault
+
+
+COMMON ERROR:
+
+Q?: I just added a new app using a DB in the global compose, but other apps using DB crash/doesnt work?
+A: See below
+
+Q? : I want to use my freshly created app with the proxy, I just setup my compose but it's seem a service is missing when i start the server? *angry racoon noises*
+A: You havn't change the `service` name of your app (by default it's `django`), so compose overide service with same name (same for volume !)
+
+Q?: WHERE MY DB STORE HIS DATA PLS I'M TILTED ? 
+A: The volume for DB is managed by docker, if you want to delete it, use `docker volume rm volume_name`
+
