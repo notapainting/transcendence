@@ -1,12 +1,12 @@
 services:
   django:
-    container_name: ${APP_NAME_1}
+    container_name: ${APP_NAME_2}
     build:
-      context: apps/auth_service/django/
+      context: apps/user_managment/django/
       dockerfile: Dockerfile.dev
-    image: ${APP_NAME_1}_image
+    image: ${APP_NAME_2}_image
     env_file:
-      - apps/auth_service/app.env.example
+      - apps/user_managment/app.env.example
     volumes:
       - source_code:/app
       - ./logs:/logs
@@ -15,14 +15,14 @@ services:
     restart: unless-stopped
     stdin_open: true 
     tty: true
-    # entrypoint: ["python", "/app/manage.py", "runserver", "0.0.0.0:${APP_PORT_1}"]
+    # entrypoint: ["python", "/app/manage.py", "runserver", "0.0.0.0:${APP_PORT_2}"]
 
   postgres:
-    container_name: ${DB_NAME_1}
-    build: apps/auth_service/postgres/
-    image: ${DB_NAME_1}_image
+    container_name: ${DB_NAME_2}
+    build: apps/user_managment/postgres/
+    image: ${DB_NAME_2}_image
     env_file:
-      - apps/auth_service/app.env.example
+      - apps/user_managment/app.env.example
     volumes:
       - pgdata:${PGDATA}
       - ./logs:/logs
@@ -32,13 +32,13 @@ services:
 
 volumes:
   source_code:
-    name: ${APP_VOLUME_1}
+    name: ${APP_VOLUME_2}
     driver: local
     driver_opts:
       type: none
-      device: apps/auth_service/django/src
+      device: apps/user_managment/django/src
       o: bind
 
   pgdata:
-    name: ${DB_VOLUME_1}
+    name: ${DB_VOLUME_2}
     driver: local
