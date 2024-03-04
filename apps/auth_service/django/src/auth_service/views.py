@@ -55,9 +55,9 @@ def GenerateVerificationUrl(request, user, viewname):
 	verification_url = request.build_absolute_uri(path)
      
 	#pour le port 8443 TEMPORAIRE
-	if '8443' not in verification_url:
+	if '8080' not in verification_url:
 		parts = list(urlparse(verification_url))
-		parts[1] = parts[1].replace('localhost', 'localhost:8443')  # Replace the domain part
+		parts[1] = parts[1].replace('localhost', 'localhost:8080')  # Replace the domain part
 		verification_url = urlunparse(parts)
 	return verification_url
 
@@ -97,7 +97,7 @@ class PasswordRequestReset(APIView):
 			reset_url = GenerateVerificationUrl(request, user, 'password_reset_confirm')
 			send_mail(
 				'Reinitialisation mot de passe',
-				f'Veuillez cliquer sur le lien pour reinitialise votre mot de passe : {reset_url}',
+				f'Veuillez cliquer sur le lien pour reinitialiser votre mot de passe : {reset_url}',
 				'jill.transcendance@gmail.com',
 				[user.email],
 				fail_silently=False,
