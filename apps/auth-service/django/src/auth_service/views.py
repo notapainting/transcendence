@@ -113,7 +113,7 @@ import requests
 
 def testFunc(request):
 	try:
-		response = requests.get("http://user_managment:8000/test/")
+		response = requests.get("http://user-managment:8000/test/")
 		data = response.json()
 		return JsonResponse(data, safe = False)
 	except requests.exceptions.RequestException as e:

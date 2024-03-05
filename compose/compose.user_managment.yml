@@ -2,11 +2,11 @@ services:
   django2:
     container_name: ${APP_NAME_2}
     build:
-      context: apps/user_managment/django/
+      context: apps/user-managment/django/
       dockerfile: Dockerfile.dev
     image: ${APP_NAME_2}_image
     env_file:
-      - apps/user_managment/app.env.example
+      - apps/user-managment/app.env.example
     volumes:
       - source_code2:/app
       - ./logs:/logs
@@ -19,10 +19,10 @@ services:
 
   postgres2:
     container_name: ${DB_NAME_2}
-    build: apps/user_managment/postgres/
+    build: apps/user-managment/postgres/
     image: ${DB_NAME_2}_image
     env_file:
-      - apps/user_managment/app.env.example
+      - apps/user-managment/app.env.example
     volumes:
       - pgdata2:${PGDATA}
       - ./logs:/logs
@@ -36,9 +36,9 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: apps/user_managment/django/src
+      device: apps/user-managment/django/src
       o: bind
 
-  pgdata:
+  pgdata2:
     name: ${DB_VOLUME_2}
     driver: local

@@ -28,8 +28,8 @@ mdir:
 	mkdir -p \
 		logs \
 		apps/game/django/src \
-		apps/auth_service/src \
-		apps/user_managment/django/src
+		apps/auth-service/src \
+		apps/user-managment/django/src
 
 logs:
 	${CMP} logs 

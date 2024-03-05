@@ -2,11 +2,11 @@ services:
   django:
     container_name: ${APP_NAME_1}
     build:
-      context: apps/auth_service/django/
+      context: apps/auth-service/django/
       dockerfile: Dockerfile.dev
     image: ${APP_NAME_1}_image
     env_file:
-      - apps/auth_service/app.env.example
+      - apps/auth-service/app.env.example
     volumes:
       - source_code:/app
       - ./logs:/logs
@@ -19,10 +19,10 @@ services:
 
   postgres:
     container_name: ${DB_NAME_1}
-    build: apps/auth_service/postgres/
+    build: apps/auth-service/postgres/
     image: ${DB_NAME_1}_image
     env_file:
-      - apps/auth_service/app.env.example
+      - apps/auth-service/app.env.example
     volumes:
       - pgdata:${PGDATA}
       - ./logs:/logs
@@ -36,7 +36,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: apps/auth_service/django/src
+      device: apps/auth-service/django/src
       o: bind
 
   pgdata:
