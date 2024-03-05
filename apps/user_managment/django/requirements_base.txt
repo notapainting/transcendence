@@ -1,8 +1,13 @@
 asgiref==3.7.2
+certifi==2024.2.2
+charset-normalizer==3.3.2
 Django==5.0.2
 djangorestframework==3.14.0
+idna==3.6
 psycopg2==2.9.9
 pytz==2024.1
+requests==2.31.0
 setuptools==69.1.0
 sqlparse==0.4.4
+urllib3==2.2.1
 wheel==0.42.0

@@ -63,8 +63,6 @@ def GenerateVerificationUrl(request, user, viewname):
 
 class UserCreate(APIView):
 	def post(self, request):
-		client_ip = request.META.get('REMOTE_ADDR')
-		print(f"L'adresse IP du client est : {client_ip}")
 		serializer = UserSerializer(data=request.data)
 		if serializer.is_valid():
 			user = serializer.save()
@@ -109,3 +107,14 @@ class PasswordRequestReset(APIView):
 
 class CustomTokenRefreshView(TokenRefreshView):
     throttle_classes = (AnonRateThrottle,)
+
+from django.http import JsonResponse
+import requests
+
+def testFunc(request):
+	try:
+		response = requests.get("http://user_managment:8000/test/")
+		data = response.json()
+		return JsonResponse(data, safe = False)
+	except requests.exceptions.RequestException as e:
+		return JsonResponse({'error': str(e)}, status=500)
