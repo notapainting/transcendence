@@ -1,0 +1,25 @@
+export VAULT_ADDR='http://127.0.0.1:8200'
+  -> allow vault agent to communicate with api
+
+ docker run \
+ 	-v ./vault/conf:/vault/config \
+	-p 8200:8200 \
+	--cap-add=IPC_LOCK \
+	hashicorp/vault \
+	server
+
+vault operator init 
+
+Unseal Key 1: 9X30CB29tYCpZq3mqiP8JxDy2M2SmeGfAfcAVT/bRspB
+Unseal Key 2: 0xSjZrs11V4TNp6ZkiHtMsxQu+xQqpmW1oynnaru4heL
+Unseal Key 3: RjbMsdhh5bhBkPgVUn0Io99NOfqtRm37f5kLF7Uv2r3y
+Unseal Key 4: DLdPk7VSY+tMFOldOkP0IeuZ71/Dzp0tDAGkkEMJCwem
+Unseal Key 5: nYaCXSkVFIbarUiX7s3dnuYiHsdzXWqWmTXJbPxX6Q1V
+
+Initial Root Token: hvs.0nOq1hwsr03COWS4KPwb9PPI
+
+
+
+vault operator unseal [key]
+
+vaut login [token]
