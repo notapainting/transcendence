@@ -38,7 +38,9 @@ deldb:
 logs:
 	${CMP} logs 
 
-.PHONY: logs all build up down clear ps config mdir
+re:	clear up
+
+.PHONY: logs all build up down clear ps config mdir re
 
 # creeate /logs
 # add /logs volume to compose
