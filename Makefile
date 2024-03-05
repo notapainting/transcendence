@@ -2,7 +2,7 @@
 CMP = docker compose --env-file env.dev \
 	--file compose.yml \
 	--file compose/compose.auth_service.yml \
-	--file compose/compose.user_managment.yml 
+	--file compose/compose.user_managment.yml
 
 all :	up
 
@@ -28,7 +28,8 @@ mdir:
 	mkdir -p \
 		logs \
 		apps/game/django/src \
-		apps/user_managment/django/src 
+		apps/auth_service/src \
+		apps/user_managment/django/src
 
 logs:
 	${CMP} logs 
