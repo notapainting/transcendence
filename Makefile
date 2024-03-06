@@ -1,7 +1,7 @@
 
 CMP = docker compose --env-file env.dev \
 	--file compose.yml \
-	--file vault/compose.vault.yml \
+	--file compose/compose.vault.yml \
 	--file compose/compose.app.yml 
 
 all :	up

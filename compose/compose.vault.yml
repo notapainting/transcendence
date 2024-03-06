@@ -1,20 +1,21 @@
-version: '3.9'
 
 services:
   vault:
     container_name: vault
-    build: context/
+    build: vault/context/
     image: my_vault
     environment:
       VAULT_ADDR: 'http://localhost:8200'
     ports: 
       - "8200:8200"
     volumes:
-      - ./data:/vault/file
+      - ./vault/data:/vault/file
+      - ./logs:/vault/logs
     cap_add:
       - IPC_LOCK
     networks:
       - vault_network
+      - app_network
     restart: unless-stopped
     command: vault server -config=/vault/config/conf.hcl
     healthcheck:
@@ -27,10 +28,10 @@ services:
 
   vault-init:
     container_name: vault-init
-    build: init/
+    build: vault/init/
     image: vault-init
     env_file:
-      - env.vault
+      - vault/env.vault.env
     environment:
       VAULT_ADDR: 'http://vault:8200'
     networks:
@@ -43,5 +44,5 @@ services:
 
 networks:
   vault_network:
-    name: test_vault
+    name: vault_private_network
     driver: bridge
