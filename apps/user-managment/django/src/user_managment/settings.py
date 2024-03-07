@@ -27,18 +27,23 @@ SECRET_KEY = 'django-insecure-$z&t+&y(==8!@k8nw67ht=u(3e2ineh1(+%a#nm&&xymn_8jtn
 DEBUG = True
 
 # ALLOWED_HOSTS = []
-
+MEDIA_ROOT = BASE_DIR / 'user_managment/img'
 ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+	'user_managment',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+	'rest_framework',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+AUTH_USER_MODEL = 'user_managment.CustomUser'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

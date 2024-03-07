@@ -35,18 +35,26 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 def verify_email(request, uidb64, token):
-    try:
-        uid = urlsafe_base64_decode(uidb64).decode('utf-8')
-        user = CustomUser.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
-        user = None
-
-    if user is not None and default_token_generator.check_token(user, token):
-        user.isVerified = True
-        user.save()
-        return HttpResponse('Lien de vérification valide', status=200)
-    else:
-        return HttpResponse('Lien de vérification invalide ou expiré', status=400)
+	try:
+		uid = urlsafe_base64_decode(uidb64).decode('utf-8')
+		user = CustomUser.objects.get(pk=uid)
+	except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+		user = None
+	if user is not None and default_token_generator.check_token(user, token):
+		user.isVerified = True
+		user.save()
+		user_data = {
+				'username': user.username,
+				'password': user.password,
+				'email' : user.email
+		}
+		response = requests.post('http://user-managment:8000/signup/', json=user_data)
+		if (response.status_code == status.HTTP_201_CREATED):
+			return HttpResponse('Lien de vérification valide', status=200)
+		else:
+			return Response("Erreur while creating user in user_managment service", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+	else:
+		return HttpResponse('Lien de vérification invalide ou expiré', status=400)
 
 def GenerateVerificationUrl(request, user, viewname):
 	token = default_token_generator.make_token(user)
@@ -68,11 +76,11 @@ class UserCreate(APIView):
 			user = serializer.save()
 			full_verification_url = GenerateVerificationUrl(request, user, 'verify_email')
 			send_mail(
-                'Vérifiez votre adresse email',
-                f'olalaaaaa sa marche : {full_verification_url}',
-                'jill.transcendance@gmail.com',
-                [user.email],
-                fail_silently=False,
+				'Vérifiez votre adresse email',
+				f'olalaaaaa sa marche : {full_verification_url}',
+				'jill.transcendance@gmail.com',
+				[user.email],
+				fail_silently=False,
 			)
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -82,8 +90,6 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 	def form_valid(self, form):
 		response = super().form_valid(form)
 		return HttpResponse('Le mot de passe a ete modifier avec succes')
-	
-
      
 class PasswordRequestReset(APIView):
 	def post(self, request):
@@ -103,18 +109,6 @@ class PasswordRequestReset(APIView):
 			return Response({"success": "Le lien de réinitialisaition de mot de passe à été envoyé avec succès."}, status=status.HTTP_200_OK)
 		except CustomUser.DoesNotExist:
 			return Response({"error": "L'adresse email est introuvable."}, status=status.HTTP_400_BAD_REQUEST)
-            
 
 class CustomTokenRefreshView(TokenRefreshView):
     throttle_classes = (AnonRateThrottle,)
-
-from django.http import JsonResponse
-import requests
-
-def testFunc(request):
-	try:
-		response = requests.get("http://user-managment:8000/test/")
-		data = response.json()
-		return JsonResponse(data, safe = False)
-	except requests.exceptions.RequestException as e:
-		return JsonResponse({'error': str(e)}, status=500)

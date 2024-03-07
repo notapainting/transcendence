@@ -1,6 +1,4 @@
-
-from django.contrib.auth.models import User
-from auth_service.models import CustomUser
+from user_managment.models import CustomUser
 from django.contrib.auth.hashers import make_password
 import uuid
 
@@ -17,9 +15,6 @@ class UserSerializer(serializers.ModelSerializer):
 		fields = ['id', 'username', 'email', 'password'] 
 		#definir des comportements supplementaire pour certain champs (write only - impossible de renvoyer le champ password au client)
 		extra_kwargs = {'password' : {'write_only' :True , 'required': True}} 
-		#surcharge
+		#surcharge 
 	def create(self, validated_data):
-		verification_key = str(uuid.uuid4())
-		validated_data['password'] = make_password(validated_data['password'])
-		validated_data['verification_key'] = verification_key
 		return CustomUser.objects.create(**validated_data)
