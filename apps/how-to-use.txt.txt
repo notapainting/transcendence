@@ -1,0 +1,9 @@
+- copy-paste a docker-container type folder from /docker in this directory
+- rename it as you want (your app name should be good enought)
+- you can build your app in a local scope using (no proxy, no other apps) by using 
+the Makefile/compose inside your app folder
+
+####	to use your apps globally (with all other apps and proxy)	####
+- create a compose file inside /compose (see /compose how-to-use)
+- add your compose file freshly added in the CMP variable inside Makefile
+- add your api location in nginx conf (see /server how-to-use)

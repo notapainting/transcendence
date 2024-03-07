@@ -1,0 +1,20 @@
+Store here compose file for each service (format: compose.service_name.yml)
+File path need to be wrote in Makefile too.
+You can take example on other conpose file here.
+Don't forget to add ENV variable inside env.dev (at root)
+
+In your compose file :
+*	/!\	each `service` in the compose file need to be unique, same for `volume`	/!\
+*	no need to add network or version 
+*	if you want you app to NOT start automatically and use it in "dev" mode:
+		- no entrypoint
+		- set this:
+		     stdin_open: true 
+		    tty: true
+		(it's like the"dev" local compose (whose should be located in your app folder))
+	keep in mind that in this mode the django server of your app doesn't start by itself, 
+	and so all app in dev mode need to be started manually
+*	else just set an entrypoint and no sttdin/tty
+
+
+You can also set all directory you need to be automatically created in mdir rule in Makefile 
