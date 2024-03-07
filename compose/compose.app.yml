@@ -40,8 +40,3 @@ volumes:
   pgdata:
     name: ${DB_VOLUME_1}
     driver: local
-    driver_opts:
-      type: none
-      device: apps/django_db_dev/postgres/data
-      o: bind
-      
