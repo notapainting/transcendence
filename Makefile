@@ -28,7 +28,7 @@ mdir:
 	mkdir -p \
 		logs \
 		apps/game/django/src \
-		apps/auth-service/src \
+		apps/auth-service/django/src \
 		apps/user-managment/django/src
 
 logs:
