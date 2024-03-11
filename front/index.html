@@ -62,8 +62,49 @@
 
 		<!-- ACCOUNT PAGE -->
 		<div id="account-content" class="page-content" style="display: none;">
-			<div class="wrapper fadeInDown">
-				<h1>Your account !</h1>
+			<div class="wrapper fadeIn">
+				<h1>Your account's informations</h1>
+				<tr>
+					<td>
+						<img class="picprofile" src="https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y3V0ZSUyMGNhdHxlbnwwfHwwfHw%3D&w=1000&q=80" alt="picprofile">
+						<p class="name">Login: <span id="userLogin"></span></p>
+						<p class="description">Pong's rank: <span id="userRank"></span></p>
+						<p class="description">Email: <span id="userEmail"></span></p>
+						<div id="editProfile-content" class="page-content center-intput" style="display: none;">
+							<form id="loginForm">
+								<input type="email" id="email" class="fadeIn second" name="email" placeholder="Enter new email">
+								<input type="password" id="password" class="fadeIn third" name="login" placeholder="Enter current password">
+								<input type="password" id="password" class="fadeIn third" name="login" placeholder="Enter your new password">
+								<input type="password" id="password" class="fadeIn third" name="login" placeholder="Enter again new password">
+								<input type="submit" class="fadeIn fourth buttonEdit" value="Edit">
+								<a href="#account"><input type="button" class="fadeIn fourth buttonEdit" value="Return"></a>
+							</form>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a target="_blank" href="#editProfile">
+							<button type="button buttonAccount" class="button buttonAccount">Edit profil</button></a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+							<button type="button buttonAccount" class="button buttonAccount">Contact</button></a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+							<button type="button buttonDelete" class="button buttonDelete">Delete Account</button></a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<h6>For more informations, please contact us!</h6>
+					</td>
+				</tr>
 			</div>
 		</div>
 

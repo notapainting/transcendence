@@ -38,6 +38,7 @@ function showSignInContent() {
 }
 
 function showAccountContent() {
+	document.getElementById('editProfile-content').style.display = 'none';
 	document.getElementById('account-content').style.display = 'block';
 }
 
@@ -106,6 +107,10 @@ document.querySelector('a[href="#account"]').addEventListener('click', function(
 	showSelectedPage("account");
 });
 
+document.querySelector('a[href="#editProfile"]').addEventListener('click', function(event) {
+	showEditProfile();
+});
+
 function selectPage()
 {
 	if (location.hash === "#jeu")
@@ -139,3 +144,13 @@ window.addEventListener('hashchange', function() {
 });
 
 selectPage();
+
+function showEditProfile()
+{
+	document.getElementById('editProfile-content').style.display = 'block';
+};
+
+function hideEditProfile()
+{
+	document.getElementById('editProfile-content').style.display = 'none';
+}
