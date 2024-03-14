@@ -1,4 +1,5 @@
 from urllib.parse import urlparse, urlunparse
+import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -23,13 +24,17 @@ from django.views.generic import View
 User = get_user_model()
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        user = self.user
-
-        if not user.isVerified:
-            raise AuthenticationFailed('Email non vérifié.')
-        return data
+	def validate(self, attrs):
+		data = super().validate(attrs)
+		user = self.user
+		if not user.isVerified:
+			raise AuthenticationFailed('Email non vérifié.')
+		user_data = {'username':user.username}
+		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data)
+		if response.status_code == 200:
+			user_info = response.json()
+			data.update(user_info)
+		return data
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -45,7 +50,6 @@ def verify_email(request, uidb64, token):
 		user.save()
 		user_data = {
 				'username': user.username,
-				'password': user.password,
 				'email' : user.email
 		}
 		response = requests.post('http://user-managment:8000/signup/', json=user_data)
@@ -89,7 +93,7 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 	template_name = 'password_reset_confirm.html'
 	def form_valid(self, form):
 		response = super().form_valid(form)
-		return HttpResponse('Le mot de passe a ete modifier avec succes')
+		return HttpResponse('Le mot de passe a ete modifier avec succes',  status=200)
      
 class PasswordRequestReset(APIView):
 	def post(self, request):
