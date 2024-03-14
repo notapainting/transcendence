@@ -347,6 +347,12 @@ body {
 	font-family: Arial, Helvetica, sans-serif
 }
 
+#account-content {
+	display: flex;
+	align-items: center;
+	text-align: center;
+}
+
 .description{
 	text-align: center;
 	font-size: 20px;
@@ -380,7 +386,9 @@ body {
 }
 
 .buttonEdit{
-	display: inline-block;
 	padding: 0;
-	width: 150px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 300px;
 }
