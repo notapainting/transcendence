@@ -12,9 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
 		#spécifie que le serializer va manipuler les Users
 		model = CustomUser
 		#specifie quels champs il va manipuler
-		fields = ['id', 'username', 'email', 'password'] 
-		#definir des comportements supplementaire pour certain champs (write only - impossible de renvoyer le champ password au client)
-		extra_kwargs = {'password' : {'write_only' :True , 'required': True}} 
-		#surcharge 
+		fields = ['id', 'username', 'email', 'isVerified', 'profile_picture', 'first_name', 'last_name', 'date_of_birth', 'gender']
 	def create(self, validated_data):
 		return CustomUser.objects.create(**validated_data)
