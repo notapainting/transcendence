@@ -359,21 +359,42 @@ body {
 	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif
 }
 
-.buttonAccount{
-	display: block;
+.buttonUser
+{
+    font-family: Roboto, sans-serif;
+    font-weight: 0;
+    font-size: 30px;
+    color: #fff;
+    background-color: #0066CC;
+    border: 2px solid #0066cc;
+    border-radius: 50px;
+    transition : 1000ms;
+    transform: translateY(0);
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+	width: 300px;
+	height: 75px;
+    margin-top: 5px;
+	white-space: nowrap;
 	margin-left: auto;
 	margin-right: auto;
-	font-size: 30px;
-	width: 300px;
+	text-align: center;
+	display: block;
+}
+
+.buttonUser:hover{
+    transition : 500ms;
+    transform : translateY(-0px);
+    transform: scale(1.08);
+    background-color: #fff;
+    color: #0066cc;
+    border: solid 2px #0066cc;
 }
 
 .buttonDelete{
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
 	font-size: 10px;
 	height: 36px;
-	width: 300px;
 	background-color: crimson;
     border: 2px solid crimson;
 }
@@ -386,7 +407,6 @@ body {
 }
 
 .buttonEdit{
-	padding: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
