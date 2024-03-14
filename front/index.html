@@ -37,20 +37,31 @@
 	<main id="content">
 		<!-- Contenu dynamique -->
 
-		<!-- CONNEXION PAGE -->
+		<!-- SIGN UP PAGE -->
 		<div id="signup-content" class="page-content" style="display: none;">
-	
+			<div class="wrapper fadeInDown">
+				<div id="formContent">
+					<h1><font color="black" ><strong>SIGN IN</strong></font></h1>
+					<form id="loginForm">
+						<input type="text" id="login" class="fadeIn second" name="login" placeholder="login">
+						<input type="email" id="email" class="fadeIn second" name="email" placeholder="email">
+						<input type="password" id="password" class="fadeIn third" name="login" placeholder="password">
+						<input type="submit" class="fadeIn fourth" value="Sign in">
+					</form>
+				</div>
+			</div>
 		</div>
 
+		<!-- LOG IN PAGE -->
 		<div id="signin-content" class="page-content" style="display: none;">
 			<div class="wrapper fadeInDown">
 				<div id="formContent">
-				  <form id="loginForm">
-					<input type="text" id="login" class="fadeIn second" name="login" placeholder="login">
-					<input type="email" id="email" class="fadeIn second" name="email" placeholder="email">
-					<input type="password" id="password" class="fadeIn third" name="login" placeholder="password">
-					<input type="submit" class="fadeIn fourth" value="Log In">
-				  </form>
+					<h1><font color="black" ><strong>LOG IN</strong></font></h1>
+					<form id="loginForm">
+						<input type="email" id="email" class="fadeIn second" name="email" placeholder="email">
+						<input type="password" id="password" class="fadeIn third" name="login" placeholder="password">
+						<input type="submit" class="fadeIn fourth" value="Log In">
+					</form>
 			
 				  <div id="formFooter">
 					<a class="underlineHover" href="#">Forgot Password?</a>
@@ -70,39 +81,41 @@
 					<p class="description">Email: <span id="userEmail"></span></p>
 					<div id="editProfile-content" class="page-content center-intput" style="display: none;">
 						<form id="loginForm">
-							<input type="email" id="email" class="fadeIn second" name="email" placeholder="Enter new email">
 							<input type="password" id="password" class="fadeIn third" name="login" placeholder="Enter current password">
 							<input type="password" id="password" class="fadeIn third" name="login" placeholder="Enter your new password">
 							<input type="password" id="password" class="fadeIn third" name="login" placeholder="Enter again new password">
 							<input type="submit" class="fadeIn fourth buttonEdit" value="Edit">
-							<a href="#account"><input type="button" class="fadeIn fourth buttonEdit" value="Return"></a>
+							<a target="_blank" href="#account"><input type="button" class="fadeIn fourth buttonUser buttonEdit" value="Return"></a>
 						</form>
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a target="_blank" href="#editProfile">
-						<button type="button buttonAccount" class="button buttonAccount">Edit profil</button></a>
+					<a href="#editProfile">
+						<button type="button" class="buttonUser buttonAccount">Edit profil</button>
+					</a>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<a target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
-						<button type="button buttonAccount" class="button buttonAccount">Contact</button></a>
+						<button type="button" class="buttonUser buttonAccount">Contact</button>
+					</a>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<a target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
-						<button type="button buttonDelete" class="button buttonDelete">Delete Account</button></a>
+						<button type="button" class="buttonUser buttonDelete">Delete Account</button>
+					</a>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<h6>For more informations, please contact us!</h6>
 				</td>
-				</tr>
+			</tr>
 		</div>
 
 
