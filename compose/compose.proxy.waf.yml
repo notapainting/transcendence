@@ -1,0 +1,16 @@
+services:
+  proxy:
+    container_name: proxy-waf
+    build:
+      context: server
+      dockerfile: Dockerfile.waf
+    image: proxy-waf
+    ports:
+     - "8443:443"
+     - "8080:80"
+    networks: 
+      - app_network
+    volumes:
+      - ./server/certs/:/certs
+      - ./front:/var/www/static
+    restart: unless-stopped
