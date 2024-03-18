@@ -1,16 +1,9 @@
-version: '3.9'
-
-networks:
-  app_network:
-    name: full_app_test
-    driver: bridge
-
 services:
-  nginx:
+  proxy:
     container_name: proxy-nginx
     build:
       context: server
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.nginx
     image: proxy-nginx
     ports:
      - "8443:443"
@@ -20,7 +13,4 @@ services:
     volumes:
       - ./server/certs/:/certs
       - ./front:/var/www/static
-      - ./logs:/var/log/nginx
     restart: unless-stopped
-
-

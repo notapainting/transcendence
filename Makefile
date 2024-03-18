@@ -1,48 +1,68 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: tlegrand <tlegrand@student.42lyon.fr>      +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/03/10 21:52:05 by tlegrand          #+#    #+#              #
+#    Updated: 2024/03/10 22:55:20 by tlegrand         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-CMP = docker compose --env-file env.dev \
-	--file compose.yml \
-	--file compose/compose.app.yml \
-	--file compose/compose.test.yml 
+-include Makefile.var
 
-all :	up
 
-build :	
+#========#	general rule	#========#
+.PHONY: all re build start up down clear top ps config logs
+
+all:	start
+
+re:	clear start
+
+
+-waf-warn:
+ifeq (${PROXY_FILE}, compose.proxy.yml)
+	@echo "${RED_LIGHT}WARNING: WAF disabled !!!${END}"
+endif
+
+#========#	build rule	#========#
+build: -waf-warn
 	${CMP} build
 
-up :	mdir build
-	${CMP} up -d
+waf:
+	@sed -i'' 's/compose.proxy.yml/compose.proxy.waf.yml/g' Makefile.var
+	@echo "${GREEN}${BOLD}WAF turn on :)\n${YELLOW}${ITALIC}please build image again${END}"
 
-down :
-	${CMP} down 
+no-waf:
+	@sed -i'' 's/compose.proxy.waf.yml/compose.proxy.yml/g' Makefile.var
+	@echo "${RED}${BOLD}Warning WAF disabled!!!\n${YELLOW}${ITALIC}please build image again${END}"
+
+
+#========#	start/stop rule	#========#
+start: -waf-warn
+	${CMP} up -d --build
 
 clear:
-	${CMP} down -v --remove-orphans
+	${CMP} down -v --rmi --remove-orphans
 
+up:	-waf-warn
+	${CMP} up -d 
+
+down:
+	${CMP} down 
+
+
+#========#	tools rule	#========#
+config:
+	${CMP} config
 ps:
 	${CMP} ps
 
-config:
-	${CMP} config
-
-mdir:
-	mkdir -p \
-		logs \
-		apps/django_db_dev/django/src \
-		apps/django_db_dev/postgres/data
-
-deldb:
-	rm -rf \
-		apps/django_db_dev/django/src \
-		apps/django_db_dev/postgres/data
+top:
+	${CMP} top
 
 logs:
 	${CMP} logs 
 
-re:	clear up
 
-.PHONY: logs all build up down clear ps config mdir re
-
-# creeate /logs
-# add /logs volume to compose
-#  change docker file 
-# make prod dockerfile
