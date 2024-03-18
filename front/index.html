@@ -25,6 +25,7 @@
 				</ul>
 				<div id="connexion-content">
 					<ul class="nav navbar-nav navbar-right">
+						<li><a href="#account"><span class="glyphicon"></span> Account</a></li>
 						<li><a href="#signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
 						<li><a href="#signin"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
 					</ul>
@@ -36,20 +37,31 @@
 	<main id="content">
 		<!-- Contenu dynamique -->
 
-		<!-- CONNEXION PAGE -->
+		<!-- SIGN UP PAGE -->
 		<div id="signup-content" class="page-content" style="display: none;">
-	
+			<div class="wrapper fadeInDown">
+				<div id="formContent">
+					<h1 class="fadeIn first"><font color="black" ><strong>SIGN UP</strong></font></h1>
+					<form id="loginForm">
+						<input type="text" id="login" class="fadeIn second" name="login" placeholder="login">
+						<input type="email" id="email" class="fadeIn second" name="email" placeholder="email">
+						<input type="password" id="password" class="fadeIn third" name="login" placeholder="password">
+						<input type="submit" class="fadeIn fourth" value="Sign in">
+					</form>
+				</div>
+			</div>
 		</div>
 
+		<!-- LOG IN PAGE -->
 		<div id="signin-content" class="page-content" style="display: none;">
 			<div class="wrapper fadeInDown">
 				<div id="formContent">
-				  <form id="loginForm">
-					<input type="text" id="login" class="fadeIn second" name="login" placeholder="login">
-					<input type="email" id="email" class="fadeIn second" name="email" placeholder="email">
-					<input type="password" id="password" class="fadeIn third" name="login" placeholder="password">
-					<input type="submit" class="fadeIn fourth" value="Log In">
-				  </form>
+					<h1 class="fadeIn first"><font color="black" ><strong>LOG IN</strong></font></h1>
+					<form id="loginForm">
+						<input type="email" id="email" class="fadeIn second" name="email" placeholder="email">
+						<input type="password" id="password" class="fadeIn third" name="login" placeholder="password">
+						<input type="submit" class="fadeIn fourth" value="Log In">
+					</form>
 			
 				  <div id="formFooter">
 					<a class="underlineHover" href="#">Forgot Password?</a>
@@ -57,6 +69,55 @@
 			  
 				</div>
 			</div>
+		</div>
+		<!-- ACCOUNT PAGE -->
+		<div id="account-content" class="page-content wrapper fadeIn" style="display: none;">
+			<h1>Your account's informations</h1>
+			<tr>
+				<td>
+					<img class="picprofile" src="https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y3V0ZSUyMGNhdHxlbnwwfHwwfHw%3D&w=1000&q=80" alt="picprofile">
+					<p class="name">Login: <span id="userLogin"></span></p>
+					<p class="description">Pong's rank: <span id="userRank"></span></p>
+					<p class="description">Email: <span id="userEmail"></span></p>
+					<div id="editProfile-content" class="page-content center-intput" style="display: none;">
+						<form id="loginForm">
+							<div>
+								<input type="password" id="password" class="fadeIn third accountEditInput" name="login" placeholder="Enter current password">
+								<input type="password" id="password" class="fadeIn third accountEditInput" name="login" placeholder="Enter your new password">
+								<input type="password" id="password" class="fadeIn third accountEditInput" name="login" placeholder="Enter again new password">
+							</div>
+							<input type="submit" class="fadeIn fourth buttonEdit" value="Edit">
+							<a href="#account"><input type="button" class="fadeIn fourth buttonEdit" value="Return"></a>
+						</form>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a href="#editProfile">
+						<button type="button" class="buttonUser">Edit profile</button>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+						<button type="button" class="buttonUser">Contact</button>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+						<button type="button" class="buttonUser buttonDelete">Delete Account</button>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h6>For more informations, please contact us!</h6>
+				</td>
+			</tr>
 		</div>
 
 
