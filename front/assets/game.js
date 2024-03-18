@@ -44,7 +44,7 @@ let sPressed = false;
 //test backend connexion
 function backTest() {
 	console.log("click");
-    fetch('https://127.0.0.1:8443/game/')
+    fetch('https://127.0.0.1:8443/api-game/game/')
         .then(response => response.json())
         .then(data => console.log(data.message))
         .catch(error => {

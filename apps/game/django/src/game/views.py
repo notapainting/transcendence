@@ -29,6 +29,9 @@ class PlayerL() :
 def back_test_view(request):
     return JsonResponse({'message': 'bouton back test click!'})
 
+def launch_ball_view(request):
+    return JsonResponse({'message': 'launch game ball click!'})
+
 @csrf_exempt
 def start_game_view(request):
     if request.method == 'POST':
