@@ -412,3 +412,7 @@ body {
 	justify-content: center;
 	width: 300px;
 }
+
+.accountEditInput {
+	max-width: 1000px;
+}

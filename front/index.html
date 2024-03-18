@@ -41,7 +41,7 @@
 		<div id="signup-content" class="page-content" style="display: none;">
 			<div class="wrapper fadeInDown">
 				<div id="formContent">
-					<h1><font color="black" ><strong>SIGN IN</strong></font></h1>
+					<h1 class="fadeIn first"><font color="black" ><strong>SIGN UP</strong></font></h1>
 					<form id="loginForm">
 						<input type="text" id="login" class="fadeIn second" name="login" placeholder="login">
 						<input type="email" id="email" class="fadeIn second" name="email" placeholder="email">
@@ -56,7 +56,7 @@
 		<div id="signin-content" class="page-content" style="display: none;">
 			<div class="wrapper fadeInDown">
 				<div id="formContent">
-					<h1><font color="black" ><strong>LOG IN</strong></font></h1>
+					<h1 class="fadeIn first"><font color="black" ><strong>LOG IN</strong></font></h1>
 					<form id="loginForm">
 						<input type="email" id="email" class="fadeIn second" name="email" placeholder="email">
 						<input type="password" id="password" class="fadeIn third" name="login" placeholder="password">
@@ -81,9 +81,11 @@
 					<p class="description">Email: <span id="userEmail"></span></p>
 					<div id="editProfile-content" class="page-content center-intput" style="display: none;">
 						<form id="loginForm">
-							<input type="password" id="password" class="fadeIn third" name="login" placeholder="Enter current password">
-							<input type="password" id="password" class="fadeIn third" name="login" placeholder="Enter your new password">
-							<input type="password" id="password" class="fadeIn third" name="login" placeholder="Enter again new password">
+							<div>
+								<input type="password" id="password" class="fadeIn third accountEditInput" name="login" placeholder="Enter current password">
+								<input type="password" id="password" class="fadeIn third accountEditInput" name="login" placeholder="Enter your new password">
+								<input type="password" id="password" class="fadeIn third accountEditInput" name="login" placeholder="Enter again new password">
+							</div>
 							<input type="submit" class="fadeIn fourth buttonEdit" value="Edit">
 							<a href="#account"><input type="button" class="fadeIn fourth buttonEdit" value="Return"></a>
 						</form>
