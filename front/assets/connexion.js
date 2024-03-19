@@ -37,12 +37,6 @@ document.getElementById("userEmail").innerHTML = "jmoutous@student.42lyon.fr"
 
 document.getElementById("userRank").innerHTML = "666" + "th"
 
-// document.getElementById("editProfile-content").addEventListener("buttonUser", function(event){
-// 	event.preventDefault(); 
-// 	document.getElementById('editProfile-content').style.display = 'none';
-// 	return;
-// });
-
 function loged() {
 	document.getElementById('user-loged').style.display = 'block'
 	document.getElementById('user-unloged').style.display = 'none'
