@@ -416,3 +416,12 @@ body {
 .accountEditInput {
 	max-width: 1000px;
 }
+
+.avatar {
+	background-image: none;
+	vertical-align: middle;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	zoom: 125%;
+}
