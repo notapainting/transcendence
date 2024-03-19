@@ -99,6 +99,36 @@ function stopGame()
 
 // Pong Functions
 function keyDownHandler(e) {
+	var formData
+	if (e.key === "ArrowUp") {
+		formData = {"keyPressed": "up"};
+	} else if (e.key === "ArrowDown") {
+		formData = {"keyPressed": "down"};
+	} else if (e.key === "w") {
+		formData = {"keyPressed": "w"};
+	} else if (e.key === "s") {
+		formData = {"keyPressed": "s"};
+	}
+
+	var formDataJSON = JSON.stringify(formData);
+	fetch('https://127.0.0.1:8443/api-game/paddle/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: formDataJSON
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+
 	if (e.key === "ArrowUp") {
 		upPressed = true;
 	} else if (e.key === "ArrowDown") {
