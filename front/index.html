@@ -23,11 +23,15 @@
 					<li id="jeuID" ><a href="#jeu">Jeu</a></li>
 					<li id="chatID" ><a href="#chat">Chat</a></li>
 				</ul>
-				<div id="connexion-content">
+				<div id="user-unloged" style="display: active;">
 					<ul class="nav navbar-nav navbar-right">
-						<li><a href="#account"><span class="glyphicon"></span> Account</a></li>
 						<li><a href="#signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
 						<li><a href="#signin"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+					</ul>
+				</div>
+				<div id="user-loged" style="display: none;">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="#account"><span class="glyphicon"></span> Account</a></li>
 					</ul>
 				</div>
 			</div>
@@ -66,7 +70,16 @@
 				  <div id="formFooter">
 					<a class="underlineHover" href="#">Forgot Password?</a>
 				  </div>
-			  
+
+					<tr id="log-in-hardcoded">
+						<td>
+							<a href="#account">
+								<!-- <button id="button-log-in-hardcoded" type="button" class="buttonUser">Log in Hardcoded</button> -->
+								<button onclick="loged()" type="button" class="buttonUser">Log in Hardcoded</button>
+							</a>
+						</td>
+					</tr>
+
 				</div>
 			</div>
 		</div>
@@ -108,6 +121,14 @@
 			</tr>
 			<tr>
 				<td>
+					<a href="#accueil">
+						<!-- <button type="button" id="button-log-out-button" class="buttonUser" style="background-color: crimson; border-color: crimson;">Log out</button> -->
+						<button type="button" onclick="unLoged()" class="buttonUser" style="background-color: crimson; border-color: crimson;">Log out</button>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td>
 					<a target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
 						<button type="button" class="buttonUser buttonDelete">Delete Account</button>
 					</a>
@@ -122,7 +143,7 @@
 
 
 		<!-- ACCUEIL -->
-		<div id="accueil-content" class="page-content" style="display: none;">
+		<div id="accueil-content" class="page-content" style="display: active;">
 			<h1>Bienvenue sur Transcendence !</h1>
 		</div>
 
