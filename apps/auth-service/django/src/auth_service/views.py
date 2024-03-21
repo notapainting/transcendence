@@ -1,3 +1,4 @@
+from tokenize import TokenError
 from urllib.parse import urlparse, urlunparse
 import requests
 from rest_framework.views import APIView
@@ -8,6 +9,7 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 from rest_framework.throttling import AnonRateThrottle
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
+from rest_framework_simplejwt.tokens import AccessToken
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from auth_service.models import CustomUser
@@ -88,6 +90,27 @@ class UserCreate(APIView):
 			)
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+	
+				# 	service = request.data.get('service', None)
+				# if service == 'user_management':
+				# 	return Response({'message': 'Token JWT valide. Redirection vers User Management.'}, status=status.HTTP_200_OK)
+				# else:
+				# 	return Response({'message': 'Service inconnu.'}, status=status.HTTP_400_BAD_REQUEST)
+
+class ValidateTokenView(APIView):
+	def post(self, request):
+		token = request.data.get('token', None)
+		if token:
+			try:
+				access_token = AccessToken(token)
+				return Response({'message': 'token valide.'}, status=status.HTTP_200_OK)
+			except TokenError as e:
+				return Response({'message': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+			except Exception as e:
+				return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+		else:
+			return Response({'message': 'Token JWT non fourni.'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 	template_name = 'password_reset_confirm.html'
@@ -104,8 +127,8 @@ class PasswordRequestReset(APIView):
 			user = CustomUser.objects.get(email = email)
 			reset_url = GenerateVerificationUrl(request, user, 'password_reset_confirm')
 			send_mail(
-				'Reinitialisation mot de passe',
-				f'Veuillez cliquer sur le lien pour reinitialiser votre mot de passe : {reset_url}',
+				'Réinitialisation mot de passe',
+				f'Veuillez cliquer sur le lien pour réinitialiser votre mot de passe : {reset_url}',
 				'jill.transcendance@gmail.com',
 				[user.email],
 				fail_silently=False,
