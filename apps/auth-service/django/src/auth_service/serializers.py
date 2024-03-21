@@ -4,7 +4,6 @@ from auth_service.models import CustomUser
 from django.contrib.auth.hashers import make_password
 import uuid
 
-	
 from rest_framework import serializers
 
 

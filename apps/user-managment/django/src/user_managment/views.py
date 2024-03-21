@@ -13,6 +13,20 @@ class UserCreate(APIView):
 			user_data = serializer.data
 			return Response(user_data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+	# def update(self, request):
+
+class UpdateClientInfo(APIView):
+	def post(self, request):
+		username = request.data.get('username')
+		if username:
+			try:
+				user = CustomUser.objects.get('username', None)
+				serializer = UserSerializer(user)
+				return Response(serializer.data, status = 200)
+			except CustomUser.DoesNotExist:
+				return Response("User not found", status=404)
+		else:
+			return Response("User not in request", status=404)
 
 class GetUserInfos(APIView):
 	def post(self, request):
