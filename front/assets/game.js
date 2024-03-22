@@ -108,6 +108,8 @@ function keyDownHandler(e) {
 		formData = {"keyPressed": "w"};
 	} else if (e.key === "s") {
 		formData = {"keyPressed": "s"};
+	} else {
+		formData = {"keyPressed": "none"};
 	}
 
 	var formDataJSON = JSON.stringify(formData);
@@ -137,7 +139,7 @@ function keyDownHandler(e) {
 		wPressed = true;
 	} else if (e.key === "s") {
 		sPressed = true;
-	}
+	} // a enlever 
 }
 
 function keyUpHandler(e) {
