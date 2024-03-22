@@ -143,6 +143,37 @@ function keyDownHandler(e) {
 }
 
 function keyUpHandler(e) {
+	var formData
+	if (e.key === "ArrowUp") {
+		formData = {"keyRelease": "up"};
+	} else if (e.key === "ArrowDown") {
+		formData = {"keyRelease": "down"};
+	} else if (e.key === "w") {
+		formData = {"keyRelease": "w"};
+	} else if (e.key === "s") {
+		formData = {"keyRelease": "s"};
+	} else {
+		formData = {"keyRelease": "none"};
+	}
+
+	var formDataJSON = JSON.stringify(formData);
+	fetch('https://127.0.0.1:8443/api-game/paddle/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: formDataJSON
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('error:',  );
+    });
+
 	if (e.key === "ArrowUp") {
 		upPressed = false;
 	} else if (e.key === "ArrowDown") {
@@ -151,7 +182,7 @@ function keyUpHandler(e) {
 		wPressed = false;
 	} else if (e.key === "s") {
 		sPressed = false;
-	}
+	} // a enlever
 }
 
 function update() {

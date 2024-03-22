@@ -1,5 +1,5 @@
 
-import json
+import json, random
 
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -52,6 +52,15 @@ def paddle_view(request):
             return JsonResponse({'message': 'w!'})
         elif key_pressed == "s":
             return JsonResponse({'message': 's!'})
+        key_release = json.loads(request.body).get('keyRelease')
+        if key_release == "up":
+            return JsonResponse({'message': 'up stop!'})
+        elif key_release == "down":
+            return JsonResponse({'message': 'down stop!'})
+        elif key_release == "w":
+            return JsonResponse({'message': 'w stop!'})
+        elif key_release == "s":
+            return JsonResponse({'message': 's stop!'})
         else:
             return JsonResponse({'message': 'none'})
     else:
@@ -69,3 +78,51 @@ def start_game_view(request):
             return JsonResponse({'error': 'Paramètre de requête incorrect'}, status=400)
     else:
         return JsonResponse({'error': 'Méthode HTTP non autorisée'}, status=405)
+
+@csrf_exempt
+def update():
+    if upPressed and rightPaddleY > 0:
+        rightPaddleY -= paddleSpeed
+    elif downPressed and rightPaddleY + paddleHeight < height:
+        rightPaddleY += paddleSpeed
+
+    if wPressed and leftPaddleY > 0:
+        leftPaddleY -= paddleSpeed
+    elif sPressed and leftPaddleY + paddleHeight < height:
+        leftPaddleY += paddleSpeed
+
+    ballX += ballSpeedX
+    ballY += ballSpeedY
+
+    if ballY - ballRadius < 0 or ballY + ballRadius > height:
+        ballSpeedY = -ballSpeedY
+
+    if (ballX - ballRadius < paddleWidth and
+            ballY > leftPaddleY and
+            ballY < leftPaddleY + paddleHeight):
+        ballSpeedX = -ballSpeedX
+
+    if (ballX + ballRadius > width - paddleWidth and
+            ballY > rightPaddleY and
+            ballY < rightPaddleY + paddleHeight):
+        ballSpeedX = -ballSpeedX
+
+    if ballX < 0:
+        rightPlayerScore += 1
+        reset()
+    elif ballX > width:
+        leftPlayerScore += 1
+        reset()
+
+    # if leftPlayerScore == maxScore:
+    #     playerWin("Left player")
+    # elif rightPlayerScore == maxScore:
+    #     playerWin("Right player")
+
+
+@csrf_exempt
+def reset():
+    ballX = width / 2
+    ballY = height / 2
+    ballSpeedX = -ballSpeedX
+    ballSpeedY = random.uniform(-5, 5)
