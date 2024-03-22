@@ -28,7 +28,8 @@ mdir:
 		logs \
 		apps/game/django/src 
 
-
+enter:
+	${CMP} exec django bash
 
 logs:
 	${CMP} logs 
