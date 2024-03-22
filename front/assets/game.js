@@ -125,7 +125,7 @@ function keyDownHandler(e) {
         console.log(data);
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('error:',  );
     });
 
 
