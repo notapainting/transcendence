@@ -17,7 +17,7 @@ services:
 
 volumes:
   source_code:
-    name: ${APP_VOLUME_1}
+    name: ${APP_VOLUME_1}_bis
     driver: local
     driver_opts:
       type: none
