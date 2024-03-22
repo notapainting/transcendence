@@ -29,11 +29,9 @@ class PlayerL() :
 def back_test_view(request):
     return JsonResponse({'message': 'bouton back test click!'})
 
+@csrf_exempt
 def paddle_view(request):
-    if request.method == 'POST':
-        return JsonResponse({'message': 'paddle move!'})
-    else:
-        return JsonResponse({'error': 'Méthode HTTP non autorisée'}, status=405)
+    return JsonResponse({'message': 'paddle move!'})
 
 @csrf_exempt
 def start_game_view(request):
