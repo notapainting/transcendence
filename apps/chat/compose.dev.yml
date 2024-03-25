@@ -37,6 +37,12 @@ services:
       - dev_network
     restart: unless-stopped
 
+  redis:
+    container_name: redis-cache
+    image: redis:5
+    networks: 
+      - dev_network
+    restart: unless-stopped
 
 volumes:
   source_code:
