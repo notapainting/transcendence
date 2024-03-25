@@ -1,8 +1,9 @@
 from django.shortcuts import render
 
-# Create your views here.
-from django.http import HttpResponse
+
+# chat/views.py
+from django.shortcuts import render
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the chat index.")
+    return render(request, "chat/index.html")
