@@ -9,6 +9,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="assets/style.css"> 
+	<link rel="stylesheet" href="assets/style-chat.css"> 
 
 </head>
 <body>
@@ -162,8 +163,38 @@
 		</div> 
 
 		<!-- CHAT -->
-		<div id="chat-content" style="display: none;">
-			<h1 id="chat-text" class="text-center"> Chat in progress .. </h1>
+		<div id="chat-content" style="display: none;" class="chat-page">
+			<h1 id="chat-text" style="color: black; margin-bottom: 20px;"> Welcome to the chat! </h1>
+			<div class="chat-display">
+				<div class="chat-messages">
+					<div class="message-all message-user">
+						<div class="message-sender">
+							Julien
+						</div>
+						<div class="message-text">
+							Hello world!
+						</div>
+						<div class="message-time">
+							14:16
+						</div>
+					</div>
+					<div class="message-all">
+						<div class="message-sender">
+							World
+						</div>
+						<div class="message-text">
+							Hello Julien!
+						</div>
+						<div class="message-time">
+							14:17
+						</div>
+					</div>
+				</div>
+				<form class="chat-input-form">
+					<input type="text" class="chat-input" required placeholder="Type your message here">
+					<button type="submit" class="chat-button">Send</button>
+				</form>
+			</div>
 		</div>
 	</main>
 	
