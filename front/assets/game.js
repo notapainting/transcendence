@@ -71,7 +71,7 @@ function startGame() {
         console.error('Error:', error);
     });
 
-	gameRunning = true; // a enlever
+	// gameRunning = true; // a enlever
 }
 
 // Stop game
@@ -94,7 +94,7 @@ function stopGame()
         console.error('Error:', error);
     });
 
-	gameRunning = false; // a enlever
+	// gameRunning = false; // a enlever
 }
 
 // Pong Functions
@@ -131,15 +131,15 @@ function keyDownHandler(e) {
     });
 
 
-	if (e.key === "ArrowUp") {
-		upPressed = true;
-	} else if (e.key === "ArrowDown") {
-		downPressed = true;
-	} else if (e.key === "w") {
-		wPressed = true;
-	} else if (e.key === "s") {
-		sPressed = true;
-	} // a enlever 
+	// if (e.key === "ArrowUp") {
+	// 	upPressed = true;
+	// } else if (e.key === "ArrowDown") {
+	// 	downPressed = true;
+	// } else if (e.key === "w") {
+	// 	wPressed = true;
+	// } else if (e.key === "s") {
+	// 	sPressed = true;
+	// } // a enlever 
 }
 
 function keyUpHandler(e) {
@@ -174,15 +174,15 @@ function keyUpHandler(e) {
         console.error('error:',  );
     });
 
-	if (e.key === "ArrowUp") {
-		upPressed = false;
-	} else if (e.key === "ArrowDown") {
-		downPressed = false;
-	} else if (e.key === "w") {
-		wPressed = false;
-	} else if (e.key === "s") {
-		sPressed = false;
-	} // a enlever
+	// if (e.key === "ArrowUp") {
+	// 	upPressed = false;
+	// } else if (e.key === "ArrowDown") {
+	// 	downPressed = false;
+	// } else if (e.key === "w") {
+	// 	wPressed = false;
+	// } else if (e.key === "s") {
+	// 	sPressed = false;
+	// } // a enlever
 }
 
 function update() {
@@ -236,6 +236,24 @@ function update() {
 	}
   }
 
+function getBallInfo() {
+    fetch('https://127.0.0.1:8443/api-game/ball-info/')
+        .then(response => response.json())
+        .then(data => {
+            draw(data);
+        })
+        .catch(error => {
+            console.error('Error fetching ball info:', error);
+        });
+}
+
+// getBallInfo();
+
+console.log("gameRunning = ", gameRunning);
+if (gameRunning === true)
+	setInterval(getBallInfo, 100);
+
+
 function playerWin(player) {
 	var message = "Congratulations! " + player + " win!";
 	var myParagraph = document.getElementById("scoreMessage");
@@ -250,30 +268,30 @@ function reset() {
 	ballSpeedY = Math.random() * 10 - 5;
 }
 
-function draw() {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+function draw(data) {
+	ctx.clearRect(0, 0, data.width, data.height);
   
 	ctx.fillStyle = "#FFF";
 	ctx.font = "15px Arial";
   
 	ctx.beginPath();
-	ctx.moveTo(canvas.width / 2, 0);
-	ctx.lineTo(canvas.width / 2, canvas.height);
+	ctx.moveTo(data.width / 2, 0);
+	ctx.lineTo(data.width / 2, data.height);
 	ctx.strokeStyle = "#FFF";
 	ctx.stroke();
 	ctx.closePath();
   
 	ctx.beginPath();
-	ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+	ctx.arc(data.x, data.y, data.radius, 0, Math.PI * 2);
 	ctx.fill();
 	ctx.closePath();
   
-	ctx.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
+	// ctx.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
   
-	ctx.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
+	// ctx.fillRect(data.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
   
-	ctx.fillText("Score: " + leftPlayerScore, 10, 20);
-	ctx.fillText("Score: " + rightPlayerScore, canvas.width - 70, 20);
+	// ctx.fillText("Score: " + leftPlayerScore, 10, 20);
+	// ctx.fillText("Score: " + rightPlayerScore, data.width - 70, 20);
   }
   
 
@@ -284,4 +302,4 @@ function loop() {
 	animationId = requestAnimationFrame(loop);
 }
 
-loop();
+// loop();
