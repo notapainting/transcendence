@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import routers, serializers, viewsets
+from django.http import HttpRequest
 
 # Create your views here.
 
@@ -26,8 +27,8 @@ rightPaddleY = height / 2 - paddleHeight / 2
 paddleSpeed = 10
 
 ballRadius = 10
-ballX = width / 2
-ballY = height / 2
+ballX = 450 # height / 2
+ballY = 300 # width / 2
 ballSpeedX = 7
 ballSpeedY = 7
 
@@ -45,22 +46,30 @@ def paddle_view(request):
     if request.method == 'POST':
         key_pressed = json.loads(request.body).get('keyPressed')
         if key_pressed == "up":
-            return JsonResponse({'message': 'up!'})
+            upPressed = True
+            # return JsonResponse({'message': 'up!'})
         elif key_pressed == "down":
-            return JsonResponse({'message': 'down!'})
+            downPressed = True
+            # return JsonResponse({'message': 'down!'})
         elif key_pressed == "w":
-            return JsonResponse({'message': 'w!'})
+            wPressed = True
+            # return JsonResponse({'message': 'w!'})
         elif key_pressed == "s":
-            return JsonResponse({'message': 's!'})
+            sPressed = True
+            # return JsonResponse({'message': 's!'})
         key_release = json.loads(request.body).get('keyRelease')
         if key_release == "up":
-            return JsonResponse({'message': 'up stop!'})
+            upPressed = False
+            # return JsonResponse({'message': 'up stop!'})
         elif key_release == "down":
-            return JsonResponse({'message': 'down stop!'})
+            downPressed = False
+            # return JsonResponse({'message': 'down stop!'})
         elif key_release == "w":
-            return JsonResponse({'message': 'w stop!'})
+            wPressed = False
+            # return JsonResponse({'message': 'w stop!'})
         elif key_release == "s":
-            return JsonResponse({'message': 's stop!'})
+            sPressed = False
+            # return JsonResponse({'message': 's stop!'})
         else:
             return JsonResponse({'message': 'none'})
     else:
@@ -68,11 +77,15 @@ def paddle_view(request):
 
 @csrf_exempt
 def start_game_view(request):
+    global game_running
     if request.method == 'POST':
-        game_running = json.loads(request.body).get('gameRunning')
-        if game_running == True:
+        gameRunning = json.loads(request.body).get('gameRunning')
+        if gameRunning == True:
+            game_running = True
+            print(game_running)
             return JsonResponse({'message': 'Start click'})
-        elif game_running == False:
+        elif gameRunning == False:
+            game_running = False
             return JsonResponse({'message': 'Stop click'})
         else:
             return JsonResponse({'error': 'Paramètre de requête incorrect'}, status=400)
@@ -80,7 +93,9 @@ def start_game_view(request):
         return JsonResponse({'error': 'Méthode HTTP non autorisée'}, status=405)
 
 @csrf_exempt
-def update():
+def update(request):
+    global ballX, ballY, ballSpeedX, ballSpeedY, rightPaddleY, rightPaddleX
+
     if upPressed and rightPaddleY > 0:
         rightPaddleY -= paddleSpeed
     elif downPressed and rightPaddleY + paddleHeight < height:
@@ -90,13 +105,10 @@ def update():
         leftPaddleY -= paddleSpeed
     elif sPressed and leftPaddleY + paddleHeight < height:
         leftPaddleY += paddleSpeed
-
     ballX += ballSpeedX
     ballY += ballSpeedY
-
     if ballY - ballRadius < 0 or ballY + ballRadius > height:
         ballSpeedY = -ballSpeedY
-
     if (ballX - ballRadius < paddleWidth and
             ballY > leftPaddleY and
             ballY < leftPaddleY + paddleHeight):
@@ -106,14 +118,12 @@ def update():
             ballY > rightPaddleY and
             ballY < rightPaddleY + paddleHeight):
         ballSpeedX = -ballSpeedX
-
-    if ballX < 0:
-        rightPlayerScore += 1
-        reset()
-    elif ballX > width:
-        leftPlayerScore += 1
-        reset()
-
+    # if ballX < 0:
+    #     rightPlayerScore += 1
+    #     reset()
+    # elif ballX > width:
+    #     leftPlayerScore += 1
+    #     reset()
     # if leftPlayerScore == maxScore:
     #     playerWin("Left player")
     # elif rightPlayerScore == maxScore:
@@ -121,8 +131,33 @@ def update():
 
 
 @csrf_exempt
-def reset():
+def reset(request):
     ballX = width / 2
     ballY = height / 2
     ballSpeedX = -ballSpeedX
     ballSpeedY = random.uniform(-5, 5)
+
+
+@csrf_exempt
+def ball_info(request):
+    print(game_running)
+    if game_running == True :
+        update(HttpRequest())
+    ball_info = {
+        'x': ballX,
+        'y': ballY,
+        'radius': ballRadius,
+        'speed_x': ballSpeedX,
+        'speed_y': ballSpeedY,
+        'width' : width,
+        'height' : height
+    }
+    return JsonResponse(ball_info)
+
+
+# @csrf_exempt
+# def loop(request):
+#     if game_running == True :
+#         update(request)
+#     else :
+#         print("game  not running")
