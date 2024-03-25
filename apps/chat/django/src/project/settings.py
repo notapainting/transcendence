@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'daphne',
+    'chat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,11 +73,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 ASGI_APPLICATION = "project.asgi.application"
 
+
 # Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
