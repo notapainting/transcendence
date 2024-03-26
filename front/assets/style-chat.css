@@ -13,9 +13,8 @@
 	display: none;
 }
 
-.chat-message {
-	height: 1200px;
-	display: flex;
+.chat-display {
+	height: 1130px;
 }
 
 .message-all {
@@ -68,6 +67,8 @@
 	display: flex;
 	align-items: center;
 	font-size: 15px;
+	/* position: absolute;
+	bottom: 9%; */
 }
 
 .chat-input{
