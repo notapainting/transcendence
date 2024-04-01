@@ -4,4 +4,102 @@ messages :
     - 
     - body
 
-https://channels.readthedocs.io/en/stable/tutorial/part_2.html
+
+
+
+architecture :
+
+
+technos :
+	+websocket (channel) 
+-XMPP
+	activitypub
+.push-sub
+	mqtt
+
+
+websocket auth : 
+(see https://devcenter.heroku.com/articles/websocket-security)
+	- pass JWT in query string (see code in java)
+	- auth extern 
+	- Smuggle access tokens inside Sec-WebSocket-Protocol
+
+Since the only header a browser will let you control is Sec-WebSocket-Protocol, 
+you can abuse it to emulate any other header. Interestingly (or rather comically),
+ this is what Kubernetes is doing. In short, you append whatever you need for 
+ authentication as an extra supported subprotocol inside Sec-WebSocket-Protocol:
+
+var ws = new WebSocket("ws://example.com/path", ["realProtocol", "yourAccessTokenOrSimilar"]);
+
+Then, on the server, you add some sort of middleware that transforms the request 
+back to its saner form before passing it further into the system. Terrible, yes, 
+but so far the best solution. No tokens in the URL, no custom authentication save 
+for the little middleware, no extra state on the server needed. 
+ Do not forget to include the real subprotocol, as various tools will 
+ reject a connection without one.
+
+dont:
+	- via cookie (very unsecure with ws)
+
+https://asgi.readthedocs.io/en/latest/specs/www.html#websocket
+
+TODO:
+	- read activitypub
+	- simple chat with 2 user
+		- front basic
+		- back
+	- dummy auth via ws:// ?username
+	- add chat history 
+	- make chat private
+	- make contact list
+	- 
+
+
+
+arch server/app:
+	-chat app server 
+		- chat
+		- notification
+		- see/writing/online...
+		- profile
+		- contact list managment
+		-
+	-bot
+	- pictures/file
+		-sticker bank
+		-file transfert server 
+		-pictures integration
+		-theme bank ?
+		-gif
+
+	
+
+
+
+
+
+OBJ:
+	-chat prive
+	-chat multi-session 
+	-auth via auth api
+	-chat group
+	-contact list
+	-block/restrain user 
+	-user creation in chat db
+	-game invitation
+	-notification (HTTP server push : https://github.com/fanout/django-eventstream)
+
+
+BONUS:
+	-end-to-end ecnrypt
+	-bot
+	-image integration
+	-stickers bank
+	-tone indicator https://toneindicators.carrd.co/
+	-file transfert
+	-conv theme ? 
+	- db cluster ?
+	- access control : user roles and permissions, or IP-based access restrictions
+
+
+
