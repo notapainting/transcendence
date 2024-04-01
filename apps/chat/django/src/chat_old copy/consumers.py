@@ -4,29 +4,20 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-import logging
-# Get an instance of a logger
-logger = logging.getLogger('django')
 
 class ChatConsumer(AsyncWebsocketConsumer):
-    userName = "Anonymous"
-
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
-        self.userName = self.scope["query_string"]
+
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         await self.accept()
-        logger.info("%s Connected!", self.userName)
 
     async def disconnect(self, close_code):
         # Leave room group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-        logger.info("%s Quit...", self.userName)
-
-        
 
     # Receive message from WebSocket
     async def receive(self, text_data):
@@ -41,5 +32,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event["message"]
 
         # Send message to WebSocket
-        logger.info(message)
         await self.send(text_data=json.dumps({"message": message}))
