@@ -20,17 +20,6 @@ u: bob
 
 
 
-architecture :
-
-
-technos :
-	+websocket (channel) 
--XMPP
-	activitypub
-.push-sub
-	mqtt
-
-
 websocket auth : 
 (see https://devcenter.heroku.com/articles/websocket-security)
 	- pass JWT in query string (see code in java)
@@ -101,9 +90,12 @@ OBJ:
 	-user creation in chat db
 	-game invitation
 	-notification (HTTP server push : https://github.com/fanout/django-eventstream)
+	-response to message
+	-profile link
 
 
 BONUS:
+	-links preview/alert when quit
 	-end-to-end ecnrypt
 	-bot
 	-image integration

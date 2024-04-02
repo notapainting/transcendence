@@ -13,6 +13,8 @@ import logging
 # Get an instance of a logger
 logger = logging.getLogger('django')
 
+
+# use cookiemiddleware for cookie -> scope['cookie']
 class ChatConsumer(AsyncWebsocketConsumer):
     userName = "Anonymous"
 
