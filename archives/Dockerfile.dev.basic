@@ -8,6 +8,6 @@ RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/
 
 RUN mkdir -p /certs /var/www/static /var/log/nginx
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx_unsecure.conf /etc/nginx/nginx.conf
 COPY nginx.proxy.conf /etc/nginx/conf.d/default.conf
 
