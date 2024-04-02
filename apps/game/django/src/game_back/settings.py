@@ -33,6 +33,9 @@ CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8080']
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+	'game',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'rest_framework',
     'corsheaders',
-	'game',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +76,11 @@ TEMPLATES = [
     },
 ]
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -84,8 +91,8 @@ REST_FRAMEWORK = {
 }
 
 
+ASGI_APPLICATION = "game_back.asgi.application"
 WSGI_APPLICATION = 'game_back.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
