@@ -12,11 +12,30 @@ NOTE:
 
 HOW TO USE:
 	- First copy this directory and rename it with your app name
-	- Fill django/app_env.example with desired data
+	- Fill env.example with desired data
 	- Build your image with make Build
 	- Use make enter to launch the container and start a bash shell inside
+	- Django need you to change database parameters in settings.py in order to actually use postgresql
 	- You can use make down/up to stop/start the container
 
 CONTAINER SHELL:
 	- There is a fews alias to help you develop your app, try 'help'
 
+DJANGO SETTINGS:
+	- Database settings in settings.py:
+
+import os
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DJ_DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_NAME'),
+        'PORT': os.getenv('DB_PORT'),
+    }
+}
+
+# for development can be useful
+DJANGO_ALLOWED_HOSTS=['*']
