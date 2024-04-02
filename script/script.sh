@@ -45,14 +45,16 @@ arch-chroot /mnt systemctl enable NetworkManager
 arch-chroot /mnt systemctl enable sshd
 
 
+
 # Package utils
 echo "Installing utils packages..."
 arch-chroot /mnt pacman -Sy --noconfirm git curl neofetch docker docker-compose python
+arch-chroot /mnt systemctl enable docker
 
 usermod -aG docker bjill
 
 echo "Cloning transcendance repo..."
-git clone "https://github.com/notapainting/transcendence"
+arch-chroot /mnt su - bjill -c "git clone https://github.com/notapainting/transcendence"
 
 arch-chroot /mnt su - bjill -c 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"'
 
