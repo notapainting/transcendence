@@ -3,9 +3,9 @@ MAKE	=	make -sj
 
 #========#	compose	#========#
 APP_DIR		=	compose/
-APP_FILE	=	compose.app.yml
+APP_FILE	=	compose.chat.yml
 
-PROXY_FILE	=	compose.proxy.yml
+PROXY_FILE	=	compose.proxy.waf.yml
 
 APP_FILE	+= ${PROXY_FILE}
 

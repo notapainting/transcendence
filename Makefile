@@ -23,7 +23,7 @@ re:	clear start
 
 -waf-warn:
 ifeq (${PROXY_FILE}, compose.proxy.yml)
-	@echo "${RED_LIGHT}WARNING: WAF disabled !!!${END}"
+	@printf "${RED_LIGHT}WARNING: WAF disabled !!!${END}\n"
 endif
 
 #========#	build rule	#========#
@@ -32,11 +32,11 @@ build: -waf-warn
 
 waf:
 	@sed -i'' 's/compose.proxy.yml/compose.proxy.waf.yml/g' Makefile.var
-	@echo "${GREEN}${BOLD}WAF turn on :)\n${YELLOW}${ITALIC}please build image again${END}"
+	@printf "${GREEN}${BOLD}WAF turn on :)\n${YELLOW}${ITALIC}please build image again${END}\n"
 
 no-waf:
 	@sed -i'' 's/compose.proxy.waf.yml/compose.proxy.yml/g' Makefile.var
-	@echo "${RED}${BOLD}Warning WAF disabled!!!\n${YELLOW}${ITALIC}please build image again${END}"
+	@printf "${RED}${BOLD}Warning WAF disabled!!!\n${YELLOW}${ITALIC}please build image again${END}\n"
 
 
 #========#	start/stop rule	#========#
@@ -44,7 +44,7 @@ start: -waf-warn
 	${CMP} up -d --build
 
 clear:
-	${CMP} down -v --rmi --remove-orphans
+	${CMP} down -v --remove-orphans --rmi all
 
 up:	-waf-warn
 	${CMP} up -d 
