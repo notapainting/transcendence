@@ -29,20 +29,3 @@ document.getElementById("loginForm").addEventListener("submit", function(event){
 		.then(data => console.log(data))
 		.catch(error => console.error(error));
 });
-
-// Request to auth
-document.getElementById("userLogin").innerHTML = "Jmoutous"
-
-document.getElementById("userEmail").innerHTML = "jmoutous@student.42lyon.fr"
-
-document.getElementById("userRank").innerHTML = "666" + "th"
-
-function loged() {
-	document.getElementById('user-loged').style.display = 'block'
-	document.getElementById('user-unloged').style.display = 'none'
-};
-
-function unLoged() {
-	document.getElementById('user-loged').style.display = 'none'
-	document.getElementById('user-unloged').style.display = 'block'
-};
