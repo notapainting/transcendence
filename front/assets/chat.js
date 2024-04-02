@@ -3,8 +3,10 @@ const roomName = "testRoom/";
 const host = "localhost";
 const port = ":8443";
 const userName = "Borys";
+document.cookie = 'Username=' + userName + ';';
+document.cookie = 'Room=' + roomName + ';';
 
-const chatSocket = new WebSocket('ws://' + host + port + '/ws/chat/' + roomName + '?userName=' + userName);
+const chatSocket = new WebSocket('wss://' + host + port + '/ws/chat/' + roomName);
 
 chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
@@ -30,3 +32,11 @@ document.querySelector('#chat-message-submit').onclick = function(e) {
     }));
    messageInputDom.value = '';
 };
+
+// var authToken = 'R3YKZFKBVi';
+
+// document.cookie = 'X-Authorization=' + authToken + '; path=/';
+
+// var ws = new WebSocket(
+//     'wss://localhost:9000/wss/'
+// );

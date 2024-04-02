@@ -7,8 +7,6 @@ services:
     image: ${APP_NAME_1}_image
     env_file:
       - apps/chat/app.env.example
-    environment:
-      DB_HOST: ${DB_NAME_1}
     volumes:
       - chat_source_code:/app
     networks:

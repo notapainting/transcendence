@@ -1,8 +1,21 @@
-messages :
-    - author
-    - date
-    - 
-    - body
+database:
+	user:
+		-username (id)
+		-contact (multikey)
+		-blocked (multikey)
+		-conv ? (= user + blocked)
+
+	messages :
+		-conv
+		-author
+		-date 
+		-body
+
+
+u: bob
+	-c: marie, jon
+	-b: marc
+	-
 
 
 
