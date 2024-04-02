@@ -33,7 +33,6 @@ document.addEventListener("keyup", keyUpHandler);
 // Listen for button events
 start.addEventListener('click', startGame);
 stop.addEventListener('click', stopGame);
-back.addEventListener('click', backTest);
 
 // Handle key press
 var upPressed = false;
@@ -41,36 +40,52 @@ var downPressed = false;
 let wPressed = false;
 let sPressed = false;
 
-//test backend connexion
-function backTest() {
-	console.log("click");
-    fetch('https://127.0.0.1:8443/api-game/game/')
-        .then(response => response.json())
-        .then(data => console.log(data.message))
-        .catch(error => {
-            console.error('Error response:', error);
-        });
-	}
+const gameSocket = new WebSocket(
+	'wss://'
+	+ window.location.host
+	+ '/ws/ws-game/'
+);
+
+gameSocket.onmessage = function(e) {
+	console.log(e);
+};
+
+gameSocket.onclose = function(e) {
+	console.error('Game socket closed unexpectedly');
+};
+
+document.querySelector('#backButton').onclick = function(e) {
+	gameSocket.send(JSON.stringify({
+		'message': 'back button click !'
+	}));
+};
+
+document.querySelector('#startButton').onclick = function(e) {
+	gameSocket.send(JSON.stringify({
+		'message': 'startButton'
+	}));
+};
+
 	
 // Start game
-function startGame() {
-    fetch('https://127.0.0.1:8443/start-game/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({"gameRunning": true})
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(data => {
-        console.log(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-
+function startGame() 
+{
+    // fetch('https://127.0.0.1:8443/start-game/', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({"gameRunning": true})
+    // })
+    // .then(response => {
+    //     return response.json();
+    // })
+    // .then(data => {
+    //     console.log(data);
+    // })
+    // .catch(error => {
+    //     console.error('Error:', error);
+    // });
 	// gameRunning = true; // a enlever
 }
 
@@ -244,12 +259,14 @@ function getBallInfo() {
         })
         .catch(error => {
             console.error('Error fetching ball info:', error);
+			data = null;
         });
 }
 
-// getBallInfo();
 
+// getBallInfo();
 console.log("gameRunning = ", gameRunning);
+
 if (gameRunning === true)
 	setInterval(getBallInfo, 100);
 

@@ -2,10 +2,10 @@
 import json, random
 
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import routers, serializers, viewsets
-from django.http import HttpRequest
+from channels.generic.websocket import WebsocketConsumer
 
 # Create your views here.
 
@@ -27,8 +27,8 @@ rightPaddleY = height / 2 - paddleHeight / 2
 paddleSpeed = 10
 
 ballRadius = 10
-ballX = 450 # height / 2
-ballY = 300 # width / 2
+ballX = height / 2
+ballY = width / 2
 ballSpeedX = 7
 ballSpeedY = 7
 
@@ -38,8 +38,17 @@ class PlayerR() :
 class PlayerL() :
 	score = 0
 
-def back_test_view(request):
-    return JsonResponse({'message': 'bouton back test click!'})
+class ChatConsumer(WebsocketConsumer):
+    def connect(self):
+        self.accept()
+    def disconnect(self, close_code):
+        pass
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+        self.send(text_data=json.dumps({
+            'message': message
+        }))
 
 @csrf_exempt
 def paddle_view(request):
@@ -94,7 +103,7 @@ def start_game_view(request):
 
 @csrf_exempt
 def update(request):
-    global ballX, ballY, ballSpeedX, ballSpeedY, rightPaddleY, rightPaddleX
+    global ballX, ballY, ballSpeedX, ballSpeedY, rightPaddleY, leftPaddleY
 
     if upPressed and rightPaddleY > 0:
         rightPaddleY -= paddleSpeed
@@ -118,12 +127,12 @@ def update(request):
             ballY > rightPaddleY and
             ballY < rightPaddleY + paddleHeight):
         ballSpeedX = -ballSpeedX
-    # if ballX < 0:
-    #     rightPlayerScore += 1
-    #     reset()
-    # elif ballX > width:
-    #     leftPlayerScore += 1
-    #     reset()
+    if ballX < 0:
+        # rightPlayerScore += 1
+        reset(request)
+    elif ballX > width:
+        # leftPlayerScore += 1
+        reset(request)
     # if leftPlayerScore == maxScore:
     #     playerWin("Left player")
     # elif rightPlayerScore == maxScore:
@@ -132,6 +141,8 @@ def update(request):
 
 @csrf_exempt
 def reset(request):
+    global ballX, ballY, ballSpeedX, ballSpeedY
+
     ballX = width / 2
     ballY = height / 2
     ballSpeedX = -ballSpeedX
