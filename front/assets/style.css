@@ -425,3 +425,9 @@ body {
 	border-radius: 50%;
 	zoom: 125%;
 }
+
+.text-chat {
+background-color: #000000; 
+color: rgb(0, 233, 159); 
+
+}

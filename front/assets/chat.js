@@ -1,42 +1,69 @@
 
 const roomName = "testRoom/";
-const host = "localhost";
+const host = window.location.host;
 const port = ":8443";
-const userName = "Borys";
-document.cookie = 'Username=' + userName + ';';
-document.cookie = 'Room=' + roomName + ';';
 
-const chatSocket = new WebSocket('wss://' + host + port + '/ws/chat/' + roomName);
 
-chatSocket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-    document.querySelector('#chat-log').value += (data.message + '\n');
-};
+var userName = 'anon';
+let chatSocket = undefined;
 
-chatSocket.onclose = function(e) {
-    console.error('Chat socket closed unexpectedly');
-};
+
+
 
 document.querySelector('#chat-message-input').focus();
-document.querySelector('#chat-message-input').onkeyup = function(e) {
-    if (e.keyCode === 13) {  // enter, return
+document.querySelector('#chat-message-input').onkeyup = function(e)
+{
+    if (e.keyCode === 13)
+    {
         document.querySelector('#chat-message-submit').click();
     }
 };
 
-document.querySelector('#chat-message-submit').onclick = function(e) {
+
+document.querySelector('#chat-submit-user').onclick = function(e)
+{
     const messageInputDom = document.querySelector('#chat-message-input');
-    const message = messageInputDom.value;
+    userName = messageInputDom.value;
+
+    document.cookie = 'userName=' + userName + ';';
+    messageInputDom.value = '';
+    chatSocket = new WebSocket('wss://' + host  + '/ws/chat/' + roomName);
+
+    chatSocket.onmessage = function(e)
+    {
+        console.log('msg')
+        const data = JSON.parse(e.data);
+        console.log(data);
+        document.querySelector('#chat-log').value += (data.message + '\n');
+    };
+
+    chatSocket.onclose = function(e)
+    {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+};
+
+document.querySelector('#chat-enter-room').onclick = function(e)
+{
+    const messageInputDom = document.querySelector('#chat-message-input').value;
+    const room  = messageInputDom; 
     chatSocket.send(JSON.stringify({
+        'type': 'room',
+        'room': room
+    }));
+   messageInputDom.value = '';
+};
+
+document.querySelector('#chat-submit-message').onclick = function(e)
+{
+    const messageInputDom = document.querySelector('#chat-message-input');
+    const message = messageInputDom.value; 
+    chatSocket.send(JSON.stringify({
+        'type': 'message',
         'message': message
     }));
    messageInputDom.value = '';
 };
 
-// var authToken = 'R3YKZFKBVi';
 
-// document.cookie = 'X-Authorization=' + authToken + '; path=/';
-
-// var ws = new WebSocket(
-//     'wss://localhost:9000/wss/'
-// );

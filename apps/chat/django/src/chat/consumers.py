@@ -2,55 +2,64 @@
 import json
 
 from asgiref.sync import async_to_sync
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
-# from urllib.parse import parse_qsl
-from requests.structures import CaseInsensitiveDict
-
-
-
-import logging
 # Get an instance of a logger
+import logging
 logger = logging.getLogger('django')
 
 
-# use cookiemiddleware for cookie -> scope['cookie']
-class ChatConsumer(AsyncWebsocketConsumer):
-    userName = "Anonymous"
 
+class ChatConsumer(AsyncJsonWebsocketConsumer):
+
+
+    # get from db conv list
+    # group_add cs to conv (group)
+    # send to cl chat history
+    # limit to 10 old conv/active user
+    # test active user : db/ping cs, middleware list, auth ?
     async def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = "chat_%s" % self.room_name
-        # dictQuery = parse_qsl(self.scope["query_string"].decode('utf-8'))
-        # self.userName = dictQuery[0][1]
-        # Join room group
+        self.room_group_name = "welcome"
+        self.userName = self.scope['cookies'].get('userName', 'Anon')
+
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-
-        raw = dict(self.scope['headers'])[b'cookie'].decode()
-        test = CaseInsensitiveDict(i.split('=', 1) for i in raw.split('; '))
-        self.userName = test.get('username', 'Anon')
-        logger.info("%s Connected!", self.userName)
         await self.accept()
+        await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": f"Hello {self.userName}"})
 
+        logger.info("%s Connected!", self.userName)
+
+    # remove from group
     async def disconnect(self, close_code):
-        # Leave room group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         logger.info("%s Quit...", self.userName)
 
 
-
     # Receive message from WebSocket
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
+    # check event type
+    #  if message
+    # find to which conv message is to 
+    # send it to
+    # log message in db
+    async def receive_json(self, text_data):
 
-        # Send message to room group
-        await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": message})
+
+        type = text_data['type']
+        if type == 'message':
+            await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": text_data["message"]})
+        elif type == 'room':
+            await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+            self.room_group_name = text_data["room"]
+            await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+            await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": f"{self.userName} enter the room {self.room_group_name}! Hello dear"})
+        else:
+            await self.send_json({'type': 'message', 'message': 'error'})
+
 
     # Receive message from room group
     async def chat_message(self, event):
         message = event["message"]
 
-        # Send message to WebSocket
         logger.info(message)
-        await self.send(text_data=json.dumps({"message": message}))
+        # Send message to WebSocket
+        await self.send_json({"message": message})
+        # await self.send(text_data=json.dumps({"message": message}))

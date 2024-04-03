@@ -65,4 +65,5 @@ top:
 logs:
 	${CMP} logs 
 
-
+enter:
+	docker exec -it chat bash
