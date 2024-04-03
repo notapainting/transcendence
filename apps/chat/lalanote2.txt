@@ -18,6 +18,39 @@ u: bob
 	-
 
 
+user 2 connect: -> groups username
+
+cl	->	msg	->	cs 
+		| from 
+		| to : conv (groups?) (!doublon)
+
+
+
+Tuc: Two users conv
+Muc: Multiple users conv
+Ssu: Single session user
+Msu: Multiple sessions user
+
+
+conv-groups arch: (G = O(n), n is number of conv)
+	Ssu: session add to group on connect
+	Msu: each session add to group on connect
+	
+	1 conv (Tuc/Muc) = 1 group
+
+db store
+-> list of conv : unique group_name
+-> 
+
+
+
+user-groups arch : (G = O(u), u is number of user)
+	1 user (Ssu/Msu) = 1 group
+
+
+	Tuc : user A send to user-group B, B respond with 'author' field to user-group A
+	Muc : user A send to user-group B, then user-group C,...etc , users can respond with 'chat.group' field 
+
 
 
 websocket auth : 
@@ -81,15 +114,15 @@ arch server/app:
 
 
 OBJ:
+	-auth via auth api
 	-chat prive
 	-chat multi-session 
-	-auth via auth api
 	-chat group
 	-contact list
 	-block/restrain user 
 	-user creation in chat db
 	-game invitation
-	-notification (HTTP server push : https://github.com/fanout/django-eventstream)
+	-notification 
 	-response to message
 	-profile link
 
