@@ -9,9 +9,11 @@ import logging
 logger = logging.getLogger('django')
 
 
+#add :
+# a way to add/del someone in contact list
+# a way to sent message to a conv (someone)
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
-
 
     # get from db conv list
     # group_add cs to conv (group)
@@ -62,4 +64,3 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         logger.info(message)
         # Send message to WebSocket
         await self.send_json({"message": message})
-        # await self.send(text_data=json.dumps({"message": message}))
