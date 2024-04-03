@@ -103,7 +103,12 @@ class ValidateTokenView(APIView):
 		if token:
 			try:
 				access_token = AccessToken(token)
-				return Response({'message': 'token valide.'}, status=status.HTTP_200_OK)
+				user_id = access_token.payload.get("user_id")
+				if user_id:
+					user = CustomUser.objects.get(pk = user_id)
+					return Response({'message': 'token valide.', 'username': user.username}, status=status.HTTP_200_OK)
+				# else
+				# 	return Response({'message': 'ID utilisateur non trouvé dans le token.'}, status=status.HTTP_400_BAD_REQUEST)
 			except TokenError as e:
 				return Response({'message': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 			except Exception as e:
