@@ -6,37 +6,18 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 width = 900
 height = 600
 maxScore = 5
-
-game_running = False
-
-upPressed = False
-downPressed = False
-wPressed = False
-sPressed = False
-
 paddleHeight = 80
 paddleWidth = 10
-leftPaddleY = height / 2 - paddleHeight / 2
-rightPaddleY = height / 2 - paddleHeight / 2
-paddleSpeed = 10
-
-ballRadius = 10
-ballX = width / 2
-ballY = height / 2
-ballSpeedX = 7
-ballSpeedY = 7
-
-rightPlayerScore = 0
-leftPlayerScore = 0
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        self.game_state = GameState()
         await self.accept()
-        init()
-        await self.send(json.dumps(get_ball_info('none')))
+        # self.game_state.__init__()
+        await self.send(json.dumps(self.game_state.to_dict('none')))
 
     async def disconnect(self, close_code):
-        init()
+        del self.game_state
 
     async def receive(self, text_data):
         global game_running, upPressed, downPressed, wPressed, sPressed
@@ -44,129 +25,123 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         # print(message)
         if message == "startButton":
-            if game_running == False :
-                game_running = True
+             if self.game_state.status['game_running'] == False :
+                self.game_state.status['game_running'] = True
                 asyncio.create_task(loop(self))
-                response = get_ball_info('none')
-                await self.send(json.dumps(response))
-        elif message == "stopButton":
-            game_running = False
+        else :
+            asyncio.create_task(self.game_state.update_player_position(message))
+
+
+class GameState:
+    def __init__(self):
+        self.status = {
+        'ballX': width / 2,
+        'ballY': height / 2,
+        'ballRadius': 10,
+        'ballSpeedX': 7,
+        'ballSpeedY': 7,
+        'width' : 900,
+        'height' : 600,
+        'leftPaddleY' : height / 2 - paddleHeight / 2,
+        'rightPaddleY' : height / 2 - paddleHeight / 2,
+        'paddleWidth' : 10,
+        'paddleHeight' : 80,
+        'paddleSpeed' : 10,
+        'leftPlayerScore' : 0,
+        'rightPlayerScore' : 0,
+        'winner' : 'none',
+        'upPressed' : False,
+        'downPressed' : False,
+        'wPressed' : False,
+        'sPressed' : False,
+        'game_running' : False
+    }
+
+    async def update_player_position(self, message):
+        if message == "stopButton":
+            self.status['game_running'] = False
         elif message == "wPressed":
-            wPressed = True
+            self.status['wPressed'] = True
         elif message == "sPressed":
-            sPressed = True
+            self.status['sPressed'] = True
         elif message == "upPressed":
-            upPressed = True
+            self.status['upPressed'] = True
         elif message == "downPressed":
-            downPressed = True
+            self.status['downPressed'] = True
         elif message == "wRelease":
-            wPressed = False
+            self.status['wPressed'] = False
         elif message == "sRelease":
-            sPressed = False
+            self.status['sPressed'] = False
         elif message == "upRelease":
-            upPressed = False
+            self.status['upPressed'] = False
         elif message == "downRelease":
-            downPressed = False
-    
-def get_ball_info(message):
-    ball_info = {
-        'x': ballX,
-        'y': ballY,
-        'radius': ballRadius,
-        'speed_x': ballSpeedX,
-        'speed_y': ballSpeedY,
+            self.status['downPressed'] = False
+
+    def to_dict(self, winner): #mise en forme
+        return {
+        'x': self.status['ballX'],
+        'y': self.status['ballY'],
+        'radius': self.status['ballRadius'],
+        'speed_x': self.status['ballSpeedX'],
+        'speed_y': self.status['ballSpeedY'],
         'width' : width,
         'height' : height,
-        'leftPaddleY' : leftPaddleY,
-        'rightPaddleY' : rightPaddleY,
-        'paddleWidth' : paddleWidth,
-        'paddleHeight' : paddleHeight,
-        'leftPlayerScore' : leftPlayerScore,
-        'rightPlayerScore' : rightPlayerScore,
-        'winner' : message
+        'leftPaddleY' : self.status['leftPaddleY'],
+        'rightPaddleY' : self.status['rightPaddleY'],
+        'paddleWidth' : self.status['paddleWidth'],
+        'paddleHeight' : self.status['paddleHeight'],
+        'leftPlayerScore' : self.status['leftPlayerScore'],
+        'rightPlayerScore' : self.status['rightPlayerScore'],
+        'winner' : self.status['winner']
     }
-    return ball_info
+    
+    def update(self):
+        if self.status['upPressed'] and self.status['rightPaddleY'] > 0:
+            self.status['rightPaddleY'] -= self.status['paddleSpeed']
+        elif self.status['downPressed'] and self.status['rightPaddleY'] + self.status['paddleHeight'] < height:
+            self.status['rightPaddleY'] += self.status['paddleSpeed']
 
-async def loop(consumer):
-    while game_running:
-        message = update(consumer)
+        if self.status['wPressed'] and self.status['leftPaddleY'] > 0:
+            self.status['leftPaddleY'] -= self.status['paddleSpeed']
+        elif self.status['sPressed'] and self.status['leftPaddleY'] + self.status['paddleHeight'] < height:
+            self.status['leftPaddleY'] += self.status['paddleSpeed']
+        self.status['ballX'] += self.status['ballSpeedX']
+        self.status['ballY'] += self.status['ballSpeedY']
+        if self.status['ballY'] - self.status['ballRadius'] < 0 or self.status['ballY'] + self.status['ballRadius'] > height:
+            self.status['ballSpeedY'] = -self.status['ballSpeedY']
+        if (self.status['ballX'] - self.status['ballRadius'] < self.status['paddleWidth'] and
+                self.status['ballY'] > self.status['leftPaddleY'] and
+                self.status['ballY'] < self.status['leftPaddleY'] + self.status['paddleHeight']):
+            self.status['ballSpeedX'] = -self.status['ballSpeedX']
+
+        if (self.status['ballX'] + self.status['ballRadius'] > width - self.status['paddleWidth'] and
+                self.status['ballY'] > self.status['rightPaddleY'] and
+                self.status['ballY'] < self.status['rightPaddleY'] + self.status['paddleHeight']):
+            self.status['ballSpeedX'] = -self.status['ballSpeedX']
+        if self.status['ballX'] < 0:
+            self.status['rightPlayerScore'] += 1
+            self.reset()
+        elif self.status['ballX'] > width:
+            self.status['leftPlayerScore'] += 1
+            self.reset()
+        if self.status['leftPlayerScore'] == maxScore:
+            self.reset()
+            self.status['winner'] = 'leftWin'
+            self.status['game_running'] = False
+        elif self.status['rightPlayerScore'] == maxScore:
+            self.reset()
+            self.status['winner'] = 'rightWin'
+            self.status['game_running'] = False
+    
+    def reset(self):
+        self.status['ballX']  = width / 2
+        self.status['ballY']  = height / 2
+        self.status['ballSpeedX'] = -self.status['ballSpeedX']
+        self.status['ballSpeedY'] = random.uniform(-5, 5)
+
+async def loop(self):
+    while self.game_state.status['game_running']:
+        message = self.game_state.update()
         await asyncio.sleep(0.02)
-        await consumer.send(json.dumps(get_ball_info('none')))
-        if (message == 'leftWin' or message == 'righttWin') :
-            await consumer.send(json.dumps(get_ball_info(message)))
-
-def update(consumer):
-    global ballX, ballY, ballSpeedX, ballSpeedY, rightPaddleY, leftPaddleY, rightPlayerScore, leftPlayerScore
-    global game_running
-
-    if upPressed and rightPaddleY > 0:
-        rightPaddleY -= paddleSpeed
-    elif downPressed and rightPaddleY + paddleHeight < height:
-        rightPaddleY += paddleSpeed
-
-    if wPressed and leftPaddleY > 0:
-        leftPaddleY -= paddleSpeed
-    elif sPressed and leftPaddleY + paddleHeight < height:
-        leftPaddleY += paddleSpeed
-    ballX += ballSpeedX
-    ballY += ballSpeedY
-    if ballY - ballRadius < 0 or ballY + ballRadius > height:
-        ballSpeedY = -ballSpeedY
-    if (ballX - ballRadius < paddleWidth and
-            ballY > leftPaddleY and
-            ballY < leftPaddleY + paddleHeight):
-        ballSpeedX = -ballSpeedX
-
-    if (ballX + ballRadius > width - paddleWidth and
-            ballY > rightPaddleY and
-            ballY < rightPaddleY + paddleHeight):
-        ballSpeedX = -ballSpeedX
-    if ballX < 0:
-        rightPlayerScore += 1
-        reset()
-    elif ballX > width:
-        leftPlayerScore += 1
-        reset()
-    if leftPlayerScore == maxScore:
-        reset()
-        game_running = False
-        return 'leftWin'
-    elif rightPlayerScore == maxScore:
-        reset()
-        game_running = False
-        return 'rightWin'
-    return 'none'
-
-def reset():
-    global ballX, ballY, ballSpeedX, ballSpeedY
-
-    ballX = width / 2
-    ballY = height / 2
-    ballSpeedX = -ballSpeedX
-    ballSpeedY = random.uniform(-5, 5)
-
-def init():
-    global ballX, ballY, ballSpeedX, ballSpeedY, rightPaddleY, leftPaddleY, rightPlayerScore, leftPlayerScore
-    global game_running, upPressed, downPressed, wPressed, sPressed, ballRadius, paddleWidth, paddleSpeed
-
-    game_running = False
-
-    upPressed = False
-    downPressed = False
-    wPressed = False
-    sPressed = False
-
-    paddleHeight = 80
-    paddleWidth = 10
-    leftPaddleY = height / 2 - paddleHeight / 2
-    rightPaddleY = height / 2 - paddleHeight / 2
-    paddleSpeed = 10
-
-    ballRadius = 10
-    ballX = width / 2
-    ballY = height / 2
-    ballSpeedX = 10
-    ballSpeedY = 10
-
-    rightPlayerScore = 0
-    leftPlayerScore = 0
+        asyncio.create_task(self.game_state.update_player_position(message))
+        await self.send(json.dumps(self.game_state.to_dict('none')))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

@@ -1,9 +1,46 @@
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.117.1/build/three.module.js';
 
-var start = document.getElementById("startButton");
-var stop = document.getElementById("stopButton");
-var back = document.getElementById("backButton");
+// var canvas2 = document.getElementById("canvas");
+// var ctx = canvas2.getContext("2d");
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, 900 / 600, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
+renderer.setSize(900, 600);
+
+
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
+cube.position.set(-1.5, 0, 0);
+scene.add(cube);
+
+const geometry2 = new THREE.BoxGeometry(-3, 0, 1);
+const material2 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube2 = new THREE.Mesh(geometry2, material2);
+cube2.position.set(1.5, 0, 0); 
+scene.add(cube2);
+
+camera.position.z = 5;
+
+function animate() {
+	requestAnimationFrame( animate );
+
+	cube.rotation.x += 0.01;
+	cube.rotation.y += 0.01;
+
+	cube2.rotation.x -= 0.01;
+	cube2.rotation.z -= 0.01;
+
+	renderer.render( scene, camera );
+}
+
+function gameRenderer(data) {
+	// console.log(data);
+	renderer.render( scene, camera );
+}
+
+animate();
 
 const gameSocket = new WebSocket(
 	'wss://'
@@ -11,15 +48,27 @@ const gameSocket = new WebSocket(
 	+ '/ws/ws-game/'
 );
 
+let lastPingTime = performance.now();
+
 gameSocket.onmessage = function(e) {
-	const message = JSON.parse(e.data);
+    const message = JSON.parse(e.data);
 	// console.log(message);
-	draw(message);
+    // draw(message);
+	gameRenderer(message);
+    
+    const currentTime = performance.now();
+    const pingDelay = currentTime - lastPingTime;
+    // console.log("Ping delay:", pingDelay, "ms");
+
 	if (message.winner == 'leftWin')
 		playerWin('left')
 	else if (message.winner == 'rightWin')
 		playerWin('right')
+
+    lastPingTime = currentTime;
+	// console.log("ping = ", lastPingTime);
 };
+
 
 gameSocket.onclose = function(e) {
 	console.error('Game socket closed unexpectedly');
@@ -122,3 +171,4 @@ function playerWin(player) {
 	var myParagraph = document.getElementById("scoreMessage");
 	myParagraph.innerText = message; 
 }
+
