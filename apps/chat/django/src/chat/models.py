@@ -29,7 +29,7 @@ class ChatUser(models.Model):
 	def __str__(self):
 		return self.name
 
-
+# see how to knoe number of manytomany item
 class ChatGroup(models.Model):
 
 	uuid = models.UUIDField(verbose_name='ChatGroup UUID, generate from seed + usernames')
@@ -45,13 +45,13 @@ class ChatGroup(models.Model):
 				"Can't create ChatGroup uuid without users"
 			)
 		key = '';
-		for users in participants:
+		for users in self.participants:
 			key += users.name
 		self.uuid = uuid.uuid5(SEED, key)
 	
 	def save(self, *args, **kwargs):
 		self.set_uuid(self)
-		self.full-clean()
+		self.full_clean()
 		super().save(*args, **kwargs)
 
 
