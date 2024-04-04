@@ -9,6 +9,9 @@ import logging
 logger = logging.getLogger('django')
 
 
+from . import models
+
+
 #add :
 # a way to add/del someone in contact list
 # a way to sent message to a conv (someone)
@@ -28,6 +31,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
         await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": f"Hello {self.userName}"})
 
+        # b = get_user_by_username(self.userName)
         logger.info("%s Connected!", self.userName)
 
     # remove from group
