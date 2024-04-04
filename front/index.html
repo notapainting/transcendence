@@ -9,7 +9,14 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="assets/style.css"> 
-
+	<script type="importmap">
+		{
+		  "imports": {
+			"three": "https://cdn.jsdelivr.net/npm/three@<version>/build/three.module.js",
+			"three/addons/": "https://cdn.jsdelivr.net/npm/three@<version>/examples/jsm/"
+		  }
+		}
+	  </script>
 </head>
 <body>
 	<div id="navbar">
@@ -66,17 +73,17 @@
 		</div>
 
 		<!-- JEU -->
-		<div id="jeu-content" class="page-content" style="display: none;">
-			<h1 id="scoreMessage"></h1>
+		<div id="jeu-content" class="page-content" style="display: block;">
 			<div class="containerGame">
-				<canvas id="canvas" width="900" height="600">
+				<canvas id="canvas" width="900" height="600"></canvas>
 			</div>
 			<div id="gameButton">
 				<button id="startButton" class="button" type="button">Start</button> 
 				<button id="stopButton" class="button" type="button">Stop</button> 
 				<button id="backButton" class="button" type="button">Back test</button> 
 			</div>
-		</div> 
+		</div>
+	
 
 		<!-- CHAT -->
 		<div id="chat-content" style="display: none;">
@@ -91,8 +98,9 @@
         </div>
     </footer>
 
+	<script type="module" src="assets/main.js"></script>
 	<script src="assets/app.js"></script>
-	<script src="assets/game.js"></script>
+	<script type="module"  src="assets/game.js"></script>
 	<script src="assets/connexion.js"></script>
 </body>
 </html>
