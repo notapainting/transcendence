@@ -45,18 +45,29 @@ arch-chroot /mnt systemctl enable NetworkManager
 arch-chroot /mnt systemctl enable sshd
 
 
-
 # Package utils
 echo "Installing utils packages..."
-arch-chroot /mnt pacman -Sy --noconfirm git curl neofetch docker docker-compose python
+arch-chroot /mnt pacman -Sy --noconfirm git curl neofetch docker docker-compose python powerline
 arch-chroot /mnt systemctl enable docker
+arch-chroot /mnt usermod -aG docker bjill
 
-usermod -aG docker bjill
-
-echo "Cloning transcendance repo..."
-arch-chroot /mnt su - bjill -c "git clone https://github.com/notapainting/transcendence"
-
+arch-chroot /mnt bash -c 'echo "FONT=Lat2-Terminus16" >> /etc/vconsole.conf'
+arch-chroot /mnt su - bjill -c 'mkdir -p ~/.config/powerline && cp -R /usr/share/powerline/config_files/* ~/.config/powerline/'
 arch-chroot /mnt su - bjill -c 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"'
 
-echo "Configuration terminée."
+
+echo "Cloning transcendance repo..."
+arch-chroot /mnt su - bjill -c 'git clone /home/bjill/https://github.com/notapainting/transcendence'
+
+#neofetch
+
+arch-chroot /mnt su - bjill -c 'mkdir ~/.bin'
+arch-chroot /mnt su - bjill -c 'touch ~/.bin/startup.sh'
+arch-chroot /mnt su - bjill -c 'chmod +x ~/.bin/startup.sh'
+arch-chroot /mnt su - bjill -c 'echo -e "#!/bin/bash\nneofetch" > ~/.bin/startup.sh'
+arch-chroot /mnt su - bjill -c 'echo ~/.bin/startup.sh >> ~/.bashrc'
+
+
+echo "Restarting..."
+sleep 10
 reboot
