@@ -1,13 +1,28 @@
-from django.shortcuts import render
-
-
 # chat/views.py
-from django.shortcuts import render
+from django.http import JsonResponse, HttpResponse
 
+def create_user(request):
+    try :
+        username = request.data['username']
+        buid = request.data['buid']
+    except KeyError as e:
+        return JsonResponse(status_code=400, data={'error': 'KeyNotfound', 'key': e.message})
+    try :
+        new_user = ChatUser(buid=buid, name=username)
+        new_user.save()
+    except BaseException as e:
+        return JsonResponse(status_code=500, data={'error': 'Internal', 'type': e.message})
+    return HttpResponse(status_code=200)
 
-def index(request):
-    return render(request, "chat/index.html")
-
-def room(request, room_name):
-    return render(request, "chat/room.html", {"room_name": room_name})
+def delete_user(request):
+    try :
+        buid = request.data['buid']
+    except KeyError as e:
+        return JsonResponse(status_code=400, data={'error': 'KeyNotfound', 'key': e.message})
+    try :
+        user = ChatUser.objects.get(buid=buid)
+        user.delete()
+    except BaseException as e:
+        return JsonResponse(status_code=500, data={'error': 'Internal', 'type': e.message})
+    return HttpResponse(status_code=200)
 

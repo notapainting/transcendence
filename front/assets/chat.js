@@ -1,7 +1,6 @@
 
 const roomName = "testRoom/";
 const host = window.location.host;
-const port = ":8443";
 
 
 var userName = 'anon';
@@ -13,6 +12,7 @@ let chatSocket = undefined;
 document.querySelector('#chat-message-input').focus();
 document.querySelector('#chat-message-input').onkeyup = function(e)
 {
+    console.log(e.keyCode)
     if (e.keyCode === 13)
     {
         document.querySelector('#chat-message-submit').click();
