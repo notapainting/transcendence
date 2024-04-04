@@ -1,0 +1,175 @@
+
+Endpoints Disponibles
+
+1. auth/signup/ - Création de compte utilisateur
+
+    Méthode HTTP: POST
+    Description: Crée un nouveau compte utilisateur.
+    Paramètres Requis:
+    username: Nom d'utilisateur unique.
+    email: Adresse email de l'utilisateur.
+    password: Mot de passe de l'utilisateur.
+    Réponse:
+    Statut HTTP 201 Created si le compte est créé avec succès.
+    Statut HTTP 400 Bad Request en cas de paramètres manquants ou invalides.
+
+    exemple : 
+    
+    fetch('/auth/signup/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        username: 'john_doe',
+        email: 'john@example.com',
+        password: 'password123',
+    }),
+    })
+    .then(response => {
+    if (response.ok) {
+        // Traitement en cas de succès
+    } else {
+        // Gestion des erreurs
+    }
+    });
+
+2. auth/token/ - Authentification de l'utilisateur
+
+    Méthode HTTP: POST
+    Description: Authentifie l'utilisateur et génère un jeton d'accès.
+    Paramètres Requis:
+    username: Nom d'utilisateur de l'utilisateur.
+    password: Mot de passe de l'utilisateur.
+    Réponse:
+    Jeton d'accès valide en cas d'authentification réussie.
+    Erreur 401 Unauthorized en cas d'informations d'identification incorrectes.
+
+    exemple: 
+
+    fetch('/auth/token/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        username: 'john_doe',
+        password: 'password123',
+    }),
+    })
+    .then(response => {
+    if (response.ok) {
+        // Récupération du jeton d'accès
+        return response.json();
+    } else {
+        // Gestion des erreurs
+    }
+    })
+    .then(data => {
+    // Utilisation du jeton d'accès
+    });
+
+3. auth/token/refresh/ - Rafraîchissement du jeton d'accès
+
+    Méthode HTTP: POST
+    Description: Rafraîchit le jeton d'accès expiré.
+    Paramètres Requis:
+    Jeton d'accès expiré.
+    Réponse:
+    Nouveau jeton d'accès valide en cas de rafraîchissement réussi.
+    Erreur 401 Unauthorized en cas de jeton d'accès non valide.
+
+    fetch('/auth/token/refresh/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        refresh: 'your_refresh_token_here',
+    }),
+    })
+    .then(response => {
+    if (response.ok) {
+        // Récupération du nouveau jeton d'accès
+        return response.json();
+    } else {
+        // Gestion des erreurs
+    }
+    })
+    .then(data => {
+    // Utilisation du nouveau jeton d'accès
+    });
+
+4. auth/verify-email/<uidb64>/<token>/ - Vérification de l'email
+
+    Méthode HTTP: GET
+    Description: Vérifie l'email de l'utilisateur à partir du lien envoyé par email.
+    Paramètres Requis:
+    uidb64: Identifiant de l'utilisateur (base64).
+    token: Token de vérification envoyé par email.
+    Réponse:
+    Succès ou échec de la vérification de l'email.
+
+5. auth/reset_password/ - Réinitialisation du mot de passe
+
+    Méthode HTTP: POST
+    Description: Envoie un lien de réinitialisation de mot de passe à l'utilisateur par email.
+    Paramètres Requis:
+    email: Adresse email de l'utilisateur.
+    Réponse:
+    Succès ou échec de l'envoi du lien de réinitialisation de mot de passe.
+    fetch('/auth/reset_password/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        email: 'john@example.com',
+    }),
+    })
+    .then(response => {
+    if (response.ok) {
+        // Traitement en cas de succès
+    } else {
+        // Gestion des erreurs
+    }
+   });
+
+6. auth/password_reset_confirm/<uidb64>/<token>/ - Confirmation de réinitialisation de mot de passe
+
+    Méthode HTTP: GET
+    Description: Page de confirmation de réinitialisation de mot de passe.
+    Paramètres Requis:
+    uidb64: Identifiant de l'utilisateur (base64).
+    token: Token de réinitialisation envoyé par email.
+    Réponse:
+    Formulaire de réinitialisation du mot de passe.
+
+7. auth/validate_token/ - Validation du jeton d'accès
+
+    Méthode HTTP: POST
+    Description: Valide un jeton d'accès JWT.
+    Paramètres Requis:
+    token: Jeton d'accès à valider.
+    Réponse:
+    Message indiquant si le jeton est valide ou non.
+
+    exemple : 
+
+    fetch('/auth/validate_token/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        token: 'your_access_token_here',
+    }),
+    })
+    .then(response => {
+    if (response.ok) {
+        // Traitement en cas de jeton valide
+    } else {
+        // Gestion des erreurs
+    }
+    });
+
