@@ -111,7 +111,6 @@ class ValidateTokenView(APIView):
 		else:
 			return Response({'message': 'Token JWT non fourni.'}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 	template_name = 'password_reset_confirm.html'
 	def form_valid(self, form):
