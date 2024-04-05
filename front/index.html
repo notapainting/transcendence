@@ -34,9 +34,7 @@
 	</div>
 
 	<main id="content">
-		<!-- Contenu dynamique -->
 
-		<!-- CONNEXION PAGE -->
 		<div id="signup-content" class="page-content" style="display: none;">
 	
 		</div>
@@ -60,12 +58,11 @@
 		</div>
 
 
-		<!-- ACCUEIL -->
+
 		<div id="accueil-content" class="page-content" style="display: none;">
 			<h1>Bienvenue sur Transcendence !</h1>
 		</div>
 
-		<!-- JEU -->
 		<div id="jeu-content" class="page-content" style="display: none;">
 			<h1 id="scoreMessage"></h1>
 			<div class="containerGame">
@@ -78,7 +75,6 @@
 			</div>
 		</div> 
 
-		<!-- CHAT -->
 		<div id="chat-content" style="display: none;">
 			<h1 id="chat-text" class="text-center"> Chat in progress .. </h1>
 		</div>
@@ -96,3 +92,225 @@
 	<script src="assets/connexion.js"></script>
 </body>
 </html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test des vues</title>
+    <style>
+        /* Styles CSS pour la mise en forme */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        .error {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Test des vues</h2>
+
+		<h3>Connexion avec username et mot de passe</h3>
+        <input type="text" id="loginUsername" placeholder="Nom d'utilisateur">
+        <input type="password" id="loginPassword" placeholder="Mot de passe">
+        <button onclick="login()">Se connecter</button>
+        <div id="loginResponse" class="response"></div>
+
+        <div id="userInfo" class="user-info" style="display: none;">
+            <img id="profilePicture" src="" alt="Photo de profil">
+            <div id="username"></div>
+            <div id="email"></div>
+        </div>
+
+        <h3>Créer un utilisateur</h3>
+        <input type="text" id="username" placeholder="Nom d'utilisateur">
+        <input type="email" id="email" placeholder="Adresse email">
+        <input type="password" id="password" placeholder="Mot de passe">
+        <button onclick="createUser()">Créer l'utilisateur</button>
+        <div id="createUserResponse" class="response"></div>
+
+        <h3>Vérifier le token</h3>
+        <input type="text" id="token" placeholder="Token JWT">
+        <button onclick="validateToken()">Valider le token</button>
+        <div id="validateTokenResponse" class="response"></div>
+
+        <h3>Réinitialiser le mot de passe</h3>
+        <input type="email" id="resetEmail" placeholder="Adresse email">
+        <button onclick="resetPassword()">Envoyer le lien de réinitialisation</button>
+        <div id="resetPasswordResponse" class="response"></div>
+
+        <h3>Actualiser le token</h3>
+        <input type="text" id="refreshToken" placeholder="Token JWT">
+        <button onclick="refreshToken()">Actualiser le token</button>
+        <div id="refreshTokenResponse" class="response"></div>
+    </div>
+
+    <script>
+        // Fonction pour créer un utilisateur
+        function createUser() {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const data = {
+                username: username,
+                email: email,
+                password: password
+            };
+            fetch('/auth/signup/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('createUserResponse').innerText = JSON.stringify(data);
+            })
+            .catch(error => {
+                document.getElementById('createUserResponse').innerText = 'Erreur : ' + error.message;
+            });
+        }
+
+        // Fonction pour valider le token
+        function validateToken() {
+            const token = document.getElementById('token').value;
+            const data = {
+                token: token
+            };
+            fetch('/auth/validate_token/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('validateTokenResponse').innerText = JSON.stringify(data);
+            })
+            .catch(error => {
+                document.getElementById('validateTokenResponse').innerText = 'Erreur : ' + error.message;
+            });
+        }
+
+        // Fonction pour réinitialiser le mot de passe
+        function resetPassword() {
+            const email = document.getElementById('resetEmail').value;
+            const data = {
+                email: email
+            };
+            fetch('/auth/reset_password/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('resetPasswordResponse').innerText = JSON.stringify(data);
+            })
+            .catch(error => {
+                document.getElementById('resetPasswordResponse').innerText = 'Erreur : ' + error.message;
+            });
+        }
+
+        // Fonction pour actualiser le token
+        function refreshToken() {
+            const token = document.getElementById('refreshToken').value;
+            const data = {
+                refresh: token
+            };
+            fetch('/auth/token/refresh/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('refreshTokenResponse').innerText = JSON.stringify(data);
+            })
+            .catch(error => {
+                document.getElementById('refreshTokenResponse').innerText = 'Erreur : ' + error.message;
+            });
+        }
+
+		function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const data = {
+                username: username,
+                password: password
+            };
+            fetch('/auth/token/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Vérifier si la connexion est réussie
+                if (data.access) {
+                    // Afficher les informations de l'utilisateur
+                    document.getElementById('profilePicture').src = `https://localhost:8443${data.profile_picture}`;
+                    document.getElementById('username').innerText = `Nom d'utilisateur: ${data.username}`;
+                    document.getElementById('email').innerText = `Email: ${data.email}`;
+                    // Afficher la section userInfo
+                    document.getElementById('userInfo').style.display = 'block';
+                    // Cacher le formulaire de connexion
+                    document.getElementById('loginResponse').innerText = '';
+                } else {
+                    // Afficher un message d'erreur si la connexion a échoué
+                    document.getElementById('loginResponse').innerText = 'Erreur : Nom d\'utilisateur ou mot de passe incorrect.';
+                }
+            })
+            .catch(error => {
+                document.getElementById('loginResponse').innerText = 'Erreur : ' + error.message;
+            });
+        }
+    </script>
+</body>
+</html> -->

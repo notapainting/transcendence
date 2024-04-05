@@ -58,7 +58,7 @@ def verify_email(request, uidb64, token):
 		if (response.status_code == status.HTTP_201_CREATED):
 			return HttpResponse('Lien de vérification valide', status=200)
 		else:
-			return Response("Erreur while creating user in user_managment service", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+			return HttpResponse("Erreur while creating user in user_managment service", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 	else:
 		return HttpResponse('Lien de vérification invalide ou expiré', status=400)
 
@@ -91,12 +91,6 @@ class UserCreate(APIView):
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	
-				# 	service = request.data.get('service', None)
-				# if service == 'user_management':
-				# 	return Response({'message': 'Token JWT valide. Redirection vers User Management.'}, status=status.HTTP_200_OK)
-				# else:
-				# 	return Response({'message': 'Service inconnu.'}, status=status.HTTP_400_BAD_REQUEST)
-
 class ValidateTokenView(APIView):
 	def post(self, request):
 		token = request.data.get('token', None)
