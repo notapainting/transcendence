@@ -34,12 +34,12 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-	'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle'
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '5/min'
-    }
+	# 'DEFAULT_THROTTLE_CLASSES': [
+    #     'rest_framework.throttling.AnonRateThrottle'
+    # ],
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'anon': '5/min'
+    # }
 }
 
 #TOKEN JWT DURATION
@@ -99,6 +99,8 @@ CSRF_TRUSTED_ORIGINS = ['https://localhost:8443']
 ROOT_URLCONF = 'auth_service.urls'
 
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+
+ALLOWED_HOSTS = ['*']
 
 TEMPLATES = [
     {

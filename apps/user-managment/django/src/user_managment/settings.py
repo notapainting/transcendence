@@ -28,6 +28,7 @@ DEBUG = True
 
 # ALLOWED_HOSTS = []
 MEDIA_ROOT = BASE_DIR / 'user_managment/img'
+MEDIA_URL = '/media/'
 ALLOWED_HOSTS = ['*']
 # Application definition
 
@@ -43,7 +44,6 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'user_managment.CustomUser'
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -120,7 +120,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
