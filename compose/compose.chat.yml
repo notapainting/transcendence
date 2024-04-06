@@ -11,6 +11,8 @@ services:
       - chat_source_code:/app
     networks:
       - app_network
+    ports:
+      - "8000:8000"
     restart: unless-stopped
     depends_on:
       - chat-db

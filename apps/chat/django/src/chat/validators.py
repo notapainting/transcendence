@@ -1,6 +1,8 @@
 #chat/validators.py
 from django.core.exceptions import ValidationError
 
+
+
 def validate_futur(value):
 	from django.utils import timezone
 
@@ -19,3 +21,4 @@ def offensive_name(value):
 				"Name is offensive",
 				params={'value': value}
 			)
+
