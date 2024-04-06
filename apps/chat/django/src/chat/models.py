@@ -1,4 +1,5 @@
 #chat/models.py
+from typing import Any
 from django.db import models
 import uuid
 
@@ -6,28 +7,42 @@ from . import validators
 from channels.db import database_sync_to_async
 from django.core.exceptions import ValidationError
 
+
+import logging
+logger = logging.getLogger('django')
+
 SEED = b'8d41fd76-abb5-48ba-b383-84082c3a7bdb'
 
 @database_sync_to_async
 def get_user_by_username(userName):
 	return ChatUser.object.filter(name=userName)
 
-def create_deleted_user(user):
-	deleted_user = ChatUser(user)
-	deleted_user.name = 'deleted' #use seed + username for uuid5
-	deleted_user.save()
-	return deleted_user
 
 
 class ChatUser(models.Model):
 
-	buid = models.UUIDField(default=uuid.uuid4) #primary_key=True,
+	buid = models.UUIDField(unique=True) #primary_key=True,
 	name = models.CharField(max_length=20, unique=True)
-	contact_list = models.ManyToManyField('ChatUser', related_name='contact')
-	blocked_list = models.ManyToManyField('ChatUser', related_name='blocked')
+	contact_list = models.ManyToManyField('self', related_name='contact')
+	blocked_list = models.ManyToManyField('self', related_name='blocked')
 
 	def __str__(self):
 		return self.name
+
+	def save(self, *args, **kwargs):
+		super().save(*args, **kwargs)
+
+	def json(self):
+		return {
+			'id': self.buid,
+			'name': self.name,
+			'contact': self.contact_list.name,
+			'blocked': self.blocked_list.name,
+			}
+
+	# def delete(self,  *args, **kwargs):
+		
+	# 	return super().delete(args, kwargs)
 
 # see how to knoe number of manytomany item
 class ChatGroup(models.Model):
