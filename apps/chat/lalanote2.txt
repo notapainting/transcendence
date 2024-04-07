@@ -89,6 +89,10 @@ TODO:
 	- make contact list
 	- 
 
+store old username for sometime
+
+e30bdce1-efd2-46da-ae86-ccee2df6e21b
+
 
 
 arch server/app:

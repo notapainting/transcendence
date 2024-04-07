@@ -2,20 +2,19 @@
 from django.urls import path
 
 from . import views
-
+from .views import UserApiView
+from .views import ContactApiView
 
 urlpatterns = [
-    path("user/list", views.list_user),
-    path("user/list/<opt>", views.list_user),
+    path("user/list", UserApiView.list_user),
+    path("user/list/<opt>", UserApiView.list_user),
 
-    path("user/create", views.create_user),
-    path("user/create/<id>", views.create_user),
-    path("user/delete/<id>", views.delete_user),
+    path("user/<id>", UserApiView.as_view()),
 
-    path("user/id/<id>", views.get_user_by_id),
-    path("user/<name>", views.get_user_by_name),
-	
-    path("user/<id>/contact/<target>", views.contact_add)
+
+    # path("user/<id>/contact/<target>", views.contact_add),
+    # path("user/<id>/contact/<target>", views.contact_add),
+    # path("user/<id>/remove/<target>", views.contact_remove)
 ]
 
 # contact add/del
