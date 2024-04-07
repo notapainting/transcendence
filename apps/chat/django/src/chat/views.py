@@ -114,13 +114,16 @@ class ContactApiView(View):
 
     def post(self, request, *args, **kwargs):
         try :
-            data = json.loads(request.body)
-            id = kwargs.get('id', data['id'])
-            target = kwargs.get('target', data['target'])
-            user = ChatUser.objects.get(uid=id)
-            user.contact_list.add(ChatUser.objects.get(uid=target))
+            if is_uuid(kwargs['id']):
+                user = ChatUser.objects.get(uid=kwargs['id'])
+                user.contact_list.add(ChatUser.objects.get(uid=kwargs['target']))
+            else:
+                user = ChatUser.objects.get(name=kwargs['id'])
+                user.contact_list.add(ChatUser.objects.get(name=kwargs['target']))
             user.save()
             return HttpResponse(status=200)
+        except KeyError:
+            return HttpResponse(status=400)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:
@@ -128,41 +131,33 @@ class ContactApiView(View):
             return HttpResponse(status=500)
 
     def get(self, request, *args, **kwargs):
-        pass
+        try :
+            if is_uuid(kwargs['id']):
+                return JsonResponse(status=200, data=ChatUser.objects.get(uid=kwargs['id']).json_contact())
+            return JsonResponse(status=200, data=ChatUser.objects.get(name=kwargs['id']).json_contact())
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
 
     def delete(self, request, *args, **kwargs):
-        pass
-
-@csrf_exempt
-def contact_add(request, id, target):
-    try :
-        user = ChatUser.objects.get(uid=id)
-        user2 = ChatUser.objects.get(uid=target)
-        user.contact_list.add(user2)
-        user.save()
-        return HttpResponse(status=200)
-
-    except (ValidationError, ObjectDoesNotExist):
-        return HttpResponse(status=404)
-    except BaseException as e:
-        logger.error(f"Internal : {e.args[0]}")
-        return HttpResponse(status=500)
-
-
-@csrf_exempt
-def contact_remove(request, id, target):
-    try :
-        user = ChatUser.objects.get(uid=id)
-        user2 = ChatUser.objects.get(uid=target)
-        user.contact_list.remove(user2)
-        user.save()
-        return HttpResponse(status=200)
-
-    except (ValidationError, ObjectDoesNotExist):
-        return HttpResponse(status=404)
-    except BaseException as e:
-        logger.error(f"Internal : {e.args[0]}")
-        return HttpResponse(status=500)
+        try :
+            if is_uuid(kwargs['id']):
+                user = ChatUser.objects.get(uid=kwargs['id'])
+                user.contact_list.remove(ChatUser.objects.get(uid=kwargs['target']))
+            else:
+                user = ChatUser.objects.get(name=kwargs['id'])
+                user.contact_list.remove(ChatUser.objects.get(name=kwargs['target']))
+            user.save()
+            return HttpResponse(status=200)
+        except KeyError:
+            return HttpResponse(status=400)
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
 
 
 

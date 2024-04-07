@@ -34,6 +34,16 @@ class ChatUser(models.Model):
 	def save(self, *args, **kwargs):
 		super().save(*args, **kwargs)
 
+	def json_contact(self):
+		return {
+			'contact': json.dumps(list(self.contact_list.all().values("uid", "name")), cls=DjangoJSONEncoder)
+		}
+
+	def json_blocked(self):
+		return {
+			'blocked': json.dumps(list(self.blocked_list.all().values("uid", "name")), cls=DjangoJSONEncoder)
+		}
+
 	def json(self):
 		return {
 			'uid': self.uid,
