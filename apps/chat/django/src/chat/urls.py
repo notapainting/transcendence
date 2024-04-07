@@ -6,20 +6,21 @@ from .views import UserApiView
 from .views import ContactApiView
 
 urlpatterns = [
-    path("user/list", UserApiView.list_user),
-    path("user/list/<opt>", UserApiView.list_user),
+    path("users", UserApiView.list_user),
+    path("users/list/<opt>", UserApiView.list_user),
 
-    path("user/<id>", UserApiView.as_view()),
+    path("users/<id>", UserApiView.as_view()),
 
 
-    # path("user/<id>/contact/<target>", views.contact_add),
-    # path("user/<id>/contact/<target>", views.contact_add),
-    # path("user/<id>/remove/<target>", views.contact_remove)
+    path("users/<id>/contacts", ContactApiView.as_view()),
+    path("users/<id>/contacts/<target>", ContactApiView.as_view()),
+    # path("users/<id>/block/<target>", ContactApiView.as_view()),
 ]
 
 # contact add/del
-# user/<id>/contact/<target> POST/DELETE
-# user/<id>/block/<target> POST/DELETE
+# users/<id>/contact/<target> POST/DELETE
+# users/<id>/block/<target> POST/DELETE
+# users/<id>/conv/<target> POST/DELETE
 
 # conv create/del/update
 # group/create
