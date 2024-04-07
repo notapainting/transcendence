@@ -17,14 +17,16 @@ SEED = b'8d41fd76-abb5-48ba-b383-84082c3a7bdb'
 def get_user_by_username(userName):
 	return ChatUser.object.filter(name=userName)
 
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 class ChatUser(models.Model):
 
-	buid = models.UUIDField(unique=True) #primary_key=True,
+	uid = models.UUIDField(unique=True)
 	name = models.CharField(max_length=20, unique=True)
-	contact_list = models.ManyToManyField('self', related_name='contact')
-	blocked_list = models.ManyToManyField('self', related_name='blocked')
+	contact_list = models.ManyToManyField('self')
+	blocked_list = models.ManyToManyField('self', related_name='blocked', symmetrical=False)
 
 	def __str__(self):
 		return self.name
@@ -34,10 +36,10 @@ class ChatUser(models.Model):
 
 	def json(self):
 		return {
-			'id': self.buid,
+			'uid': self.uid,
 			'name': self.name,
-			'contact': self.contact_list.name,
-			'blocked': self.blocked_list.name,
+			'contact': json.dumps(list(self.contact_list.all().values("uid", "name")), cls=DjangoJSONEncoder),
+			'blocked': json.dumps(list(self.blocked_list.all().values("uid", "name")), cls=DjangoJSONEncoder),
 			}
 
 	# def delete(self,  *args, **kwargs):
@@ -47,9 +49,9 @@ class ChatUser(models.Model):
 # see how to knoe number of manytomany item
 class ChatGroup(models.Model):
 
-	uuid = models.UUIDField(verbose_name='ChatGroup UUID, generate from seed + usernames')
+	cid = models.UUIDField(default=uuid.uuid4(), verbose_name='ChatGroup UUID')
 	name = models.CharField(max_length=200, validators=[validators.offensive_name])
-	participants = models.ManyToManyField(ChatUser, related_name='conv')
+	participants = models.ManyToManyField(ChatUser) #, related_name='conv'
 
 	def __str__(self):
 		return self.name
@@ -65,8 +67,8 @@ class ChatGroup(models.Model):
 		self.uuid = uuid.uuid5(SEED, key)
 	
 	def save(self, *args, **kwargs):
-		self.set_uuid(self)
-		self.full_clean()
+		# self.set_uuid(self)
+		# self.full_clean()
 		super().save(*args, **kwargs)
 
 
@@ -78,7 +80,7 @@ class ChatGroup(models.Model):
 # validate body length (at higher level)
 class ChatMessage(models.Model):
 
-	uuid = models.UUIDField(default=uuid.uuid4) #primary_key=True, 
+	mid = models.UUIDField(default=uuid.uuid4)
 
 	author = models.ForeignKey(ChatUser, verbose_name="Author", on_delete=models.CASCADE)
 

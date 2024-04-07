@@ -1,13 +1,13 @@
 # chat/views.py
 from django.http import JsonResponse, HttpResponse
 from chat.models import ChatUser
-from django.core.exceptions import ObjectDoesNotExist
-
-from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db.utils import IntegrityError
+from django.views import View
+from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+
 import json
 
 import logging
@@ -16,125 +16,153 @@ logger = logging.getLogger('django')
 # TODO: move log in models
 
 
-import uuid
 
-def is_valid_uuid(val):
+def is_uuid(val):
+    from uuid import UUID
     try:
-        uuid.UUID(str(val))
+        UUID(str(val))
         return True
-    except :
-        raise ValueError
-
-
-
-@csrf_exempt
-@require_http_methods(["POST"])
-def create_user(request, id=None):
-    data = json.loads(request.body)
-
-    try :
-        if id == None:
-            id = data['id']
-        username = data['name']
-    except KeyError as e:
-        return JsonResponse(status=400, data={'error': 'KeyNotfound', 'key': e.args[0]})
-
-    try :
-        user, new = ChatUser.objects.get_or_create(buid=id)
-        user.name = username
-        user.save()
-    except BaseException as e:
-        return JsonResponse(status=500, data={'error': 'Internal', 'context': e.args[0]})
-
-    if new == True:
-        logger.info("create user: id %s, name %s", id, username)
-        return HttpResponse(status=201)
-    logger.info("update user id %s, name %s", id, username)
-    return HttpResponse(status=200)
-
-
-@csrf_exempt
-@require_http_methods(["DELETE"])
-def delete_user(request, id):
-    if id == 'all':
-        ChatUser.objects.all().delete()
-        return HttpResponse(status=200)
-    try :
-        is_valid_uuid(id)
-        user = ChatUser.objects.get(buid=id)
     except ValueError:
-        logger.warning("Not a valid uuid : %s", id)
-        return HttpResponse(status=400)
-    except ObjectDoesNotExist as e:
-        logger.warning("user does not exist : %s", id)
-        return HttpResponse(status=404)
-    except BaseException as e:
-        return JsonResponse(status=500, data={'error': 'Internal', 'context': e.args[0]})
+        return False
+    
 
-    user.delete()
-    logger.info("user %s, deleted", id)
-    return HttpResponse(status=200)
+# handle IntegrityError
+class UserApiView(View):
 
-# catch other except
+    @csrf_exempt
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try :
+            data = json.loads(request.body)
+            id = kwargs.get('id', data['id'])
+            if ChatUser.objects.filter(Q(name=data['name']) | Q(uid=id)).exists():
+                return HttpResponse(status=403)
+            ChatUser.objects.create(uid=id, name=data['name'])
+            return HttpResponse(status=201)
+        except (ValidationError, KeyError) as e:
+            return JsonResponse(status=400, data={'error': 'BadKey', 'key': e.args[0]})
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
+
+    def get(self, request, *args, **kwargs):
+        try :
+            if is_uuid(kwargs['id']):
+                return JsonResponse(status=200, data=ChatUser.objects.get(uid=kwargs['id']).json())
+            return JsonResponse(status=200, data=ChatUser.objects.get(name=kwargs['id']).json())
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
+
+    def put(self, request, *args, **kwargs):
+        try :
+            data = json.loads(request.body)
+            id = kwargs.get('id', data['id'])
+            user = ChatUser.objects.get(uid=id)
+            if ChatUser.objects.filter(name=data['name']).exists():
+                return HttpResponse(status=403)
+            user.name = data['name']
+            user.save()
+            return HttpResponse(status=200)
+        except (ValidationError, KeyError) as e:
+            return JsonResponse(status=400, data={'error': 'BadKey', 'key': e.args[0]})
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
+
+    def delete(self, request, *args, **kwargs):
+        try :
+            id = kwargs.get('id')
+            if id == 'all':
+                ChatUser.objects.all().delete()
+            else :
+                ChatUser.objects.get(uid=id).delete()
+                logger.info("user %s, deleted", id)
+            return HttpResponse(status=200)
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
+
+    def list_user(request, opt=''):
+        try :
+            if opt == 'oname':
+                users = [i.__str__() for i in ChatUser.objects.all()]
+            else:
+                users = [i.json() for i in ChatUser.objects.all()]
+            return JsonResponse(status=200, data={'n': len(users), 'users': users}, safe=False)
+
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
+
+# logger.info(f'{"create" if new else "update"} user: id %s, name %s', user.id, user.name)
+
+
+class ContactApiView(View):
+    @csrf_exempt
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def m(self, request, *args, **kwargs):
+        pass
+
+    def post(self, request, *args, **kwargs):
+        try :
+            data = json.loads(request.body)
+            id = kwargs.get('id', data['id'])
+            target = kwargs.get('target', data['target'])
+            user = ChatUser.objects.get(uid=id)
+            user.contact_list.add(ChatUser.objects.get(uid=target))
+            user.save()
+            return HttpResponse(status=200)
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
+
+    def get(self, request, *args, **kwargs):
+        pass
+
+    def delete(self, request, *args, **kwargs):
+        pass
+
 @csrf_exempt
-@require_http_methods(["GET"])
-def get_user_by_name(request, name):
-    try :
-        user = ChatUser.objects.get(name=name)
-
-    except ObjectDoesNotExist:
-        return HttpResponse(status=404)
-
-    return JsonResponse(status=200, data={'name': user.name})
-
-@csrf_exempt
-@require_http_methods(["GET"])
-def get_user_by_id(request, id):
-    try :
-        is_valid_uuid(id)
-        user = ChatUser.objects.get(buid=id)
-    except ValueError:
-        logger.warning("Not a valid uuid : %s", id)
-        return HttpResponse(status=400)
-    except ObjectDoesNotExist as e:
-        logger.warning("user does not exist : %s", id)
-        return HttpResponse(status=404)
-    except BaseException as e:
-        return JsonResponse(status=500, data={'error': 'Internal', 'context': e.args[0]})
-
-    return JsonResponse(status=200, data=user.json())
-
-@csrf_exempt
-@require_http_methods(["GET"])
-def list_user(request, opt=''):
-    if opt == 'oname':
-        users = [i.__str__() for i in ChatUser.objects.all()]
-    else:
-        users = [i.json() for i in ChatUser.objects.all()]
-    return JsonResponse(status=200, data={'n': len(users), 'users': users}, safe=False)
-
-@csrf_exempt
-@require_http_methods(["POST", "DELETE"])
 def contact_add(request, id, target):
     try :
-        is_valid_uuid(id)
-        is_valid_uuid(target)
-        user = ChatUser.objects.get(buid=id)
-        user2 = ChatUser.objects.get(buid=target)
-        print(user.json())
+        user = ChatUser.objects.get(uid=id)
+        user2 = ChatUser.objects.get(uid=target)
         user.contact_list.add(user2)
-        print(user.json())
         user.save()
-        print(user.json())
-    except ValueError:
-        logger.warning("Not a valid uuid : %s", id)
-        return HttpResponse(status=400)
-    except ObjectDoesNotExist as e:
-        logger.warning("user does not exist : %s", id)
+        return HttpResponse(status=200)
+
+    except (ValidationError, ObjectDoesNotExist):
         return HttpResponse(status=404)
     except BaseException as e:
-        return JsonResponse(status=500, data={'error': 'Internal', 'context': e.args[0]})
+        logger.error(f"Internal : {e.args[0]}")
+        return HttpResponse(status=500)
 
-    return HttpResponse(status=200)
+
+@csrf_exempt
+def contact_remove(request, id, target):
+    try :
+        user = ChatUser.objects.get(uid=id)
+        user2 = ChatUser.objects.get(uid=target)
+        user.contact_list.remove(user2)
+        user.save()
+        return HttpResponse(status=200)
+
+    except (ValidationError, ObjectDoesNotExist):
+        return HttpResponse(status=404)
+    except BaseException as e:
+        logger.error(f"Internal : {e.args[0]}")
+        return HttpResponse(status=500)
+
 
 
