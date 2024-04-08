@@ -34,12 +34,14 @@ class GroupApiView(View):
             diff = len(members) + len(members_name) - len( query_set)
             if diff != 0:
                 return JsonResponse(status=400, data={'error': 'MissingMembers'})
- 
-            q2 = ChatGroup.objects.annotate(nb=Count("members")).values('nb').filter(nb=2).exists()
+
+            q2 = ChatGroup.objects.annotate(nb=Count("members"), filter=Q(members__in=members))
             print(f"q2: {q2}")
-            print(f"qsql: {q2}")
-            return HttpResponse(status=200)
-            # if diff == 2 and ChatGroup.objects.filter(members__in=query_set): 
+            # print(f"q2: {ChatGroup.objects.annotate(nb=Count("members")).values('nb').filter(nb=2)}")
+            if ChatGroup.objects.annotate(nb=Count("members")).values('nb').filter(nb=2).exists():
+                return HttpResponse(status=403)
+
+
 
             c = ChatGroup.objects.create(name=name)
             c.members.set( query_set)
