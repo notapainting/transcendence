@@ -1,5 +1,6 @@
 # game/consumers.py
 import json, random, asyncio
+import sys
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -35,18 +36,22 @@ class GameConsumer(AsyncWebsocketConsumer):
 class GameState:
     def __init__(self):
         self.status = {
-        'ballX': width / 2,
-        'ballY': height / 2,
+        # 'ballX': width / 2,
+        # 'ballY': height / 2,
+        'ballX': 0,
+        'ballY': 0,
         'ballRadius': 10,
         'ballSpeedX': 7,
         'ballSpeedY': 7,
         'width' : 900,
         'height' : 600,
-        'leftPaddleY' : height / 2 - paddleHeight / 2,
-        'rightPaddleY' : height / 2 - paddleHeight / 2,
-        'paddleWidth' : 10,
-        'paddleHeight' : 80,
-        'paddleSpeed' : 10,
+        # 'leftPaddleY' : height / 2 - paddleHeight / 2,
+        # 'rightPaddleY' : height / 2 - paddleHeight / 2,
+        'leftPaddleY' : 0,
+        'rightPaddleY' : 0,
+        'paddleWidth' : 8, #changed
+        'paddleHeight' : 80, 
+        'paddleSpeed' : 8, #changed
         'leftPlayerScore' : 0,
         'rightPlayerScore' : 0,
         'winner' : 'none',
@@ -82,8 +87,6 @@ class GameState:
         'x': self.status['ballX'],
         'y': self.status['ballY'],
         'radius': self.status['ballRadius'],
-        'speed_x': self.status['ballSpeedX'],
-        'speed_y': self.status['ballSpeedY'],
         'width' : width,
         'height' : height,
         'leftPaddleY' : self.status['leftPaddleY'],
@@ -96,46 +99,52 @@ class GameState:
     }
     
     def update(self):
-        if self.status['upPressed'] and self.status['rightPaddleY'] > 0:
-            self.status['rightPaddleY'] -= self.status['paddleSpeed']
-        elif self.status['downPressed'] and self.status['rightPaddleY'] + self.status['paddleHeight'] < height:
+        if self.status['upPressed'] and self.status['rightPaddleY'] < height / 2:
             self.status['rightPaddleY'] += self.status['paddleSpeed']
+        elif self.status['downPressed'] and self.status['rightPaddleY'] > -height / 2  + self.status['paddleHeight']:
+            self.status['rightPaddleY'] -= self.status['paddleSpeed']
 
-        if self.status['wPressed'] and self.status['leftPaddleY'] > 0:
-            self.status['leftPaddleY'] -= self.status['paddleSpeed']
-        elif self.status['sPressed'] and self.status['leftPaddleY'] + self.status['paddleHeight'] < height:
+        if self.status['wPressed'] and self.status['leftPaddleY'] < height / 2:
             self.status['leftPaddleY'] += self.status['paddleSpeed']
+        elif self.status['sPressed'] and self.status['leftPaddleY'] > -height / 2:
+            self.status['leftPaddleY'] -= self.status['paddleSpeed']
+
         self.status['ballX'] += self.status['ballSpeedX']
         self.status['ballY'] += self.status['ballSpeedY']
-        if self.status['ballY'] - self.status['ballRadius'] < 0 or self.status['ballY'] + self.status['ballRadius'] > height:
-            self.status['ballSpeedY'] = -self.status['ballSpeedY']
-        if (self.status['ballX'] - self.status['ballRadius'] < self.status['paddleWidth'] and
-                self.status['ballY'] > self.status['leftPaddleY'] and
-                self.status['ballY'] < self.status['leftPaddleY'] + self.status['paddleHeight']):
-            self.status['ballSpeedX'] = -self.status['ballSpeedX']
+        print(f"{self.status['ballSpeedX']}, {self.status['ballSpeedY']}", file=sys.stderr)
 
-        if (self.status['ballX'] + self.status['ballRadius'] > width - self.status['paddleWidth'] and
-                self.status['ballY'] > self.status['rightPaddleY'] and
-                self.status['ballY'] < self.status['rightPaddleY'] + self.status['paddleHeight']):
-            self.status['ballSpeedX'] = -self.status['ballSpeedX']
-        if self.status['ballX'] < 0:
-            self.status['rightPlayerScore'] += 1
-            self.reset()
-        elif self.status['ballX'] > width:
-            self.status['leftPlayerScore'] += 1
-            self.reset()
-        if self.status['leftPlayerScore'] == maxScore:
-            self.reset()
-            self.status['winner'] = 'leftWin'
-            self.status['game_running'] = False
-        elif self.status['rightPlayerScore'] == maxScore:
-            self.reset()
-            self.status['winner'] = 'rightWin'
-            self.status['game_running'] = False
+        if self.status['ballY'] - self.status['ballRadius'] < height / 2 or self.status['ballY'] + self.status['ballRadius'] > height / 2:
+            self.status['ballSpeedY'] *= -1
+
+        # if (self.status['ballX'] - self.status['ballRadius'] < self.status['paddleWidth'] and
+        #         self.status['ballY'] > self.status['leftPaddleY'] and
+        #         self.status['ballY'] < self.status['leftPaddleY'] + self.status['paddleHeight']):
+        #     self.status['ballSpeedX']  *= -1
+
+        # if (self.status['ballX'] + self.status['ballRadius'] > width - self.status['paddleWidth'] and
+        #         self.status['ballY'] > self.status['rightPaddleY'] and
+        #         self.status['ballY'] < self.status['rightPaddleY'] + self.status['paddleHeight']):
+        #     self.status['ballSpeedX']  *= -1
+        
+
+        # if self.status['ballX'] < 0:
+        #     self.status['rightPlayerScore'] += 1
+        #     self.reset()
+        # elif self.status['ballX'] > width:
+        #     self.status['leftPlayerScore'] += 1
+        #     self.reset()
+        # if self.status['leftPlayerScore'] == maxScore:
+        #     self.reset()
+        #     self.status['winner'] = 'leftWin'
+        #     self.status['game_running'] = False
+        # elif self.status['rightPlayerScore'] == maxScore:
+        #     self.reset()
+        #     self.status['winner'] = 'rightWin'
+        #     self.status['game_running'] = False
     
     def reset(self):
-        self.status['ballX']  = width / 2
-        self.status['ballY']  = height / 2
+        self.status['ballX']  = 0
+        self.status['ballY']  = 0
         self.status['ballSpeedX'] = -self.status['ballSpeedX']
         self.status['ballSpeedY'] = random.uniform(-5, 5)
 
