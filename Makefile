@@ -14,7 +14,7 @@
 
 
 #========#	general rule	#========#
-.PHONY: all re build start up down clear top ps config logs
+.PHONY: all re build start up down clear top ps config logs enter
 
 all:	start
 

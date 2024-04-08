@@ -1,24 +1,54 @@
 # chat/urls.py
-from django.urls import path
-
-from . import views
-from .views import UserApiView
-from .views import ContactApiView
-
-urlpatterns = [
-    path("users", UserApiView.list_user),
-    path("users/list/<opt>", UserApiView.list_user),
-
-    path("users/<id>", UserApiView.as_view()),
+from django.urls import path, include
 
 
-    path("users/<id>/contacts", ContactApiView.as_view()),
-    path("users/<id>/contacts/<target>", ContactApiView.as_view()),
-    # path("users/<id>/block/<target>", ContactApiView.as_view()),
+from .views import UserApiView, UserContactApiView, UserBlockedApiView
+from .GroupView import GroupApiView
+
+urls_user = [
+    path("", UserApiView.as_view()),
+    path("<id>/", UserApiView.as_view()),
+
+    path("<id>/contacts/", UserContactApiView.as_view()),
+    path("<id>/contacts/<target>/", UserContactApiView.as_view()),
+
+    path("<id>/blockeds/", UserBlockedApiView.as_view()),
+    path("<id>/blockeds/<target>/", UserBlockedApiView.as_view()),
 ]
 
+urls_group = [
+    path("", GroupApiView.as_view()),
+    path("<uuid:gid>/", GroupApiView.as_view()),
+
+    path("<uuid:gid>/members/", GroupApiView.as_view()),
+    path("<uuid:gid>/members/<uuid:uid>/", GroupApiView.as_view()), # -> redirect to /users/mid
+
+    path("<uuid:gid>/message", GroupApiView.as_view()),
+    path("<uuid:gid>/message/<uuid:mid>/", GroupApiView.as_view()), # -> redirect to /message/mid
+]
+
+urls_message = [
+    # path("", MessageApiView.as_view()),
+    # path("<uuid:gid>", MessageApiView.as_view()), -> return message data (author/date/group/body)
+    # path("<uuid:gid>/body/", MessageApiView.as_view()), -> return message body
+
+    # path("<uuid:gid>/author/", MessageApiView.as_view()),  -> redirect to /users/mid
+    # path("<uuid:gid>/conv/", MessageApiView.as_view()), -> redirect to /groups/mid
+
+]
+
+urlspatterns = [
+    path('users/', include(urls_user)),
+    path('groups/', include(urls_group))
+]
+
+urls = [
+    path('v1/', include(urlspatterns))
+]
+
+
 # contact add/del
-# users/<id>/contact/<target> POST/DELETE
+# groups/<id> POST/DELETE/GET
 # users/<id>/block/<target> POST/DELETE
 # users/<id>/conv/<target> POST/DELETE
 
