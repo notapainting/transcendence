@@ -23,7 +23,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 class ChatUser(models.Model):
 
-	uid = models.UUIDField(unique=True)
+	uid = models.UUIDField(unique=True, verbose_name='User ID')
 	name = models.CharField(max_length=20, unique=True)
 	contact_list = models.ManyToManyField('self')
 	blocked_list = models.ManyToManyField('self', related_name='blocked', symmetrical=False)
@@ -43,6 +43,11 @@ class ChatUser(models.Model):
 		return {
 			'blocked': json.dumps(list(self.blocked_list.all().values("uid", "name")), cls=DjangoJSONEncoder)
 		}
+	
+	def json_group(self):
+		return {
+			'groups': json.dumps(list(self.chatgroup_set.all().values("gid")), cls=DjangoJSONEncoder)
+		}
 
 	def json(self):
 		return {
@@ -50,36 +55,41 @@ class ChatUser(models.Model):
 			'name': self.name,
 			'contact': json.dumps(list(self.contact_list.all().values("uid", "name")), cls=DjangoJSONEncoder),
 			'blocked': json.dumps(list(self.blocked_list.all().values("uid", "name")), cls=DjangoJSONEncoder),
-			}
+			'groups': json.dumps(list(self.chatgroup_set.all().values("gid")), cls=DjangoJSONEncoder),
+		}
 
-	# def delete(self,  *args, **kwargs):
-		
-	# 	return super().delete(args, kwargs)
+	def json_short(self):
+		return {
+			'gid': self.uid,
+			'name': self.name,
+		}
+
 
 # see how to knoe number of manytomany item
 class ChatGroup(models.Model):
 
-	cid = models.UUIDField(default=uuid.uuid4(), verbose_name='ChatGroup UUID')
+	gid = models.UUIDField(default=uuid.uuid4(), unique=True, verbose_name='ChatGroup ID')
 	name = models.CharField(max_length=200, validators=[validators.offensive_name])
-	participants = models.ManyToManyField(ChatUser) #, related_name='conv'
+	members = models.ManyToManyField(ChatUser)
 
 	def __str__(self):
 		return self.name
 	
-	def set_uuid(self):
-		if self.participants == None:
-			raise ValidationError(
-				"Can't create ChatGroup uuid without users"
-			)
-		key = '';
-		for users in self.participants:
-			key += users.name
-		self.uuid = uuid.uuid5(SEED, key)
+	def json(self):
+		return {
+			'gid': self.gid,
+			'name': self.name,
+			'n': '0',
+			'members': json.dumps(list(self.members.all().values("uid", "name")), cls=DjangoJSONEncoder),
+		}
+
+	def json_short(self):
+		return {
+			'gid': self.gid,
+			'name': self.name,
+		}
 	
-	def save(self, *args, **kwargs):
-		# self.set_uuid(self)
-		# self.full_clean()
-		super().save(*args, **kwargs)
+
 
 
 # validate date message :
@@ -114,9 +124,24 @@ class ChatMessage(models.Model):
 
 
 
-
-
-
+	# def delete(self,  *args, **kwargs):
+		
+	# 	return super().delete(args, kwargs)
+ 
+	# def set_uuid(self):
+	# 	if self.members == None:
+	# 		raise ValidationError(
+	# 			"Can't create ChatGroup uuid without users"
+	# 		)
+	# 	key = '';
+	# 	for users in self.members:
+	# 		key += users.name
+	# 	self.uuid = uuid.uuid5(SEED, key)
+ 
+	# def save(self, *args, **kwargs):
+	# 	# self.set_uuid(self)
+	# 	# self.full_clean()
+	# 	super().save(*args, **kwargs)
 
 # class C:
 #     def __init__(self):

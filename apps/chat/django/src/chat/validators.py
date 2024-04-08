@@ -22,3 +22,10 @@ def offensive_name(value):
 				params={'value': value}
 			)
 
+def is_uuid(val):
+    from uuid import UUID
+    try:
+        UUID(str(val))
+        return True
+    except ValueError:
+        return False

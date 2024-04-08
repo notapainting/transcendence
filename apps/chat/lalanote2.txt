@@ -18,6 +18,44 @@ u: bob
 	-
 
 
+API
+user -> user data
+	 -> contact
+	 -> blocked
+	 -> conv	-> APIconv
+	 -> message	-> APImessage
+
+conv -> conv
+	 -> participants	-> list ->  APIuser
+	 -> message 		-> list -> APImessage
+
+message	-> message data (body. date. author id)
+		-> author	-> APIuser
+		-> conv		-> APIconv
+
+APIv1 : /api/v1/
+
+USER: /users/ 
+'' 
+	-> GET -> list of users
+
+':id/'	-> id is a uuid
+	-> POST -> create user <id> with payload, payload only accept 'name' field
+from now ':id/' in USER can be a name
+		-> GET -> user <id> data
+		-> PUT -> change user <id> data from payload, payload only accept 'name' field
+		-> DELETE -> delete user <id>
+
+':id/contacts/'
+	-> POST
+
+
+
+
+
+
+
+
 user 2 connect: -> groups username
 
 cl	->	msg	->	cs 
@@ -89,7 +127,11 @@ TODO:
 	- make contact list
 	- 
 
+
+aUTH ?
 store old username for sometime
+vm : install vscode extension directement
+
 
 e30bdce1-efd2-46da-ae86-ccee2df6e21b
 
