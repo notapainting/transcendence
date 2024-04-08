@@ -35,7 +35,7 @@ class GroupApiView(View):
             if diff != 0:
                 return JsonResponse(status=400, data={'error': 'MissingMembers'})
 
-            q2 = ChatGroup.objects.annotate(nb=Count("members"), filter=Q(members__in=members))
+            q2 = ChatGroup.objects.annotate(nb=Count("members"), distinct=True, filter=Q(members__uid__in=members))
             print(f"q2: {q2}")
             # print(f"q2: {ChatGroup.objects.annotate(nb=Count("members")).values('nb').filter(nb=2)}")
             if ChatGroup.objects.annotate(nb=Count("members")).values('nb').filter(nb=2).exists():
