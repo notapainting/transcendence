@@ -1,4 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.117.1/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
 
 // var canvas2 = document.getElementById("canvas");
 // var ctx = canvas2.getContext("2d");
@@ -8,39 +9,52 @@ const camera = new THREE.PerspectiveCamera(75, 900 / 600, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
 renderer.setSize(900, 600);
 
+camera.position.z = 450;
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-cube.position.set(-1.5, 0, 0);
-scene.add(cube);
+const controls = new OrbitControls( camera, renderer.domElement );
 
-const geometry2 = new THREE.BoxGeometry(-3, 0, 1);
-const material2 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube2 = new THREE.Mesh(geometry2, material2);
-cube2.position.set(1.5, 0, 0); 
-scene.add(cube2);
-
-camera.position.z = 5;
-
-function animate() {
+function animate(cylinder) {
 	requestAnimationFrame( animate );
 
-	cube.rotation.x += 0.01;
-	cube.rotation.y += 0.01;
-
-	cube2.rotation.x -= 0.01;
-	cube2.rotation.z -= 0.01;
+	cylinder.rotation.x += 0.01;
+	cylinder.rotation.z += 0.01;
+	cylinder.rotation.y += 0.01;
 
 	renderer.render( scene, camera );
 }
 
 function gameRenderer(data) {
-	// console.log(data);
+	scene.remove(...scene.children);
+	const geometry = new THREE.CylinderGeometry( data.paddleWidth, data.paddleWidth, data.paddleHeight, 20 ); 
+	const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
+	const geometryBall = new THREE.SphereGeometry( 15, 32, 16 ); 
+	const materialBall = new THREE.MeshBasicMaterial( { color: 0xffff00 } ); 
+	
+	const sphere = new THREE.Mesh( geometryBall, materialBall); 
+
+	const cylinderRight = new THREE.Mesh( geometry, material);
+	const cylinderLeft = new THREE.Mesh( geometry, material);
+	const sceneWidth= 900;
+    const cylinderWidth = 1; 
+    const cylinderPositionX = (sceneWidth / 2) - (cylinderWidth / 2);
+
+	
+    cylinderRight.position.set(cylinderPositionX, data.rightPaddleY, 0);
+    cylinderLeft.position.set(-cylinderPositionX, data.leftPaddleY, 0);
+	sphere.position.set(data.x, data.y, 0);
+	
+	// console.log(sphere.position.x);
+	// console.log(sphere.position.y);
+	// console.log(sphere.position.z);
+	scene.add(cylinderRight);
+	scene.add(cylinderLeft);
+	scene.add( sphere );
+
+	
 	renderer.render( scene, camera );
 }
 
-animate();
+// animate();
 
 const gameSocket = new WebSocket(
 	'wss://'
@@ -168,7 +182,7 @@ function draw(data) {
 
 function playerWin(player) {
 	var message = "Congratulations! " + player + " win!";
-	var myParagraph = document.getElementById("scoreMessage");
-	myParagraph.innerText = message; 
+	// var myParagraph = document.getElementById("scoreMessage");
+	// myParagraph.innerText = message; 
 }
 
