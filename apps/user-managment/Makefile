@@ -14,8 +14,7 @@ down:
 	${CMP} down 
 
 clear:
-	${CMP} down --rmi all -v --remove-orphans
-
+	${CMP} down -v --remove-orphans
 ps:
 	${CMP} ps
 
