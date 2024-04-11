@@ -44,7 +44,7 @@ start: -waf-warn
 	${CMP} up -d --build
 
 clear:
-	${CMP} down -v --rmi --remove-orphans
+	${CMP} down -v --remove-orphans
 
 up:	-waf-warn
 	${CMP} up -d 

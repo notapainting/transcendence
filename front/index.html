@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -91,10 +91,9 @@
 	<script src="assets/game.js"></script>
 	<script src="assets/connexion.js"></script>
 </body>
-</html>
+</html> -->
 
-
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -116,6 +115,7 @@
         input[type="text"],
         input[type="email"],
         input[type="password"],
+        input[type="file"],
         button {
             display: block;
             width: 100%;
@@ -148,7 +148,7 @@
     <div class="container">
         <h2>Test des vues</h2>
 
-		<h3>Connexion avec username et mot de passe</h3>
+        <h3>Connexion avec username et mot de passe</h3>
         <input type="text" id="loginUsername" placeholder="Nom d'utilisateur">
         <input type="password" id="loginPassword" placeholder="Mot de passe">
         <button onclick="login()">Se connecter</button>
@@ -158,6 +158,10 @@
             <img id="profilePicture" src="" alt="Photo de profil">
             <div id="username"></div>
             <div id="email"></div>
+            <h3>Modifier la photo de profil</h3>
+            <input type="file" id="profilePictureInput">
+            <button onclick="updateProfilePicture()">Modifier</button>
+            <div id="updateProfilePictureResponse" class="response"></div>
         </div>
 
         <h3>Créer un utilisateur</h3>
@@ -276,7 +280,7 @@
             });
         }
 
-		function login() {
+        function login() {
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
             const data = {
@@ -294,6 +298,8 @@
             .then(data => {
                 // Vérifier si la connexion est réussie
                 if (data.access) {
+                    // Enregistrer le token dans le localStorage
+                    localStorage.setItem('jwtToken', data.access);
                     // Afficher les informations de l'utilisateur
                     document.getElementById('profilePicture').src = `https://localhost:8443${data.profile_picture}`;
                     document.getElementById('username').innerText = `Nom d'utilisateur: ${data.username}`;
@@ -311,6 +317,29 @@
                 document.getElementById('loginResponse').innerText = 'Erreur : ' + error.message;
             });
         }
+
+        // Fonction pour mettre à jour la photo de profil
+        function updateProfilePicture() {
+            const token = localStorage.getItem('jwtToken');
+            const profilePictureInput = document.getElementById('profilePictureInput');
+            const profilePicture = profilePictureInput.files[0];
+            const formData = new FormData();
+            formData.append('profile_picture', profilePicture);
+            fetch('https://localhost:8443/auth/update_picture/', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('updateProfilePictureResponse').innerText = JSON.stringify(data);
+            })
+            .catch(error => {
+                document.getElementById('updateProfilePictureResponse').innerText = 'Erreur : ' + error.message;
+            });
+        }
     </script>
 </body>
-</html> -->
+</html>

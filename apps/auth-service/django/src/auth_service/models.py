@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractUser
 
 class CustomUser(AbstractUser):
     isVerified = models.BooleanField(default=False)
-    verification_key = models.CharField(max_length=100, blank=True)
+    unique_id = models.CharField(max_length=100, blank=True)
     is_2fa_enabled = models.BooleanField(default=False)
 
 class UserToken(models.Model):

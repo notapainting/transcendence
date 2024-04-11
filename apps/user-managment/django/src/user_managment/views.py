@@ -16,17 +16,22 @@ class UserCreate(APIView):
 	# def update(self, request):
 
 class UpdateClientInfo(APIView):
-	def post(self, request):
-		username = request.data.get('username')
-		if username:
-			try:
-				user = CustomUser.objects.get('username', None)
-				serializer = UserSerializer(user)
-				return Response(serializer.data, status = 200)
-			except CustomUser.DoesNotExist:
-				return Response("User not found", status=404)
-		else:
-			return Response("User not in request", status=404)
+	def put(self, request, *args, **kwargs):
+		try:
+			user = CustomUser.objects.get(unique_id=request.data['unique_id'])
+		except CustomUser.DoesNotExist:
+			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+		data = request.data
+		for key, value in data.items():
+			if key == 'profile_picture':
+				# Si la clé est 'profile_picture'
+				user.profile_picture.delete(save=False)
+				user.profile_picture.save(f"{user.username}.jpg", value, save=True)
+				return Response({"message": "User information updated successfully"}, status=status.HTTP_200_OK)
+			if hasattr(user, key):
+				setattr(user, key, value)
+			user.save()
+		return Response({"message": "User information updated successfully"}, status=status.HTTP_200_OK)
 
 class GetUserInfos(APIView):
 	def post(self, request):

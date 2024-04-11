@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 		extra_kwargs = {'password' : {'write_only' :True , 'required': True}} 
 		#surcharge
 	def create(self, validated_data):
-		verification_key = str(uuid.uuid4())
+		unique_id = str(uuid.uuid4())
 		validated_data['password'] = make_password(validated_data['password'])
-		validated_data['verification_key'] = verification_key
+		validated_data['unique_id'] = unique_id
 		return CustomUser.objects.create(**validated_data)
