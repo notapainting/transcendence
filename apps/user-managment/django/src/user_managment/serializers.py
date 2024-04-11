@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 		#spécifie que le serializer va manipuler les Users
 		model = CustomUser
 		#specifie quels champs il va manipuler
-		fields = ['id', 'username', 'email', 'isVerified', 'profile_picture', 'first_name', 'last_name', 'date_of_birth', 'gender']
+		fields = ['id', 'username', 'email', 'isVerified', 'unique_id' ,'profile_picture', 'first_name', 'last_name', 'date_of_birth', 'gender']
 	def create(self, validated_data):
 		return CustomUser.objects.create(**validated_data)
 	def update(self, instance, validated_data):

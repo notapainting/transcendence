@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
 	first_name = models.CharField(max_length=50, null=True, blank=True)
 	last_name = models.CharField(max_length=50, null=True, blank=True)
 	date_of_birth = models.DateField(null=True, blank=True)
+	unique_id = models.CharField(max_length=100, blank=True)
 	GENDER_CHOICES = (
 		('M', 'Male'),
 		('F', 'Female'),

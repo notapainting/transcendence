@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from user_managment.views import UserCreate, GetUserInfos
+from user_managment.views import UserCreate, GetUserInfos, UpdateClientInfo
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -24,4 +24,5 @@ from django.conf.urls.static import static
 urlpatterns = [
 	path('signup/', UserCreate.as_view(), name='signup'),
 	path('getuserinfo/', GetUserInfos.as_view(), name='get-user-info'),
+    path('update_client/', UpdateClientInfo.as_view(), name='get-user-info'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

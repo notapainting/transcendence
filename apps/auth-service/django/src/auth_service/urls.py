@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from auth_service.views import UserCreate, CustomTokenRefreshView, verify_email, CustomTokenObtainPairView, PasswordRequestReset,  CustomPasswordResetConfirmView, ValidateTokenView
+from auth_service.views import UserCreate, CustomTokenRefreshView, verify_email, CustomTokenObtainPairView, PasswordRequestReset,  CustomPasswordResetConfirmView, ValidateTokenView, UpdateClientInfo, UpdateProfilePicture
 
 
 urlpatterns = [
@@ -12,4 +12,6 @@ urlpatterns = [
 	path('auth/reset_password/', PasswordRequestReset.as_view(), name='password_request_reset'),
 	path('auth/password_reset_confirm/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 	path('auth/validate_token/', ValidateTokenView.as_view(), name='validate_token'),
+	path('auth/update_client/', UpdateClientInfo.as_view(), name='update_client'),
+	path('auth/update_picture/', UpdateProfilePicture.as_view(), name='update_picture'),
 ]

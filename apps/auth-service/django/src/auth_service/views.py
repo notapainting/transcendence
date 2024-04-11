@@ -21,6 +21,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.shortcuts import render
 from django.views.generic import View
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 User = get_user_model()
@@ -52,7 +53,8 @@ def verify_email(request, uidb64, token):
 		user.save()
 		user_data = {
 				'username': user.username,
-				'email' : user.email
+				'email' : user.email,
+				'unique_id': user.unique_id
 		}
 		response = requests.post('http://user-managment:8000/signup/', json=user_data)
 		if (response.status_code == status.HTTP_201_CREATED):
@@ -92,25 +94,91 @@ class UserCreate(APIView):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	
 class ValidateTokenView(APIView):
+	authentication_classes = [JWTAuthentication]
 	def post(self, request):
-		token = request.data.get('token', None)
-		if token:
-			try:
-				access_token = AccessToken(token)
-				return Response({'message': 'token valide.'}, status=status.HTTP_200_OK)
-			except TokenError as e:
-				return Response({'message': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
-			except Exception as e:
-				return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-		else:
-			return Response({'message': 'Token JWT non fourni.'}, status=status.HTTP_400_BAD_REQUEST)
+		user_id = self.request.user.id
+		try:
+			user = CustomUser.objects.get(id=user_id)
+		except CustomUser.DoesNotExist:
+			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+		return Response({'message': 'token valide.', 'username': user.username}, status=status.HTTP_200_OK)
 
+# class UpdateProfilePicture(APIView):
+# 	authentication_classes = [JWTAuthentication]
+# 	def put(self, request, *args, **kwargs):
+# 		user_id = self.request.user.id
+# 		try:
+# 			user = CustomUser.objects.get(id=user_id)
+# 		except CustomUser.DoesNotExist:
+# 			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+# 		profile_picture = request.FILES.get('profile_picture')
+# 		unique_code = user.unique_code
+
+# 		if profile_picture and unique_code:
+# 			try:
+# 				# Envoi de l'image et du code unique à user-managment
+# 				files = {'profile_picture': profile_picture}
+# 				data = {'unique_code': unique_code}
+# 				response = requests.put('http://user-managment:8000/update_profile_picture/', files=files, data=data)
+# 				response.raise_for_status()  # Gère les erreurs HTTP
+# 			except requests.exceptions.RequestException as e:
+# 				return Response({"error": f"Failed to update profile picture: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# 			return Response({"message": "Profile picture updated successfully"}, status=status.HTTP_200_OK)
+# 		else:
+# 			return Response({"error": "Missing profile picture or unique code"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateProfilePicture(APIView):
+	authentication_classes = [JWTAuthentication]
+
+	def put(self, request, *args, **kwargs):
+		user_id = self.request.user.id
+		try:
+			user = CustomUser.objects.get(id=user_id)
+		except CustomUser.DoesNotExist:
+			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+		profile_picture = request.FILES.get('profile_picture')
+		if profile_picture:
+			try:
+				files = {'profile_picture': profile_picture}
+				data = {'unique_id': user.unique_id}
+				update_response = requests.put('http://user-managment:8000/update_client/', files=files, data=data)
+				update_response.raise_for_status()  
+			except requests.exceptions.RequestException as e:
+				return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+			return Response({"message": "Profile picture updated successfully"}, status=status.HTTP_200_OK)
+		else:
+			return Response({"error": "No profile picture provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateClientInfo(APIView):
+	authentication_classes = [JWTAuthentication]
+	def put(self, request, *args, **kwargs):
+		user_id = self.request.user.id
+		try:
+			user = CustomUser.objects.get(id=user_id)
+		except CustomUser.DoesNotExist:
+			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+		try:
+			request.data['unique_id'] = user.unique_id
+			update_response = requests.put('http://user-managment:8000/update_client/', json=request.data)
+			update_response.raise_for_status()  
+		except requests.exceptions.RequestException as e:
+			return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+		data = request.data
+		for key, value in data.items():
+			if hasattr(user, key):
+				setattr(user, key, value)
+		user.save()
+		return Response({"message": "User information updated successfully"}, status=status.HTTP_200_OK)
+
+	
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 	template_name = 'password_reset_confirm.html'
 	def form_valid(self, form):
 		response = super().form_valid(form)
 		return HttpResponse('Le mot de passe a ete modifier avec succes',  status=200)
-     
+
 class PasswordRequestReset(APIView):
 	def post(self, request):
 		email = request.data.get('email')
