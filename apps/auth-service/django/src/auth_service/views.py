@@ -22,7 +22,7 @@ from django.contrib.auth.views import PasswordResetConfirmView
 from django.shortcuts import render
 from django.views.generic import View
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from django.shortcuts import redirect
 
 User = get_user_model()
 
@@ -103,32 +103,6 @@ class ValidateTokenView(APIView):
 			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 		return Response({'message': 'token valide.', 'username': user.username}, status=status.HTTP_200_OK)
 
-# class UpdateProfilePicture(APIView):
-# 	authentication_classes = [JWTAuthentication]
-# 	def put(self, request, *args, **kwargs):
-# 		user_id = self.request.user.id
-# 		try:
-# 			user = CustomUser.objects.get(id=user_id)
-# 		except CustomUser.DoesNotExist:
-# 			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-# 		profile_picture = request.FILES.get('profile_picture')
-# 		unique_code = user.unique_code
-
-# 		if profile_picture and unique_code:
-# 			try:
-# 				# Envoi de l'image et du code unique à user-managment
-# 				files = {'profile_picture': profile_picture}
-# 				data = {'unique_code': unique_code}
-# 				response = requests.put('http://user-managment:8000/update_profile_picture/', files=files, data=data)
-# 				response.raise_for_status()  # Gère les erreurs HTTP
-# 			except requests.exceptions.RequestException as e:
-# 				return Response({"error": f"Failed to update profile picture: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-# 			return Response({"message": "Profile picture updated successfully"}, status=status.HTTP_200_OK)
-# 		else:
-# 			return Response({"error": "Missing profile picture or unique code"}, status=status.HTTP_400_BAD_REQUEST)
-
-
 class UpdateProfilePicture(APIView):
 	authentication_classes = [JWTAuthentication]
 
@@ -200,3 +174,42 @@ class PasswordRequestReset(APIView):
 
 class CustomTokenRefreshView(TokenRefreshView):
     throttle_classes = (AnonRateThrottle,)
+
+import os
+from django.http import JsonResponse
+
+def authenticate_with_42(request):
+	uid = os.getenv('UID')
+	if uid is None:
+		pass #implementer uen redirection
+	authorization_url = f"https://api.intra.42.fr/oauth/authorize?client_id={uid}&redirect_uri=https://127.0.0.1:8443/auth/Oauth&response_type=code"
+	response = JsonResponse({'authorization_url': authorization_url})
+	response["Access-Control-Allow-Origin"] = "*"
+	response["Access-Control-Allow-Methods"] = "GET"
+	response["Access-Control-Allow-Headers"] = "Content-Type"
+
+	return response
+
+def oauth_callback(request):
+	code = request.GET['code']
+	if code:
+		token_url = "https://api.intra.42.fr/oauth/token"
+		client_id = os.getenv('UID')
+		client_secret = os.getenv('SECRET_KEY')
+		redirect_url = "https://127.0.0.1:8443/auth/Oauth"
+		payload = {
+			"grant_type": "authorization_code",
+			"client_id": client_id,
+			"client_secret": client_secret,
+			"redirect_uri": redirect_url,
+			"code": code
+		}
+		response = requests.post(token_url, data=payload)
+		if response.ok:
+			# Extraire le jeton d'accès de la réponse
+			access_token = response.json().get('access_token')
+			return JsonResponse({'access_token': access_token})
+		else:
+			return JsonResponse({'error': 'Échec de la récupération du jeton d\'accès'}, status=400)
+	else:
+		return JsonResponse({'error': 'Code d\'autorisation manquant dans la requête'}, status=400)
