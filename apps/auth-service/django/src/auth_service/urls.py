@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from auth_service.views import UserCreate, CustomTokenRefreshView, verify_email, CustomTokenObtainPairView, PasswordRequestReset,  CustomPasswordResetConfirmView, ValidateTokenView, UpdateClientInfo, UpdateProfilePicture
+from auth_service.views import UserCreate, CustomTokenRefreshView, verify_email, CustomTokenObtainPairView, PasswordRequestReset,  CustomPasswordResetConfirmView, ValidateTokenView, UpdateClientInfo, UpdateProfilePicture, authenticate_with_42, oauth_callback
 
 
 urlpatterns = [
@@ -14,4 +14,6 @@ urlpatterns = [
 	path('auth/validate_token/', ValidateTokenView.as_view(), name='validate_token'),
 	path('auth/update_client/', UpdateClientInfo.as_view(), name='update_client'),
 	path('auth/update_picture/', UpdateProfilePicture.as_view(), name='update_picture'),
+	path('auth/authenticate_with_42/', authenticate_with_42, name='authenticate_with_42'),
+	path('auth/Oauth', oauth_callback, name='oauth_callback'),
 ]

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from user_managment.models import CustomUser
 
+
 class UserCreate(APIView):
 	def post(self, request):
 		serializer = UserSerializer(data = request.data)
@@ -45,3 +46,4 @@ class GetUserInfos(APIView):
 				return Response("User not found", status=404)
 		else:
 			return Response("User not in request", status=404)
+

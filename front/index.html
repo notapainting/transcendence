@@ -154,7 +154,7 @@
         <input type="password" id="loginPassword" placeholder="Mot de passe">
         <button onclick="login()">Se connecter</button>
         <div id="loginResponse" class="response"></div>
-
+        <button onclick="authenticateWith42()">Se connecter avec 42</button>
         <div id="userInfo" class="user-info" style="display: none;">
             <img id="profilePicture" src="" alt="Photo de profil">
             <div id="username"></div>
@@ -341,6 +341,30 @@
                 document.getElementById('updateProfilePictureResponse').innerText = 'Erreur : ' + error.message;
             });
         }
+        function authenticateWith42() {
+    fetch('auth/authenticate_with_42/', {
+        method: 'GET',
+        redirect: 'follow' // Suivre les redirections
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur lors de la connexion avec l\'école 42');
+        }
+        // Extraire l'URL de redirection depuis la réponse JSON
+        return response.json();
+    })
+    .then(data => {
+        // Récupérer l'URL d'autorisation de l'école 42 depuis les données JSON
+        const authorizationUrl = data.authorization_url;
+        // Rediriger l'utilisateur vers l'URL d'autorisation de l'école 42
+        window.location.href = authorizationUrl;
+    })
+    .catch(error => {
+        document.getElementById('loginResponse').innerText = 'Erreur : ' + error.message;
+    });
+}
+
+
     </script>
 </body>
 </html>
