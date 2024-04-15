@@ -11,3 +11,4 @@ setuptools==69.1.0
 sqlparse==0.4.4
 urllib3==2.2.1
 wheel==0.42.0
+pillow==10.3.0
