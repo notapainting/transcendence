@@ -52,10 +52,14 @@ def verify_email(request, uidb64, token):
 		user.isVerified = True
 		user.save()
 		user_data = {
-				'username': user.username,
-				'email' : user.email,
-				'unique_id': user.unique_id
+			'username': user.username,
+			'email': user.email,
+			'unique_id': user.unique_id
 		}
+		
+		# Vérifier si profile_picture n'est pas vide avant de l'ajouter à user_data
+		if user.profile_picture:
+			user_data['profile_picture'] = user.profile_picture
 		response = requests.post('http://user-managment:8000/signup/', json=user_data)
 		if (response.status_code == status.HTTP_201_CREATED):
 			return HttpResponse('Lien de vérification valide', status=200)
@@ -190,6 +194,10 @@ def authenticate_with_42(request):
 
 	return response
 
+
+import random
+import string
+
 def oauth_callback(request):
 	code = request.GET['code']
 	if code:
@@ -208,7 +216,41 @@ def oauth_callback(request):
 		if response.ok:
 			# Extraire le jeton d'accès de la réponse
 			access_token = response.json().get('access_token')
-			return JsonResponse({'access_token': access_token})
+			user_info_url = "https://api.intra.42.fr/v2/me"
+			headers = {
+				"Authorization": f"Bearer {access_token}"
+			}
+			user_info_response = requests.get(user_info_url, headers=headers)
+			if user_info_response.ok :
+				user_data = user_info_response.json()	
+				password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+				username = user_data.get('login')
+				profile_picture = user_data.get('image', {}).get('versions', {}).get('small')
+				print(profile_picture)
+				email = user_data.get('email')
+				if CustomUser.objects.filter(username=username).exists() and CustomUser.objects.filter(is_42=False).exists():
+					pass #implementer une feature de username set si deja pris par un compte non 42.
+				elif not CustomUser.objects.filter(username=username).exists():
+					serializer = UserSerializer(data={
+					'username': username,
+					'password': password,
+					'email': email,
+					'is_42': True,
+					'profile_picture': profile_picture
+					})
+					if serializer.is_valid():
+						user = serializer.save()
+						full_verification_url = GenerateVerificationUrl(request, user, 'verify_email')
+						send_mail(
+							'Vérifiez votre adresse email',
+							f'olalaaaaa sa marche : {full_verification_url}',
+							'jill.transcendance@gmail.com',
+							[user.email],
+							fail_silently=False,
+					)
+				return JsonResponse({'username': username, 'profile_picture': profile_picture, 'email': email, 'password': password})
+			else:	
+				return JsonResponse({'error': 'Échec de la récuperation des informatiosn utilisateur'}, status=400)
 		else:
 			return JsonResponse({'error': 'Échec de la récupération du jeton d\'accès'}, status=400)
 	else:
