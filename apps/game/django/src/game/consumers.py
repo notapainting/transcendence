@@ -42,7 +42,7 @@ class GameState:
         'ballY': 0,
         'ballRadius': 1,
         'ballSpeedX': 1,
-        'ballSpeedY': 0,
+        'ballSpeedY': 0.1,
         'width' : 150,
         'height' : 50,
         # 'leftPaddleY' : height / 2 - paddleHeight / 2,
@@ -156,7 +156,7 @@ class GameState:
         self.status['ballX']  = 0
         self.status['ballY']  = 0
         self.status['ballSpeedX'] = -self.status['ballSpeedX']
-        self.status['ballSpeedY'] = random.uniform(-5, 5)
+        self.status['ballSpeedY'] = random.uniform(-1, 1)
 
 async def loop(self):
     while self.game_state.status['game_running']:
