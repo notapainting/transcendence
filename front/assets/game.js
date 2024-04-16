@@ -5,18 +5,18 @@ import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/exampl
 // var ctx = canvas2.getContext("2d");
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, 900 / 600, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(45, 900 / 600, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
+scene.background = new THREE.Color(0x333333);
 renderer.setSize(900, 600);
 
 // camera.position.z = 50;
-camera.position.set( -50, -50, 50 );
-
+camera.position.set( 0, -70, 80 );
 
 const controls = new OrbitControls( camera, renderer.domElement );
 
-// Créer une lumière directionnelle
-const light = new THREE.DirectionalLight(0xff0000, 1);
+// Light
+const light = new THREE.DirectionalLight(0xe5d0ff, 1);
 light.position.set(0, 0, 1);
 
 
@@ -35,41 +35,63 @@ function animate(cylinder) {
 }
 
 function gameRenderer(data) {
-	scene.remove(...scene.children);
+    scene.remove(...scene.children);
 
-	// Game limits
-	const materialLine = new THREE.LineBasicMaterial( { color: 0xffffff } );
-	const points = [];
-	points.push( new THREE.Vector3( data.width, -data.height, 0 ) );
-	points.push( new THREE.Vector3( data.width, data.height, 0 ) );
-	points.push( new THREE.Vector3( -data.width, data.height, 0 ) );
-	points.push( new THREE.Vector3( -data.width, -data.height, 0 ) );
-	points.push( new THREE.Vector3( data.width, -data.height, 0 ) );
-	const geometryLine = new THREE.BufferGeometry().setFromPoints( points );
-	const line = new THREE.Line( geometryLine, materialLine );
-	scene.add( line );
+    // Game limits
+    const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
+    const points = [];
+    points.push(new THREE.Vector3(data.width, -data.height, 0));
+    points.push(new THREE.Vector3(data.width, data.height, 0));
+    points.push(new THREE.Vector3(-data.width, data.height, 0));
+    points.push(new THREE.Vector3(-data.width, -data.height, 0));
+    points.push(new THREE.Vector3(data.width, -data.height, 0));
+    const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
+    const line = new THREE.Line(geometryLine, materialLine);
+    scene.add(line);
 
-	//Paddles
-	const geometry = new THREE.CylinderGeometry( data.paddleWidth, data.paddleWidth, data.paddleHeight, 20 ); 
-	const material = new THREE.MeshPhongMaterial( {color: 0xffffff} ); 
-	const cylinderRight = new THREE.Mesh( geometry, material);
-	const cylinderLeft = new THREE.Mesh( geometry, material);
+    // Background plane
+    const geometryPlane = new THREE.PlaneGeometry(data.width * 2, data.height * 2);
+    const materialPlane = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5 });
+    const plane = new THREE.Mesh(geometryPlane, materialPlane);
+    plane.position.z = -3;
+    plane.receiveShadow = true; // Activer la réception d'ombres
+    scene.add(plane);
+
+    // Paddles
+    const geometry = new THREE.CylinderGeometry(data.paddleWidth, data.paddleWidth, data.paddleHeight, 20);
+    const material = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x7F00FF, emissiveIntensity: 1 }); 
+    const cylinderRight = new THREE.Mesh(geometry, material);
+    const cylinderLeft = new THREE.Mesh(geometry, material);
     cylinderRight.position.set(data.width - 5, data.rightPaddleY, 0);
     cylinderLeft.position.set(-data.width + 5, data.leftPaddleY, 0);
-	scene.add(cylinderRight);
-	scene.add(cylinderLeft);
+    cylinderRight.castShadow = true; 
+    cylinderLeft.castShadow = true; 
+    scene.add(cylinderRight);
+    scene.add(cylinderLeft);
 
-	//Ball
-	const geometryBall = new THREE.SphereGeometry( data.ballRadius, 20, 20); 
-	const materialBall = new THREE.MeshPhongMaterial( { color: 0xffff00 } ); 
-	const sphere = new THREE.Mesh( geometryBall, materialBall); 
-	sphere.position.set(data.x, data.y, 0);
-	scene.add(sphere);
+    // Ball
+    const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 20);
+    const materialBall = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x7F00FF, emissiveIntensity: 1 });
+    const sphere = new THREE.Mesh(geometryBall, materialBall);
+    sphere.position.set(data.x, data.y, 0);
+    scene.add(sphere);
 
-	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-	scene.add(light);
-	renderer.render( scene, camera );
+    // Lights
+    const light1 = new THREE.PointLight(0x7F00FF, 0.4, 50); 
+    light1.position.set(data.width - 5, data.rightPaddleY, 10);
+    const light2 = new THREE.PointLight(0x7F00FF, 0.4, 50); 
+    light2.position.set(-data.width + 5, data.leftPaddleY, 10);
+    const light3 = new THREE.PointLight(0x7F00FF, 0.4, 50); 
+    light3.position.set(data.x, data.y, 10);
+    scene.add(light);
+    scene.add(light1);
+    scene.add(light2);
+    scene.add(light3);
+
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.render(scene, camera);
 }
+
 
 // animate();
 
