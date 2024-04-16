@@ -4,8 +4,8 @@ import sys
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-width = 900
-height = 600
+width = 50
+height = 30
 maxScore = 5
 paddleHeight = 80
 paddleWidth = 10
@@ -40,18 +40,18 @@ class GameState:
         # 'ballY': height / 2,
         'ballX': 0,
         'ballY': 0,
-        'ballRadius': 10,
-        'ballSpeedX': 7,
+        'ballRadius': 1,
+        'ballSpeedX': 1,
         'ballSpeedY': 0,
-        'width' : 900,
-        'height' : 600,
+        'width' : 150,
+        'height' : 50,
         # 'leftPaddleY' : height / 2 - paddleHeight / 2,
         # 'rightPaddleY' : height / 2 - paddleHeight / 2,
         'leftPaddleY' : 0,
         'rightPaddleY' : 0,
-        'paddleWidth' : 8, #changed
-        'paddleHeight' : 80, 
-        'paddleSpeed' : 8, #changed
+        'paddleWidth' : 1, #changed
+        'paddleHeight' : 8, 
+        'paddleSpeed' : 1, #changed
         'leftPlayerScore' : 0,
         'rightPlayerScore' : 0,
         'winner' : 'none',
@@ -99,28 +99,28 @@ class GameState:
     }
     
     def update(self):
-        if self.status['upPressed'] and self.status['rightPaddleY'] < height / 2:
+        if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeight'] / 2 < height:
             self.status['rightPaddleY'] += self.status['paddleSpeed']
-        elif self.status['downPressed'] and self.status['rightPaddleY'] > -height / 2  + self.status['paddleHeight']:
+        elif self.status['downPressed'] and self.status['rightPaddleY'] - self.status['paddleHeight'] / 2 > -height:
             self.status['rightPaddleY'] -= self.status['paddleSpeed']
 
-        if self.status['wPressed'] and self.status['leftPaddleY'] < height / 2:
+        if self.status['wPressed'] and self.status['leftPaddleY'] + self.status['paddleHeight'] / 2 < height:
             self.status['leftPaddleY'] += self.status['paddleSpeed']
-        elif self.status['sPressed'] and self.status['leftPaddleY'] > -height / 2:
+        elif self.status['sPressed'] and self.status['leftPaddleY'] - self.status['paddleHeight'] / 2 > -height:
             self.status['leftPaddleY'] -= self.status['paddleSpeed']
 
         self.status['ballX'] += self.status['ballSpeedX']
         self.status['ballY'] += self.status['ballSpeedY']
 
-        # if self.status['ballY'] - self.status['ballRadius'] < height / 2 or self.status['ballY'] + self.status['ballRadius'] > height / 2:
-        #     self.status['ballSpeedY'] *= -1
+        if self.status['ballY'] - self.status['ballRadius'] < -height  or self.status['ballY'] + self.status['ballRadius'] > height :
+            self.status['ballSpeedY'] *= -1
 
-        if (self.status['ballX'] + self.status['ballRadius'] > width / 2 - self.status['paddleWidth'] and
+        if (self.status['ballX'] + self.status['ballRadius'] > width - 5 - self.status['paddleWidth'] and
                 self.status['ballY'] > self.status['rightPaddleY'] - self.status['paddleHeight'] / 2 and
                 self.status['ballY'] < self.status['rightPaddleY'] + self.status['paddleHeight'] / 2):
             self.status['ballSpeedX'] *= -1
 
-        if (self.status['ballX'] - self.status['ballRadius'] < -width / 2 + self.status['paddleWidth'] and
+        if (self.status['ballX'] - self.status['ballRadius'] < -width + 5 + self.status['paddleWidth'] and
                 self.status['ballY'] > self.status['leftPaddleY'] - self.status['paddleHeight'] / 2 and
                 self.status['ballY'] < self.status['leftPaddleY'] + self.status['paddleHeight'] / 2):
             self.status['ballSpeedX'] *= -1
@@ -136,11 +136,11 @@ class GameState:
         #     self.status['ballSpeedX']  *= -1
         
 
-        if self.status['ballX'] < -width / 2:
+        if self.status['ballX'] < -width:
             print('colllision')
             self.status['rightPlayerScore'] += 1
             self.reset()
-        elif self.status['ballX'] > width / 2:
+        elif self.status['ballX'] > width:
             self.status['leftPlayerScore'] += 1
             self.reset()
         # if self.status['leftPlayerScore'] == maxScore:

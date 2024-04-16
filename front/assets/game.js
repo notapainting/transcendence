@@ -9,9 +9,20 @@ const camera = new THREE.PerspectiveCamera(75, 900 / 600, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
 renderer.setSize(900, 600);
 
-camera.position.z = 450;
+// camera.position.z = 50;
+camera.position.set( -50, -50, 50 );
+
 
 const controls = new OrbitControls( camera, renderer.domElement );
+
+// Créer une lumière directionnelle
+const light = new THREE.DirectionalLight(0xff0000, 1);
+light.position.set(0, 0, 1);
+
+
+// Activer les ombres dans le renderer
+renderer.shadowMap.enabled = false;
+
 
 function animate(cylinder) {
 	requestAnimationFrame( animate );
@@ -25,32 +36,38 @@ function animate(cylinder) {
 
 function gameRenderer(data) {
 	scene.remove(...scene.children);
-	const geometry = new THREE.CylinderGeometry( data.paddleWidth, data.paddleWidth, data.paddleHeight, 20 ); 
-	const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
-	const geometryBall = new THREE.SphereGeometry( 15, 32, 16 ); 
-	const materialBall = new THREE.MeshBasicMaterial( { color: 0xffff00 } ); 
-	
-	const sphere = new THREE.Mesh( geometryBall, materialBall); 
 
+	// Game limits
+	const materialLine = new THREE.LineBasicMaterial( { color: 0xffffff } );
+	const points = [];
+	points.push( new THREE.Vector3( data.width, -data.height, 0 ) );
+	points.push( new THREE.Vector3( data.width, data.height, 0 ) );
+	points.push( new THREE.Vector3( -data.width, data.height, 0 ) );
+	points.push( new THREE.Vector3( -data.width, -data.height, 0 ) );
+	points.push( new THREE.Vector3( data.width, -data.height, 0 ) );
+	const geometryLine = new THREE.BufferGeometry().setFromPoints( points );
+	const line = new THREE.Line( geometryLine, materialLine );
+	scene.add( line );
+
+	//Paddles
+	const geometry = new THREE.CylinderGeometry( data.paddleWidth, data.paddleWidth, data.paddleHeight, 20 ); 
+	const material = new THREE.MeshPhongMaterial( {color: 0xffffff} ); 
 	const cylinderRight = new THREE.Mesh( geometry, material);
 	const cylinderLeft = new THREE.Mesh( geometry, material);
-	const sceneWidth= 900;
-    const cylinderWidth = 1; 
-    const cylinderPositionX = (sceneWidth / 2) - (cylinderWidth / 2);
-
-	
-    cylinderRight.position.set(cylinderPositionX, data.rightPaddleY, 0);
-    cylinderLeft.position.set(-cylinderPositionX, data.leftPaddleY, 0);
-	sphere.position.set(data.x, data.y, 0);
-	
-	// console.log(sphere.position.x);
-	// console.log(sphere.position.y);
-	// console.log(sphere.position.z);
+    cylinderRight.position.set(data.width - 5, data.rightPaddleY, 0);
+    cylinderLeft.position.set(-data.width + 5, data.leftPaddleY, 0);
 	scene.add(cylinderRight);
 	scene.add(cylinderLeft);
-	scene.add( sphere );
 
-	
+	//Ball
+	const geometryBall = new THREE.SphereGeometry( data.ballRadius, 20, 20); 
+	const materialBall = new THREE.MeshPhongMaterial( { color: 0xffff00 } ); 
+	const sphere = new THREE.Mesh( geometryBall, materialBall); 
+	sphere.position.set(data.x, data.y, 0);
+	scene.add(sphere);
+
+	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+	scene.add(light);
 	renderer.render( scene, camera );
 }
 
@@ -82,7 +99,6 @@ gameSocket.onmessage = function(e) {
     lastPingTime = currentTime;
 	// console.log("ping = ", lastPingTime);
 };
-
 
 gameSocket.onclose = function(e) {
 	console.error('Game socket closed unexpectedly');
