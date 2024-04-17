@@ -1,14 +1,15 @@
 # game/consumers.py
-import json, random, asyncio
+import json, random, asyncio, time
 import sys
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 width = 50
 height = 30
-maxScore = 5
+maxScore = 2
 paddleHeight = 80
 paddleWidth = 10
+ballSpeedX = 0.8
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -24,7 +25,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         global game_running, upPressed, downPressed, wPressed, sPressed
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
-        # print(message)
         if message == "startButton":
              if self.game_state.status['game_running'] == False :
                 self.game_state.status['game_running'] = True
@@ -36,22 +36,18 @@ class GameConsumer(AsyncWebsocketConsumer):
 class GameState:
     def __init__(self):
         self.status = {
-        # 'ballX': width / 2,
-        # 'ballY': height / 2,
         'ballX': 0,
         'ballY': 0,
         'ballRadius': 1,
-        'ballSpeedX': 1,
+        'ballSpeedX': ballSpeedX,
         'ballSpeedY': 0.1,
         'width' : 150,
         'height' : 50,
-        # 'leftPaddleY' : height / 2 - paddleHeight / 2,
-        # 'rightPaddleY' : height / 2 - paddleHeight / 2,
         'leftPaddleY' : 0,
         'rightPaddleY' : 0,
-        'paddleWidth' : 1, #changed
-        'paddleHeight' : 8, 
-        'paddleSpeed' : 1, #changed
+        'paddleWidth' : 1,
+        'paddleHeight' : 10, 
+        'paddleSpeed' : 1.2,
         'leftPlayerScore' : 0,
         'rightPlayerScore' : 0,
         'winner' : 'none',
@@ -118,44 +114,34 @@ class GameState:
         if (self.status['ballX'] + self.status['ballRadius'] > width - 5 - self.status['paddleWidth'] and
                 self.status['ballY'] > self.status['rightPaddleY'] - self.status['paddleHeight'] / 2 and
                 self.status['ballY'] < self.status['rightPaddleY'] + self.status['paddleHeight'] / 2):
-            self.status['ballSpeedX'] *= -1
+            self.status['ballSpeedX'] *= -1.05
 
         if (self.status['ballX'] - self.status['ballRadius'] < -width + 5 + self.status['paddleWidth'] and
                 self.status['ballY'] > self.status['leftPaddleY'] - self.status['paddleHeight'] / 2 and
                 self.status['ballY'] < self.status['leftPaddleY'] + self.status['paddleHeight'] / 2):
-            self.status['ballSpeedX'] *= -1
+            self.status['ballSpeedX'] *= -1.05
 
-        # if (self.status['ballX'] - self.status['ballRadius'] < self.status['paddleWidth'] and
-        #         self.status['ballY'] > self.status['leftPaddleY'] and
-        #         self.status['ballY'] < self.status['leftPaddleY'] + self.status['paddleHeight']):
-        #     self.status['ballSpeedX']  *= -1
-
-        # if (self.status['ballX'] + self.status['ballRadius'] > width - self.status['paddleWidth'] and
-        #         self.status['ballY'] > self.status['rightPaddleY'] and
-        #         self.status['ballY'] < self.status['rightPaddleY'] + self.status['paddleHeight']):
-        #     self.status['ballSpeedX']  *= -1
-        
-
-        if self.status['ballX'] < -width:
-            print('colllision')
+        if self.status['ballX'] < -width + 2:
             self.status['rightPlayerScore'] += 1
+            # time.sleep(0.2)
             self.reset()
-        elif self.status['ballX'] > width:
+        elif self.status['ballX'] > width  - 2:
             self.status['leftPlayerScore'] += 1
+            # time.sleep(0.2)
             self.reset()
-        # if self.status['leftPlayerScore'] == maxScore:
-        #     self.reset()
-        #     self.status['winner'] = 'leftWin'
-        #     self.status['game_running'] = False
-        # elif self.status['rightPlayerScore'] == maxScore:
-        #     self.reset()
-        #     self.status['winner'] = 'rightWin'
-        #     self.status['game_running'] = False
+        if self.status['leftPlayerScore'] == maxScore:
+            self.reset()
+            self.status['winner'] = 'leftWin'
+            self.status['game_running'] = False
+        elif self.status['rightPlayerScore'] == maxScore:
+            self.reset()
+            self.status['winner'] = 'rightWin'
+            self.status['game_running'] = False
     
     def reset(self):
         self.status['ballX']  = 0
         self.status['ballY']  = 0
-        self.status['ballSpeedX'] = -self.status['ballSpeedX']
+        self.status['ballSpeedX'] = -ballSpeedX
         self.status['ballSpeedY'] = random.uniform(-1, 1)
 
 async def loop(self):
