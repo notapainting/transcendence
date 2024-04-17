@@ -12,7 +12,7 @@ APP_FILE	+= ${PROXY_FILE}
 FILE	=	${addprefix --file , ${addprefix ${APP_DIR}, ${APP_FILE}}}
 
 
-BASE	=	docker compose \
+BASE	=	docker-compose \
 				--env-file env.dev \
 				--file compose.network.yml 
 

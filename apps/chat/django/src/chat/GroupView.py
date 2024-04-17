@@ -21,45 +21,47 @@ class GroupApiView(View):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+    # check if user cant create conv (ie for private has un contact)
     def post(self, request, *args, **kwargs):
         try :
             data = jloads(request.body)#can throw
             name = kwargs.get('name', data['name'])
             members = data['members']
             members_name = data['members_name']
-            print(members)
-            print(members_name)
             query_set = ChatUser.objects.filter(Q(uid__in=members) | Q(name__in=members_name))
             print(query_set)
             diff = len(members) + len(members_name) - len( query_set)
             if diff != 0:
                 return JsonResponse(status=400, data={'error': 'MissingMembers'})
 
-            q2 = ChatGroup.objects.annotate(nb=Count("members"), distinct=True, filter=Q(members__uid__in=members))
-            print(f"q2: {q2}")
+            # implementer verification doublon conv ? 
+            # q2 = ChatGroup.objects.annotate(nb=Count("members"), distinct=True, filter=Q(members__uid__in=members))
+            # print(f"q2: {q2}")
             # print(f"q2: {ChatGroup.objects.annotate(nb=Count("members")).values('nb').filter(nb=2)}")
-            if ChatGroup.objects.annotate(nb=Count("members")).values('nb').filter(nb=2).exists():
-                return HttpResponse(status=403)
+            # if ChatGroup.objects.annotate(nb=Count("members")).values('nb').filter(nb=2).exists():
+                # return HttpResponse(status=403)
 
 
 
             c = ChatGroup.objects.create(name=name)
-            c.members.set( query_set)
+            c.members.set(query_set)
             c.save()
 
             return HttpResponse(status=201)
-        except (ValidationError, KeyError) as e:
+        except KeyError as e:
             return JsonResponse(status=400, data={'error': 'BadKey', 'key': e.args[0]})
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
         except BaseException as e:
             logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=500)
 
     def get(self, request, *args, **kwargs):
         try :
-            id = kwargs.get('gid')
+            id = kwargs.get('id')
             if id == None or id == 'short':
                 return self.list(id)
-            return JsonResponse(status=200, data=ChatGroup.objects.get(gid=id).json())
+            return JsonResponse(status=200, data=ChatGroup.objects.get(id=id).json())
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:
@@ -67,18 +69,28 @@ class GroupApiView(View):
             return HttpResponse(status=500)
 
 # add/remove members
+# chekc if user can manage group
     def put(self, request, *args, **kwargs):
         try :
             data = jloads(request.body)
-            id = kwargs.get('id', data['id'])
-            user = ChatGroup.objects.get(gid=id)
-            if ChatGroup.objects.filter(name=data['name']).exists():
-                return HttpResponse(status=403)
-            user.name = data['name']
-            user.save()
+            group = ChatGroup.objects.get(id=kwargs.get('id'))
+            name = data.get('name')
+            if name != None:
+                group.name = name
+            add = data.get('add')
+            if add != None:
+                add = ChatUser.objects.filter(uid__in=add)
+                group.members.set(members__in=add)
+            remove = data.get('remove')
+            if remove != None:
+                remove = ChatUser.objects.filter(uid__in=remove)
+                group.members.remove(members__in=remove)
+            group.save()
             return HttpResponse(status=200)
-        except (ValidationError, KeyError) as e:
+        except KeyError as e:
             return JsonResponse(status=400, data={'error': 'BadKey', 'key': e.args[0]})
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
         except BaseException as e:
             logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=500)
@@ -86,11 +98,8 @@ class GroupApiView(View):
     def delete(self, request, *args, **kwargs):
         try :
             id = kwargs.get('id')
-            if id == 'all':
-                ChatGroup.objects.all().delete()
-            else :
-                ChatGroup.objects.get(gid=id).delete()
-                logger.info("user %s, deleted", id)
+            ChatGroup.objects.get(id=id).delete()
+            logger.info("group %s, deleted", id)
             return HttpResponse(status=200)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)

@@ -23,7 +23,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 class ChatUser(models.Model):
 
-	uid = models.UUIDField(unique=True, verbose_name='User ID')
+	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	name = models.CharField(max_length=20, unique=True)
 	contact_list = models.ManyToManyField('self')
 	blocked_list = models.ManyToManyField('self', related_name='blocked', symmetrical=False)
@@ -36,31 +36,31 @@ class ChatUser(models.Model):
 
 	def json_contact(self):
 		return {
-			'contact': json.dumps(list(self.contact_list.all().values("uid", "name")), cls=DjangoJSONEncoder)
+			'contact': json.dumps(list(self.contact_list.all().values("id", "name")), cls=DjangoJSONEncoder)
 		}
 
 	def json_blocked(self):
 		return {
-			'blocked': json.dumps(list(self.blocked_list.all().values("uid", "name")), cls=DjangoJSONEncoder)
+			'blocked': json.dumps(list(self.blocked_list.all().values("id", "name")), cls=DjangoJSONEncoder)
 		}
 	
 	def json_group(self):
 		return {
-			'groups': json.dumps(list(self.chatgroup_set.all().values("gid")), cls=DjangoJSONEncoder)
+			'groups': json.dumps(list(self.chatgroup_set.all().values("id")), cls=DjangoJSONEncoder)
 		}
 
 	def json(self):
 		return {
-			'uid': self.uid,
+			'id': self.id,
 			'name': self.name,
-			'contact': json.dumps(list(self.contact_list.all().values("uid", "name")), cls=DjangoJSONEncoder),
-			'blocked': json.dumps(list(self.blocked_list.all().values("uid", "name")), cls=DjangoJSONEncoder),
-			'groups': json.dumps(list(self.chatgroup_set.all().values("gid")), cls=DjangoJSONEncoder),
+			'contact': json.dumps(list(self.contact_list.all().values("id", "name")), cls=DjangoJSONEncoder),
+			'blocked': json.dumps(list(self.blocked_list.all().values("id", "name")), cls=DjangoJSONEncoder),
+			'groups': json.dumps(list(self.chatgroup_set.all().values("id")), cls=DjangoJSONEncoder),
 		}
 
 	def json_short(self):
 		return {
-			'gid': self.uid,
+			'id': self.id,
 			'name': self.name,
 		}
 
@@ -68,7 +68,7 @@ class ChatUser(models.Model):
 # see how to knoe number of manytomany item
 class ChatGroup(models.Model):
 
-	gid = models.UUIDField(default=uuid.uuid4(), unique=True, verbose_name='ChatGroup ID')
+	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	name = models.CharField(max_length=200, validators=[validators.offensive_name])
 	members = models.ManyToManyField(ChatUser)
 
@@ -77,15 +77,15 @@ class ChatGroup(models.Model):
 	
 	def json(self):
 		return {
-			'gid': self.gid,
+			'id': self.id,
 			'name': self.name,
 			'n': '0',
-			'members': json.dumps(list(self.members.all().values("uid", "name")), cls=DjangoJSONEncoder),
+			'members': json.dumps(list(self.members.all().values("id", "name")), cls=DjangoJSONEncoder),
 		}
 
 	def json_short(self):
 		return {
-			'gid': self.gid,
+			'id': self.id,
 			'name': self.name,
 		}
 	
@@ -100,12 +100,12 @@ class ChatGroup(models.Model):
 # validate body length (at higher level)
 class ChatMessage(models.Model):
 
-	mid = models.UUIDField(default=uuid.uuid4)
+	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
 	author = models.ForeignKey(ChatUser, verbose_name="Author", on_delete=models.CASCADE)
 
 	date_save = models.DateTimeField(verbose_name="Record date", auto_now_add=True)
-	date_pub = models.DateTimeField(verbose_name="Publication date", validators=[validators.validate_futur])
+	date_pub = models.DateTimeField(verbose_name="Publication date",  auto_now_add=True, validators=[validators.validate_futur])
 
 	respond_to = models.ForeignKey(
 		'ChatMessage',
@@ -115,12 +115,12 @@ class ChatMessage(models.Model):
 		null=True
 		)
 
-	conv = models.ForeignKey(ChatGroup, on_delete=models.CASCADE)
+	group = models.ForeignKey(ChatGroup, on_delete=models.CASCADE)
 
 	body = models.CharField(max_length=512)
 
-	def __str__():
-		pass
+	def __str__(self):
+		return self.body
 
 
 

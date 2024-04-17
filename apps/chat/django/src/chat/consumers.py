@@ -4,6 +4,8 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
+from chat.models import ChatGroup, ChatUser
+
 # Get an instance of a logger
 import logging
 logger = logging.getLogger('django')
@@ -24,19 +26,33 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     # limit to 10 old conv/active user
     # test active user : db/ping cs, middleware list, auth ?
     async def connect(self):
-        self.room_group_name = "welcome"
-        self.userName = self.scope['cookies'].get('userName', 'Anon')
+        #"auth"
+        self.userName = self.scope['cookies'].get('userName')
+        user = ChatUser.object.get(self.userName)
+        if user == None:
+            await self.close(code=401)
+        
+        #connect to group and load group history
+        for group in user.chatgroup_set.all():
+            chat_history = group.chatmessage_set.all().order_by("-date_save")[:2].__str__() #last 10 or last 20? unread
+            await self.send_json({"history": chat_history})
+            await self.channel_layer.group_add(group.id, self.channel_name)
 
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+
+        #accept connectiont to client when everythings is good
         await self.accept()
-        await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": f"Hello {self.userName}"})
-
-        # b = get_user_by_username(self.userName)
         logger.info("%s Connected!", self.userName)
 
-    # remove from group
+        #ptit hello comme ca gratos
+        for group in user.chatgroup_set.all():
+            await self.channel_layer.group_send(group.name, {"type": "chat_message", "message": f"Hello {self.userName}"})
+        
+
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        #remove user from group at disconnect
+        for group in user.chatgroup_set.all():
+            await self.channel_layer.group_discard(group.id, self.channel_name)
+
         logger.info("%s Quit...", self.userName)
 
 
@@ -51,7 +67,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         type = text_data['type']
         if type == 'message':
-            await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": text_data["message"]})
+            await self.channel_layer.group_send(text_data['group'], {"type": "chat_message", "message": text_data["message"]})
+            ChatGroup.object.get(id=text_data['group']).chatmessage_set.create(
+                author=text_data['author'],
+                respond_to=text_data['respond_to'],
+                body=text_data['body']
+            )
         elif type == 'room':
             await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
             self.room_group_name = text_data["room"]
