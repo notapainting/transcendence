@@ -29,9 +29,9 @@ class UserApiView(View):
         try :
             data = jloads(request.body)
             id = kwargs.get('id', data['id'])
-            if ChatUser.objects.filter(Q(name=data['name']) | Q(uid=id)).exists():
+            if ChatUser.objects.filter(Q(name=data['name']) | Q(id=id)).exists():
                 return HttpResponse(status=403)
-            ChatUser.objects.create(uid=id, name=data['name'])
+            ChatUser.objects.create(id=id, name=data['name'])
             return HttpResponse(status=201)
         except (ValidationError, KeyError) as e:
             return JsonResponse(status=400, data={'error': 'BadKey', 'key': e.args[0]})
@@ -45,7 +45,7 @@ class UserApiView(View):
             if id == None or id == 'oname':
                 return self.list_user(id)
             if is_uuid(id):
-                return JsonResponse(status=200, data=ChatUser.objects.get(uid=id).json())
+                return JsonResponse(status=200, data=ChatUser.objects.get(id=id).json())
             return JsonResponse(status=200, data=ChatUser.objects.get(name=id).json())
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
@@ -57,7 +57,7 @@ class UserApiView(View):
         try :
             data = jloads(request.body)
             id = kwargs.get('id', data['id'])
-            user = ChatUser.objects.get(uid=id)
+            user = ChatUser.objects.get(id=id)
             if ChatUser.objects.filter(name=data['name']).exists():
                 return HttpResponse(status=403)
             user.name = data['name']
@@ -75,7 +75,7 @@ class UserApiView(View):
             if id == 'all':
                 ChatUser.objects.all().delete()
             else :
-                ChatUser.objects.get(uid=id).delete()
+                ChatUser.objects.get(id=id).delete()
                 logger.info("user %s, deleted", id)
             return HttpResponse(status=200)
         except (ValidationError, ObjectDoesNotExist):
@@ -106,8 +106,8 @@ class UserContactApiView(View):
     def post(self, request, *args, **kwargs):
         try :
             if is_uuid(kwargs['id']):
-                user = ChatUser.objects.get(uid=kwargs['id'])
-                user.contact_list.add(ChatUser.objects.get(uid=kwargs['target']))
+                user = ChatUser.objects.get(id=kwargs['id'])
+                user.contact_list.add(ChatUser.objects.get(id=kwargs['target']))
             else:
                 user = ChatUser.objects.get(name=kwargs['id'])
                 user.contact_list.add(ChatUser.objects.get(name=kwargs['target']))
@@ -124,7 +124,7 @@ class UserContactApiView(View):
     def get(self, request, *args, **kwargs):
         try :
             if is_uuid(kwargs['id']):
-                return JsonResponse(status=200, data=ChatUser.objects.get(uid=kwargs['id']).json_contact())
+                return JsonResponse(status=200, data=ChatUser.objects.get(id=kwargs['id']).json_contact())
             return JsonResponse(status=200, data=ChatUser.objects.get(name=kwargs['id']).json_contact())
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
@@ -135,8 +135,8 @@ class UserContactApiView(View):
     def delete(self, request, *args, **kwargs):
         try :
             if is_uuid(kwargs['id']):
-                user = ChatUser.objects.get(uid=kwargs['id'])
-                user.contact_list.remove(ChatUser.objects.get(uid=kwargs['target']))
+                user = ChatUser.objects.get(id=kwargs['id'])
+                user.contact_list.remove(ChatUser.objects.get(id=kwargs['target']))
             else:
                 user = ChatUser.objects.get(name=kwargs['id'])
                 user.contact_list.remove(ChatUser.objects.get(name=kwargs['target']))
@@ -162,8 +162,8 @@ class UserBlockedApiView(View):
     def post(self, request, *args, **kwargs):
         try :
             if is_uuid(kwargs['id']):
-                user = ChatUser.objects.get(uid=kwargs['id'])
-                user.blocked_list.add(ChatUser.objects.get(uid=kwargs['target']))
+                user = ChatUser.objects.get(id=kwargs['id'])
+                user.blocked_list.add(ChatUser.objects.get(id=kwargs['target']))
             else:
                 user = ChatUser.objects.get(name=kwargs['id'])
                 user.blocked_list.add(ChatUser.objects.get(name=kwargs['target']))
@@ -180,7 +180,7 @@ class UserBlockedApiView(View):
     def get(self, request, *args, **kwargs):
         try :
             if is_uuid(kwargs['id']):
-                return JsonResponse(status=200, data=ChatUser.objects.get(uid=kwargs['id']).json_blocked())
+                return JsonResponse(status=200, data=ChatUser.objects.get(id=kwargs['id']).json_blocked())
             return JsonResponse(status=200, data=ChatUser.objects.get(name=kwargs['id']).json_blocked())
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
@@ -191,8 +191,8 @@ class UserBlockedApiView(View):
     def delete(self, request, *args, **kwargs):
         try :
             if is_uuid(kwargs['id']):
-                user = ChatUser.objects.get(uid=kwargs['id'])
-                user.blocked_list.remove(ChatUser.objects.get(uid=kwargs['target']))
+                user = ChatUser.objects.get(id=kwargs['id'])
+                user.blocked_list.remove(ChatUser.objects.get(id=kwargs['target']))
             else:
                 user = ChatUser.objects.get(name=kwargs['id'])
                 user.blocked_list.remove(ChatUser.objects.get(name=kwargs['target']))

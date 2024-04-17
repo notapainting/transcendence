@@ -1,3 +1,9 @@
+TODO: 
+	-check for no async ORM in API 
+
+
+
+
 database:
 	user:
 		-username (id)
@@ -116,7 +122,7 @@ dont:
 
 https://asgi.readthedocs.io/en/latest/specs/www.html#websocket
 
-TODO:
+TODO:2
 	- read activitypub
 	- simple chat with 2 user
 		- front basic
