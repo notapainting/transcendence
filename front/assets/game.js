@@ -23,63 +23,71 @@ renderer.shadowMap.enabled = false;
 
 let scoreRight = 0
 let scoreLeft = 0
+let explosion = false;
 
-function createExplosion(position) {
-    // Nombre de particules dans l'explosion
-    var particleCount = 100;
-    
-    // Matériau des particules
-    var particleMaterial = new THREE.PointsMaterial({
-        color: 0xffffff,
-        size: 1
+function createParticle() {
+    var geometry = new THREE.BufferGeometry();
+    var vertices = new Float32Array([0, 0, 0]); // Position de départ
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+
+    var material = new THREE.PointsMaterial({ color: 0xffffff, size: 1 });
+
+    var particle = new THREE.Points(geometry, material);
+    scene.add(particle);
+
+    // Définir une direction aléatoire
+    var direction = new THREE.Vector3(
+        Math.random() - 0.5,
+        Math.random() - 0.5,
+        Math.random() - 0.5
+    ).normalize();
+
+    var speed = 0.3; // Vitesse de déplacement
+    var distance = 8; // Distance maximale de déplacement
+
+    // Animation de déplacement de la particule
+    var update = function () {
+		console.log("gngngn");
+        var positionAttribute = particle.geometry.getAttribute('position');
+        var currentPosition = new THREE.Vector3().fromBufferAttribute(positionAttribute, 0);
+        currentPosition.addScaledVector(direction, speed);
+        positionAttribute.setXYZ(0, currentPosition.x, currentPosition.y, currentPosition.z);
+        positionAttribute.needsUpdate = true;
+        distance -= speed;
+        if (distance <= 0) {
+            // Si la particule a atteint sa distance maximale, la supprimer
+            scene.remove(particle);
+            cancelAnimationFrame(animationId); // Arrêter l'animation
+        }
+    };
+
+    var animationId = requestAnimationFrame(function animate() {
+        update();
+        animationId = requestAnimationFrame(animate);
     });
-    
-    // Géométrie des particules
-    var particleGeometry = new THREE.BufferGeometry();
-    
-    // Tableau pour stocker les positions des particules
-    var positions = new Float32Array(particleCount * 3);
-    
-    // Initialisation des positions des particules
-    for (var i = 0; i < particleCount; i++) {
-        positions[i * 3] = position.x + (Math.random() - 0.5) * 2;
-        positions[i * 3 + 1] = position.y + (Math.random() - 0.5) * 2;
-        positions[i * 3 + 2] = position.z + (Math.random() - 0.5) * 2;
-    }
-    
-    // Ajout des positions à la géométrie
-    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    
-    // Création du système de particules
-    var particles = new THREE.Points(particleGeometry, particleMaterial);
-    
-    // Ajout des particules à la scène
-    scene.add(particles);
-    
-    // Animation de l'explosion
-    var speed = 0.01; // Vitesse d'expansion des particules
-	var startTime = Date.now();
-    
-    function animate() {
-        var currentTime = Date.now();
-        var elapsedTime = (currentTime - startTime) / 1000; // Temps écoulé en secondes
-        
-        // Si 5 secondes se sont écoulées, arrêtez l'animation
-        if (elapsedTime >= 5) {
-            return;
-        }
-        
-        var positions = particleGeometry.attributes.position.array;
-        for (var i = 0; i < particleCount; i++) {
-            positions[i * 3] += (Math.random() - 0.5) * speed;
-            positions[i * 3 + 1] += (Math.random() - 0.5) * speed;
-            positions[i * 3 + 2] += (Math.random() - 0.5) * speed;
-        }
-        particleGeometry.attributes.position.needsUpdate = true;
-        requestAnimationFrame(animate);
-    }
-    animate();
 }
+
+
+// Dans votre fonction animate(), lorsque l'explosion est déclenchée, vous pouvez créer des particules
+function animate() {
+    requestAnimationFrame(animate);
+
+    if (explosion === true) {
+		console.log("??");
+        // Créer des particules
+        for (var i = 0; i < 100; i++) {
+			console.log("wtfffffffffffffffffffffff");
+            createParticle();
+        }
+        explosion = false; // Pour n'exécuter l'explosion qu'une seule fois
+    }
+
+    renderer.render(scene, camera);
+}
+
+
+animate();
 
 
 function gameRenderer(data) {
@@ -144,34 +152,29 @@ function gameRenderer(data) {
     scene.add(light2);
     scene.add(light3);
 
+	// scene.add(cylinder);
+	// scene.add(particles);
+
 	// Explosion
     if (data.leftPlayerScore > scoreLeft) {
         scoreLeft++;
 		console.log("???Explosion at:", sphere.position.x, sphere.position.y);
-		createExplosion(new THREE.Vector3(0, 0, 0));
-        // explode(sphere.position.x, sphere.position.y);
+		// createExplosion(new THREE.Vector3(0, 0, 0));
+		explosion = true;
     }
     if (data.rightPlayerScore > scoreRight) {
         scoreRight++;
 		console.log("???Explosion at:", sphere.position.x, sphere.position.y);
-		createExplosion(new THREE.Vector3(0, 0, 0));
-        // explode(sphere.position.x, sphere.position.y);
+		// createExplosion(new THREE.Vector3(0, 0, 0));
+		explosion = true;
     }
 
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.render(scene, camera);
 }
 
-createExplosion(new THREE.Vector3(0, 0, 0));
+// createExplosion(new THREE.Vector3(0, 0, 0));
 
-// function animate() {
-//     requestAnimationFrame(animate);
-// 	explode(0,0);
-// 	animateExplosion();
-//     renderer.render(scene, camera);
-// }
-
-// animate();
 
 const gameSocket = new WebSocket(
 	'wss://'
@@ -302,3 +305,29 @@ function playerWin(player) {
 	// myParagraph.innerText = message; 
 }
 
+// function createExplosion(position) {
+//     // scene.add(particles);
+    
+//     // Animation de l'explosion
+
+    
+//     function animate() {
+//         var currentTime = Date.now();
+//         var elapsedTime = (currentTime - startTime) / 1000; // Temps écoulé en secondes
+        
+//         // Si 5 secondes se sont écoulées, arrêtez l'animation
+//         if (elapsedTime >= 5) {
+//             return;
+//         }
+        
+//         var positions = particleGeometry.attributes.position.array;
+//         for (var i = 0; i < particleCount; i++) {
+//             positions[i * 3] += (Math.random() - 0.5) * speed;
+//             positions[i * 3 + 1] += (Math.random() - 0.5) * speed;
+//             positions[i * 3 + 2] += (Math.random() - 0.5) * speed;
+//         }
+//         particleGeometry.attributes.position.needsUpdate = true;
+//         requestAnimationFrame(animate);
+//     }
+//     animate();
+// }
