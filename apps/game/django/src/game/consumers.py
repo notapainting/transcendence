@@ -46,6 +46,8 @@ class GameState:
         'width' : 150,
         'height' : 50,
         'leftPaddleY' : 0,
+        'leftPaddleX' : -width + 5,
+        'rightPaddleX' : width - 5,
         'rightPaddleY' : 0,
         'paddleWidth' : 1,
         'paddleHeight' : 10, 
@@ -84,6 +86,7 @@ class GameState:
         return {
         'x': self.status['ballX'],
         'y': self.status['ballY'],
+        'speed': self.status['ballSpeedX'],
         'collisionX': self.status['collisionX'],
         'collisionY': self.status['collisionY'],
         'radius': self.status['ballRadius'],
@@ -99,6 +102,7 @@ class GameState:
     }
     
     def update(self):
+        # deplacement des paddles
         if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeight'] / 2 < height:
             self.status['rightPaddleY'] += self.status['paddleSpeed']
         elif self.status['downPressed'] and self.status['rightPaddleY'] - self.status['paddleHeight'] / 2 > -height:
@@ -109,27 +113,26 @@ class GameState:
         elif self.status['sPressed'] and self.status['leftPaddleY'] - self.status['paddleHeight'] / 2 > -height:
             self.status['leftPaddleY'] -= self.status['paddleSpeed']
 
+        # deplacement de la balle
         self.status['ballX'] += self.status['ballSpeedX']
         self.status['ballY'] += self.status['ballSpeedY']
 
-        if self.status['ballY'] - self.status['ballRadius'] < -height:
-            self.status['ballY'] = -height + self.status['ballRadius']
+        # collision haut et bas
+        if self.status['ballY'] <= -height + self.status['ballRadius'] or self.status['ballY'] >= height - self.status['ballRadius']:
             self.status['ballSpeedY'] *= -1
-        elif self.status['ballY'] + self.status['ballRadius'] > height:
-            self.status['ballY'] = height - self.status['ballRadius']
-            self.status['ballSpeedY'] *= -1
-        
+
         right_paddle_top = self.status['rightPaddleY'] + self.status['paddleHeight'] / 2
         right_paddle_bottom = self.status['rightPaddleY'] - self.status['paddleHeight'] / 2
 
         left_paddle_top = self.status['leftPaddleY'] + self.status['paddleHeight'] / 2
         left_paddle_bottom = self.status['leftPaddleY'] - self.status['paddleHeight'] / 2
 
+        # collisions avec les paddles
         if (self.status['ballX'] + self.status['ballRadius'] > width - 5 - self.status['paddleWidth'] and
                 self.status['ballY'] >= right_paddle_bottom and
                 self.status['ballY'] <= right_paddle_top and
                 self.status['ballSpeedX'] > 0):
-            self.status['ballSpeedX'] *= -1.05
+            self.status['ballSpeedX'] *= -1.08
             if self.status['ballY'] >= right_paddle_top - self.status['paddleHeight'] / 4:
                 self.status['ballSpeedY'] = abs(self.status['ballSpeedY'])
             elif self.status['ballY'] <= right_paddle_bottom + self.status['paddleHeight'] / 4:
@@ -139,24 +142,22 @@ class GameState:
                 self.status['ballY'] >= left_paddle_bottom and
                 self.status['ballY'] <= left_paddle_top and
                 self.status['ballSpeedX'] < 0):
-            self.status['ballSpeedX'] *= -1.05
+            self.status['ballSpeedX'] *= -1.08
             if self.status['ballY'] >= left_paddle_top - self.status['paddleHeight'] / 4:
                 self.status['ballSpeedY'] = abs(self.status['ballSpeedY'])
             elif self.status['ballY'] <= left_paddle_bottom + self.status['paddleHeight'] / 4:
                 self.status['ballSpeedY'] = -abs(self.status['ballSpeedY'])
-
-        if self.status['ballX'] < -width + 2:
+    
+        if self.status['ballX'] <= -width:
             self.status['rightPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
             self.reset()
-            # time.sleep(0.2)
-        elif self.status['ballX'] > width - 2:
+        elif self.status['ballX'] >= width:
             self.status['leftPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
             self.reset()
-            # time.sleep(0.2)
         if self.status['leftPlayerScore'] == maxScore:
             self.reset()
             self.status['winner'] = 'leftWin'
