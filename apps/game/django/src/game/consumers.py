@@ -6,7 +6,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 width = 50
 height = 30
-maxScore = 2
+maxScore = 5
 paddleHeight = 80
 paddleWidth = 10
 ballSpeedX = 0.8
@@ -38,6 +38,8 @@ class GameState:
         self.status = {
         'ballX': 0,
         'ballY': 0,
+        'collisionX': 0,
+        'collisionY': 0,
         'ballRadius': 1,
         'ballSpeedX': ballSpeedX,
         'ballSpeedY': 0.1,
@@ -82,6 +84,8 @@ class GameState:
         return {
         'x': self.status['ballX'],
         'y': self.status['ballY'],
+        'collisionX': self.status['collisionX'],
+        'collisionY': self.status['collisionY'],
         'radius': self.status['ballRadius'],
         'width' : width,
         'height' : height,
@@ -111,23 +115,49 @@ class GameState:
         if self.status['ballY'] - self.status['ballRadius'] < -height  or self.status['ballY'] + self.status['ballRadius'] > height :
             self.status['ballSpeedY'] *= -1
 
+        right_paddle_top = self.status['rightPaddleY'] + self.status['paddleHeight'] / 2
+        right_paddle_bottom = self.status['rightPaddleY'] - self.status['paddleHeight'] / 2
+
+        left_paddle_top = self.status['leftPaddleY'] + self.status['paddleHeight'] / 2
+        left_paddle_bottom = self.status['leftPaddleY'] - self.status['paddleHeight'] / 2
+
+        # Check collision with right paddle including corners
         if (self.status['ballX'] + self.status['ballRadius'] > width - 5 - self.status['paddleWidth'] and
-                self.status['ballY'] > self.status['rightPaddleY'] - self.status['paddleHeight'] / 2 and
-                self.status['ballY'] < self.status['rightPaddleY'] + self.status['paddleHeight'] / 2):
+                self.status['ballY'] > right_paddle_bottom and
+                self.status['ballY'] < right_paddle_top):
             self.status['ballSpeedX'] *= -1.05
 
+            # Check if the collision occurred at the top corner of the paddle
+            if self.status['ballY'] >= right_paddle_top - self.status['paddleHeight'] / 4:
+                self.status['ballSpeedY'] = abs(self.status['ballSpeedY'])  # Change Y direction to go upwards
+            # Check if the collision occurred at the bottom corner of the paddle
+            elif self.status['ballY'] <= right_paddle_bottom + self.status['paddleHeight'] / 4:
+                self.status['ballSpeedY'] = -abs(self.status['ballSpeedY'])  # Change Y direction to go downwards
+
+        # Check collision with left paddle including corners
         if (self.status['ballX'] - self.status['ballRadius'] < -width + 5 + self.status['paddleWidth'] and
-                self.status['ballY'] > self.status['leftPaddleY'] - self.status['paddleHeight'] / 2 and
-                self.status['ballY'] < self.status['leftPaddleY'] + self.status['paddleHeight'] / 2):
+                self.status['ballY'] > left_paddle_bottom and
+                self.status['ballY'] < left_paddle_top):
             self.status['ballSpeedX'] *= -1.05
+
+            # Check if the collision occurred at the top corner of the paddle
+            if self.status['ballY'] >= left_paddle_top - self.status['paddleHeight'] / 4:
+                self.status['ballSpeedY'] = abs(self.status['ballSpeedY'])  # Change Y direction to go upwards
+            # Check if the collision occurred at the bottom corner of the paddle
+            elif self.status['ballY'] <= left_paddle_bottom + self.status['paddleHeight'] / 4:
+                self.status['ballSpeedY'] = -abs(self.status['ballSpeedY'])  # Change Y direction to go downwards
 
         if self.status['ballX'] < -width + 2:
             self.status['rightPlayerScore'] += 1
+            self.status['collisionX'] = self.status['ballX']
+            self.status['collisionY'] = self.status['ballY']
             # time.sleep(0.2)
             self.reset()
         elif self.status['ballX'] > width  - 2:
             self.status['leftPlayerScore'] += 1
             # time.sleep(0.2)
+            self.status['collisionX'] = self.status['ballX']
+            self.status['collisionY'] = self.status['ballY']
             self.reset()
         if self.status['leftPlayerScore'] == maxScore:
             self.reset()
@@ -139,10 +169,11 @@ class GameState:
             self.status['game_running'] = False
     
     def reset(self):
-        self.status['ballX']  = 0
-        self.status['ballY']  = 0
+        self.status['ballX'] = 0
+        self.status['ballY'] = 0
         self.status['ballSpeedX'] = -ballSpeedX
         self.status['ballSpeedY'] = random.uniform(-1, 1)
+
 
 async def loop(self):
     while self.game_state.status['game_running']:

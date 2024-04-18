@@ -21,34 +21,38 @@ light.position.set(0, 0, 1);
 // Activer les ombres dans le renderer
 renderer.shadowMap.enabled = false;
 
+var colors = [0x7F00FF, 0xe5d0ff, 0xbf8bff, 0x5b00ba, 0x6900a3, 0x51007e, 0x9700cc];
+
 let scoreRight = 0
 let scoreLeft = 0
 let explosion = false;
+let collisionX = 0;
+let collisionY = 0;
 
 function createParticle() {
     var geometry = new THREE.BufferGeometry();
-    var vertices = new Float32Array([0, 0, 0]); // Position de départ
+    var vertices = new Float32Array([collisionX, collisionY, 0]);
 
     geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
-    var material = new THREE.PointsMaterial({ color: 0xffffff, size: 1 });
+    var randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+    var material = new THREE.PointsMaterial({ color: randomColor, size: 1.5 });
+
 
     var particle = new THREE.Points(geometry, material);
     scene.add(particle);
 
-    // Définir une direction aléatoire
     var direction = new THREE.Vector3(
         Math.random() - 0.5,
         Math.random() - 0.5,
         Math.random() - 0.5
     ).normalize();
 
-    var speed = 0.3; // Vitesse de déplacement
-    var distance = 8; // Distance maximale de déplacement
+    var speed = 0.6; 
+    var distance = 10;
 
-    // Animation de déplacement de la particule
     var update = function () {
-		console.log("gngngn");
         var positionAttribute = particle.geometry.getAttribute('position');
         var currentPosition = new THREE.Vector3().fromBufferAttribute(positionAttribute, 0);
         currentPosition.addScaledVector(direction, speed);
@@ -56,9 +60,8 @@ function createParticle() {
         positionAttribute.needsUpdate = true;
         distance -= speed;
         if (distance <= 0) {
-            // Si la particule a atteint sa distance maximale, la supprimer
             scene.remove(particle);
-            cancelAnimationFrame(animationId); // Arrêter l'animation
+            cancelAnimationFrame(animationId);
         }
     };
 
@@ -68,30 +71,35 @@ function createParticle() {
     });
 }
 
-
-// Dans votre fonction animate(), lorsque l'explosion est déclenchée, vous pouvez créer des particules
 function animate() {
     requestAnimationFrame(animate);
 
     if (explosion === true) {
-		console.log("??");
-        // Créer des particules
         for (var i = 0; i < 100; i++) {
-			console.log("wtfffffffffffffffffffffff");
             createParticle();
         }
-        explosion = false; // Pour n'exécuter l'explosion qu'une seule fois
+        explosion = false;
     }
-
     renderer.render(scene, camera);
-}
 
+}
 
 animate();
 
+function clearScene() {
+    let toRemove = [];
+    scene.children.forEach((child) => {
+        if (child.type !== 'Points') {
+            toRemove.push(child);
+        }
+    });
+    toRemove.forEach((child) => {
+        scene.remove(child);
+    });
+}
 
 function gameRenderer(data) {
-	scene.remove(...scene.children);
+	clearScene(); 
 	
     // Game limits
     const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
@@ -123,7 +131,7 @@ function gameRenderer(data) {
 	
     // Paddles
     const geometry = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeight, 20);
-    const material = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x7F00FF, emissiveIntensity: 1 }); 
+    const material = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x7F00FF, emissiveIntensity: 10 }); 
     let cylinderRight = new THREE.Mesh(geometry, material);
     let cylinderLeft = new THREE.Mesh(geometry, material);
     cylinderRight.position.set(data.width - 5, data.rightPaddleY, 0);
@@ -135,7 +143,7 @@ function gameRenderer(data) {
 	
     // Ball
     const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 20);
-    const materialBall = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x7F00FF, emissiveIntensity: 1 });
+    const materialBall = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x7F00FF, emissiveIntensity: 20 });
     let sphere = new THREE.Mesh(geometryBall, materialBall);
     sphere.position.set(data.x, data.y, 0);
     scene.add(sphere);
@@ -152,28 +160,24 @@ function gameRenderer(data) {
     scene.add(light2);
     scene.add(light3);
 
-	// scene.add(cylinder);
-	// scene.add(particles);
 
-	// Explosion
+	// Explosion collision
     if (data.leftPlayerScore > scoreLeft) {
+        collisionX = data.collisionX;
+        collisionY = data.collisionY;
         scoreLeft++;
-		console.log("???Explosion at:", sphere.position.x, sphere.position.y);
-		// createExplosion(new THREE.Vector3(0, 0, 0));
 		explosion = true;
     }
     if (data.rightPlayerScore > scoreRight) {
+        collisionX = data.collisionX;
+        collisionY = data.collisionY;
         scoreRight++;
-		console.log("???Explosion at:", sphere.position.x, sphere.position.y);
-		// createExplosion(new THREE.Vector3(0, 0, 0));
 		explosion = true;
     }
 
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.render(scene, camera);
 }
-
-// createExplosion(new THREE.Vector3(0, 0, 0));
 
 
 const gameSocket = new WebSocket(
@@ -272,62 +276,9 @@ document.addEventListener('keyup', function(event) {
 	}
 });
 
-
-function draw(data) {
-	ctx.clearRect(0, 0, data.width, data.height);
-  
-	ctx.fillStyle = "#FFF";
-	ctx.font = "15px Arial";
-  
-	ctx.beginPath();
-	ctx.moveTo(data.width / 2, 0);
-	ctx.lineTo(data.width / 2, data.height);
-	ctx.strokeStyle = "#FFF";
-	ctx.stroke();
-	ctx.closePath();
-  
-	ctx.beginPath();
-	ctx.arc(data.x, data.y, data.radius, 0, Math.PI * 2);
-	ctx.fill();
-	ctx.closePath();
-  
-	ctx.fillRect(0, data.leftPaddleY, data.paddleWidth, data.paddleHeight);
-  
-	ctx.fillRect(data.width - data.paddleWidth, data.rightPaddleY, data.paddleWidth, data.paddleHeight);
-  
-	ctx.fillText("Score: " + data.leftPlayerScore, 10, 20);
-	ctx.fillText("Score: " + data.rightPlayerScore, data.width - 70, 20);
-  }
-
 function playerWin(player) {
 	var message = "Congratulations! " + player + " win!";
 	// var myParagraph = document.getElementById("scoreMessage");
 	// myParagraph.innerText = message; 
 }
 
-// function createExplosion(position) {
-//     // scene.add(particles);
-    
-//     // Animation de l'explosion
-
-    
-//     function animate() {
-//         var currentTime = Date.now();
-//         var elapsedTime = (currentTime - startTime) / 1000; // Temps écoulé en secondes
-        
-//         // Si 5 secondes se sont écoulées, arrêtez l'animation
-//         if (elapsedTime >= 5) {
-//             return;
-//         }
-        
-//         var positions = particleGeometry.attributes.position.array;
-//         for (var i = 0; i < particleCount; i++) {
-//             positions[i * 3] += (Math.random() - 0.5) * speed;
-//             positions[i * 3 + 1] += (Math.random() - 0.5) * speed;
-//             positions[i * 3 + 2] += (Math.random() - 0.5) * speed;
-//         }
-//         particleGeometry.attributes.position.needsUpdate = true;
-//         requestAnimationFrame(animate);
-//     }
-//     animate();
-// }
