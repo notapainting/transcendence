@@ -21,13 +21,21 @@ light.position.set(0, 0, 1);
 // Activer les ombres dans le renderer
 renderer.shadowMap.enabled = false;
 
-var colors = [0x7F00FF, 0xe5d0ff, 0xbf8bff, 0x5b00ba, 0x6900a3, 0x51007e, 0x9700cc];
+var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
+var colorsViolet = [0x4c005a, 0x6a1292, 0x8436a1, 0xa34bb4, 0xde70ec, 0xa34bb4, 0x8436a1, 0x6a1292];
+var colorsPink = [0xffc2cd, 0xff93ac, 0xff6289, 0xfc3468, 0xff084a, 0xfc3468, 0xff6289, 0xff93ac];
+var colorPalettes = [colorsViolet, colorsBlue, colorsPink];
+let colorBall = colorsViolet;
+
+var colorTransitionTime = 2000;
+var colorStartTime = Date.now();
 
 let scoreRight = 0
 let scoreLeft = 0
 let explosion = false;
 let collisionX = 0;
 let collisionY = 0;
+let initialSpeed = 0.8;
 
 function createParticle() {
     var geometry = new THREE.BufferGeometry();
@@ -35,7 +43,7 @@ function createParticle() {
 
     geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
-    var randomColor = colors[Math.floor(Math.random() * colors.length)];
+    var randomColor = colorBall[Math.floor(Math.random() * colorBall.length)];
 
     var material = new THREE.PointsMaterial({ color: randomColor, size: 1.5 });
 
@@ -74,6 +82,7 @@ function createParticle() {
 function animate() {
     requestAnimationFrame(animate);
 
+
     if (explosion === true) {
         for (var i = 0; i < 100; i++) {
             createParticle();
@@ -98,9 +107,25 @@ function clearScene() {
     });
 }
 
+function interpolateColor(color) {
+    const now = Date.now();
+    const elapsedTime = now - colorStartTime;
+    const timePerColor = colorTransitionTime / color.length;
+    const colorIndexStart = Math.floor(elapsedTime / timePerColor) % color.length;
+    const colorIndexEnd = (colorIndexStart + 1) % color.length;
+    const ratio = (elapsedTime % timePerColor) / timePerColor;
+
+    const colorStart = new THREE.Color(color[colorIndexStart]);
+    const colorEnd = new THREE.Color(color[colorIndexEnd]);
+
+    const interpolatedColor = new THREE.Color().copy(colorStart).lerp(colorEnd, ratio);
+    return interpolatedColor.getHex();
+}
+
+
 function gameRenderer(data) {
 	clearScene(); 
-	
+
     // Game limits
     const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
     const points = [];
@@ -131,7 +156,7 @@ function gameRenderer(data) {
 	
     // Paddles
     const geometry = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeight, 20);
-    const material = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x7F00FF, emissiveIntensity: 10 }); 
+    const material = new THREE.MeshStandardMaterial({ color: 0xffffff}); 
     let cylinderRight = new THREE.Mesh(geometry, material);
     let cylinderLeft = new THREE.Mesh(geometry, material);
     cylinderRight.position.set(data.width - 5, data.rightPaddleY, 0);
@@ -143,17 +168,20 @@ function gameRenderer(data) {
 	
     // Ball
     const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 20);
-    const materialBall = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x7F00FF, emissiveIntensity: 20 });
+    const materialBall = new THREE.MeshStandardMaterial({ color: 0xffffff});
     let sphere = new THREE.Mesh(geometryBall, materialBall);
     sphere.position.set(data.x, data.y, 0);
     scene.add(sphere);
 
     // Lights
-    const light1 = new THREE.PointLight(0x7F00FF, 400, 50); 
+	const lightColor = interpolateColor(colorBall); 
+    const lightIntensity = 400;
+    const lightDistance = 50;
+    const light1 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
     light1.position.set(data.width - 5, data.rightPaddleY, 10);
-    const light2 = new THREE.PointLight(0x7F00FF, 400, 50); 
+    const light2 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
     light2.position.set(-data.width + 5, data.leftPaddleY, 10);
-    const light3 = new THREE.PointLight(0x7F00FF, 400, 50); 
+    const light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
     light3.position.set(data.x, data.y, 10);
     scene.add(light);
     scene.add(light1);
@@ -174,6 +202,13 @@ function gameRenderer(data) {
         scoreRight++;
 		explosion = true;
     }
+
+	if (data.speed != initialSpeed)
+	{
+		var randomIndex = Math.floor(Math.random() * colorPalettes.length);
+		colorBall = colorPalettes[randomIndex];
+		initialSpeed = data.speed;
+	}
 
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.render(scene, camera);
