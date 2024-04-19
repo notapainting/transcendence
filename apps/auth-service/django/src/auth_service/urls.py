@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from auth_service.views import UserCreate, CustomTokenRefreshView, verify_email, CustomTokenObtainPairView, PasswordRequestReset,  CustomPasswordResetConfirmView, ValidateTokenView, UpdateClientInfo, UpdateProfilePicture, authenticate_with_42, oauth_callback
+from auth_service.views import UserCreate, CustomTokenRefreshView, verify_email, CustomTokenObtainPairView, PasswordRequestReset,  CustomPasswordResetConfirmView, ValidateTokenView, UpdateClientInfo, UpdateProfilePicture, authenticate_with_42, oauth_callback, Activate2FAView, Confirm2FAView
 
 
 urlpatterns = [
@@ -15,5 +15,7 @@ urlpatterns = [
 	path('auth/update_client/', UpdateClientInfo.as_view(), name='update_client'),
 	path('auth/update_picture/', UpdateProfilePicture.as_view(), name='update_picture'),
 	path('auth/authenticate_with_42/', authenticate_with_42, name='authenticate_with_42'),
-	path('auth/Oauth', oauth_callback, name='oauth_callback'),
+	path('auth/Oauth/', oauth_callback, name='oauth_callback'),
+    path('auth/activate2FA/', Activate2FAView.as_view(), name='activate_2FA'),
+    path('auth/confirm2FA/', Confirm2FAView.as_view(), name='confirm_2FA'),
 ]

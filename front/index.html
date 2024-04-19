@@ -164,11 +164,23 @@
             <button onclick="updateProfilePicture()">Modifier</button>
             <div id="updateProfilePictureResponse" class="response"></div>
         </div>
-
+        <div class="container">
+            <h2>Test des vues</h2>
+    
+            <h3>Activer l'authentification à deux facteurs</h3>
+            <button onclick="activate2FA()">Activer l'authentification à deux facteurs</button>
+            <div id="activate2FAResponse" class="response"></div>
+            <div id="qrCodeContainer"></div>
+            <h3>Confirmer l'activation de l'authentification à deux facteurs</h3>
+            <input type="text" id="code" placeholder="Code à entrer">
+            <button onclick="confirm2FA()">Confirmer l'activation</button>
+            <div id="confirm2FAResponse" class="response"></div>
+        </div>
+    
         <h3>Créer un utilisateur</h3>
-        <input type="text" id="username" placeholder="Nom d'utilisateur">
-        <input type="email" id="email" placeholder="Adresse email">
-        <input type="password" id="password" placeholder="Mot de passe">
+        <input type="text" id="username-create" placeholder="Nom d'utilisateur">
+        <input type="email" id="email-create" placeholder="Adresse email">
+        <input type="password" id="password-create" placeholder="Mot de passe">
         <button onclick="createUser()">Créer l'utilisateur</button>
         <div id="createUserResponse" class="response"></div>
 
@@ -191,9 +203,9 @@
     <script>
         // Fonction pour créer un utilisateur
         function createUser() {
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('username-create').value;
+            const email = document.getElementById('email-create').value;
+            const password = document.getElementById('password-create').value;
             const data = {
                 username: username,
                 email: email,
@@ -363,7 +375,67 @@
         document.getElementById('loginResponse').innerText = 'Erreur : ' + error.message;
     });
 }
+function activate2FA() {
+    const token = localStorage.getItem('jwtToken'); // Récupérer le token d'access
+    fetch('/auth/activate2FA/', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`, // Ajouter le token d'access à l'en-tête Authorization
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const qrImgBase64 = data.qr_img; // Récupérer l'image du QR code base64 depuis la réponse JSON
+        // Créer un élément <img> pour afficher l'image du QR code
+        const qrImgElement = document.createElement('img');
+        qrImgElement.src = 'data:image/png;base64,' + qrImgBase64; // Définir la source de l'image sur l'image QR base64
+        qrImgElement.alt = 'QR Code'; // Ajouter une description alternative pour l'image
+        // Ajouter l'élément <img> à un conteneur existant dans votre HTML
+        const container = document.getElementById('qrCodeContainer');
+        container.innerHTML = ''; // Effacer le contenu précédent du conteneur
+        container.appendChild(qrImgElement); // Ajouter l'élément <img> au conteneur
+    })
+    .catch(error => {
+        document.getElementById('activate2FAResponse').innerText = 'Erreur : ' + error.message;
+    });
+}
+    function confirm2FA() {
+        const token = localStorage.getItem('jwtToken'); // Récupérer le token d'access
+        const code = document.getElementById('code').value; // Récupérer le code de confirmation depuis l'élément HTML
+        console.log(code);
+        console.log('yo')
+        fetch('/auth/confirm2FA/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Ajouter le token d'access à l'en-tête Authorization
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code: code }) // Envoyer le code de confirmation dans le corps de la requête
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Traiter la réponse du serveur
+            document.getElementById('confirm2FAResponse').innerText = JSON.stringify(data);
+        })
+        .catch(error => {
+            // Gérer les erreurs
+            document.getElementById('confirm2FAResponse').innerText = 'Erreur : ' + error.message;
+        });
+    }
+    // Extraction des paramètres de l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username');
+    const profilePicture = urlParams.get('profile_picture');
+    const email = urlParams.get('email');
 
+    // Affichage des informations de l'utilisateur dans la div userInfo
+    document.getElementById('profilePicture').src = profilePicture;
+    document.getElementById('username').innerText = `Nom d'utilisateur: ${username}`;
+    document.getElementById('email').innerText = `Email: ${email}`;
+
+    // Afficher la section userInfo
+    document.getElementById('userInfo').style.display = 'block';
 
     </script>
 </body>
