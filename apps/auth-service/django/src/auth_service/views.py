@@ -186,25 +186,24 @@ def authenticate_with_42(request):
 	uid = os.getenv('UID')
 	if uid is None:
 		pass #implementer uen redirection
-	authorization_url = f"https://api.intra.42.fr/oauth/authorize?client_id={uid}&redirect_uri=https://127.0.0.1:8443/auth/Oauth&response_type=code"
+	authorization_url = f"https://api.intra.42.fr/oauth/authorize?client_id={uid}&redirect_uri=https://10.14.3.2:8443/auth/Oauth/&response_type=code"
 	response = JsonResponse({'authorization_url': authorization_url})
 	response["Access-Control-Allow-Origin"] = "*"
 	response["Access-Control-Allow-Methods"] = "GET"
 	response["Access-Control-Allow-Headers"] = "Content-Type"
-
 	return response
 
 
 import random
 import string
-
+from django.http import HttpResponseRedirect
 def oauth_callback(request):
 	code = request.GET['code']
 	if code:
 		token_url = "https://api.intra.42.fr/oauth/token"
 		client_id = os.getenv('UID')
 		client_secret = os.getenv('SECRET_KEY')
-		redirect_url = "https://127.0.0.1:8443/auth/Oauth"
+		redirect_url = "https://10.14.3.2:8443/auth/Oauth/"
 		payload = {
 			"grant_type": "authorization_code",
 			"client_id": client_id,
@@ -248,6 +247,7 @@ def oauth_callback(request):
 							[user.email],
 							fail_silently=False,
 					)
+				return redirect('https://localhost:8443/?username={}&profile_picture={}&email={}'.format(username, profile_picture, email))
 				return JsonResponse({'username': username, 'profile_picture': profile_picture, 'email': email, 'password': password})
 			else:	
 				return JsonResponse({'error': 'Échec de la récuperation des informatiosn utilisateur'}, status=400)
@@ -255,3 +255,73 @@ def oauth_callback(request):
 			return JsonResponse({'error': 'Échec de la récupération du jeton d\'accès'}, status=400)
 	else:
 		return JsonResponse({'error': 'Code d\'autorisation manquant dans la requête'}, status=400)
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+import pyotp
+import qrcode
+import base64
+from io import BytesIO
+
+class Activate2FAView(APIView):
+	authentication_classes = [JWTAuthentication]
+	permission_classes = [IsAuthenticated]
+
+	def generate_qr_code(self, secret_key, otp_url):
+		qr = qrcode.QRCode(
+			version=1,
+			error_correction=qrcode.constants.ERROR_CORRECT_L,
+			box_size=10,
+			border=4,
+		)
+		qr.add_data(otp_url)
+		qr.make(fit=True)
+		qr_img = qr.make_image(fill_color="black", back_color="white")
+		buffer = BytesIO()
+		qr_img.save(buffer, "PNG")
+		qr_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+		return qr_base64
+
+	def post(self, request):
+		# Génération de la clé secrète pour l'utilisateur
+		user = request.user
+		secret_key = pyotp.random_base32()
+		
+		# Génération de l'URL pour le QR code
+		otp_url = pyotp.totp.TOTP(secret_key).provisioning_uri(user.email, issuer_name="Nom de votre application")
+
+		# Générer le QR code en base64
+		qr_base64 = self.generate_qr_code(secret_key, otp_url)
+
+		# Activer la 2FA pour l'utilisateur
+		user.is_2fa_enabled = True
+		user.secret_key = secret_key
+		user.save()
+
+		return Response({'qr_img': qr_base64, 'secret_key': secret_key}, status=status.HTTP_200_OK)
+
+
+class Confirm2FAView(APIView):
+	authentication_classes = [JWTAuthentication]
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request):
+		user = request.user
+		print("salut")
+		if request.method == 'POST':
+			code = request.data.get('code')
+			print(code)
+			secret_key = user.secret_key
+			if pyotp.TOTP(secret_key).verify(code):
+				user.is_2fa_enabled = True
+				user.save()
+				return Response({'success': True})
+			else:
+				return Response({'success': False, 'error': 'Code incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+
+		return Response({'error': 'Méthode non autorisée'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
