@@ -11,6 +11,7 @@ class CustomUser(AbstractUser):
     is_2fa_enabled = models.BooleanField(default=False)
     is_42 = models.BooleanField(default=False)
     profile_picture = models.CharField(max_length=300, null=True, blank=True)
+    secret_key = models.CharField(max_length=100, blank=True, null=True)
 
 class UserToken(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='tokens')
