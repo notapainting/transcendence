@@ -40,7 +40,21 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 		return data
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+	serializer_class = CustomTokenObtainPairSerializer
+	def post(self, request, *args, **kwargs):
+		# Appeler la méthode post de la classe parent pour obtenir la réponse
+		response = super().post(request, *args, **kwargs)
+
+		# Récupérer les jetons d'accès et de rafraîchissement
+		access_token = response.data.get('access')
+		refresh_token = response.data.get('refresh')
+		response.data.pop('access', None)
+		response.data.pop('refresh', None)
+		# Ajouter les cookies à la réponse
+		response.set_cookie(key='access', value=access_token, httponly=True)
+		response.set_cookie(key='refresh', value=refresh_token, httponly=True)
+
+		return response
 
 def verify_email(request, uidb64, token):
 	try:
@@ -96,33 +110,42 @@ class UserCreate(APIView):
 			)
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-	
+
+def get_user_from_access_token(access_token_cookie):
+    try:
+        token = AccessToken(access_token_cookie)
+        user_id = token['user_id']
+        user = CustomUser.objects.get(id=user_id)
+        return user
+    except AccessToken.DoesNotExist:
+        raise AuthenticationFailed("Access token is missing or invalid")
+    except CustomUser.DoesNotExist:
+        raise AuthenticationFailed("User not found")
+
 class ValidateTokenView(APIView):
 	authentication_classes = [JWTAuthentication]
 	def post(self, request):
-		user_id = self.request.user.id
+		access_token_cookie = request.COOKIES.get('access')
+		user = get_user_from_access_token(access_token_cookie)
 		try:
 			user = CustomUser.objects.get(id=user_id)
 		except CustomUser.DoesNotExist:
 			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 		return Response({'message': 'token valide.', 'username': user.username}, status=status.HTTP_200_OK)
 
+
 class UpdateProfilePicture(APIView):
 	authentication_classes = [JWTAuthentication]
-
 	def put(self, request, *args, **kwargs):
-		user_id = self.request.user.id
-		try:
-			user = CustomUser.objects.get(id=user_id)
-		except CustomUser.DoesNotExist:
-			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+		access_token_cookie = request.COOKIES.get('access')
+		user = get_user_from_access_token(access_token_cookie)
 		profile_picture = request.FILES.get('profile_picture')
 		if profile_picture:
 			try:
 				files = {'profile_picture': profile_picture}
 				data = {'unique_id': user.unique_id}
 				update_response = requests.put('http://user-managment:8000/update_client/', files=files, data=data)
-				update_response.raise_for_status()  
+				update_response.raise_for_status()   
 			except requests.exceptions.RequestException as e:
 				return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 			return Response({"message": "Profile picture updated successfully"}, status=status.HTTP_200_OK)
@@ -132,11 +155,8 @@ class UpdateProfilePicture(APIView):
 class UpdateClientInfo(APIView):
 	authentication_classes = [JWTAuthentication]
 	def put(self, request, *args, **kwargs):
-		user_id = self.request.user.id
-		try:
-			user = CustomUser.objects.get(id=user_id)
-		except CustomUser.DoesNotExist:
-			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+		access_token_cookie = request.COOKIES.get('access')
+		user = get_user_from_access_token(access_token_cookie)
 		try:
 			request.data['unique_id'] = user.unique_id
 			update_response = requests.put('http://user-managment:8000/update_client/', json=request.data)
@@ -270,7 +290,6 @@ from io import BytesIO
 
 class Activate2FAView(APIView):
 	authentication_classes = [JWTAuthentication]
-	permission_classes = [IsAuthenticated]
 
 	def generate_qr_code(self, secret_key, otp_url):
 		qr = qrcode.QRCode(
@@ -289,7 +308,9 @@ class Activate2FAView(APIView):
 
 	def post(self, request):
 		# Génération de la clé secrète pour l'utilisateur
-		user = request.user
+  
+		access_token_cookie = request.COOKIES.get('access')
+		user = get_user_from_access_token(access_token_cookie)
 		secret_key = pyotp.random_base32()
 		
 		# Génération de l'URL pour le QR code
@@ -299,7 +320,6 @@ class Activate2FAView(APIView):
 		qr_base64 = self.generate_qr_code(secret_key, otp_url)
 
 		# Activer la 2FA pour l'utilisateur
-		user.is_2fa_enabled = True
 		user.secret_key = secret_key
 		user.save()
 
@@ -308,10 +328,10 @@ class Activate2FAView(APIView):
 
 class Confirm2FAView(APIView):
 	authentication_classes = [JWTAuthentication]
-	permission_classes = [IsAuthenticated]
 
 	def post(self, request):
-		user = request.user
+		access_token_cookie = request.COOKIES.get('access')
+		user = get_user_from_access_token(access_token_cookie)
 		print("salut")
 		if request.method == 'POST':
 			code = request.data.get('code')

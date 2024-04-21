@@ -91,6 +91,19 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS = ['*']
+
+# Activer les cookies sécurisés (à définir sur True pour une utilisation en production avec HTTPS)
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+# Activer les cookies HTTPOnly
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+
+# Configuration des domaines (laissez vide pour un développement en local)
+SESSION_COOKIE_DOMAIN = ''
+CSRF_COOKIE_DOMAIN = ''
 
 CSRF_TRUSTED_ORIGINS = ['https://localhost:8443']
 
@@ -100,7 +113,6 @@ ROOT_URLCONF = 'auth_service.urls'
 
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
-ALLOWED_HOSTS = ['*']
 
 TEMPLATES = [
     {
@@ -136,7 +148,11 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),
     }
 }
-
+# JWT_AUTH = {
+#     'JWT_AUTH_COOKIE': 'access_token',  # Nom du cookie pour le token d'accès
+#     'JWT_REFRESH_TOKEN_COOKIE': 'refresh_token',  # Nom du cookie pour le token de rafraîchissement
+#     # Autres configurations JWT...
+# }
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 

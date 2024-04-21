@@ -307,12 +307,18 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => response.json())
+            .then(response => {
+                // Log the access_token cookie
+                console.log('Access token cookie:', document.cookie);
+                if (response.ok) {
+                    return response.json(); // Convertir la réponse en JSON
+                } else {
+                    throw new Error('La requête a échoué');
+                }
+            })
             .then(data => {
                 // Vérifier si la connexion est réussie
-                if (data.access) {
-                    // Enregistrer le token dans le localStorage
-                    localStorage.setItem('jwtToken', data.access);
+                if (data.username) {
                     // Afficher les informations de l'utilisateur
                     document.getElementById('profilePicture').src = `https://localhost:8443${data.profile_picture}`;
                     document.getElementById('username').innerText = `Nom d'utilisateur: ${data.username}`;
@@ -331,18 +337,15 @@
             });
         }
 
+
         // Fonction pour mettre à jour la photo de profil
         function updateProfilePicture() {
-            const token = localStorage.getItem('jwtToken');
             const profilePictureInput = document.getElementById('profilePictureInput');
             const profilePicture = profilePictureInput.files[0];
             const formData = new FormData();
             formData.append('profile_picture', profilePicture);
             fetch('https://localhost:8443/auth/update_picture/', {
                 method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
                 body: formData
             })
             .then(response => response.json())
@@ -353,90 +356,73 @@
                 document.getElementById('updateProfilePictureResponse').innerText = 'Erreur : ' + error.message;
             });
         }
+
         function authenticateWith42() {
-    fetch('auth/authenticate_with_42/', {
-        method: 'GET',
-        redirect: 'follow' // Suivre les redirections
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erreur lors de la connexion avec l\'école 42');
+            fetch('auth/authenticate_with_42/', {
+                method: 'GET',
+                redirect: 'follow' // Suivre les redirections
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la connexion avec l\'école 42');
+                }
+                // Extraire l'URL de redirection depuis la réponse JSON
+                return response.json();
+            })
+            .then(data => {
+                // Récupérer l'URL d'autorisation de l'école 42 depuis les données JSON
+                const authorizationUrl = data.authorization_url;
+                // Rediriger l'utilisateur vers l'URL d'autorisation de l'école 42
+                window.location.href = authorizationUrl;
+            })
+            .catch(error => {
+                document.getElementById('loginResponse').innerText = 'Erreur : ' + error.message;
+            });
         }
-        // Extraire l'URL de redirection depuis la réponse JSON
-        return response.json();
-    })
-    .then(data => {
-        // Récupérer l'URL d'autorisation de l'école 42 depuis les données JSON
-        const authorizationUrl = data.authorization_url;
-        // Rediriger l'utilisateur vers l'URL d'autorisation de l'école 42
-        window.location.href = authorizationUrl;
-    })
-    .catch(error => {
-        document.getElementById('loginResponse').innerText = 'Erreur : ' + error.message;
-    });
-}
-function activate2FA() {
-    const token = localStorage.getItem('jwtToken'); // Récupérer le token d'access
-    fetch('/auth/activate2FA/', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`, // Ajouter le token d'access à l'en-tête Authorization
-            'Content-Type': 'application/json'
+
+        function activate2FA() {
+            fetch('/auth/activate2FA/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const qrImgBase64 = data.qr_img; // Récupérer l'image du QR code base64 depuis la réponse JSON
+                // Créer un élément <img> pour afficher l'image du QR code
+                const qrImgElement = document.createElement('img');
+                qrImgElement.src = 'data:image/png;base64,' + qrImgBase64; // Définir la source de l'image sur l'image QR base64
+                qrImgElement.alt = 'QR Code'; // Ajouter une description alternative pour l'image
+                // Ajouter l'élément <img> à un conteneur existant dans votre HTML
+                const container = document.getElementById('qrCodeContainer');
+                container.innerHTML = ''; // Effacer le contenu précédent du conteneur
+                container.appendChild(qrImgElement); // Ajouter l'élément <img> au conteneur
+            })
+            .catch(error => {
+                document.getElementById('activate2FAResponse').innerText = 'Erreur : ' + error.message;
+            });
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        const qrImgBase64 = data.qr_img; // Récupérer l'image du QR code base64 depuis la réponse JSON
-        // Créer un élément <img> pour afficher l'image du QR code
-        const qrImgElement = document.createElement('img');
-        qrImgElement.src = 'data:image/png;base64,' + qrImgBase64; // Définir la source de l'image sur l'image QR base64
-        qrImgElement.alt = 'QR Code'; // Ajouter une description alternative pour l'image
-        // Ajouter l'élément <img> à un conteneur existant dans votre HTML
-        const container = document.getElementById('qrCodeContainer');
-        container.innerHTML = ''; // Effacer le contenu précédent du conteneur
-        container.appendChild(qrImgElement); // Ajouter l'élément <img> au conteneur
-    })
-    .catch(error => {
-        document.getElementById('activate2FAResponse').innerText = 'Erreur : ' + error.message;
-    });
-}
-    function confirm2FA() {
-        const token = localStorage.getItem('jwtToken'); // Récupérer le token d'access
-        const code = document.getElementById('code').value; // Récupérer le code de confirmation depuis l'élément HTML
-        console.log(code);
-        console.log('yo')
-        fetch('/auth/confirm2FA/', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`, // Ajouter le token d'access à l'en-tête Authorization
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ code: code }) // Envoyer le code de confirmation dans le corps de la requête
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Traiter la réponse du serveur
-            document.getElementById('confirm2FAResponse').innerText = JSON.stringify(data);
-        })
-        .catch(error => {
-            // Gérer les erreurs
-            document.getElementById('confirm2FAResponse').innerText = 'Erreur : ' + error.message;
-        });
-    }
-    // Extraction des paramètres de l'URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('username');
-    const profilePicture = urlParams.get('profile_picture');
-    const email = urlParams.get('email');
-
-    // Affichage des informations de l'utilisateur dans la div userInfo
-    document.getElementById('profilePicture').src = profilePicture;
-    document.getElementById('username').innerText = `Nom d'utilisateur: ${username}`;
-    document.getElementById('email').innerText = `Email: ${email}`;
-
-    // Afficher la section userInfo
-    document.getElementById('userInfo').style.display = 'block';
-
+        function confirm2FA() {
+            const code = document.getElementById('code').value;
+            const data = {
+                code: code
+            };
+            fetch('/auth/confirm2FA/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('confirm2FAResponse').innerText = JSON.stringify(data);
+            })
+            .catch(error => {
+                document.getElementById('confirm2FAResponse').innerText = 'Erreur : ' + error.message;
+            });
+        }
     </script>
 </body>
 </html>
