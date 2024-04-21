@@ -1,4 +1,9 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
+import { EffectComposer } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { AfterimagePass } from 'https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/AfterimagePass.js';
+
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
 
 // var canvas2 = document.getElementById("canvas");
@@ -12,6 +17,8 @@ renderer.setSize(900, 600);
 
 camera.position.set( 0, -70, 80 );
 
+let sphere;
+
 const controls = new OrbitControls( camera, renderer.domElement );
 
 // Light
@@ -20,6 +27,20 @@ light.position.set(0, 0, 1);
 
 // Activer les ombres dans le renderer
 renderer.shadowMap.enabled = false;
+
+// const bloomPass = new UnrealBloomPass( new THREE.Vector2( 900, 600 ), 0.2, 0, 0.1 );
+const renderScene = new RenderPass(scene, camera);
+
+// bloomComposer.renderToScreen = false;
+const afterImagePass = new AfterimagePass();
+afterImagePass.uniforms["damp"].value = 0.975;
+afterImagePass.renderToScreen = false;
+afterImagePass.selectedObjects = [sphere];
+
+const composer = new EffectComposer(renderer);
+composer.addPass(renderScene);
+// composer.addPass( bloomPass );
+composer.addPass(afterImagePass);
 
 var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
 var colorsViolet = [0x4c005a, 0x6a1292, 0x8436a1, 0xa34bb4, 0xde70ec, 0xa34bb4, 0x8436a1, 0x6a1292];
@@ -88,8 +109,8 @@ function animate() {
             createParticle();
         }
         explosion = false;
-    }
-    renderer.render(scene, camera);
+    } 
+    composer.render(scene, camera);
 
 }
 
@@ -169,7 +190,7 @@ function gameRenderer(data) {
     // Ball
     const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 20);
     const materialBall = new THREE.MeshStandardMaterial({ color: 0xffffff});
-    let sphere = new THREE.Mesh(geometryBall, materialBall);
+    sphere = new THREE.Mesh(geometryBall, materialBall);
     sphere.position.set(data.x, data.y, 0);
     scene.add(sphere);
 
@@ -211,7 +232,7 @@ function gameRenderer(data) {
 	}
 
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.render(scene, camera);
+    composer.render(scene, camera);
 }
 
 
