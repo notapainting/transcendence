@@ -23,7 +23,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 class ChatUser(models.Model):
 
-	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+	id = models.UUIDField(primary_key=True, editable=False)
 	name = models.CharField(max_length=20, unique=True)
 	contact_list = models.ManyToManyField('self')
 	blocked_list = models.ManyToManyField('self', related_name='blocked', symmetrical=False)
@@ -46,7 +46,7 @@ class ChatUser(models.Model):
 	
 	def json_group(self):
 		return {
-			'groups': json.dumps(list(self.chatgroup_set.all().values("id")), cls=DjangoJSONEncoder)
+			'groups': json.dumps(list(self.groups.all().values("id")), cls=DjangoJSONEncoder)
 		}
 
 	def json(self):
@@ -55,7 +55,7 @@ class ChatUser(models.Model):
 			'name': self.name,
 			'contact': json.dumps(list(self.contact_list.all().values("id", "name")), cls=DjangoJSONEncoder),
 			'blocked': json.dumps(list(self.blocked_list.all().values("id", "name")), cls=DjangoJSONEncoder),
-			'groups': json.dumps(list(self.chatgroup_set.all().values("id")), cls=DjangoJSONEncoder),
+			'groups': json.dumps(list(self.groups.all().values("id")), cls=DjangoJSONEncoder),
 		}
 
 	def json_short(self):
@@ -70,7 +70,7 @@ class ChatGroup(models.Model):
 
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	name = models.CharField(max_length=200, validators=[validators.offensive_name])
-	members = models.ManyToManyField(ChatUser)
+	members = models.ManyToManyField(ChatUser, related_name='groups')
 
 	def __str__(self):
 		return self.name
