@@ -2,7 +2,7 @@
 from django.urls import path, include
 from django.views.generic.base import RedirectView 
 
-from .views import UserApiView, UserContactApiView, UserBlockedApiView
+from .UserViews import UserApiView, UserContactApiView, UserBlockedApiView
 from .GroupView import GroupApiView
 
 urls_user = [
