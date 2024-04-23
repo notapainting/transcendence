@@ -18,29 +18,22 @@ renderer.setSize(900, 600);
 camera.position.set( 0, -70, 80 );
 
 let sphere;
+const trailPositions = [];
 
-const controls = new OrbitControls( camera, renderer.domElement );
+const controls = new OrbitControls(camera, renderer.domElement);
 
 // Light
 const light = new THREE.DirectionalLight(0xe5d0ff, 1);
 light.position.set(0, 0, 1);
 
-// Activer les ombres dans le renderer
-renderer.shadowMap.enabled = false;
+// Activate shadows in the renderer
+renderer.shadowMap.enabled = true;
 
-// const bloomPass = new UnrealBloomPass( new THREE.Vector2( 900, 600 ), 0.2, 0, 0.1 );
-const renderScene = new RenderPass(scene, camera);
-
-// bloomComposer.renderToScreen = false;
-const afterImagePass = new AfterimagePass();
-afterImagePass.uniforms["damp"].value = 0.975;
-afterImagePass.renderToScreen = false;
-afterImagePass.selectedObjects = [sphere];
-
+// Composer pour la scène principale
 const composer = new EffectComposer(renderer);
+const renderScene = new RenderPass(scene, camera);
 composer.addPass(renderScene);
-// composer.addPass( bloomPass );
-composer.addPass(afterImagePass);
+
 
 var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
 var colorsViolet = [0x4c005a, 0x6a1292, 0x8436a1, 0xa34bb4, 0xde70ec, 0xa34bb4, 0x8436a1, 0x6a1292];
@@ -110,8 +103,7 @@ function animate() {
         }
         explosion = false;
     } 
-    composer.render(scene, camera);
-
+    composer.render();
 }
 
 animate();
@@ -143,6 +135,50 @@ function interpolateColor(color) {
     return interpolatedColor.getHex();
 }
 
+function createTrailParticles(position, color) {
+    const numParticles = 5; 
+    const particleSize = 0.5;
+    const trailSpeed = 0.1;
+
+    for (let i = 0; i < numParticles; i++) {
+        const geometry = new THREE.BufferGeometry();
+        const vertices = new Float32Array([position.x, position.y, position.z]);
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+
+        const material = new THREE.PointsMaterial({ color: color, size: particleSize, opacity: 1.0, transparent: true });
+
+        const particle = new THREE.Points(geometry, material);
+        scene.add(particle);
+
+        const direction = new THREE.Vector3(
+            Math.random() - 0.5,
+            Math.random() - 0.5,
+            Math.random() - 0.5
+        ).normalize();
+
+        const speed = trailSpeed * Math.random(); 
+        var distance = 10;
+
+        const update = function () {
+            const positionAttribute = particle.geometry.getAttribute('position');
+            const currentPosition = new THREE.Vector3().fromBufferAttribute(positionAttribute, 0);
+            currentPosition.addScaledVector(direction, speed);
+            positionAttribute.setXYZ(0, currentPosition.x, currentPosition.y, currentPosition.z);
+            positionAttribute.needsUpdate = true;
+            distance -= speed;
+            if (distance <= 0) {
+                scene.remove(particle);
+                cancelAnimationFrame(animationId);
+            }
+        };
+
+        var animationId = requestAnimationFrame(function animate() {
+            update();
+            animationId = requestAnimationFrame(animate);
+        });
+    }
+}
 
 function gameRenderer(data) {
 	clearScene(); 
@@ -194,6 +230,31 @@ function gameRenderer(data) {
     sphere.position.set(data.x, data.y, 0);
     scene.add(sphere);
 
+    const materialTrail = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent:true});
+    trailPositions.push(sphere.position.clone());
+    if (trailPositions.length > 15 || explosion === true) {
+        trailPositions.shift();
+    }
+
+    scene.children
+        .filter(obj => obj.userData.isTrailSphere)
+        .forEach(obj => scene.remove(obj));
+
+    var size = 0.1;
+    trailPositions.forEach(position => {
+        const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
+        trailSphere.position.copy(position);
+        trailSphere.scale.multiplyScalar(size);
+        if (size < 1)
+            size += 0.08;
+        trailSphere.userData.isTrailSphere = true;
+        materialTrail.opacity = 0.5;
+        scene.add(trailSphere);
+    });
+
+    // const trailColor = new THREE.Color(0xffffff);
+    // createTrailParticles(sphere.position, trailColor);
+    
     // Lights
 	const lightColor = interpolateColor(colorBall); 
     const lightIntensity = 400;
@@ -224,15 +285,21 @@ function gameRenderer(data) {
 		explosion = true;
     }
 
-	if (data.speed != initialSpeed)
-	{
-		var randomIndex = Math.floor(Math.random() * colorPalettes.length);
-		colorBall = colorPalettes[randomIndex];
-		initialSpeed = data.speed;
-	}
+    if (data.speed != initialSpeed)
+    {
+        var randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * colorPalettes.length);
+        } while (colorBall === colorPalettes[randomIndex]);
+    
+        colorBall = colorPalettes[randomIndex];
+        initialSpeed = data.speed;
+    }
+    
 
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    composer.render(scene, camera);
+
+    composer.render();
 }
 
 
