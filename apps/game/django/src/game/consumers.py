@@ -10,6 +10,7 @@ maxScore = 5
 paddleHeight = 80
 paddleWidth = 10
 ballSpeedX = 0.8
+reset = 0
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -102,6 +103,11 @@ class GameState:
     }
     
     def update(self):
+        global reset
+
+        if reset == 1:
+            reset = 2
+
         # deplacement des paddles
         if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeight'] / 2 < height:
             self.status['rightPaddleY'] += self.status['paddleSpeed']
@@ -169,15 +175,21 @@ class GameState:
 
     
     def reset(self):
+        global reset
         self.status['ballX'] = 0
         self.status['ballY'] = 0
         self.status['ballSpeedX'] = -ballSpeedX
         self.status['ballSpeedY'] = random.uniform(-1, 1)
+        reset = 1
 
 
 async def loop(self):
+    global reset
     while self.game_state.status['game_running']:
         message = self.game_state.update()
         await asyncio.sleep(0.02)
         asyncio.create_task(self.game_state.update_player_position(message))
-        await self.send(json.dumps(self.game_state.to_dict('none')))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+        await self.send(json.dumps(self.game_state.to_dict('none')))
+        if reset ==  2:
+            time.sleep(0.5)
+            reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
