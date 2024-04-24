@@ -138,7 +138,7 @@ class GameState:
         # collisions avec les paddles
         if (self.status['ballX'] + self.status['ballRadius'] > width - 5 - self.status['paddleWidth'] and
                 self.status['ballY'] >= right_paddle_bottom and
-                self.status['ballY'] <= right_paddle_top and
+                self.status['ballY'] <= right_paddle_top and 
                 self.status['ballSpeedX'] > 0):
             self.status['ballSpeedX'] *= -1 - acceleration
             if self.status['ballY'] >= right_paddle_top - self.status['paddleHeight'] / 4:
