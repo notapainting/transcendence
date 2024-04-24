@@ -14,13 +14,27 @@ const camera = new THREE.PerspectiveCamera(45, 900 / 600, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
 scene.background = new THREE.Color(0x333333);
 renderer.setSize(900, 600);
-
 camera.position.set( 0, -70, 80 );
 
-let sphere;
-const trailPositions = [];
-
 const controls = new OrbitControls(camera, renderer.domElement);
+
+var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
+var colorsViolet = [0x4c005a, 0x6a1292, 0x8436a1, 0xa34bb4, 0xde70ec, 0xa34bb4, 0x8436a1, 0x6a1292];
+var colorsPink = [0xffc2cd, 0xff93ac, 0xff6289, 0xfc3468, 0xff084a, 0xfc3468, 0xff6289, 0xff93ac];
+var colorPalettes = [colorsViolet, colorsBlue, colorsPink];
+let colorBall = colorsViolet;
+
+var colorTransitionTime = 2000;
+var colorStartTime = Date.now();
+let sphere;
+let trailPositions = [];
+let scoreRight = 0
+let scoreLeft = 0
+let explosion = false;
+let collisionX = 0;
+let collisionY = 0;
+let collisionPaddle = false;
+let initialSpeed = 0.8;
 
 // Light
 const light = new THREE.DirectionalLight(0xe5d0ff, 1);
@@ -34,23 +48,6 @@ const composer = new EffectComposer(renderer);
 const renderScene = new RenderPass(scene, camera);
 composer.addPass(renderScene);
 
-
-var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
-var colorsViolet = [0x4c005a, 0x6a1292, 0x8436a1, 0xa34bb4, 0xde70ec, 0xa34bb4, 0x8436a1, 0x6a1292];
-var colorsPink = [0xffc2cd, 0xff93ac, 0xff6289, 0xfc3468, 0xff084a, 0xfc3468, 0xff6289, 0xff93ac];
-var colorPalettes = [colorsViolet, colorsBlue, colorsPink];
-let colorBall = colorsViolet;
-
-var colorTransitionTime = 2000;
-var colorStartTime = Date.now();
-
-let scoreRight = 0
-let scoreLeft = 0
-let explosion = false;
-let collisionX = 0;
-let collisionY = 0;
-let initialSpeed = 0.8;
-
 function createParticle() {
     var geometry = new THREE.BufferGeometry();
     var vertices = new Float32Array([collisionX, collisionY, 0]);
@@ -58,9 +55,7 @@ function createParticle() {
     geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
     var randomColor = colorBall[Math.floor(Math.random() * colorBall.length)];
-
     var material = new THREE.PointsMaterial({ color: randomColor, size: 1.5 });
-
 
     var particle = new THREE.Points(geometry, material);
     scene.add(particle);
@@ -73,7 +68,6 @@ function createParticle() {
 
     var speed = 0.6; 
     var distance = 10;
-
     var update = function () {
         var positionAttribute = particle.geometry.getAttribute('position');
         var currentPosition = new THREE.Vector3().fromBufferAttribute(positionAttribute, 0);
@@ -96,13 +90,28 @@ function createParticle() {
 function animate() {
     requestAnimationFrame(animate);
 
-
+	
     if (explosion === true) {
+		scene.children
+		.filter(obj => obj.userData.isTrailSphere)
+		.forEach(obj => scene.remove(obj));
+		scene.remove(sphere);
         for (var i = 0; i < 100; i++) {
-            createParticle();
+			createParticle();
         }
         explosion = false;
     } 
+	if (collisionPaddle === true)
+	{
+		var randomIndex;
+		do {
+			randomIndex = Math.floor(Math.random() * colorPalettes.length);
+		} while (colorBall === colorPalettes[randomIndex]);
+	
+		colorBall = colorPalettes[randomIndex];
+		collisionPaddle = false;
+	}
+
     composer.render();
 }
 
@@ -231,27 +240,33 @@ function gameRenderer(data) {
     scene.add(sphere);
 
     const materialTrail = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent:true});
-    trailPositions.push(sphere.position.clone());
-    if (trailPositions.length > 15 || explosion === true) {
-        trailPositions.shift();
-    }
 
-    scene.children
-        .filter(obj => obj.userData.isTrailSphere)
-        .forEach(obj => scene.remove(obj));
-
-    var size = 0.1;
-    trailPositions.forEach(position => {
-        const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
-        trailSphere.position.copy(position);
-        trailSphere.scale.multiplyScalar(size);
-        if (size < 1)
-            size += 0.08;
-        trailSphere.userData.isTrailSphere = true;
-        materialTrail.opacity = 0.5;
-        scene.add(trailSphere);
-    });
-
+	if (explosion) {
+		scene.children
+			.filter(obj => obj.userData.isTrailSphere)
+			.forEach(obj => scene.remove(obj));
+	} else {
+		trailPositions.push(sphere.position.clone());
+		if (trailPositions.length > 15) {
+			trailPositions.shift();
+		}
+	
+		scene.children
+			.filter(obj => obj.userData.isTrailSphere)
+			.forEach(obj => scene.remove(obj));
+	
+		var size = 0.1;
+		trailPositions.forEach(position => {
+			const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
+			trailSphere.position.copy(position);
+			trailSphere.scale.multiplyScalar(size);
+			if (size < 1)
+				size += 0.08;
+			trailSphere.userData.isTrailSphere = true;
+			materialTrail.opacity = 0.5;
+			scene.add(trailSphere);
+		});
+	}
     // const trailColor = new THREE.Color(0xffffff);
     // createTrailParticles(sphere.position, trailColor);
     
@@ -270,35 +285,28 @@ function gameRenderer(data) {
     scene.add(light2);
     scene.add(light3);
 
-
 	// Explosion collision
     if (data.leftPlayerScore > scoreLeft) {
         collisionX = data.collisionX;
         collisionY = data.collisionY;
         scoreLeft++;
 		explosion = true;
+		trailPositions = [];
     }
     if (data.rightPlayerScore > scoreRight) {
         collisionX = data.collisionX;
         collisionY = data.collisionY;
         scoreRight++;
 		explosion = true;
+		trailPositions = [];
     }
-
     if (data.speed != initialSpeed)
     {
-        var randomIndex;
-        do {
-            randomIndex = Math.floor(Math.random() * colorPalettes.length);
-        } while (colorBall === colorPalettes[randomIndex]);
-    
-        colorBall = colorPalettes[randomIndex];
+		collisionPaddle = true;
         initialSpeed = data.speed;
     }
     
-
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
     composer.render();
 }
 

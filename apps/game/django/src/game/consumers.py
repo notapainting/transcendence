@@ -10,7 +10,9 @@ maxScore = 5
 paddleHeight = 80
 paddleWidth = 10
 ballSpeedX = 0.8
+acceleration = 0.01
 reset = 0
+counter = 0
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -138,7 +140,7 @@ class GameState:
                 self.status['ballY'] >= right_paddle_bottom and
                 self.status['ballY'] <= right_paddle_top and
                 self.status['ballSpeedX'] > 0):
-            self.status['ballSpeedX'] *= -1.08
+            self.status['ballSpeedX'] *= -1 - acceleration
             if self.status['ballY'] >= right_paddle_top - self.status['paddleHeight'] / 4:
                 self.status['ballSpeedY'] = abs(self.status['ballSpeedY'])
             elif self.status['ballY'] <= right_paddle_bottom + self.status['paddleHeight'] / 4:
@@ -148,7 +150,7 @@ class GameState:
                 self.status['ballY'] >= left_paddle_bottom and
                 self.status['ballY'] <= left_paddle_top and
                 self.status['ballSpeedX'] < 0):
-            self.status['ballSpeedX'] *= -1.08
+            self.status['ballSpeedX'] *= -1 - acceleration
             if self.status['ballY'] >= left_paddle_top - self.status['paddleHeight'] / 4:
                 self.status['ballSpeedY'] = abs(self.status['ballSpeedY'])
             elif self.status['ballY'] <= left_paddle_bottom + self.status['paddleHeight'] / 4:
@@ -172,13 +174,17 @@ class GameState:
             self.reset()
             self.status['winner'] = 'rightWin'
             self.status['game_running'] = False
-
     
     def reset(self):
-        global reset
+        global reset, counter
+
         self.status['ballX'] = 0
         self.status['ballY'] = 0
-        self.status['ballSpeedX'] = -ballSpeedX
+        if counter % 2 == 0:
+            self.status['ballSpeedX'] = -ballSpeedX 
+        else:
+            self.status['ballSpeedX'] = ballSpeedX 
+        counter += 1
         self.status['ballSpeedY'] = random.uniform(-1, 1)
         reset = 1
 
