@@ -8,7 +8,9 @@ from django.db.utils import IntegrityError
 from django.views import View
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
+
 from .validators import is_uuid
+from .serializer import ChatUserSerializer
 
 from json import loads as jloads
 
@@ -41,12 +43,19 @@ class UserApiView(View):
 
     def get(self, request, *args, **kwargs):
         try :
+            fields = request.GET.get("fields")
+
+            print(fields)
             id = kwargs.get('id')
-            if id == None or id == 'oname':
-                return self.list_user(id)
+            if id == None:
+                return JsonResponse(status=200, data=self.list_user(fields), safe=False)
             if is_uuid(id):
-                return JsonResponse(status=200, data=ChatUser.objects.get(id=id).json())
-            return JsonResponse(status=200, data=ChatUser.objects.get(name=id).json())
+                qset = ChatUser.objects.get(id=id)
+            else:
+                qset = ChatUser.objects.get(name=id)
+            data =ChatUserSerializer(qset, fields=fields).data
+            print(data)
+            return JsonResponse(status=200, data=data)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:
@@ -84,17 +93,13 @@ class UserApiView(View):
             logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=500)
 
-    def list_user(request, opt=''):
-        try :
-            if opt == 'oname':
-                users = [i.__str__() for i in ChatUser.objects.all()]
-            else:
-                users = [i.json() for i in ChatUser.objects.all()]
-            return JsonResponse(status=200, data={'n': len(users), 'users': users}, safe=False)
+    def list_user(self, opt=''):
+        qset = ChatUser.objects.all()
+        if opt == 'oname':
+            return ChatUserSerializer(qset, many=True, fields={'name', ''}).data
+        else:
+            return ChatUserSerializer(qset, many=True).data
 
-        except BaseException as e:
-            logger.error(f"Internal : {e.args[0]}")
-            return HttpResponse(status=500)
 
 
 class UserContactApiView(View):
