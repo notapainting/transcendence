@@ -16,7 +16,10 @@ class   BaseSerializer(serializers.ModelSerializer):
         
         # Drop any fields that are not specified in the `fields` argument.
         if fields is not None:
-            allowed = set(fields)
+            if isinstance(fields, basestring): #types.StringTypes
+                allowed = fields
+            else:
+                allowed = set(fields)
             print(allowed)
             existing = set(self.fields)
             for field_name in existing - allowed:
