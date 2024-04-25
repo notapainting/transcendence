@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
+from rest_framework.validators import UniqueValidator
+
 from . import models
 import io
-
 
 class   BaseSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
@@ -16,11 +17,8 @@ class   BaseSerializer(serializers.ModelSerializer):
         
         # Drop any fields that are not specified in the `fields` argument.
         if fields is not None:
-            if isinstance(fields, basestring): #types.StringTypes
-                allowed = fields
-            else:
-                allowed = set(fields)
-            print(allowed)
+            fields = fields.split()
+            allowed = set(fields)
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
@@ -34,7 +32,7 @@ class   BaseSerializer(serializers.ModelSerializer):
 
 
 class ChatUserSerializer(BaseSerializer):
-    id = serializers.UUIDField()
+    id = serializers.UUIDField(validators=[UniqueValidator(queryset=models.ChatUser.objects.all())])
     
     class Meta:
         model = models.ChatUser

@@ -30,13 +30,17 @@ class UserApiView(View):
     def post(self, request, *args, **kwargs):
         try :
             data = jloads(request.body)
-            id = kwargs.get('id', data['id'])
+            s = ChatUserSerializer(data= request.body)
+            if s.is_valid() is False:
+                print(s.errors)
+                return HttpResponse(status=400)
+            print('it is tru')
+            id = kwargs.get('id', s.data['id'])
             if ChatUser.objects.filter(Q(name=data['name']) | Q(id=id)).exists():
                 return HttpResponse(status=403)
             ChatUser.objects.create(id=id, name=data['name'])
             return HttpResponse(status=201)
-        except (ValidationError, KeyError) as e:
-            return JsonResponse(status=400, data={'error': 'BadKey', 'key': e.args[0]})
+
         except BaseException as e:
             logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=500)
@@ -44,18 +48,19 @@ class UserApiView(View):
     def get(self, request, *args, **kwargs):
         try :
             fields = request.GET.get("fields")
-
-            print(fields)
+            many = False
+            safe = True
             id = kwargs.get('id')
             if id == None:
-                return JsonResponse(status=200, data=self.list_user(fields), safe=False)
-            if is_uuid(id):
+                qset = ChatUser.objects.all()
+                many = True
+                safe = False
+            elif is_uuid(id):
                 qset = ChatUser.objects.get(id=id)
             else:
                 qset = ChatUser.objects.get(name=id)
-            data =ChatUserSerializer(qset, fields=fields).data
-            print(data)
-            return JsonResponse(status=200, data=data)
+            data = ChatUserSerializer(qset, many=many, fields=fields).data
+            return JsonResponse(status=200, data=data, safe=safe)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:
@@ -92,14 +97,6 @@ class UserApiView(View):
         except BaseException as e:
             logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=500)
-
-    def list_user(self, opt=''):
-        qset = ChatUser.objects.all()
-        if opt == 'oname':
-            return ChatUserSerializer(qset, many=True, fields={'name', ''}).data
-        else:
-            return ChatUserSerializer(qset, many=True).data
-
 
 
 class UserContactApiView(View):
