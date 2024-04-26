@@ -30,6 +30,8 @@ const composer = new EffectComposer(renderer);
 const renderScene = new RenderPass(scene, camera);
 composer.addPass(renderScene);
 
+let sphere;
+
 var startGame = false;
 var start = false;
 
@@ -48,6 +50,7 @@ let explosion = false;
 let collisionX = 0;
 let collisionY = 0;
 let initialSpeed = 0.8;
+let collisionPaddle = false;
 
 let acceleration = 9.8;
 let bounce_distance = 40;
