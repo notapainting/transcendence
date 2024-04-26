@@ -1,100 +1,41 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transcentest</title>
-	
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-	<link rel="stylesheet" href="assets/style.css"> 
-	<link rel="stylesheet" href="assets/style-chat.css"> 
-
+    <title>Bjill | Welcome</title>
+    <link rel="stylesheet" href="./style.css">    
 </head>
 <body>
-	<div id="navbar">
-		<nav class="navbar navbar-inverse">
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<a class="navbar-brand" href="#">Transcendence</a>
-				</div>
-				<ul class="nav navbar-nav">
-					<li id="accID" class="active"><a href="#accueil">Accueil</a></li>
-					<li id="jeuID" ><a href="#jeu">Jeu</a></li>
-					<li id="chatID" ><a href="#chat">Chat</a></li>
-				</ul>
-				<div id="connexion-content">
-					<ul class="nav navbar-nav navbar-right">
-						<li><a href="#signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-						<li><a href="#signin"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-					</ul>
-				</div>
-			</div>
-		</nav>
-	</div>
-
-	<main id="content">
-
-		<div id="signup-content" class="page-content" style="display: none;">
-	
-		</div>
-
-		<div id="signin-content" class="page-content" style="display: none;">
-			<div class="wrapper fadeInDown">
-				<div id="formContent">
-				  <form id="loginForm">
-					<input type="text" id="login" class="fadeIn second" name="login" placeholder="login">
-					<input type="email" id="email" class="fadeIn second" name="email" placeholder="email">
-					<input type="password" id="password" class="fadeIn third" name="login" placeholder="password">
-					<input type="submit" class="fadeIn fourth" value="Log In">
-				  </form>
-			
-				  <div id="formFooter">
-					<a class="underlineHover" href="#">Forgot Password?</a>
-				  </div>
-			  
-				</div>
-			</div>
-		</div>
-
-
-
-		<div id="accueil-content" class="page-content" style="display: none;">
-			<h1>Bienvenue sur Transcendence !</h1>
-		</div>
-
-		<div id="jeu-content" class="page-content" style="display: none;">
-			<h1 id="scoreMessage"></h1>
-			<div class="containerGame">
-				<canvas id="canvas" width="900" height="600">
-			</div>
-			<div id="gameButton">
-				<button id="startButton" class="button" type="button">Start</button> 
-				<button id="stopButton" class="button" type="button">Stop</button> 
-				<button id="backButton" class="button" type="button">Back test</button> 
-			</div>
-		</div> 
-
-		<div id="chat-content" style="display: none;">
-			<h1 id="chat-text" class="text-center"> Chat in progress .. </h1>
-		</div>
-	</main>
-	
-
-    <footer class="footer">
-        <div class="containerFooter">
-            <span class="text-muted">Transcendence &copy; 2024</span>
+    <main class="main">
+        <nav class="nav">
+            <ul>
+                <li><a href="#home" class="home">Home</a></li>
+                <li><a href="#profile" class="profile">Profile</a></li>
+                <li><a href="#game" class="game">Game</a></li>
+                <li><a href="#chat" class="chat">Chat</a></li>
+                <li><a href="#settings" class="settings">Settings</a></li>
+                <li><a href="#disconnect" class="disconnect">Disconnect</a></li>
+            </ul>
+        </nav>
+        <div id="home" class="parallax-container section">
+            <div class="parallax background-threes"></div>
+            <div class="parallax back-threes">
+            </div>
+            <div class="parallax middle-threes">
+            </div>
+            <div class="parallax front-threes">
+            </div>
         </div>
-    </footer>
-
-	<script src="assets/app.js"></script>
-	<script src="assets/game.js"></script>
-	<script src="assets/connexion.js"></script>
+        <div class="section red" id="game"></div>
+    </main>
+    <script src="./index.js"></script>
 </body>
-</html> -->
+</html>
 
-<!DOCTYPE html>
+
+
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -425,4 +366,4 @@
         }
     </script>
 </body>
-</html>
+</html> -->
