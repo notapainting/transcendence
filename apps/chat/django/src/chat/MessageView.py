@@ -8,6 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from json import loads as jloads
 from logging import getLogger
 from django.db.models import Count
+from .serializer import MessageSerializer, render_json
+
 
 logger = getLogger('django')
 
@@ -22,25 +24,16 @@ class MessageApiView(View):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
-            data = jloads(request.body)#can throw
-
-            group = ChatGroup.objects.get(id=kwargs.get('id'))
-            author = ChatUser.object.get(name=data['author'])
-            respond_to ChatMessage.object.get(id=data['respond_to'])
-
-            date_pub = data['date_pub']
-            body = data['body']
-
-            message = ChatMessage.object.create(author=author, 
-                                                date_pub=pub, 
-                                                conv=group, 
-                                                respond_to=respond_to, 
-                                                body=body)
+            s = MessageSerializer(data=request.body)
+            if s.is_valid() is False:
+                print(s.errors)
+                return HttpResponse(status=400)
+            print(s.validated_data)
+            s.create(s.validated_data)
             return HttpResponse(status=201)
-        except KeyError as e:
-            return JsonResponse(status=400, data={'error': 'BadKey', 'key': e.args[0]})
+        
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:
@@ -50,7 +43,7 @@ class MessageApiView(View):
     def get(self, *args, **kwargs):
         pass
 
-    def put(self, *args, **kwargs):
+    def patch(self, *args, **kwargs):
         pass
 
     def delete(self, *args, **kwargs):

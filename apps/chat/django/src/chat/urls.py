@@ -4,10 +4,11 @@ from django.views.generic.base import RedirectView
 
 from .UserViews import UserApiView, UserContactApiView, UserBlockedApiView
 from .GroupView import GroupApiView
+from .MessageView import MessageApiView
 
 urls_user = [
     path("", UserApiView.as_view()),
-    path("<id>/", UserApiView.as_view()),
+    path("<name>/", UserApiView.as_view()),
 
     path("<id>/contacts/", UserContactApiView.as_view()),
     path("<id>/contacts/<target>/", UserContactApiView.as_view()),
@@ -19,16 +20,10 @@ urls_user = [
 urls_group = [
     path("", GroupApiView.as_view()),
     path("<uuid:id>/", GroupApiView.as_view()),
-
-    path("<uuid:id>/members/", GroupApiView.as_view()),
-    # path("<uuid:id>/members/<uuid:id>/", GroupApiView.as_view()), # -> redirect to /users/id
-
-    path("<uuid:id>/message", GroupApiView.as_view()),
-    # path("<uuid:id>/message/<uuid:id>/", GroupApiView.as_view()), # -> redirect to /message/id
 ]
 
 urls_message = [
-    # path("", MessageApiView.as_view()),
+    path("", MessageApiView.as_view()),
     # path("<uuid:id>", MessageApiView.as_view()), # -> return message data (author/date/group/body)
 
     # path("<uuid:id>/author/", MessageApiView.as_view()), # -> redirect to /users/id
@@ -38,7 +33,8 @@ urls_message = [
 
 urlspatterns = [
     path('users/', include(urls_user)),
-    path('groups/', include(urls_group))
+    path('groups/', include(urls_group)),
+    path('messages/', include(urls_message))
 ]
 
 urls = [

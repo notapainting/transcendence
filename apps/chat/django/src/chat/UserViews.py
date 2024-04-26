@@ -10,7 +10,8 @@ from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 
 from .validators import is_uuid
-from .serializer import ChatUserSerializer
+from .serializer import UserSerializer, render_json
+
 
 from json import loads as jloads
 
@@ -18,27 +19,25 @@ from logging import getLogger
 logger = getLogger('django')
 
 
+from channels.db import database_sync_to_async
+
 
 
 # handle IntegrityError
 class UserApiView(View):
 
     @csrf_exempt
+    @database_sync_to_async
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         try :
-            data = jloads(request.body)
-            s = ChatUserSerializer(data= request.body)
+            s = UserSerializer(data=request.body)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)
-            print('it is tru')
-            id = kwargs.get('id', s.data['id'])
-            if ChatUser.objects.filter(Q(name=data['name']) | Q(id=id)).exists():
-                return HttpResponse(status=403)
-            ChatUser.objects.create(id=id, name=data['name'])
+            s.create(s.validated_data)
             return HttpResponse(status=201)
 
         except BaseException as e:
@@ -50,48 +49,61 @@ class UserApiView(View):
             fields = request.GET.get("fields")
             many = False
             safe = True
-            id = kwargs.get('id')
-            if id == None:
+            name = kwargs.get('name')
+            if name == None:
                 qset = ChatUser.objects.all()
                 many = True
                 safe = False
-            elif is_uuid(id):
-                qset = ChatUser.objects.get(id=id)
             else:
-                qset = ChatUser.objects.get(name=id)
-            data = ChatUserSerializer(qset, many=many, fields=fields).data
-            return JsonResponse(status=200, data=data, safe=safe)
+                qset = ChatUser.objects.get(name=name)
+            data = UserSerializer(qset, many=many, fields=fields).data
+            data = render_json(data)
+            return HttpResponse(status=200, content=data)
+
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:
             logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=500)
 
-    def put(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         try :
             data = jloads(request.body)
-            id = kwargs.get('id', data['id'])
-            user = ChatUser.objects.get(id=id)
-            if ChatUser.objects.filter(name=data['name']).exists():
-                return HttpResponse(status=403)
-            user.name = data['name']
-            user.save()
+            name = kwargs.get('name', data['name'])
+            user = ChatUser.objects.get(name=name)
+            s = UserSerializer(user, data=request.body, partial=True)
+            if s.is_valid() is False:
+                print(s.errors)
+                return HttpResponse(status=400)
+            logger.info(s.validated_data)
+            s.update(s.instance, s.validated_data)
             return HttpResponse(status=200)
-        except (ValidationError, KeyError) as e:
-            return JsonResponse(status=400, data={'error': 'BadKey', 'key': e.args[0]})
+
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
         except BaseException as e:
             logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=500)
 
     def delete(self, request, *args, **kwargs):
         try :
-            id = kwargs.get('id')
-            if id == 'all':
+            opt = request.GET.get("opt")
+            names = request.GET.get("name")
+ 
+            if opt == 'all':
                 ChatUser.objects.all().delete()
-            else :
-                ChatUser.objects.get(id=id).delete()
-                logger.info("user %s, deleted", id)
+                return HttpResponse(status=200)
+            elif ids is None and names is None:
+                return HttpResponse(status=400)
+
+            if names is not None:
+                names = names.split()
+                for name in names:
+                    ChatUser.objects.get(name=name).delete()	
+                    logger.info("user %s, deleted", name)
+
             return HttpResponse(status=200)
+
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:
@@ -107,12 +119,8 @@ class UserContactApiView(View):
 
     def post(self, request, *args, **kwargs):
         try :
-            if is_uuid(kwargs['id']):
-                user = ChatUser.objects.get(id=kwargs['id'])
-                user.contact_list.add(ChatUser.objects.get(id=kwargs['target']))
-            else:
-                user = ChatUser.objects.get(name=kwargs['id'])
-                user.contact_list.add(ChatUser.objects.get(name=kwargs['target']))
+            user = ChatUser.objects.get(name=kwargs['id'])
+            user.contact_list.add(ChatUser.objects.get(name=kwargs['target']))
             user.save()
             return HttpResponse(status=200)
         except KeyError:
@@ -125,8 +133,6 @@ class UserContactApiView(View):
 
     def get(self, request, *args, **kwargs):
         try :
-            if is_uuid(kwargs['id']):
-                return JsonResponse(status=200, data=ChatUser.objects.get(id=kwargs['id']).json_contact())
             return JsonResponse(status=200, data=ChatUser.objects.get(name=kwargs['id']).json_contact())
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
@@ -136,12 +142,8 @@ class UserContactApiView(View):
 
     def delete(self, request, *args, **kwargs):
         try :
-            if is_uuid(kwargs['id']):
-                user = ChatUser.objects.get(id=kwargs['id'])
-                user.contact_list.remove(ChatUser.objects.get(id=kwargs['target']))
-            else:
-                user = ChatUser.objects.get(name=kwargs['id'])
-                user.contact_list.remove(ChatUser.objects.get(name=kwargs['target']))
+            user = ChatUser.objects.get(name=kwargs['id'])
+            user.contact_list.remove(ChatUser.objects.get(name=kwargs['target']))
             user.save()
             return HttpResponse(status=200)
         except KeyError:
@@ -163,12 +165,8 @@ class UserBlockedApiView(View):
 
     def post(self, request, *args, **kwargs):
         try :
-            if is_uuid(kwargs['id']):
-                user = ChatUser.objects.get(id=kwargs['id'])
-                user.blocked_list.add(ChatUser.objects.get(id=kwargs['target']))
-            else:
-                user = ChatUser.objects.get(name=kwargs['id'])
-                user.blocked_list.add(ChatUser.objects.get(name=kwargs['target']))
+            user = ChatUser.objects.get(name=kwargs['id'])
+            user.blocked_list.add(ChatUser.objects.get(name=kwargs['target']))
             user.save()
             return HttpResponse(status=200)
         except KeyError:
@@ -181,8 +179,6 @@ class UserBlockedApiView(View):
 
     def get(self, request, *args, **kwargs):
         try :
-            if is_uuid(kwargs['id']):
-                return JsonResponse(status=200, data=ChatUser.objects.get(id=kwargs['id']).json_blocked())
             return JsonResponse(status=200, data=ChatUser.objects.get(name=kwargs['id']).json_blocked())
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
@@ -192,12 +188,8 @@ class UserBlockedApiView(View):
 
     def delete(self, request, *args, **kwargs):
         try :
-            if is_uuid(kwargs['id']):
-                user = ChatUser.objects.get(id=kwargs['id'])
-                user.blocked_list.remove(ChatUser.objects.get(id=kwargs['target']))
-            else:
-                user = ChatUser.objects.get(name=kwargs['id'])
-                user.blocked_list.remove(ChatUser.objects.get(name=kwargs['target']))
+            user = ChatUser.objects.get(name=kwargs['id'])
+            user.blocked_list.remove(ChatUser.objects.get(name=kwargs['target']))
             user.save()
             return HttpResponse(status=200)
         except KeyError:

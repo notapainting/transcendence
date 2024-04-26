@@ -8,6 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from json import loads as jloads
 from logging import getLogger
 from django.db.models import Count
+from .serializer import GroupSerializer, render_json
+
 
 logger = getLogger('django')
 
@@ -24,33 +26,17 @@ class GroupApiView(View):
     # check if user cant create conv (ie for private has un contact)
     def post(self, request, *args, **kwargs):
         try :
-            data = jloads(request.body)#can throw
-            name = kwargs.get('name', data['name'])
-            members = data['members']
-            members_name = data['members_name']
-            query_set = ChatUser.objects.filter(Q(uid__in=members) | Q(name__in=members_name))
-            print(query_set)
-            diff = len(members) + len(members_name) - len( query_set)
-            if diff != 0:
-                return JsonResponse(status=400, data={'error': 'MissingMembers'})
-
+            s = GroupSerializer(data=request.body)
+            if s.is_valid() is False:
+                print(s.errors)
+                return HttpResponse(status=400)
+            print(s.validated_data)
             # implementer verification doublon conv ? 
-            # q2 = ChatGroup.objects.annotate(nb=Count("members"), distinct=True, filter=Q(members__uid__in=members))
-            # print(f"q2: {q2}")
-            # print(f"q2: {ChatGroup.objects.annotate(nb=Count("members")).values('nb').filter(nb=2)}")
-            # if ChatGroup.objects.annotate(nb=Count("members")).values('nb').filter(nb=2).exists():
-                # return HttpResponse(status=403)
-
-
-
-            c = ChatGroup.objects.create(name=name)
-            c.members.set(query_set)
-            c.save()
-
+            s.create(s.validated_data)
             return HttpResponse(status=201)
-        except KeyError as e:
-            return JsonResponse(status=400, data={'error': 'BadKey', 'key': e.args[0]})
-        except (ValidationError, ObjectDoesNotExist):
+
+        except (ValidationError, ObjectDoesNotExist) as e:
+            logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=404)
         except BaseException as e:
             logger.error(f"Internal : {e.args[0]}")
@@ -58,10 +44,20 @@ class GroupApiView(View):
 
     def get(self, request, *args, **kwargs):
         try :
+            fields = request.GET.get("fields")
+            many = False
+            safe = True
             id = kwargs.get('id')
-            if id == None or id == 'short':
-                return self.list(id)
-            return JsonResponse(status=200, data=ChatGroup.objects.get(id=id).json())
+            if id == None:
+                qset = ChatGroup.objects.all()
+                many = True
+                safe = False
+            else:
+                qset = ChatGroup.objects.get(id=id)
+            data = GroupSerializer(qset, many=many, fields=fields).data
+            data = render_json(data)
+            return HttpResponse(status=200, content=data)
+
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:
@@ -70,25 +66,18 @@ class GroupApiView(View):
 
 # add/remove members
 # chekc if user can manage group
-    def put(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         try :
-            data = jloads(request.body)
+
             group = ChatGroup.objects.get(id=kwargs.get('id'))
-            name = data.get('name')
-            if name != None:
-                group.name = name
-            add = data.get('add')
-            if add != None:
-                add = ChatUser.objects.filter(uid__in=add)
-                group.members.set(members__in=add)
-            remove = data.get('remove')
-            if remove != None:
-                remove = ChatUser.objects.filter(uid__in=remove)
-                group.members.remove(members__in=remove)
-            group.save()
+            s = GroupSerializer(group, data=request.body)
+            if s.is_valid() is False:
+                print(s.errors)
+                return HttpResponse(status=400)
+            print(s.validated_data)
+            s.update(s.instance, s.validated_data)
             return HttpResponse(status=200)
-        except KeyError as e:
-            return JsonResponse(status=400, data={'error': 'BadKey', 'key': e.args[0]})
+
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:
@@ -97,23 +86,27 @@ class GroupApiView(View):
 
     def delete(self, request, *args, **kwargs):
         try :
-            id = kwargs.get('id')
-            ChatGroup.objects.get(id=id).delete()
-            logger.info("group %s, deleted", id)
+            opt = request.GET.get("opt")
+            ids = request.GET.get("id")
+ 
+            if opt == 'all':
+                ChatGroup.objects.all().delete()
+                return HttpResponse(status=200)
+            elif ids is None:
+                return HttpResponse(status=400)
+                
+            if ids is not None:
+                ids = ids.split()
+                for id in ids:
+                    ChatGroup.objects.get(id=id).delete()
+                    logger.info("user %s, deleted", id)
+
             return HttpResponse(status=200)
+        
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:
             logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=500)
 
-    def list(request, opt=None):
-        try :
-            if opt == 'short':
-                users = [i.json_short() for i in ChatGroup.objects.all()]
-            else:
-                users = [i.json() for i in ChatGroup.objects.all()]
-            return JsonResponse(status=200, data={'n': len(users), 'groups': users}, safe=False)
-        except BaseException as e:
-            logger.error(f"Internal : {e.args[0]}")
-            return HttpResponse(status=500)
+

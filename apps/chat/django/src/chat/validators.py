@@ -29,3 +29,10 @@ def is_uuid(val):
         return True
     except ValueError:
         return False
+
+# validate date message :
+    # - no futur date
+    # - timeline coherence ? message cant be older than previous one
+# validate author (at higher level)
+# validate conv (at higher level)
+# validate body length (at higher level)
