@@ -27,7 +27,7 @@ class GroupApiView(View):
     def post(self, request, *args, **kwargs):
         try :
             s = GroupSerializer(data=request.body)
-            if s.is_valid() is False:
+            if s.is_valid() is False:#trhow if user doesnt exit
                 print(s.errors)
                 return HttpResponse(status=400)
             print(s.validated_data)

@@ -6,7 +6,7 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from chat.models import ChatGroup, ChatUser
 from chat.serializer import GroupSerializer, UserSerializer, MessageSerializer, render_json
-
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 # Get an instance of a logger
 import logging
@@ -19,51 +19,63 @@ from . import models
 # m = ms(c, many=True)
 # m.data -> [OrdreDcit]
 
-
-class ChatConsumer(AsyncJsonWebsocketConsumer):
+from channels.db import database_sync_to_async
 
     # get from db conv list
     # group_add cs to conv (group)
     # send to cl chat history
     # limit to 10 old conv/active user
     # test active user : db/ping cs, middleware list, auth ?
-    async def connect(self):
-        #"auth"
+
+class ChatConsumer(AsyncJsonWebsocketConsumer):
+
+    group_list = []
+
+    @database_sync_to_async
+    def auth(self):
         self.userName = self.scope['cookies'].get('userName')
-        print("here")
-        user = ChatUser.objects.get(name=self.userName)
-        print("not here")
-        if user == None:
+        try:
+            return ChatUser.objects.get(name=self.userName)
+        except ObjectDoesNotExist:
+            return None
+
+    @database_sync_to_async
+    def get_group_list(self):
+        data = GroupSerializer(self.user.groups.all(), many=True, fields='id name members messages').data
+        for group in data:
+            self.group_list.append(group['id'])
+            group['messages'] = group['messages'][:2]
+        return data
+
+
+    async def connect(self):
+
+        self.user = await self.auth()
+        if self.user == None:
             await self.close(code=401)
-        
+            return
+
         #accept connectiont to client
         await self.accept()
         logger.info("%s Connected!", self.userName)
 
-        # send group list
-        group_list = render_json(GroupSerializer(user.groups.all(), many=True, fields='id name members').data)
-        await self.send_json({"group.list": group_list})
-        
-        #connect to group and load group history
-        for group in user.groups.all():
-            chat_history = render_json(GroupSerializer(c, fields='messages').data['messages'][:3])
-            print(chat_history)
-            await self.send_json({"history": chat_history})
-            await self.channel_layer.group_add(group.id, self.channel_name)
+        # send group summary
+        data = await self.get_group_list()
+        await self.send_json({"group.summary": data})
 
-
-
-
+        # add user to channel groups
+        for id in self.group_list:
+            await self.channel_layer.group_add(id, self.channel_name)
 
         #ptit hello comme ca gratos
-        for group in user.groups.all():
-            await self.channel_layer.group_send(group.name, {"type": "chat_message", "message": f"Hello {self.userName}"})
-        
+        for id in self.group_list:
+            await self.channel_layer.group_send(id, {"type": "chat.message", "message": f"Hello {self.userName}"})
+
 
     async def disconnect(self, close_code):
         #remove user from group at disconnect
-        for group in user.groups.all():
-            await self.channel_layer.group_discard(group.id, self.channel_name)
+        for id in self.group_list:
+            await self.channel_layer.group_discard(id, self.channel_name)
 
         logger.info("%s Quit...", self.userName)
 
