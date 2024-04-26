@@ -4,6 +4,13 @@ TODO:
 
 FIXME: 
 	- POST on /users without '/' -> 500
+    - POST without body
+
+
+
+./manage.py makemigrations
+./manage.py shell
+
 
 database:
 	user:

@@ -33,8 +33,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.close(code=401)
         
         #connect to group and load group history
-        for group in user.chatgroup_set.all():
-            chat_history = group.chatmessage_set.all().order_by("-date_save")[:2].__str__() #last 10 or last 20? unread
+        for group in user.groups.all():
+            chat_history = group.message.all().order_by("-date_save")[:2].__str__() #last 10 or last 20? unread
             await self.send_json({"history": chat_history})
             await self.channel_layer.group_add(group.id, self.channel_name)
 
@@ -44,13 +44,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         logger.info("%s Connected!", self.userName)
 
         #ptit hello comme ca gratos
-        for group in user.chatgroup_set.all():
+        for group in user.groups.all():
             await self.channel_layer.group_send(group.name, {"type": "chat_message", "message": f"Hello {self.userName}"})
         
 
     async def disconnect(self, close_code):
         #remove user from group at disconnect
-        for group in user.chatgroup_set.all():
+        for group in user.groups.all():
             await self.channel_layer.group_discard(group.id, self.channel_name)
 
         logger.info("%s Quit...", self.userName)
