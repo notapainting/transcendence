@@ -6,8 +6,10 @@ from rest_framework.validators import UniqueValidator
 from . import models
 import io
 
+from channels.db import database_sync_to_async
+
 def parse_json(json_data):
-	return JSONParser().parse(io.BytesIO(json_data))
+    return JSONParser().parse(io.BytesIO(json_data))
 
 
 def render_json(raw_data):
@@ -72,14 +74,12 @@ class MessageSerializer(BaseSerializer):
 
 class GroupSerializer(BaseSerializer):
     members = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True)
-    messages = MessageSerializer(many=True, fields='id author body')
+    messages = MessageSerializer(many=True, required=False, fields='id author body')
 
     class Meta:
         model = models.ChatGroup
         fields = ['id', 'name', 'members', 'messages']
-        extra_kwargs = {
-                	'messages': {'required': False}
-                }
+
 
 
 

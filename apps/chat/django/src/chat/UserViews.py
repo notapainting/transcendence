@@ -93,7 +93,7 @@ class UserApiView(View):
             if opt == 'all':
                 ChatUser.objects.all().delete()
                 return HttpResponse(status=200)
-            elif ids is None and names is None:
+            elif names is None:
                 return HttpResponse(status=400)
 
             if names is not None:
