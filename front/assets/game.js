@@ -4,23 +4,38 @@ import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/
 import { UnrealBloomPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { AfterimagePass } from 'https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/AfterimagePass.js';
 import { GlitchPass } from 'https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/GlitchPass.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, 900 / 600, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(45, 900/600, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
-scene.background = new THREE.Color(0x333333);
-renderer.setSize(900, 600);
-camera.position.set( 0, -70, 80 );
+scene.background = new THREE.Color(0x0d3452);
+renderer.setSize(1200, 900);
+camera.position.set( 0, -155, 80 );
 
 var trailPositions = [];
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
 // Light
-const light = new THREE.DirectionalLight(0xe5d0ff, 1);
-light.position.set(0, 0, 1);
+// const light = new THREE.DirectionalLight(0x0096c7, 1.5);
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(0, 0, 10);
+
+const geometryBall1 = new THREE.SphereGeometry(0, 10, 10);
+const materialBall1 = new THREE.MeshToonMaterial({ color: 0xffffff});
+let spotLight = new THREE.Mesh(geometryBall1, materialBall1);
+spotLight.position.set(-80, 35, -10);
+scene.add(spotLight);
+
+
+const spotLight1 = new THREE.DirectionalLight(0x00b4d8, 20);
+spotLight1.position.set(0, 0, -5);
+
+const spotLight2 = new THREE.DirectionalLight(0xffc600, 0);
+spotLight2.position.set(0, 0, -30);
 
 // Activate shadows in the renderer
 renderer.shadowMap.enabled = true;
@@ -32,16 +47,20 @@ composer.addPass(renderScene);
 
 let sphere;
 
-var startGame = false;
+// scenes
+var ballFall = false;
 var start = false;
 
 var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
 var colorsViolet = [0x4c005a, 0x6a1292, 0x8436a1, 0xa34bb4, 0xde70ec, 0xa34bb4, 0x8436a1, 0x6a1292];
 var colorsPink = [0xffc2cd, 0xff93ac, 0xff6289, 0xfc3468, 0xff084a, 0xfc3468, 0xff6289, 0xff93ac];
-var colorPalettes = [colorsViolet, colorsBlue, colorsPink];
-let colorBall = colorsViolet;
+var colorsGreen = [0x132A13, 0x31572C, 0x4F772D, 0x90A955, 0xECF39E, 0x90A955, 0x4F772D, 0x31572C];
+var colorsYellow = [0xFCEC5D, 0xFCDC5D, 0xFCCC5D, 0xFCB75D, 0xFCAC5D, 0xFCB75D, 0xFCDC5D, 0xFCDC5D];
+var colorsOrange = [0xFF9E00, 0xFF8500, 0xFF6D00, 0xFF5400, 0xFF4800, 0xFF5400, 0xFF6D00, 0xFF8500];
+var colorPalettes = [colorsBlue, colorsGreen, colorsYellow, colorsOrange];
+let colorBall = colorsBlue;
 
-var colorTransitionTime = 2000;
+var colorTransitionTime = 3000;
 var colorStartTime = Date.now();
 
 let scoreRight = 0
@@ -54,7 +73,7 @@ let collisionPaddle = false;
 
 let acceleration = 9.8;
 let bounce_distance = 40;
-let time_step = 0.04;
+let time_step = 0.06;
 let time_counter = Math.sqrt(bounce_distance * 2 / acceleration);
 let initial_speed = acceleration * time_counter;
 let bounce_height_factor = 1;
@@ -62,6 +81,28 @@ let bounce_height_factor = 1;
 let light1;
 let light2;
 let light3;
+
+const loader = new GLTFLoader();
+var loadedObject;
+
+loader.load('./caillou.gltf', function ( gltf ) {
+
+    loadedObject = gltf.scene;
+
+    loadedObject.position.set(5, 10, -65);
+
+    loadedObject.scale.set(0.5, 0.5, 0.5); 
+
+    loadedObject.rotation.x = 20.44; 
+    loadedObject.rotation.y = 5; 
+
+    scene.add(loadedObject);
+
+}, undefined, function ( error ) {
+
+	console.error( error );
+
+} );
 
 function createParticle() {
     var geometry = new THREE.BufferGeometry();
@@ -105,7 +146,7 @@ function createParticle() {
 function animate() {
     requestAnimationFrame(animate);
 
-    if(startGame === true)
+    if(ballFall === true)
     {
         scene.add(sphere);
         if (sphere.position.z < 0) {
@@ -115,7 +156,7 @@ function animate() {
         let adjusted_initial_speed = initial_speed * bounce_height_factor;
         sphere.position.z = 0 + adjusted_initial_speed * time_counter - 0.5 * acceleration * time_counter * time_counter;
         if (sphere.position.z <= 0 && adjusted_initial_speed <= 0.5) {
-            startGame = false;
+            ballFall = false;
             start = true;
         } else {
             time_counter += time_step;
@@ -174,54 +215,15 @@ function interpolateColor(color) {
     return interpolatedColor.getHex();
 }
 
-function createTrailParticles(position, color) {
-    const numParticles = 5; 
-    const particleSize = 0.5;
-    const trailSpeed = 0.1;
-
-    for (let i = 0; i < numParticles; i++) {
-        const geometry = new THREE.BufferGeometry();
-        const vertices = new Float32Array([position.x, position.y, position.z]);
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-
-        const material = new THREE.PointsMaterial({ color: color, size: particleSize, opacity: 1.0, transparent: true });
-
-        const particle = new THREE.Points(geometry, material);
-        scene.add(particle);
-
-        const direction = new THREE.Vector3(
-            Math.random() - 0.5,
-            Math.random() - 0.5,
-            Math.random() - 0.5
-        ).normalize();
-
-        const speed = trailSpeed * Math.random(); 
-        var distance = 10;
-
-        const update = function () {
-            const positionAttribute = particle.geometry.getAttribute('position');
-            const currentPosition = new THREE.Vector3().fromBufferAttribute(positionAttribute, 0);
-            currentPosition.addScaledVector(direction, speed);
-            positionAttribute.setXYZ(0, currentPosition.x, currentPosition.y, currentPosition.z);
-            positionAttribute.needsUpdate = true;
-            distance -= speed;
-            if (distance <= 0) {
-                scene.remove(particle);
-                cancelAnimationFrame(animationId);
-            }
-        };
-
-        var animationId = requestAnimationFrame(function animate() {
-            update();
-            animationId = requestAnimationFrame(animate);
-        });
-    }
-}
-
 function gameRenderer(data) {
 	clearScene(); 
-    startGame = true;
+    ballFall = true;
+    scene.add(loadedObject);
+    scene.add(spotLight);
+
+    // console.log(camera.position.x);
+    // console.log(camera.position.y);
+    // console.log(camera.position.z);
 
     // Game limits
     const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
@@ -244,15 +246,15 @@ function gameRenderer(data) {
     const plane = new THREE.Mesh(geometryPlane, materialPlane);
     plane.position.z = -2;
     plane.receiveShadow = true;
-    scene.add(plane);
+    // scene.add(plane);
 	
     // Paddles
     const geometry = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeight, 20);
     const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
     let cylinderRight = new THREE.Mesh(geometry, material);
     let cylinderLeft = new THREE.Mesh(geometry, material);
-    cylinderRight.position.set(data.width - 5, data.rightPaddleY, 0);
-    cylinderLeft.position.set(-data.width + 5, data.leftPaddleY, 0);
+    cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY, 0);
+    cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY, 0);
     cylinderRight.castShadow = true; 
     cylinderLeft.castShadow = true; 
     scene.add(cylinderRight);
@@ -323,13 +325,11 @@ function gameRenderer(data) {
 			scene.add(trailSphere);
 		});
 	}
-    // const trailColor = new THREE.Color(0xffffff);
-    // createTrailParticles(sphere.position, trailColor);
-    
+
     // Lights
 	const lightColor = interpolateColor(colorBall); 
-    const lightIntensity = 300;
-    const lightDistance = 50;
+    const lightIntensity = 100;
+    const lightDistance = 80;
     light1 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
     light1.position.set(data.width - 5, data.rightPaddleY, cylinderRight.position.z + 5);
     light2 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
@@ -340,6 +340,9 @@ function gameRenderer(data) {
     scene.add(light1);
     scene.add(light2);
     scene.add(light3);
+
+    scene.add(spotLight1);
+    scene.add(spotLight2);
 
 	// Explosion collision
     if (data.leftPlayerScore > scoreLeft) {
