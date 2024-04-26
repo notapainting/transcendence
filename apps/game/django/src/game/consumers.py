@@ -96,7 +96,9 @@ class GameState:
         'width' : width,
         'height' : height,
         'leftPaddleY' : self.status['leftPaddleY'],
+        'leftPaddleX' : self.status['leftPaddleX'],
         'rightPaddleY' : self.status['rightPaddleY'],
+        'rightPaddleX' : self.status['rightPaddleX'],
         'paddleWidth' : self.status['paddleWidth'],
         'paddleHeight' : self.status['paddleHeight'],
         'leftPlayerScore' : self.status['leftPlayerScore'],
@@ -136,7 +138,7 @@ class GameState:
         left_paddle_bottom = self.status['leftPaddleY'] - self.status['paddleHeight'] / 2
 
         # collisions avec les paddles
-        if (self.status['ballX'] + self.status['ballRadius'] > width - 5 - self.status['paddleWidth'] and
+        if (self.status['ballX'] + self.status['ballRadius'] > self.status['rightPaddleX'] - self.status['paddleWidth'] and
                 self.status['ballY'] >= right_paddle_bottom and
                 self.status['ballY'] <= right_paddle_top and 
                 self.status['ballSpeedX'] > 0):
@@ -146,7 +148,7 @@ class GameState:
             elif self.status['ballY'] <= right_paddle_bottom + self.status['paddleHeight'] / 4:
                 self.status['ballSpeedY'] = -abs(self.status['ballSpeedY'])
 
-        if (self.status['ballX'] - self.status['ballRadius'] < -width + 5 + self.status['paddleWidth'] and
+        if (self.status['ballX'] - self.status['ballRadius'] < self.status['leftPaddleX'] + self.status['paddleWidth'] and
                 self.status['ballY'] >= left_paddle_bottom and
                 self.status['ballY'] <= left_paddle_top and
                 self.status['ballSpeedX'] < 0):
@@ -156,12 +158,12 @@ class GameState:
             elif self.status['ballY'] <= left_paddle_bottom + self.status['paddleHeight'] / 4:
                 self.status['ballSpeedY'] = -abs(self.status['ballSpeedY'])
     
-        if self.status['ballX'] <= -width:
+        if self.status['ballX'] <= self.status['leftPaddleX'] - 3: # a changer pour le bug des paddle
             self.status['rightPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
             self.reset()
-        elif self.status['ballX'] >= width:
+        elif self.status['ballX'] >= self.status['rightPaddleX'] + 3: # a changer pour le bug des paddle
             self.status['leftPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']

@@ -1,0 +1,11 @@
+Model Information:
+* title:	dark forest
+* source:	https://sketchfab.com/3d-models/dark-forest-bf13146085eb4a77ac90f215d456f317
+* author:	luna (https://sketchfab.com/arfarf)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "dark forest" (https://sketchfab.com/3d-models/dark-forest-bf13146085eb4a77ac90f215d456f317) by luna (https://sketchfab.com/arfarf) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
