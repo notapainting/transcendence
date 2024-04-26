@@ -43,8 +43,8 @@ class ChatMessage(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 
-    author = models.ForeignKey(ChatUser, related_name="messages", on_delete=models.CASCADE)
-    group = models.ForeignKey(ChatGroup, related_name="messages", on_delete=models.CASCADE)
+    author = models.ForeignKey(ChatUser, on_delete=models.CASCADE)
+    group = models.ForeignKey(ChatGroup, on_delete=models.CASCADE)
 
     date_save = models.DateTimeField(verbose_name="Record date", auto_now_add=True)
     date_pub = models.DateTimeField(verbose_name="Publication date",  auto_now_add=True, validators=[validators.validate_futur])
@@ -57,6 +57,10 @@ class ChatMessage(models.Model):
         )
 
     body = models.CharField(max_length=512)
+    
+    class Meta:
+        default_related_name = "messages"
+        ordering = ["-date_save"]
 
 
 

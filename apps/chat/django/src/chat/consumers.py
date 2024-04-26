@@ -5,6 +5,8 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from chat.models import ChatGroup, ChatUser
+from chat.serializer import GroupSerializer, UserSerializer, MessageSerializer, render_json
+
 
 # Get an instance of a logger
 import logging
@@ -13,10 +15,10 @@ logger = logging.getLogger('django')
 
 from . import models
 
+# c = ChatGroup.objects.get(id='edc6e65a-65bd-4eb7-8d99-832410c54965').messages.all()[:3]
+# m = ms(c, many=True)
+# m.data -> [OrdreDcit]
 
-#add :
-# a way to add/del someone in contact list
-# a way to sent message to a conv (someone)
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
 
@@ -28,20 +30,30 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         #"auth"
         self.userName = self.scope['cookies'].get('userName')
-        user = ChatUser.object.get(self.userName)
+        print("here")
+        user = ChatUser.objects.get(name=self.userName)
+        print("not here")
         if user == None:
             await self.close(code=401)
         
+        #accept connectiont to client
+        await self.accept()
+        logger.info("%s Connected!", self.userName)
+
+        # send group list
+        group_list = render_json(GroupSerializer(user.groups.all(), many=True, fields='id name members').data)
+        await self.send_json({"group.list": group_list})
+        
         #connect to group and load group history
         for group in user.groups.all():
-            chat_history = group.message.all().order_by("-date_save")[:2].__str__() #last 10 or last 20? unread
+            chat_history = render_json(GroupSerializer(c, fields='messages').data['messages'][:3])
+            print(chat_history)
             await self.send_json({"history": chat_history})
             await self.channel_layer.group_add(group.id, self.channel_name)
 
 
-        #accept connectiont to client when everythings is good
-        await self.accept()
-        logger.info("%s Connected!", self.userName)
+
+
 
         #ptit hello comme ca gratos
         for group in user.groups.all():

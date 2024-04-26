@@ -27,7 +27,7 @@ document.querySelector('#chat-submit-user').onclick = function(e)
 
     document.cookie = 'userName=' + userName + ';';
     messageInputDom.value = '';
-    chatSocket = new WebSocket('wss://' + host  + '/ws/chat/' + roomName);
+    chatSocket = new WebSocket('wss://' + host  + '/chat/');
 
     chatSocket.onmessage = function(e)
     {
