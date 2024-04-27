@@ -5,13 +5,13 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from chat.models import ChatGroup, ChatUser
-from chat.serializer import GroupSerializer, UserSerializer, MessageSerializer, render_json
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-
+from chat.serializer import ChatGroupSerializer, ChatUserSerializer, ChatMessageSerializer, render_json, EventSerializer,MessageEventSerializer
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.serializers import ValidationError
 # Get an instance of a logger
 import logging
 logger = logging.getLogger('django')
-
+from channels.exceptions import DenyConnection
 
 from . import models
 
@@ -41,44 +41,51 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def get_group_list(self):
-        data = GroupSerializer(self.user.groups.all(), many=True, fields='id name members messages').data
+        data = ChatGroupSerializer(self.user.groups.all(), 
+                               many=True, 
+                               fields='id name members messages'
+                               ).data
         for group in data:
             self.group_list.append(group['id'])
             group['messages'] = group['messages'][:2]
+        data.insert(0, {'type': 'group.summary'})
         return data
 
 
     async def connect(self):
-
         self.user = await self.auth()
         if self.user == None:
-            await self.close(code=401)
-            return
+            raise DenyConnection
+            # await self.close(code=401)
+            # return
 
         #accept connectiont to client
-        await self.accept()
+        subprotocol = self.scope.get('subprotocol')
+        await self.accept(subprotocol)
         logger.info("%s Connected!", self.userName)
 
         # send group summary
         data = await self.get_group_list()
-        await self.send_json({"group.summary": data})
+        await self.send_json(data)
 
         # add user to channel groups
         for id in self.group_list:
             await self.channel_layer.group_add(id, self.channel_name)
 
-        #ptit hello comme ca gratos
-        for id in self.group_list:
-            await self.channel_layer.group_send(id, {"type": "chat.message", "message": f"Hello {self.userName}"})
+        # #ptit hello comme ca gratos
+        # for id in self.group_list:
+        #     await self.channel_layer.group_send(id, {"type": "chat.message", "message": f"Hello {self.userName}"})
 
 
     async def disconnect(self, close_code):
-        #remove user from group at disconnect
         for id in self.group_list:
             await self.channel_layer.group_discard(id, self.channel_name)
-
         logger.info("%s Quit...", self.userName)
 
+
+    async def dispatch(self, message):
+        print(f'msg type : {message['type']}')
+        await super().dispatch(message)
 
     # Receive message from WebSocket
     # check event type
@@ -86,30 +93,40 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     # find to which conv message is to 
     # send it to
     # log message in db
+
+    # handle db errors
+    @database_sync_to_async
+    def handle_message(self, data):
+        data['author'] = self.userName
+        ms = ChatMessageSerializer(data=data)
+        ms.is_valid(raise_exception=True)
+        print("mssss")
+        print(ms.data)
+        ms.create(ms.validated_data)
+
     async def receive_json(self, text_data):
+        se = EventSerializer(data=text_data)
+        try :
+            se.is_valid(raise_exception=True)
+            print("sedata")
+            print(se.data['data'])
+            if se.validated_data['type'] == 'chat.message':
+                await self.handle_message(se.validated_data['data'])
+                await self.channel_layer.group_send(se.data['data']['group'], se.data)
 
 
-        type = text_data['type']
-        if type == 'message':
-            await self.channel_layer.group_send(text_data['group'], {"type": "chat_message", "message": text_data["message"]})
-            ChatGroup.object.get(id=text_data['group']).chatmessage_set.create(
-                author=text_data['author'],
-                respond_to=text_data['respond_to'],
-                body=text_data['body']
-            )
-        elif type == 'room':
-            await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-            self.room_group_name = text_data["room"]
-            await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-            await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": f"{self.userName} enter the room {self.room_group_name}! Hello dear"})
-        else:
-            await self.send_json({'type': 'message', 'message': 'error'})
+        except ValidationError as e:
+                print(e.args[0])
+                await self.send_json({"message": "fck u"})
+
+
+
 
 
     # Receive message from room group
     async def chat_message(self, event):
-        message = event["message"]
+        # logger.info(event)
+        message = event
 
-        logger.info(message)
         # Send message to WebSocket
         await self.send_json({"message": message})
