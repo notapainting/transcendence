@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from json import loads as jloads
 from logging import getLogger
 from django.db.models import Count
-from .serializer import MessageSerializer, render_json
+from .serializer import ChatMessageSerializer, render_json
 
 
 logger = getLogger('django')
@@ -26,7 +26,7 @@ class MessageApiView(View):
 
     def post(self, request, *args, **kwargs):
         try:
-            s = MessageSerializer(data=request.body)
+            s = ChatMessageSerializer(data=request.body)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)

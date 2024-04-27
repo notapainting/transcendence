@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from . import validators
 from django.core.exceptions import ValidationError
-
+from django.utils import timezone
 
 import logging
 logger = logging.getLogger('django')
@@ -30,7 +30,7 @@ class ChatUser(models.Model):
 
 class ChatGroup(models.Model):
     def __str__(self):
-        return self.name
+        return str(self.id)
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=200, validators=[validators.offensive_name])
@@ -46,8 +46,7 @@ class ChatMessage(models.Model):
     author = models.ForeignKey(ChatUser, on_delete=models.CASCADE)
     group = models.ForeignKey(ChatGroup, on_delete=models.CASCADE)
 
-    date_save = models.DateTimeField(verbose_name="Record date", auto_now_add=True)
-    date_pub = models.DateTimeField(verbose_name="Publication date",  auto_now_add=True, validators=[validators.validate_futur])
+    date = models.DateTimeField(default=timezone.now, verbose_name="Publication date")
     respond_to = models.ForeignKey(
         'ChatMessage',
         on_delete=models.SET_NULL, 
@@ -60,7 +59,7 @@ class ChatMessage(models.Model):
     
     class Meta:
         default_related_name = "messages"
-        ordering = ["-date_save"]
+        ordering = ["-date"]
 
 
 

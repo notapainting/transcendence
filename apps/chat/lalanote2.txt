@@ -7,45 +7,71 @@ FIXME:
     - POST without body
 
 
+consumer -> client :
+type : groupe.summary
+{
+    foreach group
+    {
+        id
+        name
+        members
+        last message
+        last read (N)
+    }
+}
+
+type : contact.summary
+{
+    foreach contact
+    {
+        name
+        status
+        type (block/contact/invitation)
+    }
+}
+
+type : contact.update
+{
+    name
+    status
+    type (block/contact/invitation)
+}
+
+type : message
+{
+    group (M)
+    body (M)
+    author (M)
+    date (O)
+    respond_to (O)
+}
+
+
+
+client -> consumer : 
+type : message
+{
+    group (M)
+    body (M)
+    author (I)
+    date (O)
+    respond_to (O)
+}
+
+type : contact.update
+{
+    name
+    type (block/contact/invitation)
+}
+
+
+
+755b83ae-0cb9-461c-8639-b55ec589a6a5
 
 ./manage.py makemigrations
 ./manage.py shell
 
 
-database:
-	user:
-		-username (id)
-		-contact (multikey)
-		-blocked (multikey)
-		-conv ? (= user + blocked)
-
-	messages :
-		-conv
-		-author
-		-date 
-		-body
-
-
-u: bob
-	-c: marie, jon
-	-b: marc
-	-
-
-
-API
-user -> user data
-	 -> contact
-	 -> blocked
-	 -> conv	-> APIconv
-	 -> message	-> APImessage
-
-conv -> conv
-	 -> participants	-> list ->  APIuser
-	 -> message 		-> list -> APImessage
-
-message	-> message data (body. date. author id)
-		-> author	-> APIuser
-		-> conv		-> APIconv
 
 APIv1 : /api/v1/
 
@@ -70,13 +96,6 @@ https://stackoverflow.com/questions/30752268/how-to-filter-objects-for-count-ann
 
 
 
-user 2 connect: -> groups username
-
-cl	->	msg	->	cs 
-		| from 
-		| to : conv (groups?) (!doublon)
-
-
 
 Tuc: Two users conv
 Muc: Multiple users conv
@@ -93,16 +112,6 @@ conv-groups arch: (G = O(n), n is number of conv)
 db store
 -> list of conv : unique group_name
 -> 
-
-
-
-user-groups arch : (G = O(u), u is number of user)
-	1 user (Ssu/Msu) = 1 group
-
-
-	Tuc : user A send to user-group B, B respond with 'author' field to user-group A
-	Muc : user A send to user-group B, then user-group C,...etc , users can respond with 'chat.group' field 
-
 
 
 websocket auth : 
@@ -142,14 +151,6 @@ TODO:2
 	- 
 
 
-aUTH ?
-store old username for sometime
-vm : install vscode extension directement
-
-
-e30bdce1-efd2-46da-ae86-ccee2df6e21b
-
-
 
 arch server/app:
 	-chat app server 
@@ -168,13 +169,6 @@ arch server/app:
 		-gif
 
 	
-
-user : 
-08c5e0ae-69b8-418e-84c5-9010ef8d1d1e	luciole
-
-dc9eafa7-e01b-42c6-90b9-766987b6e2ba	acheron
-
-32d52fba-fe52-4129-9aee-eb252de9d2f1	sam
 
 
 OBJ:

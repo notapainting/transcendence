@@ -1,0 +1,71 @@
+{"consumer":"client"}
+{
+    "type":"group.summary",
+    {
+        "id":"",
+        "name":"",
+        "members":"",
+        "messages":"",
+        "last_read":""
+    }
+}
+
+{
+    "type":"group.update",
+    "id":"",
+    "name":"",
+    "members":""
+}
+
+{
+    "type":"contact.summary",
+    {
+        "name":"",
+        "status":"",
+        "rel":"contact/blocked/invitation"
+    }
+}
+
+{
+    "type":"contact.update",
+    "name":"",
+    "status":"",
+    "rel":"contact/blocked/invitation"
+}
+
+{
+    "type":"chat.message",
+    {
+        "group":"755b83ae-0cb9-461c-8639-b55ec589a6a5",
+        "body":"hello",
+        "respond_to": "",
+        "author":"",
+        "date":""
+    }
+}
+
+
+{"client":"consumer"}
+{
+    "type":"chat.message",
+    {
+        "group":"755b83ae-0cb9-461c-8639-b55ec589a6a5",
+        "body":"hello",
+        "respond_to": "",
+        "author":"",
+        "date":""
+    }
+}
+
+{
+    "type":"contact.update",
+    "name":"",
+    "rel":"contact/blocked/invitation"
+}
+
+{
+    "type":"group.update",
+    "id":"",
+    "name":"",
+    "members":""
+}
