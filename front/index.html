@@ -1,10 +1,55 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single page web app</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <ul>
+            <li><a href="/" class="nav__link" data-link>Home</a></li>
+            <li><a href="/game" class="nav__link" data-link>Game</a></li>
+            <li><a href="/profile" class="nav__link" data-link>Profile</a></li>
+            <li><a href="/settings" class="nav__link" data-link>Settings</a></li>
+        </ul>
+    </nav>
+    <div id="Home" class="view parallax-container">
+        <div class="parallax background-threes"></div>
+        <div class="parallax back-threes"></div>
+        <div class="parallax middle-threes"></div>
+        <div class="parallax front-threes"></div>
+    </div>
+    <div id="Game" class="view">
+        <div class="header-bg"></div>
+        <div class="choose-mode-container">
+            <div class="choose-mode">
+                <div class="solo item-mode"></div>
+                <div class="multi item-mode"></div>
+            </div>
+        </div>
+    </div>
+    <div id="Profile" class="view">
+        <h1>Welcome To Profile</h1>
+    </div>
+    <div id="Settings" class="view">
+        <h1>Welcome To Settings</h1>
+    </div>
+    <script type="module" src="js/AbstractView.js"></script>
+    <script type="module" src="js/Dashboard.js"></script>
+    <script type="module" src="js/index.js"></script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bjill | Welcome</title>
-    <link rel="stylesheet" href="./style.css">    
+    <link rel="stylesheet" href="/style.css">    
 </head>
 <body>
     <main class="main">
@@ -31,7 +76,9 @@
     </main>
     <script src="./index.js"></script>
 </body>
-</html>
+</html> -->
+
+
 
 
 
