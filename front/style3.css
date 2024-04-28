@@ -1,0 +1,121 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: "basteleur";
+    src: url('fonts/Basteleur-Moonlight.woff2') format('woff2'), /* Format WOFF2 */
+}
+
+body {
+    background-color: #0C3452;
+}
+
+
+.parallax-container {
+    height: 60vh; /* ou toute autre valeur souhaitée */
+    position: relative; /* Assurez-vous que la position est relative pour que les couches parallax fonctionnent correctement */
+    margin-top: 90px;
+}
+
+.parallax {
+    width: 100%;
+    position: relative;
+    overflow-x: hidden; /* Empêche le défilement horizontal */
+    overflow-y: auto; /* Permet le défilement vertical si nécessaire */
+}
+
+.back-threes,
+.middle-threes,
+.front-threes, .background-threes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: 3000px 750px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+
+.background-threes{
+    background-color: rgb(82, 182, 154);
+}
+
+.back-threes {
+    background-image: url('img/1.png');
+}
+
+.middle-threes {
+    background-image: url('img/2.png');
+}
+
+.front-threes {
+    background-image: url('img/3.png');
+}
+
+h1 {
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    color: #708090;
+    text-align: center;
+}
+
+.nav {
+    position: fixed;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 50px;
+    width: 40%;
+    z-index: 2;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+
+.nav ul {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    list-style-type: none;
+    height: 100%;
+}
+
+.nav ul li a {
+    color: #FFD700;
+    text-decoration: none;
+    font-size: 30px;
+    font-family: "basteleur", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    display: inline-block;
+    transition: transform 0.3s ease-out;
+}
+
+.nav ul li a:hover{
+    color: wheat;
+    transform: scale(1.2);
+}
+
+.red {
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+    background-color: red;
+    transition: opacity 1s ease;
+}
+
+
+/* Gold Yellow: #FFD700/
+Olive Green: #556B2F
+Crimson Red: #DC143C/
+Cobalt Blue: #0047AB
+Emerald Green: #50C878 /
+Royal Purple: #6A0DAD
+Copper Brown: #B87333/
+Slate Gray: #708090 */
