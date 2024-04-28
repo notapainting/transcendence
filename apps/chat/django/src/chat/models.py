@@ -24,8 +24,8 @@ class ChatUser(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=20, unique=True)
-    contact_list = models.ManyToManyField('self')
-    blocked_list = models.ManyToManyField('self', related_name='blocked', symmetrical=False)
+    contacts = models.ManyToManyField('self')
+    blockeds = models.ManyToManyField('self', related_name='blocked', symmetrical=False)
 
 
 class ChatGroup(models.Model):

@@ -51,28 +51,36 @@ class   BaseSerializer(serializers.ModelSerializer):
 class ChatUserSerializer(BaseSerializer):
     class Meta:
         model = models.ChatUser
-        fields = ['name', 'contact_list', 'blocked_list', 'groups']
+        fields = ['name', 'contacts', 'blockeds', 'groups']
         extra_kwargs = {
-                            'contact_list': {'required': False},
-                            'blocked_list': {'required': False},
+                            'contacts': {'required': False},
+                            'blockeds': {'required': False},
                             'groups': {'required': False}
                         }
+    contacts = serializers.PrimaryKeyRelatedField(queryset=models.ChatUser.objects.all(),
+                                            required=True,
+                                            allow_null=False,
+                                            pk_field=serializers.UUIDField(format='hex_verbose'))
 
 
+
+# restrain group to users groups
+from uuid import uuid4
 class ChatMessageSerializer(BaseSerializer):
     class Meta:
         model = models.ChatMessage
         fields = ['id', 'author', 'group', 'date', 'respond_to', 'body']
-        extra_kwargs = {'date': {'format' : '%Y-%m-%dT%H:%M:%S.%fZ%z', 'default':timezone.now}}
+        extra_kwargs = {
+            'date': {'format' : '%Y-%m-%dT%H:%M:%S.%fZ%z', 'default':timezone.now},
+            'id': {'format' : 'hex_verbose', 'default': uuid4}
+            }
 
     author = UserRelatedField(queryset=models.ChatUser.objects.all(), required=False)
+    group = serializers.PrimaryKeyRelatedField(queryset=models.ChatGroup.objects.all(),
+                                            required=True,
+                                            allow_null=False,
+                                            pk_field=serializers.UUIDField(format='hex_verbose'))
 
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        # print("ret is")
-        # print(ret)
-        # ret['id'] = str(ret['id'])
-        return ret
 
 
 class ChatGroupSerializer(BaseSerializer):
@@ -84,12 +92,20 @@ class ChatGroupSerializer(BaseSerializer):
     messages = ChatMessageSerializer(many=True, required=False, fields='id author date body')
 
 
-class EventSerializer(serializers.Serializer):
-    type = serializers.CharField(max_length=50)
-    data = serializers.DictField(child=serializers.CharField())
+class ContactEventSerializer(serializers.Serializer):
+    author = serializers.CharField(required=False)
+    name = serializers.CharField()
+    rel = serializers.CharField(required=False)#change to choice
+    status = serializers.CharField(required=False)#change to choice
 
-class MessageEventSerializer(EventSerializer):
-    pass
+    def create(self, data):
+        pass
+
+
+class EventSerializer(serializers.Serializer):
+    name = serializers.CharField()
+
+
 
 content = b'{"id":"08c5e0ae-69b8-418e-84c5-9010ef8d1d1e","name":"luciole"}'
 new = b'{"id":"62e661f9-a68e-4558-b833-339a90cecd01", "name":"xueyi"}'

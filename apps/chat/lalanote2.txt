@@ -7,62 +7,9 @@ FIXME:
     - POST without body
 
 
-consumer -> client :
-type : groupe.summary
-{
-    foreach group
-    {
-        id
-        name
-        members
-        last message
-        last read (N)
-    }
-}
 
-type : contact.summary
-{
-    foreach contact
-    {
-        name
-        status
-        type (block/contact/invitation)
-    }
-}
-
-type : contact.update
-{
-    name
-    status
-    type (block/contact/invitation)
-}
-
-type : message
-{
-    group (M)
-    body (M)
-    author (M)
-    date (O)
-    respond_to (O)
-}
-
-
-
-client -> consumer : 
-type : message
-{
-    group (M)
-    body (M)
-    author (I)
-    date (O)
-    respond_to (O)
-}
-
-type : contact.update
-{
-    name
-    type (block/contact/invitation)
-}
+list all conv
+list friend
 
 
 

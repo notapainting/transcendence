@@ -120,7 +120,7 @@ class UserContactApiView(View):
     def post(self, request, *args, **kwargs):
         try :
             user = ChatUser.objects.get(name=kwargs['id'])
-            user.contact_list.add(ChatUser.objects.get(name=kwargs['target']))
+            user.contacts.add(ChatUser.objects.get(name=kwargs['target']))
             user.save()
             return HttpResponse(status=200)
         except KeyError:
@@ -143,7 +143,7 @@ class UserContactApiView(View):
     def delete(self, request, *args, **kwargs):
         try :
             user = ChatUser.objects.get(name=kwargs['id'])
-            user.contact_list.remove(ChatUser.objects.get(name=kwargs['target']))
+            user.contacts.remove(ChatUser.objects.get(name=kwargs['target']))
             user.save()
             return HttpResponse(status=200)
         except KeyError:
@@ -166,7 +166,7 @@ class UserBlockedApiView(View):
     def post(self, request, *args, **kwargs):
         try :
             user = ChatUser.objects.get(name=kwargs['id'])
-            user.blocked_list.add(ChatUser.objects.get(name=kwargs['target']))
+            user.blockeds.add(ChatUser.objects.get(name=kwargs['target']))
             user.save()
             return HttpResponse(status=200)
         except KeyError:
@@ -189,7 +189,7 @@ class UserBlockedApiView(View):
     def delete(self, request, *args, **kwargs):
         try :
             user = ChatUser.objects.get(name=kwargs['id'])
-            user.blocked_list.remove(ChatUser.objects.get(name=kwargs['target']))
+            user.blockeds.remove(ChatUser.objects.get(name=kwargs['target']))
             user.save()
             return HttpResponse(status=200)
         except KeyError:
