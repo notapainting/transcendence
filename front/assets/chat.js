@@ -64,13 +64,13 @@ document.querySelector('#chat-enter-room').onclick = function(e)
     const messageInputDom = document.querySelector('#chat-input').value;
     const room  = messageInputDom; 
     chatSocket.send(JSON.stringify({
-        'type': 'contact.update',
-        'data': 
-            {
-                "name":"self",
-                "status":"online",
-                "rel":"contact/blocked/invitation"
-            }
+        "type":"contact.update",
+        "data":
+        {
+            "name":"test",
+            "rel":"contact",
+            "op":"add"
+        }
     }));
    messageInputDom.value = '';
 };

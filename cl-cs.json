@@ -32,7 +32,6 @@
     {
         [
             "name":"",
-            "status":"",
             "rel":"contact/blocked/invitation"
         ]
         [
@@ -46,8 +45,16 @@
     "data":
     {
         "name":"",
-        "status":"",
-        "rel":"contact/blocked/invitation"
+        "rel":"contact/block",
+        "op":"add/del"
+    }
+}
+
+{
+    "type":"status.update",
+    "data":
+    {
+        "status":"online"
     }
 }
 
