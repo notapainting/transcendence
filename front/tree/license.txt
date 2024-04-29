@@ -1,0 +1,11 @@
+Model Information:
+* title:	Stylized hand painted scene
+* source:	https://sketchfab.com/3d-models/stylized-hand-painted-scene-30ddd6d6d8a6491d8b52975c19968099
+* author:	Sander Vander Meiren (https://sketchfab.com/Sander.Vander.Meiren)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Stylized hand painted scene" (https://sketchfab.com/3d-models/stylized-hand-painted-scene-30ddd6d6d8a6491d8b52975c19968099) by Sander Vander Meiren (https://sketchfab.com/Sander.Vander.Meiren) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

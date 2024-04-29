@@ -1,19 +1,22 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 import { EffectComposer } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { AfterimagePass } from 'https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/AfterimagePass.js';
-import { GlitchPass } from 'https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/GlitchPass.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+import { animationData } from './animation.js';
+import { animate } from './animation.js';
+import * as utils from './utils.js';
+import * as load from './loader.js';
 
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, 900/600, 0.1, 1000);
+export const scene = new THREE.Scene();
+export const camera = new THREE.PerspectiveCamera(45, 1920/1080, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
 scene.background = new THREE.Color(0x0d3452);
-renderer.setSize(1200, 900);
-camera.position.set( 0, -155, 80 );
+renderer.setSize(1920, 1080);
+camera.position.set( 0, 0, 500 ); 
+camera.rotation.set( -Math.PI / 6, 0, 0 ); 
+// camera.position.set( 0, -155, 80 ); // position de la camera pour le jeu
 
 var trailPositions = [];
 
@@ -25,288 +28,124 @@ const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(0, 0, 10);
 
 const geometryBall1 = new THREE.SphereGeometry(0, 10, 10);
-const materialBall1 = new THREE.MeshToonMaterial({ color: 0xffffff});
+const materialBall1 = new THREE.MeshToonMaterial({ color: 0xfcca46});
 let spotLight = new THREE.Mesh(geometryBall1, materialBall1);
-spotLight.position.set(-80, 35, -10);
+spotLight.position.set(20, 50, -15);
 scene.add(spotLight);
 
+const spotLight1 = new THREE.DirectionalLight(0xffcb77, 1);
+spotLight1.position.set(100, 0, 60);
 
-const spotLight1 = new THREE.DirectionalLight(0x00b4d8, 20);
-spotLight1.position.set(0, 0, -5);
-
-const spotLight2 = new THREE.DirectionalLight(0xffc600, 0);
-spotLight2.position.set(0, 0, -30);
+const spotLight2 = new THREE.AmbientLight(0x00b4d8, 0.1);
+spotLight2.position.set(0, 50, -400);
 
 // Activate shadows in the renderer
 renderer.shadowMap.enabled = true;
 
 // Composer pour la scène principale
-const composer = new EffectComposer(renderer);
+export const composer = new EffectComposer(renderer);
 const renderScene = new RenderPass(scene, camera);
 composer.addPass(renderScene);
 
-let sphere;
+export var sphere;
+
+export var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
+export var colorsGreen = [0x132A13, 0x31572C, 0x4F772D, 0x90A955, 0xECF39E, 0x90A955, 0x4F772D, 0x31572C];
+export var colorsYellow = [0xFCEC5D, 0xFCDC5D, 0xFCCC5D, 0xFCB75D, 0xFCAC5D, 0xFCB75D, 0xFCDC5D, 0xFCDC5D];
+export var colorsOrange = [0xFF9E00, 0xFF8500, 0xFF6D00, 0xFF5400, 0xFF4800, 0xFF5400, 0xFF6D00, 0xFF8500];
+export var colorPalettes = [colorsBlue, colorsGreen, colorsYellow, colorsOrange];
+export let colorBall = colorsBlue;
+
+export let scoreRight = 0
+export let scoreLeft = 0
+export let explosion = false;
+export let collisionX = 0;
+export let collisionY = 0;
+export let initialSpeed = 0.8;
+export let collisionPaddle = false;
+
+export let light1;
+export let light2;
+export let light3;
 
 // scenes
-var ballFall = false;
-var start = false;
+export var start = false; // A REMETTRE A FALSE
+export var sceneHandler = 0;
 
-var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
-var colorsViolet = [0x4c005a, 0x6a1292, 0x8436a1, 0xa34bb4, 0xde70ec, 0xa34bb4, 0x8436a1, 0x6a1292];
-var colorsPink = [0xffc2cd, 0xff93ac, 0xff6289, 0xfc3468, 0xff084a, 0xfc3468, 0xff6289, 0xff93ac];
-var colorsGreen = [0x132A13, 0x31572C, 0x4F772D, 0x90A955, 0xECF39E, 0x90A955, 0x4F772D, 0x31572C];
-var colorsYellow = [0xFCEC5D, 0xFCDC5D, 0xFCCC5D, 0xFCB75D, 0xFCAC5D, 0xFCB75D, 0xFCDC5D, 0xFCDC5D];
-var colorsOrange = [0xFF9E00, 0xFF8500, 0xFF6D00, 0xFF5400, 0xFF4800, 0xFF5400, 0xFF6D00, 0xFF8500];
-var colorPalettes = [colorsBlue, colorsGreen, colorsYellow, colorsOrange];
-let colorBall = colorsBlue;
-
-var colorTransitionTime = 3000;
-var colorStartTime = Date.now();
-
-let scoreRight = 0
-let scoreLeft = 0
-let explosion = false;
-let collisionX = 0;
-let collisionY = 0;
-let initialSpeed = 0.8;
-let collisionPaddle = false;
-
-let acceleration = 9.8;
-let bounce_distance = 40;
-let time_step = 0.06;
-let time_counter = Math.sqrt(bounce_distance * 2 / acceleration);
-let initial_speed = acceleration * time_counter;
-let bounce_height_factor = 1;
-
-let light1;
-let light2;
-let light3;
-
-const loader = new GLTFLoader();
-var loadedObject;
-
-loader.load('./caillou.gltf', function ( gltf ) {
-
-    loadedObject = gltf.scene;
-
-    loadedObject.position.set(5, 10, -65);
-
-    loadedObject.scale.set(0.5, 0.5, 0.5); 
-
-    loadedObject.rotation.x = 20.44; 
-    loadedObject.rotation.y = 5; 
-
-    scene.add(loadedObject);
-
-}, undefined, function ( error ) {
-
-	console.error( error );
-
-} );
-
-function createParticle() {
-    var geometry = new THREE.BufferGeometry();
-    var vertices = new Float32Array([collisionX, collisionY, 0]);
-
-    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-
-    var randomColor = colorBall[Math.floor(Math.random() * colorBall.length)];
-    var material = new THREE.PointsMaterial({ color: randomColor, size: 1.5 });
-
-    var particle = new THREE.Points(geometry, material);
-    scene.add(particle);
-
-    var direction = new THREE.Vector3(
-        Math.random() - 0.5,
-        Math.random() - 0.5,
-        Math.random() - 0.5
-    ).normalize();
-
-    var speed = 0.6; 
-    var distance = 10;
-    var update = function () {
-        var positionAttribute = particle.geometry.getAttribute('position');
-        var currentPosition = new THREE.Vector3().fromBufferAttribute(positionAttribute, 0);
-        currentPosition.addScaledVector(direction, speed);
-        positionAttribute.setXYZ(0, currentPosition.x, currentPosition.y, currentPosition.z);
-        positionAttribute.needsUpdate = true;
-        distance -= speed;
-        if (distance <= 0) {
-            scene.remove(particle);
-            cancelAnimationFrame(animationId);
-        }
-    };
-
-    var animationId = requestAnimationFrame(function animate() {
-        update();
-        animationId = requestAnimationFrame(animate);
-    });
-}
-
-function animate() {
-    requestAnimationFrame(animate);
-
-    if(ballFall === true)
-    {
-        scene.add(sphere);
-        if (sphere.position.z < 0) {
-            time_counter = 0;
-            bounce_height_factor *= 0.5;
-        }
-        let adjusted_initial_speed = initial_speed * bounce_height_factor;
-        sphere.position.z = 0 + adjusted_initial_speed * time_counter - 0.5 * acceleration * time_counter * time_counter;
-        if (sphere.position.z <= 0 && adjusted_initial_speed <= 0.5) {
-            ballFall = false;
-            start = true;
-        } else {
-            time_counter += time_step;
-            light3.position.set(sphere.position.x, sphere.position.y, sphere.position.z);
-        }
-    }
-    if (explosion === true) {
-        scene.children
-            .filter(obj => obj.userData.isTrailSphere)
-            .forEach(obj => scene.remove(obj));
-        for (var i = 0; i < 100; i++) {
-			createParticle();
-        }
-        explosion = false;
-    } 
-	if (collisionPaddle === true)
-	{
-		var randomIndex;
-		do {
-			randomIndex = Math.floor(Math.random() * colorPalettes.length);
-		} while (colorBall === colorPalettes[randomIndex]);
-	
-		colorBall = colorPalettes[randomIndex];
-		collisionPaddle = false;
-	}
-
-    composer.render();
-}
 
 animate();
 
-function clearScene() {
-    let toRemove = [];
-    scene.children.forEach((child) => {
-        if (child.type !== 'Points') {
-            toRemove.push(child);
-        }
-    });
-    toRemove.forEach((child) => {
-        scene.remove(child);
-    });
-}
-
-function interpolateColor(color) {
-    const now = Date.now();
-    const elapsedTime = now - colorStartTime;
-    const timePerColor = colorTransitionTime / color.length;
-    const colorIndexStart = Math.floor(elapsedTime / timePerColor) % color.length;
-    const colorIndexEnd = (colorIndexStart + 1) % color.length;
-    const ratio = (elapsedTime % timePerColor) / timePerColor;
-
-    const colorStart = new THREE.Color(color[colorIndexStart]);
-    const colorEnd = new THREE.Color(color[colorIndexEnd]);
-
-    const interpolatedColor = new THREE.Color().copy(colorStart).lerp(colorEnd, ratio);
-    return interpolatedColor.getHex();
-}
-
-function gameRenderer(data) {
-	clearScene(); 
-    ballFall = true;
-    scene.add(loadedObject);
+export function gameRenderer(data) {
+	utils.clearScene(); 
+    animationData.ballFall = true;
+    scene.add(load.tree);
     scene.add(spotLight);
+	scene.add(light);
+	scene.add(spotLight1);
+	scene.add(spotLight2);
 
     // console.log(camera.position.x);
-    // console.log(camera.position.y);
+    // ballFall = true;console.log(camera.position.y);
     // console.log(camera.position.z);
 
-    // Game limits
-    const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
-    const points = [];
-    points.push(new THREE.Vector3(data.width, -data.height, 0));
-    points.push(new THREE.Vector3(data.width, data.height, 0));
-    points.push(new THREE.Vector3(-data.width, data.height, 0));
-    points.push(new THREE.Vector3(-data.width, -data.height, 0));
-    points.push(new THREE.Vector3(data.width, -data.height, 0));
-    points.push(new THREE.Vector3(0, -data.height, 0));
-    points.push(new THREE.Vector3(data.heigt, 0, 0));
-    points.push(new THREE.Vector3(0, data.height, 0));
-    const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
-    const line = new THREE.Line(geometryLine, materialLine);
-    scene.add(line);
+	if (sceneHandler === 1)
+	{
+		// Game limits
+		const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
+		const points = [];
+		points.push(new THREE.Vector3(data.width, -data.height, 0));
+		points.push(new THREE.Vector3(data.width, data.height, 0));
+		points.push(new THREE.Vector3(-data.width, data.height, 0));
+		points.push(new THREE.Vector3(-data.width, -data.height, 0));
+		points.push(new THREE.Vector3(data.width, -data.height, 0));
+		points.push(new THREE.Vector3(0, -data.height, 0));
+		points.push(new THREE.Vector3(data.heigt, 0, 0));
+		points.push(new THREE.Vector3(0, data.height, 0));
+		const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
+		const line = new THREE.Line(geometryLine, materialLine);
+		scene.add(line);
+		
+		// Background plane
+		const geometryPlane = new THREE.PlaneGeometry(data.width * 2, data.height * 2);
+		const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5 });
+		const plane = new THREE.Mesh(geometryPlane, materialPlane);
+		plane.position.z = -2;
+		plane.receiveShadow = true;
+		// scene.add(plane);
+		
+		// Paddles
+		const geometry = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeight, 20);
+		const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
+		let cylinderRight = new THREE.Mesh(geometry, material);
+		let cylinderLeft = new THREE.Mesh(geometry, material);
+		cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY, 0);
+		cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY, 0);
+		cylinderRight.castShadow = true; 
+		cylinderLeft.castShadow = true; 
+		scene.add(cylinderRight);
+		scene.add(cylinderLeft);
+		
+		// Ball
+		const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 20);
+		const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
+		sphere = new THREE.Mesh(geometryBall, materialBall);
+		sphere.position.set(data.x, data.y, 0);
+		scene.add(sphere);
 	
-    // Background plane
-    const geometryPlane = new THREE.PlaneGeometry(data.width * 2, data.height * 2);
-    const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5 });
-    const plane = new THREE.Mesh(geometryPlane, materialPlane);
-    plane.position.z = -2;
-    plane.receiveShadow = true;
-    // scene.add(plane);
-	
-    // Paddles
-    const geometry = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeight, 20);
-    const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
-    let cylinderRight = new THREE.Mesh(geometry, material);
-    let cylinderLeft = new THREE.Mesh(geometry, material);
-    cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY, 0);
-    cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY, 0);
-    cylinderRight.castShadow = true; 
-    cylinderLeft.castShadow = true; 
-    scene.add(cylinderRight);
-    scene.add(cylinderLeft);
-	
-    // Ball
-    const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 20);
-    const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
-    sphere = new THREE.Mesh(geometryBall, materialBall);
-    sphere.position.set(data.x, data.y, 0);
-    scene.add(sphere);
-
-    if (start) {
-        sphere.position.set(data.x, data.y, 0);
-        scene.add(sphere);
-    } else {
-        sphere.position.set(data.x, data.y, 40);
-    }
-    
-    const materialTrail = new THREE.MeshToonMaterial({ color: 0xffffff, transparent:true});
-    if (start)
-    {
-        trailPositions.push(sphere.position.clone());
-        if (trailPositions.length > 15 || explosion === true) {
-            trailPositions.shift();
-        }
-    }
-
-    scene.children
-        .filter(obj => obj.userData.isTrailSphere)
-        .forEach(obj => scene.remove(obj));
-
-    var size = 0.1;
-    trailPositions.forEach(position => {
-        const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
-        trailSphere.position.copy(position);
-        trailSphere.scale.multiplyScalar(size);
-        if (size < 1)
-            size += 0.08;
-        trailSphere.userData.isTrailSphere = true;
-        materialTrail.opacity = 0.5;
-        scene.add(trailSphere);
-    });
-
-	if (explosion) {
-		scene.children
-			.filter(obj => obj.userData.isTrailSphere)
-			.forEach(obj => scene.remove(obj));
-	} else {
-		trailPositions.push(sphere.position.clone());
-		if (trailPositions.length > 15) {
-			trailPositions.shift();
+		if (start) {
+			sphere.position.set(data.x, data.y, 0);
+			scene.add(sphere);
+		} else {
+			sphere.position.set(data.x, data.y, 40);
+		}
+		
+		const materialTrail = new THREE.MeshToonMaterial({ color: 0xffffff, transparent:true});
+		if (start)
+		{
+			trailPositions.push(sphere.position.clone());
+			if (trailPositions.length > 15 || explosion === true) {
+				trailPositions.shift();
+			}
 		}
 	
 		scene.children
@@ -324,157 +163,77 @@ function gameRenderer(data) {
 			materialTrail.opacity = 0.5;
 			scene.add(trailSphere);
 		});
+	
+		if (explosion) {
+			scene.children
+				.filter(obj => obj.userData.isTrailSphere)
+				.forEach(obj => scene.remove(obj));
+		} else {
+			trailPositions.push(sphere.position.clone());
+			if (trailPositions.length > 15) {
+				trailPositions.shift();
+			}
+		
+			scene.children
+				.filter(obj => obj.userData.isTrailSphere)
+				.forEach(obj => scene.remove(obj));
+		
+			var size = 0.1;
+			trailPositions.forEach(position => {
+				const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
+				trailSphere.position.copy(position);
+				trailSphere.scale.multiplyScalar(size);
+				if (size < 1)
+					size += 0.08;
+				trailSphere.userData.isTrailSphere = true;
+				materialTrail.opacity = 0.5;
+				scene.add(trailSphere);
+			});
+		}
+	
+		// Lights
+		const lightColor = utils.interpolateColor(colorBall); 
+		const lightIntensity = 100;
+		const lightDistance = 80;
+		light1 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
+		light1.position.set(data.width - 5, data.rightPaddleY, cylinderRight.position.z + 5);
+		light2 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
+		light2.position.set(-data.width + 5, data.leftPaddleY, cylinderLeft.position.z + 5);
+		light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
+		light3.position.set(data.x, data.y, sphere.position.z);
+		scene.add(light2);
+		scene.add(light1);
+		scene.add(light3);
+		
+	
+		// Explosion collision
+		if (data.leftPlayerScore > scoreLeft) {
+			
+			collisionX = data.collisionX;
+			collisionY = data.collisionY;
+			scoreLeft++;
+			trailPositions = [];
+			explosion = true;
+			trailPositions = [];
+		}
+		if (data.rightPlayerScore > scoreRight) {
+			collisionX = data.collisionX;
+			collisionY = data.collisionY;
+			scoreRight++;
+			trailPositions = [];
+			explosion = true;
+			trailPositions = [];
+		}
+		if (data.speed != initialSpeed)
+		{
+			collisionPaddle = true;
+			initialSpeed = data.speed;
+		}
 	}
 
-    // Lights
-	const lightColor = interpolateColor(colorBall); 
-    const lightIntensity = 100;
-    const lightDistance = 80;
-    light1 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
-    light1.position.set(data.width - 5, data.rightPaddleY, cylinderRight.position.z + 5);
-    light2 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
-    light2.position.set(-data.width + 5, data.leftPaddleY, cylinderLeft.position.z + 5);
-    light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
-    light3.position.set(data.x, data.y, sphere.position.z);
-    scene.add(light);
-    scene.add(light1);
-    scene.add(light2);
-    scene.add(light3);
-
-    scene.add(spotLight1);
-    scene.add(spotLight2);
-
-	// Explosion collision
-    if (data.leftPlayerScore > scoreLeft) {
-        
-        collisionX = data.collisionX;
-        collisionY = data.collisionY;
-        scoreLeft++;
-        trailPositions = [];
-		explosion = true;
-		trailPositions = [];
-    }
-    if (data.rightPlayerScore > scoreRight) {
-        collisionX = data.collisionX;
-        collisionY = data.collisionY;
-        scoreRight++;
-        trailPositions = [];
-		explosion = true;
-		trailPositions = [];
-    }
-    if (data.speed != initialSpeed)
-    {
-		collisionPaddle = true;
-        initialSpeed = data.speed;
-    }
     
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     composer.render();
 }
 
-
-const gameSocket = new WebSocket(
-	'wss://'
-	+ window.location.host
-	+ '/ws/ws-game/'
-);
-
-let lastPingTime = performance.now();
-
-gameSocket.onmessage = function(e) {
-    const message = JSON.parse(e.data);
-    // explosion(message);
-	
-	gameRenderer(message);
-    
-    const currentTime = performance.now();
-    const pingDelay = currentTime - lastPingTime;
-    // console.log("Ping delay:", pingDelay, "ms");
-
-	if (message.winner == 'leftWin')
-		playerWin('left')
-	else if (message.winner == 'rightWin')
-		playerWin('right')
-
-    lastPingTime = currentTime;
-	// console.log("ping = ", lastPingTime);
-};
-
-gameSocket.onclose = function(e) {
-	console.error('Game socket closed unexpectedly');
-};
-
-document.querySelector('#backButton').onclick = function(e) {
-	gameSocket.send(JSON.stringify({
-		'message': 'back button click !'
-	}));
-};
-
-document.querySelector('#startButton').onclick = function(e) {
-    if (start)
-    {
-        gameSocket.send(JSON.stringify({
-            'message': 'startButton'
-        }));
-    }
-};
-
-document.querySelector('#stopButton').onclick = function(e) {
-	gameSocket.send(JSON.stringify({
-		'message': 'stopButton'
-	}));
-};
-
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'w') {
-        gameSocket.send(JSON.stringify({
-            'message': 'wPressed'
-        }));
-    }
-	else if (event.key === 's') {
-		gameSocket.send(JSON.stringify({
-			'message': 'sPressed'
-		}));
-	}
-	else if (event.key === 'ArrowUp') {
-		gameSocket.send(JSON.stringify({
-			'message': 'upPressed'
-		}));
-	}
-	else if (event.key === 'ArrowDown') {
-		gameSocket.send(JSON.stringify({
-			'message': 'downPressed'
-		}));
-	}
-});
-
-
-document.addEventListener('keyup', function(event) {
-    if (event.key === 'w') {
-        gameSocket.send(JSON.stringify({
-            'message': 'wRelease'
-        }));
-    }
-	else if (event.key === 's') {
-		gameSocket.send(JSON.stringify({
-			'message': 'sRelease'
-		}));
-	}
-	else if (event.key === 'ArrowUp') {
-		gameSocket.send(JSON.stringify({
-			'message': 'upRelease'
-		}));
-	}
-	else if (event.key === 'ArrowDown') {
-		gameSocket.send(JSON.stringify({
-			'message': 'downRelease'
-		}));
-	}
-});
-
-function playerWin(player) {
-	var message = "Congratulations! " + player + " win!";
-	// var myParagraph = document.getElementById("scoreMessage");
-	// myParagraph.innerText = message; 
-}
 

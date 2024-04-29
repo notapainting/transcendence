@@ -75,7 +75,12 @@
 		<!-- JEU -->
 		<div id="jeu-content" class="page-content" style="display: block;">
 			<div class="containerGame">
-				<canvas id="canvas" width="1200" height="900"></canvas>
+				<canvas id="canvas" width="1920" height="1080"></canvas>
+				<div class="animationButton">
+					<button id="startGame" class="buttonStart" type="button">Play Online</button>
+					<button id="localGame" class="buttonStart" type="button">Local Game</button>
+					<button id="exit" class="buttonStart" type="button">Exit</button>
+				</div>
 			</div>
 			<div id="gameButton">
 				<button id="startButton" class="button" type="button">Start</button> 
@@ -101,6 +106,7 @@
 	<script type="module" src="assets/main.js"></script>
 	<script src="assets/app.js"></script>
 	<script type="module"  src="assets/game.js"></script>
+	<script type="module"  src="assets/websocket.js"></script>
 	<script src="assets/connexion.js"></script>
 </body>
 </html>
