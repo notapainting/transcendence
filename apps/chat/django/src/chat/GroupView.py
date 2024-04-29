@@ -8,8 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from json import loads as jloads
 from logging import getLogger
 from django.db.models import Count
-from .serializer import ChatGroupSerializer, render_json, parse_json
 
+import chat.serializer as ser
 
 logger = getLogger('django')
 
@@ -26,8 +26,8 @@ class GroupApiView(View):
     # check if user cant create conv (ie for private has un contact)
     def post(self, request, *args, **kwargs):
         try :
-            data = parse_json(request.body)
-            s = ChatGroupSerializer(data=data)
+            data = ser.parse_json(request.body)
+            s = ser.ChatGroup(data=data)
             if s.is_valid() is False:#trhow if user doesnt exit
                 print(s.errors)
                 return HttpResponse(status=400)
@@ -55,8 +55,8 @@ class GroupApiView(View):
                 safe = False
             else:
                 qset = ChatGroup.objects.get(id=id)
-            data = ChatGroupSerializer(qset, many=many, fields=fields).data
-            data = render_json(data)
+            data = ser.ChatGroup(qset, many=many, fields=fields).data
+            data = ser.render_json(data)
             return HttpResponse(status=200, content=data)
 
         except (ValidationError, ObjectDoesNotExist):
@@ -71,7 +71,7 @@ class GroupApiView(View):
         try :
 
             group = ChatGroup.objects.get(id=kwargs.get('id'))
-            s = ChatGroupSerializer(group, data=request.body)
+            s = ser.ChatGroup(group, data=request.body, partial=True)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)

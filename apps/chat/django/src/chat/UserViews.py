@@ -10,8 +10,8 @@ from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 
 from .validators import is_uuid
-from .serializer import ChatUserSerializer, render_json
 
+import chat.serializer as ser
 
 from json import loads as jloads
 
@@ -33,7 +33,7 @@ class UserApiView(View):
 
     def post(self, request, *args, **kwargs):
         try :
-            s = ChatUserSerializer(data=request.body)
+            s = ser.ChatUser(data=request.body)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)
@@ -56,8 +56,8 @@ class UserApiView(View):
                 safe = False
             else:
                 qset = ChatUser.objects.get(name=name)
-            data = ChatUserSerializer(qset, many=many, fields=fields).data
-            data = render_json(data)
+            data = ser.ChatUser(qset, many=many, fields=fields).data
+            data = ser.render_json(data)
             return HttpResponse(status=200, content=data)
 
         except (ValidationError, ObjectDoesNotExist):
@@ -71,7 +71,7 @@ class UserApiView(View):
             data = jloads(request.body)
             name = kwargs.get('name', data['name'])
             user = ChatUser.objects.get(name=name)
-            s = ChatUserSerializer(user, data=request.body, partial=True)
+            s = ser.ChatUser(user, data=request.body, partial=True)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)

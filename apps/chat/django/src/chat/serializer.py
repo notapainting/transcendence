@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from rest_framework.validators import UniqueValidator
-
+from rest_framework.serializers import ValidationError
 from . import models
 import io
+from uuid import uuid4
 
 from django.utils import timezone
 
@@ -24,15 +24,16 @@ class UserRelatedField(serializers.RelatedField):
     def to_representation(self, value):
         return str(value)
     def to_internal_value(self, data):
-        return models.ChatUser.objects.get(name=data)
+        try :
+            return models.ChatUser.objects.get(name=data)
+        except BaseException:
+            raise ValidationError({'ChatUser': 'User not found'})
 
 # serializer
 class   BaseSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         fields = kwargs.pop('fields', None)
         super().__init__(*args, **kwargs)
-        # if hasattr(self, 'initial_data') is True and self.initial_data is not None:
-        #     self.initial_data = self.parse_json()
 
         if fields is not None:
             fields = fields.split()
@@ -41,14 +42,9 @@ class   BaseSerializer(serializers.ModelSerializer):
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
 
-    def parse_json(self):
-        return JSONParser().parse(io.BytesIO(self.initial_data))
-
-    def render_json(self):
-        return (JSONRenderer().render(self.data)) 
 
 
-class ChatUserSerializer(BaseSerializer):
+class ChatUser(BaseSerializer):
     class Meta:
         model = models.ChatUser
         fields = ['name', 'contacts', 'blockeds', 'groups']
@@ -57,16 +53,16 @@ class ChatUserSerializer(BaseSerializer):
                             'blockeds': {'required': False},
                             'groups': {'required': False}
                         }
-    contacts = serializers.PrimaryKeyRelatedField(queryset=models.ChatUser.objects.all(),
-                                            required=True,
-                                            allow_null=False,
-                                            pk_field=serializers.UUIDField(format='hex_verbose'))
-
+    contacts = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True, required=False)
+    
+    # contacts = serializers.PrimaryKeyRelatedField(queryset=models.ChatUser.objects.all(),
+    #                                         required=True,
+    #                                         allow_null=False,
+    #                                         pk_field=serializers.UUIDField(format='hex_verbose'))
 
 
 # restrain group to users groups
-from uuid import uuid4
-class ChatMessageSerializer(BaseSerializer):
+class ChatMessage(BaseSerializer):
     class Meta:
         model = models.ChatMessage
         fields = ['id', 'author', 'group', 'date', 'respond_to', 'body']
@@ -82,28 +78,34 @@ class ChatMessageSerializer(BaseSerializer):
                                             pk_field=serializers.UUIDField(format='hex_verbose'))
 
 
-
-class ChatGroupSerializer(BaseSerializer):
+class ChatGroup(BaseSerializer):
     class Meta:
         model = models.ChatGroup
         fields = ['id', 'name', 'members', 'messages']
 
     members = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True)
-    messages = ChatMessageSerializer(many=True, required=False, fields='id author date body')
+    messages = ChatMessage(many=True, required=False, fields='id author date body')
 
 
-class ContactEventSerializer(serializers.Serializer):
+# event serializer
+class EventBaseSerializer(serializers.Serializer):
     author = serializers.CharField(required=False)
-    name = serializers.CharField()
-    rel = serializers.CharField(required=False)#change to choice
-    status = serializers.CharField(required=False)#change to choice
 
     def create(self, data):
-        pass
+        print(self.validated_data)
 
 
-class EventSerializer(serializers.Serializer):
-    name = serializers.CharField()
+class EventContact(EventBaseSerializer):
+    name = UserRelatedField(queryset=models.ChatUser.objects.all())
+    rel = serializers.CharField()#change to choice
+    op = serializers.CharField()#change to choice
+
+
+class EventStatus(EventBaseSerializer):
+    status = serializers.CharField()#change to choice
+
+
+
 
 
 
