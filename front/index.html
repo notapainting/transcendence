@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Single page web app</title>
     <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav class="nav">
@@ -20,6 +23,7 @@
         <div class="parallax back-threes"></div>
         <div class="parallax middle-threes"></div>
         <div class="parallax front-threes"></div>
+
     </div>
     <div id="Game" class="view">
         <div class="header-bg"></div>
@@ -36,8 +40,32 @@
     <div id="Settings" class="view">
         <h1>Welcome To Settings</h1>
     </div>
-    <script type="module" src="js/AbstractView.js"></script>
-    <script type="module" src="js/Dashboard.js"></script>
+    <div id="Signin" class="view">
+
+        <div class="form-signin-container">
+            <div class="triangle-form"></div>
+            <div class="form-signin">
+                <h1>LOGIN</h1>
+                <p>Don't have an account ? <a href="">Create an account</a></p>
+                <div class="login-password-container">
+                    <input type="text" id="login-signin" class="input-signin" placeholder="username">
+                    <input type="password" id="password-signin" class="input-signin" placeholder="password">
+                    <div class="remember-container">
+                        <input type="checkbox">
+                        <a href="#" class="remember-me">Remember Me</a>
+                        <a href="#" class="forgot-password">Forgot password ?</a>
+                    </div>
+                    
+                </div>
+                <button class="login-button">Se connecter</button>
+                <div id="loginResponse" class="response"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+    </script>
+    <script type="module" src="js/Game.js"></script>
+    <script type="module" src="js/Home.js"></script>
     <script type="module" src="js/index.js"></script>
 </body>
 </html>
@@ -217,19 +245,21 @@
 
         // Fonction pour valider le token
         function validateToken() {
-            const token = document.getElementById('token').value;
-            const data = {
-                token: token
-            };
+            // Supprimez la récupération du token de l'input
+
+            // Supprimez l'en-tête Content-Type et le corps de la requête
+            // Remplacez-les par la méthode de transmission des cookies
+
             fetch('/auth/validate_token/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
+                credentials: 'include' // Ajoutez cette option pour inclure les cookies dans la requête
             })
-            .then(response => response.json())
+            .then(response => {
+                // Vous pouvez supprimer cette partie si vous n'avez pas besoin de la réponse JSON
+                return response.json();
+            })
             .then(data => {
+                // Vous pouvez supprimer cette partie si vous n'avez pas besoin de la réponse JSON
                 document.getElementById('validateTokenResponse').innerText = JSON.stringify(data);
             })
             .catch(error => {
@@ -261,20 +291,16 @@
 
         // Fonction pour actualiser le token
         function refreshToken() {
-            const token = document.getElementById('refreshToken').value;
-            const data = {
-                refresh: token
-            };
             fetch('/auth/token/refresh/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
+                credentials: 'same-origin' // Pour inclure les cookies dans la demande
             })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('refreshTokenResponse').innerText = JSON.stringify(data);
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('refreshTokenResponse').innerText = "Token actualisé avec succès !";
+                } else {
+                    throw new Error('Erreur lors de la mise à jour du token.');
+                }
             })
             .catch(error => {
                 document.getElementById('refreshTokenResponse').innerText = 'Erreur : ' + error.message;
@@ -290,10 +316,7 @@
             };
             fetch('/auth/token/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
+                credentials: 'include' // Ajoutez cette option pour inclure les cookies dans la requête
             })
             .then(response => {
                 // Log the access_token cookie

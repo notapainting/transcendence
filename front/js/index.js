@@ -1,41 +1,13 @@
 import { showHome, parallaxEffect } from './Home.js';
+import { showGame } from './Game.js';
+import { showProfile } from './Profile.js';
+import { showSettings } from './Settings.js';
+import { showSignin, sendData } from './Signin.js';
 
 const navigateTo = url => {
     history.pushState(null, null, url)
     router()
 }
-
-const showGame = () => {
-    const headerBgElement = document.querySelector(".header-bg");
-    headerBgElement.style.transform = "translateY(-200px)";
-
-    document.querySelector("#Game").style.display = "block";
-    document.querySelector("body").style.backgroundColor = "#FFCC00"
-    const soloElement = document.querySelector(".solo");
-    const multiElement = document.querySelector(".multi");
-    soloElement.style.opacity = "0";
-    multiElement.style.opacity = "0";
-    setTimeout(() => {
-        headerBgElement.style.transform = "translateY(0px)";
-    }, 10); 
-    setTimeout(() => {
-        soloElement.style.opacity = "1";
-    }, 500); 
-    setTimeout(() => {
-        multiElement.style.opacity = "1";
-    }, 1000); 
-
-};
-
-const showProfile = () => {
-    document.querySelector("#Profile").style.display = "block";
-    // Ici, vous pouvez ajouter des manipulations supplémentaires spécifiques à la vue des paramètres
-};
-
-const showSettings = () => {
-    document.querySelector("#Settings").style.display = "block";
-    // Ici, vous pouvez ajouter des manipulations supplémentaires spécifiques à la vue des paramètres
-};
 
 const clearView = () => {
     document.querySelectorAll(".view").forEach(div => {
@@ -44,12 +16,40 @@ const clearView = () => {
     document.removeEventListener('mousemove', parallaxEffect);
 }
 
+const isUserAuthenticated = () => {
+    return fetch('auth/validate_token/', {
+        method: 'POST',
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log("Je return true dans access")
+            return true;
+        } else {
+            return fetch('auth/token/refresh/', {
+                method: 'POST',
+                credentials: 'same-origin'
+            })
+            .then(refreshResponse => {
+                if (refreshResponse.ok) {
+                    console.log("Je return true dans refresh")
+                    return true;
+                } else {
+                    console.log("Je return false dans refresh")
+                    return false;  
+                }
+            });
+        }
+    });
+}
+
 const router = async () => {
     const routes = [
         {path: "/", view:() => showHome() },
         {path: "/game", view:() => showGame()},
         {path: "/profile", view:() => showProfile()},
         {path: "/settings", view:() => showSettings()},
+        {path: "/signin", view:() => showSignin()},
     ];
     const potentialMatches = routes.map(route => {
         return {
@@ -58,13 +58,24 @@ const router = async () => {
         };
     })
     let match = potentialMatches.find(potentialMatches => potentialMatches.isMatch === true)
-    console.log(match)
     if (!match){
         match = {
             route: routes[0],
             isMatch: true
         }
     }
+    if (match.route.path === "/profile"){
+        console.log("yooo")
+        const isAuthenticated = await isUserAuthenticated();
+        if (!isAuthenticated){
+            console.log("hello")
+            match = {
+                route: routes[4],
+                isMatch: true
+            }
+        }
+    }
+    history.pushState(null, null, match.route.path)
     clearView();
     match.route.view();
 };
