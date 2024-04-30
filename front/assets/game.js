@@ -48,6 +48,8 @@ const renderScene = new RenderPass(scene, camera);
 composer.addPass(renderScene);
 
 export var sphere;
+export var cylinderRight;
+export var cylinderLeft;
 
 export var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
 export var colorsGreen = [0x132A13, 0x31572C, 0x4F772D, 0x90A955, 0xECF39E, 0x90A955, 0x4F772D, 0x31572C];
@@ -68,10 +70,11 @@ export let light1;
 export let light2;
 export let light3;
 
-// scenes
-export var start = false; // A REMETTRE A FALSE
-export var sceneHandler = 0;
+export var sceneHeight = 70;
 
+// scenes
+export var start = true; // A REMETTRE A FALSE
+export var sceneHandler = 0;
 
 animate();
 
@@ -88,147 +91,149 @@ export function gameRenderer(data) {
     // ballFall = true;console.log(camera.position.y);
     // console.log(camera.position.z);
 
-	if (sceneHandler === 1)
-	{
-		// Game limits
-		const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
-		const points = [];
-		points.push(new THREE.Vector3(data.width, -data.height, 0));
-		points.push(new THREE.Vector3(data.width, data.height, 0));
-		points.push(new THREE.Vector3(-data.width, data.height, 0));
-		points.push(new THREE.Vector3(-data.width, -data.height, 0));
-		points.push(new THREE.Vector3(data.width, -data.height, 0));
-		points.push(new THREE.Vector3(0, -data.height, 0));
-		points.push(new THREE.Vector3(data.heigt, 0, 0));
-		points.push(new THREE.Vector3(0, data.height, 0));
-		const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
-		const line = new THREE.Line(geometryLine, materialLine);
-		scene.add(line);
-		
-		// Background plane
-		const geometryPlane = new THREE.PlaneGeometry(data.width * 2, data.height * 2);
-		const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5 });
-		const plane = new THREE.Mesh(geometryPlane, materialPlane);
-		plane.position.z = -2;
-		plane.receiveShadow = true;
-		// scene.add(plane);
-		
-		// Paddles
-		const geometry = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeight, 20);
-		const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
-		let cylinderRight = new THREE.Mesh(geometry, material);
-		let cylinderLeft = new THREE.Mesh(geometry, material);
-		cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY, 0);
-		cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY, 0);
-		cylinderRight.castShadow = true; 
-		cylinderLeft.castShadow = true; 
-		scene.add(cylinderRight);
-		scene.add(cylinderLeft);
-		
-		// Ball
-		const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 20);
-		const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
-		sphere = new THREE.Mesh(geometryBall, materialBall);
-		sphere.position.set(data.x, data.y, 0);
-		scene.add(sphere);
+	// Game limits
+	const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
+	const points = [];
+	points.push(new THREE.Vector3(data.width, -data.height, 0));
+	points.push(new THREE.Vector3(data.width, data.height, 0));
+	points.push(new THREE.Vector3(-data.width, data.height, 0));
+	points.push(new THREE.Vector3(-data.width, -data.height, 0));
+	points.push(new THREE.Vector3(data.width, -data.height, 0));
+	points.push(new THREE.Vector3(0, -data.height, 0));
+	points.push(new THREE.Vector3(data.heigt, 0, 0));
+	points.push(new THREE.Vector3(0, data.height, 0));
+	const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
+	const line = new THREE.Line(geometryLine, materialLine);
 	
-		if (start) {
-			sphere.position.set(data.x, data.y, 0);
-			scene.add(sphere);
-		} else {
-			sphere.position.set(data.x, data.y, 40);
-		}
-		
-		const materialTrail = new THREE.MeshToonMaterial({ color: 0xffffff, transparent:true});
-		if (start)
-		{
-			trailPositions.push(sphere.position.clone());
-			if (trailPositions.length > 15 || explosion === true) {
-				trailPositions.shift();
-			}
-		}
+	// Background plane
+	const geometryPlane = new THREE.PlaneGeometry(data.width * 2, data.height * 2);
+	const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5 });
+	const plane = new THREE.Mesh(geometryPlane, materialPlane);
+	plane.position.z = -2;
+	plane.receiveShadow = true;
+	// scene.add(plane);
 	
-		scene.children
-			.filter(obj => obj.userData.isTrailSphere)
-			.forEach(obj => scene.remove(obj));
+	// Paddles
+	const geometry = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeight, 20);
+	const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
+	cylinderRight = new THREE.Mesh(geometry, material);
+	cylinderLeft = new THREE.Mesh(geometry, material);
+	cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY + sceneHeight, 0);
+	cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY + sceneHeight, 0);
+	cylinderRight.castShadow = true; 
+	cylinderLeft.castShadow = true; 
 	
-		var size = 0.1;
-		trailPositions.forEach(position => {
-			const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
-			trailSphere.position.copy(position);
-			trailSphere.scale.multiplyScalar(size);
-			if (size < 1)
-				size += 0.08;
-			trailSphere.userData.isTrailSphere = true;
-			materialTrail.opacity = 0.5;
-			scene.add(trailSphere);
-		});
+	// Ball
+	const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 20);
+	const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
+	sphere = new THREE.Mesh(geometryBall, materialBall);
+	sphere.position.set(data.x, data.y + sceneHeight, 0);
+	// sphere.position.set(20, 50, -15);
+
+	// if (start) {
+	// 	sphere.position.set(data.x, data.y, 0);
+	// 	scene.add(sphere);
+	// } else {
+	// 	sphere.position.set(data.x, data.y, 40);
+	// }
 	
-		if (explosion) {
-			scene.children
-				.filter(obj => obj.userData.isTrailSphere)
-				.forEach(obj => scene.remove(obj));
-		} else {
-			trailPositions.push(sphere.position.clone());
-			if (trailPositions.length > 15) {
-				trailPositions.shift();
-			}
-		
-			scene.children
-				.filter(obj => obj.userData.isTrailSphere)
-				.forEach(obj => scene.remove(obj));
-		
-			var size = 0.1;
-			trailPositions.forEach(position => {
-				const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
-				trailSphere.position.copy(position);
-				trailSphere.scale.multiplyScalar(size);
-				if (size < 1)
-					size += 0.08;
-				trailSphere.userData.isTrailSphere = true;
-				materialTrail.opacity = 0.5;
-				scene.add(trailSphere);
-			});
-		}
+	// const materialTrail = new THREE.MeshToonMaterial({ color: 0xffffff, transparent:true});
+	// if (start)
+	// {
+	// 	trailPositions.push(sphere.position.clone());
+	// 	if (trailPositions.length > 15 || explosion === true) {
+	// 		trailPositions.shift();
+	// 	}
+	// }
+
+	// scene.children
+	// 	.filter(obj => obj.userData.isTrailSphere)
+	// 	.forEach(obj => scene.remove(obj));
+
+	// var size = 0.1;
+	// trailPositions.forEach(position => {
+	// 	const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
+	// 	trailSphere.position.copy(position);
+	// 	trailSphere.scale.multiplyScalar(size);
+	// 	if (size < 1)
+	// 		size += 0.08;
+	// 	trailSphere.userData.isTrailSphere = true;
+	// 	materialTrail.opacity = 0.5;
+	// 	scene.add(trailSphere);
+	// });
+
+	// if (explosion) {
+	// 	scene.children
+	// 		.filter(obj => obj.userData.isTrailSphere)
+	// 		.forEach(obj => scene.remove(obj));
+	// } else {
+	// 	trailPositions.push(sphere.position.clone());
+	// 	if (trailPositions.length > 15) {
+	// 		trailPositions.shift();
+	// 	}
 	
-		// Lights
-		const lightColor = utils.interpolateColor(colorBall); 
-		const lightIntensity = 100;
-		const lightDistance = 80;
-		light1 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
-		light1.position.set(data.width - 5, data.rightPaddleY, cylinderRight.position.z + 5);
-		light2 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
-		light2.position.set(-data.width + 5, data.leftPaddleY, cylinderLeft.position.z + 5);
-		light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
-		light3.position.set(data.x, data.y, sphere.position.z);
+	// 	scene.children
+	// 		.filter(obj => obj.userData.isTrailSphere)
+	// 		.forEach(obj => scene.remove(obj));
+	
+	// 	var size = 0.1;
+	// 	trailPositions.forEach(position => {
+	// 		const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
+	// 		trailSphere.position.copy(position);
+	// 		trailSphere.scale.multiplyScalar(size);
+	// 		if (size < 1)
+	// 			size += 0.08;
+	// 		trailSphere.userData.isTrailSphere = true;
+	// 		materialTrail.opacity = 0.5;
+	// 		scene.add(trailSphere);
+	// 	});
+	// }
+
+	// Lights
+	const lightColor = utils.interpolateColor(colorBall); 
+	const lightIntensity = 100;
+	const lightDistance = 80;
+	light1 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
+	light1.position.set(data.width - 5, data.rightPaddleY, cylinderRight.position.z + 5);
+	light2 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
+	light2.position.set(-data.width + 5, data.leftPaddleY, cylinderLeft.position.z + 5);
+	light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
+	light3.position.set(data.x, data.y, sphere.position.z);
+
+	if (animationData.intro === 4){
 		scene.add(light2);
 		scene.add(light1);
 		scene.add(light3);
-		
+
+		scene.add(line);
+		scene.add(cylinderRight);
+		scene.add(cylinderLeft);
+		scene.add(sphere);
+	}
 	
-		// Explosion collision
-		if (data.leftPlayerScore > scoreLeft) {
-			
-			collisionX = data.collisionX;
-			collisionY = data.collisionY;
-			scoreLeft++;
-			trailPositions = [];
-			explosion = true;
-			trailPositions = [];
-		}
-		if (data.rightPlayerScore > scoreRight) {
-			collisionX = data.collisionX;
-			collisionY = data.collisionY;
-			scoreRight++;
-			trailPositions = [];
-			explosion = true;
-			trailPositions = [];
-		}
-		if (data.speed != initialSpeed)
-		{
-			collisionPaddle = true;
-			initialSpeed = data.speed;
-		}
+
+	// Explosion collision
+	if (data.leftPlayerScore > scoreLeft) {
+		
+		collisionX = data.collisionX;
+		collisionY = data.collisionY;
+		scoreLeft++;
+		trailPositions = [];
+		explosion = true;
+		trailPositions = [];
+	}
+	if (data.rightPlayerScore > scoreRight) {
+		collisionX = data.collisionX;
+		collisionY = data.collisionY;
+		scoreRight++;
+		trailPositions = [];
+		explosion = true;
+		trailPositions = [];
+	}
+	if (data.speed != initialSpeed)
+	{
+		collisionPaddle = true;
+		initialSpeed = data.speed;
 	}
 
     

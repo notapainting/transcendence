@@ -103,6 +103,12 @@ export async function animate() {
 		utils.translationCameraXYZ(game.camera, target, initialPosCam, finalPosCam, 130, 4);
 	}
 
+	if (animationData.intro === 4){
+		game.scene.add(game.sphere);
+		game.scene.add(game.cylinderLeft);
+		game.scene.add(game.cylinderRight);
+	}
+
 	if (game.sceneHandler === 1)
 	{
 		if(animationData.ballFall === true)
