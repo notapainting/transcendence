@@ -25,7 +25,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 // Light
 // const light = new THREE.DirectionalLight(0x0096c7, 1.5);
 const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(0, 0, 10);
+light.position.set(0, 80, 0);
 
 const geometryBall1 = new THREE.SphereGeometry(0, 10, 10);
 const materialBall1 = new THREE.MeshToonMaterial({ color: 0xfcca46});

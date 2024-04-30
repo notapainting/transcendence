@@ -60,16 +60,16 @@ loader.load('./background/scene.gltf', function ( gltf ) {
 	console.error( error );
 } );
 
-loader.load('./clouds/scene.gltf', function ( gltf ) {
+// loader.load('./clouds/scene.gltf', function ( gltf ) {
 
-    sky = gltf.scene;
+//     sky = gltf.scene;
 
-    sky.position.set(0, -100, 0);
+//     sky.position.set(0, -100, 0);
 
-    sky.scale.set(20, 20, 20); 
+//     sky.scale.set(20, 20, 20); 
 
-    scene.add(sky);
+//     scene.add(sky);
 
-}, undefined, function ( error ) {
-	console.error( error );
-} );
+// }, undefined, function ( error ) {
+// 	console.error( error );
+// } );
