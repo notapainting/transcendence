@@ -44,7 +44,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 	def post(self, request, *args, **kwargs):
 		# Appeler la méthode post de la classe parent pour obtenir la réponse
 		response = super().post(request, *args, **kwargs)
-
 		# Récupérer les jetons d'accès et de rafraîchissement
 		access_token = response.data.get('access')
 		refresh_token = response.data.get('refresh')
@@ -112,25 +111,21 @@ class UserCreate(APIView):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def get_user_from_access_token(access_token_cookie):
-    try:
-        token = AccessToken(access_token_cookie)
-        user_id = token['user_id']
-        user = CustomUser.objects.get(id=user_id)
-        return user
-    except AccessToken.DoesNotExist:
-        raise AuthenticationFailed("Access token is missing or invalid")
-    except CustomUser.DoesNotExist:
-        raise AuthenticationFailed("User not found")
+	try:
+		token = AccessToken(access_token_cookie)
+		user_id = token['user_id']
+		user = CustomUser.objects.get(id=user_id)
+		return user
+	except CustomUser.DoesNotExist:
+		raise AuthenticationFailed("User not found")
+	except Exception as e:
+		raise AuthenticationFailed("Error validating access token: {}".format(str(e)))
 
 class ValidateTokenView(APIView):
 	authentication_classes = [JWTAuthentication]
 	def post(self, request):
 		access_token_cookie = request.COOKIES.get('access')
 		user = get_user_from_access_token(access_token_cookie)
-		try:
-			user = CustomUser.objects.get(id=user_id)
-		except CustomUser.DoesNotExist:
-			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 		return Response({'message': 'token valide.', 'username': user.username}, status=status.HTTP_200_OK)
 
 
@@ -195,9 +190,22 @@ class PasswordRequestReset(APIView):
 			return Response({"success": "Le lien de réinitialisaition de mot de passe à été envoyé avec succès."}, status=status.HTTP_200_OK)
 		except CustomUser.DoesNotExist:
 			return Response({"error": "L'adresse email est introuvable."}, status=status.HTTP_400_BAD_REQUEST)
+		
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class CustomTokenRefreshView(TokenRefreshView):
-    throttle_classes = (AnonRateThrottle,)
+	def post(self, request, *args, **kwargs):
+		refresh_token_cookie = request.COOKIES.get('refresh')
+		if not refresh_token_cookie:
+			return Response({'error': 'Refresh token cookie not found'}, status=status.HTTP_400_BAD_REQUEST)
+		try:
+			refresh_token = RefreshToken(refresh_token_cookie)
+			access_token = refresh_token.access_token
+			response = Response(status=status.HTTP_200_OK)
+			response.set_cookie('access', str(access_token), httponly=True)  # Définition du cookie HTTPOnly
+			return response
+		except Exception as e:
+			return Response({'error': 'Failed to refresh access token'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 import os
 from django.http import JsonResponse
