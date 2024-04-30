@@ -9,15 +9,19 @@
 }
 body {
     background-color: #0C3452;
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+a {
+    text-decoration: none;
 }
 
 /* nav */
 
 nav {
-    position: fixed;
-    top: 0%;
-    left: 50%;
-    transform: translateX(-50%);
+    margin: 0 auto;
     height: 50px;
     width: 40%;
     z-index: 2;
@@ -51,19 +55,18 @@ nav {
 
 /* home page */
 
+
 .parallax-container {
-    height: 60vh; /* ou toute autre valeur souhaitée */
-    position: relative; /* Assurez-vous que la position est relative pour que les couches parallax fonctionnent correctement */
+    height: 60vh; 
+    position: relative; 
     margin-top: 90px;
-    opacity: 0;
-    transition: opacity 1.5s ease;
 }
 
 .parallax {
     width: 100%;
     position: relative;
-    overflow-x: hidden; /* Empêche le défilement horizontal */
-    overflow-y: auto; /* Permet le défilement vertical si nécessaire */
+    overflow-x: hidden; 
+    overflow-y: auto;
 }
 
 .back-threes,
@@ -103,8 +106,11 @@ nav {
 .header-bg {
     height: 200px;
     width: 100%;
+    position: absolute;
+    top: 0;
     background-image: url("/img/game-header-bg.png");
     background-repeat: no-repeat;
+    z-index: -1;
     transform: translateY(-200px);
     transition: transform 0.5s ease;
 }
@@ -140,8 +146,103 @@ nav {
 
 .solo {
     background-image: url("img/solor-mode.webp");
+
 }
 
 .multi {
     background-image: url("img/multiplayer-mode.webp");
+}
+
+/* signin-page */
+
+#Signin {
+}
+
+.form-signin-container {
+    background-color: #FFFFFF;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 70%;
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.form-signin{
+    width: 90%;
+    height: 80%;
+
+}
+
+.form-signin h1 {
+    display: inline-block;
+    padding-bottom: 10px;
+    font-family: "Arvo", serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.form-signin p {
+    margin-bottom: 20px;
+}
+.form-signin p a {
+
+    color: purple;
+}
+
+.login-password-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+}
+
+.input-signin{
+    width: 40%;
+    border: none;
+    border: 1px solid #DDDDDD;
+    border-radius: 10px;
+    height: 50px;
+    outline: none;
+    padding-left: 10px;
+    font-size: 20px;
+}
+
+.input-signin::placeholder {
+    font-size: 20px;
+}
+
+#password-signin {
+    margin-top: 30px;
+}
+
+.remember-container {
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.remember-container a {
+    color: #2c3e50;
+}
+
+.remember-me {
+}
+
+.forgot-password {
+    
+}
+
+.triangle-form {
+    background-color: rebeccapurple;
+    height: 100%;
+    clip-path: polygon(100% 0, 40% 0, 100% 99%);
+    width: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
