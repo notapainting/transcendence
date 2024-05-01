@@ -134,25 +134,17 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def contact_handler(self, data):
+        if data['relation'] == 'i':
+            raise ValidationError('client should not send invitation', code=400)
         try :
-            if data['rel'] == 'contact':#add invitation system
-                if data['op'] == 'add':
-                    t = mod.ChatUser.objects.get(name=data['name'])
-                    self.user.contacts.add(t)
-                elif data['op'] == 'remove':
-                    t = self.user.contacts.get(name=data['name'])
-                    self.user.contacts.remove(t)
+            if data['relation'] == 'c':
 
-            elif data['rel'] == 'block':
-                if data['op'] == 'add':
-                    t = mod.ChatUser.objects.get(name=data['name'])
-                    self.user.blockes.add(t)
-                elif data['op'] == 'remove':
-                    t = self.user.blockeds.get(name=data['name'])
-                    self.user.blockeds.remove(t)
-            return True
+# need to implement refresh of chatuser contact and block
         except ObjectDoesNotExist:
-            return False
+            raise ValidationError('target not found', code=404)
+        except BaseException as e:
+            raise ValidationError('internal', code=500)
+
 
 # contact -> username !! selfgroups ?? 
     async def event_handler(self, type, data):
@@ -168,8 +160,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 print(contact)
                 await self.channel_layer.group_send(contact, ms)
         elif type == 'contact.update':
-            if await self.contact_handler(ms['data']) is True:
-                await self.send_json(ms)
+            await self.contact_handler(ms['data'])
+            await self.send_json(ms)
 
 
     async def receive_json(self, text_data):

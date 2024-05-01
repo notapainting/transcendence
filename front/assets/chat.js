@@ -67,9 +67,9 @@ document.querySelector('#chat-enter-room').onclick = function(e)
         "type":"contact.update",
         "data":
         {
-            "name":"test",
-            "rel":"contact",
-            "op":"add"
+            "name":"acheron",
+            "relation":"c",
+            "op":"add/del"
         }
     }));
    messageInputDom.value = '';

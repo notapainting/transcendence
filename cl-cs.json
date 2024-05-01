@@ -22,7 +22,8 @@
         {
             "id":"",
             "name":"",
-            "members":""
+            "members":"",
+            "last_read":""
         }
 }
 

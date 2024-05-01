@@ -95,17 +95,71 @@ class EventBaseSerializer(serializers.Serializer):
         print(self.validated_data)
 
 
+RELATIONS = [
+    ('c', 'contact'),
+    ('b', 'blocked'),
+    ('i', 'invitation'),
+]
 class EventContact(EventBaseSerializer):
     name = UserRelatedField(queryset=models.ChatUser.objects.all())
-    rel = serializers.CharField()#change to choice
-    op = serializers.CharField()#change to choice
+    relation = serializers.ChoiceField(choices=RELATIONS)
 
-
+STATUS = [
+    ('d', 'disconnected'),
+    ('o', 'online'),
+    ('a', 'afk'),
+]
 class EventStatus(EventBaseSerializer):
-    status = serializers.CharField()#change to choice
+    status = serializers.ChoiceField(choices=STATUS)
+
+# from client, invit is ignored
+
+# if invit -> error 400
+
+# in block
+#   + block  -> unblock
+#   + contact  -> unblock
 
 
 
+# in contact
+#   + contact -> remove
+#   + block -> remove
+#             + block
+
+# nowhere
+#   + block -> block
+#   + contact -> invit
+
+# add to contact
+# remove from contact
+# add block
+# remove to block
+# cancel invit
+
+
+# -> contact 
+#   1- in contact-> remove
+#   1- in block  -> unblock
+#   1- notin     -> send invit
+
+# -> block 
+#   1- in block  -> unblock
+#   1/2- user exist -> block (if in contact, remove too,maybe via validator?)
+
+            # check if target in block then remove it
+            # try :
+            #     t = self.user.blockeds.get(name=data['name'])
+            #     self.user.blockeds.remove(t)
+            #     return
+            # except ObjectDoesNotExist:
+            #     pass
+
+
+
+# -> send invit : if author already invited by target, 
+#   -> accept and add to contact
+# -> user not in db -> 404
 
 
 
