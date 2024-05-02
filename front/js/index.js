@@ -4,12 +4,13 @@ import { showProfile } from './Profile.js';
 import { showSettings } from './Settings.js';
 import { showSignin, sendData } from './Signin.js';
 
-const navigateTo = url => {
+export const navigateTo = url => {
     history.pushState(null, null, url)
     router()
 }
 
 const clearView = () => {
+console.log("Appel ClearView")
     document.querySelectorAll(".view").forEach(div => {
         div.style.display = "none";
     });
@@ -44,6 +45,7 @@ const isUserAuthenticated = () => {
 }
 
 const router = async () => {
+    console.log("Appel Router")
     const routes = [
         {path: "/", view:() => showHome() },
         {path: "/game", view:() => showGame()},
@@ -65,19 +67,16 @@ const router = async () => {
         }
     }
     if (match.route.path === "/profile"){
-        console.log("yooo")
         const isAuthenticated = await isUserAuthenticated();
         if (!isAuthenticated){
-            console.log("hello")
             match = {
                 route: routes[4],
                 isMatch: true
             }
         }
     }
-    history.pushState(null, null, match.route.path)
     clearView();
-    match.route.view();
+    match.route.view()
 };
 
 window.addEventListener("popstate", router);
