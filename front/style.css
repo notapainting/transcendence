@@ -22,10 +22,14 @@ a {
 /* nav */
 
 nav {
-    margin: 0 auto;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    position: absolute;
+    z-index: 4;
     height: 50px;
     width: 40%;
-    z-index: 2;
     margin-top: 20px;
     border-radius: 5px;
 }
@@ -59,16 +63,12 @@ nav {
 
 .parallax-container {
     height: 100vh; 
-    position: relative; 
-
-}
-
-.parallax {
-    width: 100%;
     position: relative;
-    overflow-x: hidden; 
-    overflow-y: auto;
+    background-color: rebeccapurple;
+    width: 100%;
 }
+
+
 
 .back-threes,
 .middle-threes,
@@ -77,31 +77,65 @@ nav {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background-size: 220%;
+    height: 100vh;
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    transition: transform 2s ease;
+    transition: transform 2s ease, opacity 1s ease;
 }
 
+.banner {
+    position: absolute;
+    height: 5vh;
+    background-color:#0C3452;
+    transition: opacity 0.5s ease;
+    width: 100%;
+    z-index: 5;
+}
 
+.top-hide {
+    top: 0;
+}
+
+.bot-hide {
+    bottom: 0;
+}
 
 .background-threes{
-    background-color: rgb(82, 182, 154);
+    background-image: url("img/screnshot-game.png");
+    filter: blur(5px);
+    opacity: 0.8;
+    transition: filter 0.5s ease, background-size 2s ease;
+    z-index: 1;
 }
 
 .back-threes {
     background-image: url('img/1.png');
+    z-index: 2;
 }
 
 .middle-threes {
     background-image: url('img/2.png');
+    z-index: 3;
 }
 
 .front-threes {
     background-image: url('img/3.png');
+    z-index: 4;
 }
 
+.test-nav {
+    width: 600px;
+    height: 600px;
+    right: 10%;
+    top: 50%;
+    transform: translateY(-50%);
+    background-image: url("img/test-nav.png");
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+    z-index: 1;
+}
 
 /* game page */
 
