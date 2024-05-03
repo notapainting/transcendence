@@ -49,7 +49,7 @@ document.querySelector('#chat-submit-user').onclick = function(e)
         console.log('msg')
         const data = JSON.parse(e.data);
         console.log(data);
-        document.querySelector('#chat-log').value += (data.message + '\n');
+        document.querySelector('#chat-log').value += (data.data + '\n');
     };
 
     chatSocket.onclose = function(e)
@@ -68,8 +68,8 @@ document.querySelector('#chat-enter-room').onclick = function(e)
         "data":
         {
             "name":"acheron",
-            "relation":"c",
-            "op":"add/del"
+            "relation":"i",
+            "operation":"a"
         }
     }));
    messageInputDom.value = '';

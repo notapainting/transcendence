@@ -33,7 +33,8 @@ class UserApiView(View):
 
     def post(self, request, *args, **kwargs):
         try :
-            s = ser.ChatUser(data=request.body)
+            data = ser.parse_json(data=request.body)
+            s = ser.ChatUser(data=data)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)
