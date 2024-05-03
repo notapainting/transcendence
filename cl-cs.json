@@ -33,7 +33,7 @@
     {
         [
             "name":"",
-            "rel":"contact/blocked/invitation"
+            "relation":"c/b/i"
         ]
         [
             ...
@@ -46,8 +46,8 @@
     "data":
     {
         "name":"",
-        "rel":"contact/block",
-        "op":"add/del"
+        "relation":"c/b/i",
+        "operation":"a/r"
     }
 }
 

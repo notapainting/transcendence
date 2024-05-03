@@ -47,6 +47,30 @@ async def get_serializer(type):
 
 
 
+def resolve_invitation(author, target):
+    if author.invited_by.all().filter(name=target.name).exists():
+        author.contacts.add(target)
+        target.invitations.remove(author)
+        author_response = ser.EventContact(data={'author': author.name, 'name': target.name, 'relation':'c', 'operation':'a'})
+        target_response = ser.EventContact(data={'author': target.name, 'name': author.name, 'relation':'c', 'operation':'a'})
+        return True
+    else:
+        author.invitations.add(target)
+        author_response = ser.EventContact(data={'author': author.name, 'name': target.name, 'relation':'i', 'operation':'a'})
+        # target_response = ser.EventContact(data={'author': target.name, 'name': author.name, 'relation':'i', 'operation':'a'})
+        return False
+    if author_response.is_valid() is False:
+        print(s.errors)
+        raise ValidationError('internal..')
+    print(author_response.data)
+    return author_response.data
+    
+
+async def cook_response(data):
+    pass
+    swap = data['author']
+    data['name'] = swap
+
 @database_sync_to_async
 def serializer_handler(serializer, data):
     ser = serializer(data=data)
@@ -120,30 +144,56 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         print(f'msg type : {message['type']}')
         await super().dispatch(message)
 
-    # Receive message from WebSocket
-    # check event type
-    #  if message
-    # find to which conv message is to 
-    # send it to
-    # log message in db
+
 
     @database_sync_to_async
     def get_contact_list(self):
         contacts = ser.ChatUser(self.user).data['contacts']
         return contacts
 
+
+# add contact / add invit -> return invit or if success contact
+# add block -> return add block (same)
+# del block -> return del block (same)
+# del contact -> return del contact (same)
+# del invit -> return del invit (same)
+    # maj user from database
     @database_sync_to_async
     def contact_handler(self, data):
-        if data['relation'] == 'i':
-            raise ValidationError('client should not send invitation', code=400)
+        op = data.get('operation', None)
+        if op is None:
+            raise ValidationError('missing operation field', code=400)
         try :
+            author = mod.ChatUser.objects.get(name=self.userName)
+            target = mod.ChatUser.objects.get(name=data['name'])
+            if author == target:
+               raise ValidationError('forbidden self operation on contact', code=403)
             if data['relation'] == 'c':
+                if op == 'a':
+                    if resolve_invitation(author, target) is False:
+                        data['relation'] = 'i'
+                elif op == 'r':
+                    author.contacts.remove(target)
+            elif data['relation'] == 'b':
+                if op == 'a':
+                    author.blockeds.add(target)
+                elif op == 'r':
+                    author.blockeds.remove(target)
+            elif data['relation'] == 'i':
+                if op == 'a':                   
+                    if resolve_invitation(author, target) is True:
+                        data['relation'] = 'c'
+                elif op == 'r':
+                    author.invitations.remove(target)
+            return data
 
-# need to implement refresh of chatuser contact and block
         except ObjectDoesNotExist:
             raise ValidationError('target not found', code=404)
+        except ValidationError:
+            raise 
         except BaseException as e:
-            raise ValidationError('internal', code=500)
+            print(e.args[0])
+            raise ValidationError('INTERNAL', code=500)
 
 
 # contact -> username !! selfgroups ?? 
@@ -151,17 +201,19 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         ms = {}
         ms['type'] = type
         ms['data'] = data
-        print(ms)
         if type == 'chat.message':
             await self.channel_layer.group_send(ms['data']['group'], ms)
         elif type == 'status.update':
             contacts = await self.get_contact_list();
             for contact in contacts:
-                print(contact)
                 await self.channel_layer.group_send(contact, ms)
         elif type == 'contact.update':
-            await self.contact_handler(ms['data'])
+            ret = await self.contact_handler(ms['data'])
+            ms['data'] = ret
             await self.send_json(ms)
+            ret['author'], ret['name'] = ret['name'], ret['author']
+            print(ret)
+            await self.channel_layer.group_send(ms['data']['author'], ms)
 
 
     async def receive_json(self, text_data):
@@ -174,7 +226,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         except ValidationError as e:
                 print(e.args[0])
-                await self.send_json({"message": "fck u"})
+                await self.send_json({"data": "fck u"})
 
 
     # Receive message from room group
@@ -183,5 +235,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(event)
 
     async def status_update(self, event):
+        # Send message to WebSocket
+        await self.send_json(event)
+
+    async def contact_update(self, event):
         # Send message to WebSocket
         await self.send_json(event)

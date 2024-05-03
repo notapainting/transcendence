@@ -47,18 +47,15 @@ class   BaseSerializer(serializers.ModelSerializer):
 class ChatUser(BaseSerializer):
     class Meta:
         model = models.ChatUser
-        fields = ['name', 'contacts', 'blockeds', 'groups']
+        fields = ['name', 'contacts', 'blockeds', 'invitations', 'invited_by', 'groups']
         extra_kwargs = {
-                            'contacts': {'required': False},
-                            'blockeds': {'required': False},
                             'groups': {'required': False}
                         }
     contacts = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True, required=False)
+    blockeds = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True, required=False)
+    invitations = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True, required=False)
+    invited_by = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True, required=False)
     
-    # contacts = serializers.PrimaryKeyRelatedField(queryset=models.ChatUser.objects.all(),
-    #                                         required=True,
-    #                                         allow_null=False,
-    #                                         pk_field=serializers.UUIDField(format='hex_verbose'))
 
 
 # restrain group to users groups
@@ -92,7 +89,8 @@ class EventBaseSerializer(serializers.Serializer):
     author = serializers.CharField(required=False)
 
     def create(self, data):
-        print(self.validated_data)
+        pass
+        # print(self.validated_data)
 
 
 RELATIONS = [
@@ -100,9 +98,14 @@ RELATIONS = [
     ('b', 'blocked'),
     ('i', 'invitation'),
 ]
+OPERATIONS = [
+    ('a', 'add'),
+    ('r', 'remove'),
+]
 class EventContact(EventBaseSerializer):
     name = UserRelatedField(queryset=models.ChatUser.objects.all())
     relation = serializers.ChoiceField(choices=RELATIONS)
+    operation = serializers.ChoiceField(choices=OPERATIONS, required=False)
 
 STATUS = [
     ('d', 'disconnected'),
@@ -116,44 +119,6 @@ class EventStatus(EventBaseSerializer):
 
 # if invit -> error 400
 
-# in block
-#   + block  -> unblock
-#   + contact  -> unblock
-
-
-
-# in contact
-#   + contact -> remove
-#   + block -> remove
-#             + block
-
-# nowhere
-#   + block -> block
-#   + contact -> invit
-
-# add to contact
-# remove from contact
-# add block
-# remove to block
-# cancel invit
-
-
-# -> contact 
-#   1- in contact-> remove
-#   1- in block  -> unblock
-#   1- notin     -> send invit
-
-# -> block 
-#   1- in block  -> unblock
-#   1/2- user exist -> block (if in contact, remove too,maybe via validator?)
-
-            # check if target in block then remove it
-            # try :
-            #     t = self.user.blockeds.get(name=data['name'])
-            #     self.user.blockeds.remove(t)
-            #     return
-            # except ObjectDoesNotExist:
-            #     pass
 
 
 
