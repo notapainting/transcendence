@@ -6,6 +6,7 @@ const loader = new GLTFLoader();
 export var tree;
 export var round1;
 export var sky;
+export var clouds;
 export var mixer;
 export var clips;
 
@@ -46,13 +47,13 @@ loader.load('./round1/scene.gltf', function ( gltf ) {
 	console.error( error );
 } );
 
-loader.load('./background/scene.gltf', function ( gltf ) {
+loader.load('./nightSky/scene.glb', function ( gltf ) {
 
     sky = gltf.scene;
 
-    sky.position.set(0, 0, 0);
+    sky.position.set(0, 0, 200);
 
-    sky.scale.set(150, 150, 150); 
+    sky.scale.set(25, 25, 25); 
 
     scene.add(sky);
 
@@ -60,16 +61,16 @@ loader.load('./background/scene.gltf', function ( gltf ) {
 	console.error( error );
 } );
 
-loader.load('./clouds/scene.gltf', function ( gltf ) {
+// loader.load('./clouds/scene.gltf', function ( gltf ) {
 
-    sky = gltf.scene;
+//     clouds = gltf.scene;
 
-    sky.position.set(0, -100, 0);
+//     clouds.position.set(0, -100, 0);
 
-    sky.scale.set(20, 20, 20); 
+//     clouds.scale.set(20, 20, 20); 
 
-    scene.add(sky);
+//     scene.add(clouds);
 
-}, undefined, function ( error ) {
-	console.error( error );
-} );
+// }, undefined, function ( error ) {
+// 	console.error( error );
+// } );
