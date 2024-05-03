@@ -24,7 +24,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 // Light
 // const light = new THREE.DirectionalLight(0x0096c7, 1.5);
-const light = new THREE.DirectionalLight(0xffffff, 1);
+const light = new THREE.DirectionalLight(0xFF85FB, 2);
 light.position.set(0, 0, 10);
 
 const geometryBall1 = new THREE.SphereGeometry(0, 10, 10);
