@@ -9,11 +9,14 @@ import * as load from './loader.js';
 
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
 
+var width = window.innerWidth;
+var height = window.innerHeight
+
 export const scene = new THREE.Scene();
-export const camera = new THREE.PerspectiveCamera(45, 1920/1080, 0.1, 1000);
+export const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
 scene.background = new THREE.Color(0x0d3452);
-renderer.setSize(1920, 1080);
+renderer.setSize(width, height);
 camera.position.set( 0, 0, 500 ); 
 camera.rotation.set( -Math.PI / 6, 0, 0 ); 
 // camera.position.set( 0, -155, 80 ); // position de la camera pour le jeu
@@ -24,8 +27,8 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 // Light
 // const light = new THREE.DirectionalLight(0x0096c7, 1.5);
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(0, 80, 0);
+const light = new THREE.DirectionalLight(0xFF85FB, 2);
+light.position.set(0, 0, 10);
 
 const geometryBall1 = new THREE.SphereGeometry(0, 10, 10);
 const materialBall1 = new THREE.MeshToonMaterial({ color: 0xfcca46});
