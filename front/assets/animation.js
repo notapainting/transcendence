@@ -58,6 +58,9 @@ export async function animate() {
 	if (load.mixer)
 		load.mixer.update(0.01);
 
+	if (load.sky)
+		load.sky.rotation.y += 0.001;
+
 	// animation rotation arbre premiere scene
 	if (load.tree && animationData.intro === 0) {
 		var initialPos = new THREE.Vector3(0, 0, 0);
