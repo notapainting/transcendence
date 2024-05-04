@@ -26,6 +26,18 @@ from django.shortcuts import redirect
 
 User = get_user_model()
 
+def get_user_from_access_token(access_token_cookie):
+	try:
+		token = AccessToken(access_token_cookie)
+		user_id = token['user_id']
+		user = CustomUser.objects.get(id=user_id)
+		return user
+	except CustomUser.DoesNotExist:
+		raise AuthenticationFailed("User not found")
+	except Exception as e:
+		raise AuthenticationFailed("Error validating access token: {}".format(str(e)))
+
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 	def validate(self, attrs):
 		data = super().validate(attrs)
@@ -38,6 +50,28 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 			user_info = response.json()
 			data.update(user_info)
 		return data
+
+class LogoutRequest(APIView):
+    def post(self, request):
+        response = HttpResponse("Logged out successfully")
+        response.delete_cookie('access', path='/')  # Supprimer le cookie d'accès
+        response.delete_cookie('refresh', path='/')  # Supprimer le cookie de rafraîchissement
+        return response
+
+
+class GetUserPersonnalInfos(APIView):
+	authentication_classes = [JWTAuthentication]
+	def get(self, request):
+		access_token_cookie = request.COOKIES.get('access')
+		user = get_user_from_access_token(access_token_cookie)
+		user_data = {'username':user.username}
+		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data)
+		if response.status_code == 200:
+			user_info = response.json()
+			return Response(user_info, status=status.HTTP_200_OK)
+		else:
+			return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
 	serializer_class = CustomTokenObtainPairSerializer
@@ -52,7 +86,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 		# Ajouter les cookies à la réponse
 		response.set_cookie(key='access', value=access_token, httponly=True)
 		response.set_cookie(key='refresh', value=refresh_token, httponly=True)
-
 		return response
 
 def verify_email(request, uidb64, token):
@@ -109,17 +142,6 @@ class UserCreate(APIView):
 			)
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-def get_user_from_access_token(access_token_cookie):
-	try:
-		token = AccessToken(access_token_cookie)
-		user_id = token['user_id']
-		user = CustomUser.objects.get(id=user_id)
-		return user
-	except CustomUser.DoesNotExist:
-		raise AuthenticationFailed("User not found")
-	except Exception as e:
-		raise AuthenticationFailed("Error validating access token: {}".format(str(e)))
 
 class ValidateTokenView(APIView):
 	authentication_classes = [JWTAuthentication]
