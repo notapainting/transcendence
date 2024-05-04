@@ -1,5 +1,5 @@
 
-let buttonElement = document.querySelector(".login-button");
+let buttonElement = document.querySelector(".login-register-button");
 export const sendData = () => {
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;

@@ -3,44 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Single page web app</title>
+    <title>Bjill</title>
     <link rel="stylesheet" href="/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav class="nav">
+    <!-- <nav class="nav">
         <ul>
             <li><a href="/" class="nav__link" data-link>Home</a></li>
             <li><a href="/game" class="nav__link" data-link>Game</a></li>
             <li><a href="/profile" class="nav__link" data-link>Profile</a></li>
             <li><a href="/settings" class="nav__link" data-link>Settings</a></li>
         </ul>
-    </nav>
+    </nav> -->
     <div id="Home" class="view">
         <div class="parallax-container">
             <div class="banner top-hide"></div>
             <div class="background-threes"></div>
-            <div class="back-threes"></div>
-            <div class="middle-threes"></div>
-            <div class="front-threes"></div>
+            <div class="back-threes parallax-items"></div>
+            <div class="middle-threes parallax-items"></div>
+            <div class="front-threes parallax-items"></div>
             <div class="banner bot-hide"></div>
-            <div class="test-nav">
-            
+            <!-- <div class="test-nav"></div> -->
+        </div>
+        <div class="home-form">
+            <input type="text" class="home-form-input home-email" placeholder="e-mail">
+            <input type="text" class="home-form-input home-login" placeholder="username">
+            <input type="password" class="home-form-input home-password" placeholder="password">
+            <div class="login-or-signin">
+                <div class="button login-register-button">LOGIN</div>
+                <p class="register-login-text">Don't have an account ? <br><span class="register-login-link">Create an account</span></p>
             </div>
         </div>
-
-    </div>
-    <div id="Game" class="view">
-        <div class="header-bg"></div>
-        <div class="choose-mode-container">
-            <div class="choose-mode">
-                <div class="solo item-mode"></div>
-                <div class="multi item-mode"></div>
-            </div>
+        <div class="nav-top">
+            <p class="welcome-text-nav"></p>
+            <div class="profile-picture-nav"></div>
+            <div class="logout-icon-nav"></div>
         </div>
     </div>
+    <div id="Game" class="view"></div>
     <div id="Profile" class="view">
         <h1>Welcome To Profile</h1>
     </div>
@@ -48,7 +51,6 @@
         <h1>Welcome To Settings</h1>
     </div>
     <div id="Signin" class="view">
-
         <div class="form-signin-container">
             <div class="triangle-form"></div>
             <div class="form-signin">
@@ -56,24 +58,21 @@
                 <p>Don't have an account ? <a href="">Create an account</a></p>
                 <div class="login-password-container">
                     <input type="text" id="login-signin" class="input-signin" placeholder="username">
-                    <input type="password" id="password-signin" class="input-signin" placeholder="password">
+                    <input type="password" id="password-signup" class="input-signin" placeholder="password">
                     <div class="remember-container">
                         <input type="checkbox">
                         <a href="#" class="remember-me">Remember Me</a>
                         <a href="#" class="forgot-password">Forgot password ?</a>
                     </div>
-                    
                 </div>
                 <button class="login-button">Se connecter</button>
-                <div id="loginResponse" class="response"></div>
+               <div id="loginResponse" class="response"></div> 
             </div>
         </div>
     </div>
-    <script>
-    </script>
-
     <script type="module" src="js/Home.js"></script>
     <script type="module" src="js/index.js"></script>
+    <script type="module" src="js/Signin.js"></script>
 </body>
 </html>
 
