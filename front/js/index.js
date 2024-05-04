@@ -17,7 +17,7 @@ console.log("Appel ClearView")
     document.removeEventListener('mousemove', parallaxEffect);
 }
 
-const isUserAuthenticated = () => {
+export const isUserAuthenticated = () => {
     return fetch('auth/validate_token/', {
         method: 'POST',
         credentials: 'same-origin'
