@@ -358,7 +358,6 @@ class Activate2FAView(APIView):
 
 class Confirm2FAView(APIView):
 	authentication_classes = [JWTAuthentication]
-
 	def post(self, request):
 		access_token_cookie = request.COOKIES.get('access')
 		user = get_user_from_access_token(access_token_cookie)
