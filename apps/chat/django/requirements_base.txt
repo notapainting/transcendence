@@ -10,6 +10,8 @@ cryptography==42.0.5
 daphne==4.1.0
 Django==5.0.2
 djangorestframework==3.14.0
+djangoviz==0.1.1
+graphqlclient==0.2.4
 hyperlink==21.0.0
 idna==3.6
 incremental==22.10.0

@@ -48,28 +48,17 @@ async def get_serializer(type):
 
 
 def resolve_invitation(author, target):
+    if author.blocked_by.all().filter(name=target.name).exist():
+        raise ValidationError('author is blocked', code=403)
+    if author.blockeds.all().filter(name=target.name).exist():
+        raise ValidationError('target is blocked by author.. dont be stupid plz', code=403)
     if author.invited_by.all().filter(name=target.name).exists():
         author.contacts.add(target)
         target.invitations.remove(author)
-        author_response = ser.EventContact(data={'author': author.name, 'name': target.name, 'relation':'c', 'operation':'a'})
-        target_response = ser.EventContact(data={'author': target.name, 'name': author.name, 'relation':'c', 'operation':'a'})
         return True
     else:
         author.invitations.add(target)
-        author_response = ser.EventContact(data={'author': author.name, 'name': target.name, 'relation':'i', 'operation':'a'})
-        # target_response = ser.EventContact(data={'author': target.name, 'name': author.name, 'relation':'i', 'operation':'a'})
         return False
-    if author_response.is_valid() is False:
-        print(s.errors)
-        raise ValidationError('internal..')
-    print(author_response.data)
-    return author_response.data
-    
-
-async def cook_response(data):
-    pass
-    swap = data['author']
-    data['name'] = swap
 
 @database_sync_to_async
 def serializer_handler(serializer, data):
@@ -176,7 +165,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     author.contacts.remove(target)
             elif data['relation'] == 'b':
                 if op == 'a':
+                    author.contacts.remove(target)
+                    author.invitations.remove(target)
+                    target.invitations.remove(author)
                     author.blockeds.add(target)
+                    # author.groups.all().filter(members=)
+                    # find a way to select private conv easily
                 elif op == 'r':
                     author.blockeds.remove(target)
             elif data['relation'] == 'i':
@@ -195,6 +189,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             print(e.args[0])
             raise ValidationError('INTERNAL', code=500)
 
+    # check if user is blocked ? 
+    @database_sync_to_async
+    def message_handler(self, data):
+        author = mod.ChatUser.get(name=self.userName)
+        if author.groups.all().filter(id=data['group']).exist() is False:
+            raise ValidationError('author not in group', code=403)
 
 # contact -> username !! selfgroups ?? 
     async def event_handler(self, type, data):
@@ -202,6 +202,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         ms['type'] = type
         ms['data'] = data
         if type == 'chat.message':
+            self.message_handler(ms['data'])
             await self.channel_layer.group_send(ms['data']['group'], ms)
         elif type == 'status.update':
             contacts = await self.get_contact_list();

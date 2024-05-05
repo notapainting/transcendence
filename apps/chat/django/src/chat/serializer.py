@@ -29,6 +29,8 @@ class UserRelatedField(serializers.RelatedField):
         except BaseException:
             raise ValidationError({'ChatUser': 'User not found'})
 
+
+# https://stackoverflow.com/questions/17256724/include-intermediary-through-model-in-responses-in-django-rest-framework/17263583#17263583
 # serializer
 class   BaseSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):

@@ -1,5 +1,8 @@
 TODO: 
 	-check for no async ORM in API 
+    - add relationship -> update or create better
+    - update event message.private/group logic
+    - update dserializer
 
 
 FIXME: 
