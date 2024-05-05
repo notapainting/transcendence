@@ -57,6 +57,7 @@ CSRF_COOKIE_SECURE = False
 INSTALLED_APPS = [
     'daphne',
     'chat',
+    'djangoviz',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

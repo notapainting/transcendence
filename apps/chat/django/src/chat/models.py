@@ -18,15 +18,73 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 
+# class ChatUser(models.Model):
+#     def __str__(self):
+#         return self.name
+
+#     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+#     name = models.CharField(max_length=20, unique=True)
+#     contacts = models.ManyToManyField('self')
+#     blockeds = models.ManyToManyField('self', related_name='blocked_by', symmetrical=False)
+#     invitations = models.ManyToManyField('self', related_name='invited_by', symmetrical=False)
+
+class UserRelation(models.Model):
+    class RelationType(models.TextChoices):
+        INVIT="I"
+        INVITED="ID"
+        BLOCK="B"
+        BLOCKED="BD"
+        COMRADE="C"
+
+    inverse = {
+        RelationType.INVIT: RelationType.INVITED,
+        RelationType.BLOCK: RelationType.BLOCKED,
+        RelationType.COMRADE: RelationType.COMRADE,
+    }
+
+    class Meta:
+        unique_together = ('from_user', 'to_user')
+
+    def __str__(self):
+        return f'from {self.from_user.name} to {self.to_user.name}'
+
+    from_user = models.ForeignKey("ChatUser", related_name='outbox', on_delete=models.CASCADE)
+    to_user = models.ForeignKey("ChatUser", related_name='inbox', on_delete=models.CASCADE)
+    status = models.CharField(choices=RelationType)
+
 class ChatUser(models.Model):
     def __str__(self):
         return self.name
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=20, unique=True)
-    contacts = models.ManyToManyField('self')
-    blockeds = models.ManyToManyField('self', related_name='blocked_by', symmetrical=False)
-    invitations = models.ManyToManyField('self', related_name='invited_by', symmetrical=False)
+    contacts = models.ManyToManyField('self',
+                                      through=UserRelation,
+                                      symmetrical=False,
+                                      related_name="+")
+
+    def add_relationship(self, target, status=UserRelation.RelationType.INVIT, symm=True):
+        relationship, created = UserRelation.objects.get_or_create(
+            from_user=self,
+            to_user=target)
+        if symm is True and status == UserRelation.RelationType.COMRADE:
+            target.add_relationship(self, status, False)
+        return relationship
+
+
+    def get_contacts_by_status(self, status='C'):
+        return self.contacts.filter(
+            inbox__status=status)
+
+
+    def remove_relationship(self, target, symm=True):
+        r = UserRelation.objects.get(
+            from_user=self,
+            to_user=target)
+        
+        if symm is True and r.status == UserRelation.RelationType.COMRADE:
+            target.remove_relationship(self, False)
+        r.delete()
 
 
 class ChatGroup(models.Model):
@@ -35,7 +93,15 @@ class ChatGroup(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=200, validators=[validators.offensive_name])
-    members = models.ManyToManyField(ChatUser, related_name='groups')
+    members = models.ManyToManyField(ChatUser, through='GroupShip', related_name='groups')
+
+class GroupShip(models.Model):
+    def __str__(self):
+        return f'from {self.user.name} to {self.group.name}'
+
+    user = models.ForeignKey(ChatUser, related_name="groupship", on_delete=models.CASCADE)
+    group = models.ForeignKey(ChatGroup, related_name="groupships", on_delete=models.CASCADE)
+    last_read = models.DateTimeField(default=None)
 
     
 class ChatMessage(models.Model):
