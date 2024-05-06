@@ -39,7 +39,7 @@ EVENT_CLIENT_TYPE = ['group.update', 'contact.update', 'status.update', 'chat.me
 
 async def get_serializer(type):
     serializers = {
-        'chat.message' : ser.ChatMessage,
+        'chat.message' : ser.Message,
         'contact.update' : ser.EventContact,
         'status.update' : ser.EventStatus,
     }
@@ -87,7 +87,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     def auth(self):
         self.userName = self.scope['cookies'].get('userName')
         try:
-            return mod.ChatUser.objects.get(name=self.userName)
+            return mod.User.objects.get(name=self.userName)
         except ObjectDoesNotExist:
             return None
 
@@ -95,7 +95,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     def get_group_list(self):
         data = {}
         data['type'] = 'group.summary'
-        data['data'] = ser.ChatGroup(self.user.groups.all(), 
+        data['data'] = ser.Group(self.user.groups.all(), 
                                many=True, 
                                fields='id name members messages'
                                ).data
@@ -119,7 +119,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(data)
 
         # add user to channel groups
-        await self.channel_layer.group_add(self.userName, self.channel_name)
+        await self.channel_layer.group_add(self.userName, self.channel_name)#attention au name
         for id in self.group_list:
             await self.channel_layer.group_add(id, self.channel_name)
 
@@ -137,7 +137,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def get_contact_list(self):
-        contacts = ser.ChatUser(self.user).data['contacts']
+        contacts = ser.User(self.user).data['contacts']
         return contacts
 
 
@@ -153,8 +153,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if op is None:
             raise ValidationError('missing operation field', code=400)
         try :
-            author = mod.ChatUser.objects.get(name=self.userName)
-            target = mod.ChatUser.objects.get(name=data['name'])
+            author = mod.User.objects.get(name=self.userName)
+            target = mod.User.objects.get(name=data['name'])
             if author == target:
                raise ValidationError('forbidden self operation on contact', code=403)
             if data['relation'] == 'c':
@@ -192,7 +192,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     # check if user is blocked ? 
     @database_sync_to_async
     def message_handler(self, data):
-        author = mod.ChatUser.get(name=self.userName)
+        author = mod.User.get(name=self.userName)
         if author.groups.all().filter(id=data['group']).exist() is False:
             raise ValidationError('author not in group', code=403)
 

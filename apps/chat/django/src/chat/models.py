@@ -18,7 +18,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 
-class ChatUser(models.Model):
+class User(models.Model):
     def __str__(self):
         return self.name
 
@@ -28,19 +28,18 @@ class ChatUser(models.Model):
     blockeds = models.ManyToManyField('self', related_name='blocked_by', symmetrical=False)
     invitations = models.ManyToManyField('self', related_name='invited_by', symmetrical=False)
 
+    class Roles(models.IntegerChoices):
+        READER = 0
+        WRITER = 1
+        ADMIN = 2
+        OWNER = 3
+
 class UserRelation(models.Model):
     class RelationType(models.TextChoices):
         INVIT="I"
-        INVITED="ID"
         BLOCK="B"
-        BLOCKED="BD"
         COMRADE="C"
 
-    inverse = {
-        RelationType.INVIT: RelationType.INVITED,
-        RelationType.BLOCK: RelationType.BLOCKED,
-        RelationType.COMRADE: RelationType.COMRADE,
-    }
 
     class Meta:
         unique_together = ('from_user', 'to_user')
@@ -48,11 +47,11 @@ class UserRelation(models.Model):
     def __str__(self):
         return f'from {self.from_user.name} to {self.to_user.name}'
 
-    from_user = models.ForeignKey("ChatUser", related_name='outbox', on_delete=models.CASCADE)
-    to_user = models.ForeignKey("ChatUser", related_name='inbox', on_delete=models.CASCADE)
+    from_user = models.ForeignKey("User", related_name='outbox', on_delete=models.CASCADE)
+    to_user = models.ForeignKey("User", related_name='inbox', on_delete=models.CASCADE)
     status = models.CharField(choices=RelationType)
 
-# class ChatUser(models.Model):
+# class User(models.Model):
 #     def __str__(self):
 #         return self.name
 
@@ -88,35 +87,37 @@ class UserRelation(models.Model):
 #         r.delete()
 
 
-class ChatGroup(models.Model):
+class Group(models.Model):
     def __str__(self):
         return str(self.id)
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=200, validators=[validators.offensive_name])
-    members = models.ManyToManyField(ChatUser, through='GroupShip', related_name='groups')
+    members = models.ManyToManyField(User, through='GroupShip', related_name='groups')
+
 
 class GroupShip(models.Model):
     def __str__(self):
         return f'from {self.user.name} to {self.group.name}'
 
-    user = models.ForeignKey(ChatUser, related_name="groupship", on_delete=models.CASCADE)
-    group = models.ForeignKey(ChatGroup, related_name="groupships", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="groupships", on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, related_name="memberships", on_delete=models.CASCADE)
+    role = models.PositiveSmallIntegerField(choices=User.Roles, default=User.Roles.WRITER)
     last_read = models.DateTimeField(default=None, null=True)
 
-    
-class ChatMessage(models.Model):
+
+class Message(models.Model):
     def __str__(self):
         return self.body
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 
-    author = models.ForeignKey(ChatUser, on_delete=models.CASCADE)
-    group = models.ForeignKey(ChatGroup, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
     date = models.DateTimeField(default=timezone.now, verbose_name="Publication date")
     respond_to = models.ForeignKey(
-        'ChatMessage',
+        'Message',
         on_delete=models.SET_NULL, 
         related_name="response",
         default=None, 
@@ -124,7 +125,7 @@ class ChatMessage(models.Model):
         )
 
     body = models.CharField(max_length=512)
-    
+
     class Meta:
         default_related_name = "messages"
         ordering = ["-date"]
@@ -145,7 +146,7 @@ class ChatMessage(models.Model):
     # def set_uuid(self):
     # 	if self.members == None:
     # 		raise ValidationError(
-    # 			"Can't create ChatGroup uuid without users"
+    # 			"Can't create Group uuid without users"
     # 		)
     # 	key = '';
     # 	for users in self.members:

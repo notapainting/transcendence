@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.serializers import ValidationError
-from . import models
+import chat.models as mod
 import io
 from uuid import uuid4
 
@@ -25,9 +25,9 @@ class UserRelatedField(serializers.RelatedField):
         return str(value)
     def to_internal_value(self, data):
         try :
-            return models.ChatUser.objects.get(name=data)
+            return mod.User.objects.get(name=data)
         except BaseException:
-            raise ValidationError({'ChatUser': 'User not found'})
+            raise ValidationError({'User': 'User not found'})
 
 
 # https://stackoverflow.com/questions/17256724/include-intermediary-through-model-in-responses-in-django-rest-framework/17263583#17263583
@@ -46,44 +46,57 @@ class   BaseSerializer(serializers.ModelSerializer):
 
 
 
-class ChatUser(BaseSerializer):
+class User(BaseSerializer):
     class Meta:
-        model = models.ChatUser
+        model = mod.User
         fields = ['name', 'contacts', 'blockeds', 'invitations', 'invited_by', 'groups']
         extra_kwargs = {
                             'groups': {'required': False}
                         }
-    contacts = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True, required=False)
-    blockeds = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True, required=False)
-    invitations = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True, required=False)
-    invited_by = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True, required=False)
+    contacts = UserRelatedField(queryset=mod.User.objects.all(), many=True, required=False)
+    blockeds = UserRelatedField(queryset=mod.User.objects.all(), many=True, required=False)
+    invitations = UserRelatedField(queryset=mod.User.objects.all(), many=True, required=False)
+    invited_by = UserRelatedField(queryset=mod.User.objects.all(), many=True, required=False)
     
 
+# import chat.serializer as ser
+# import chat.models as mod
+# g = mod.GroupShip.objects.all().get(id=11)
+# 
+# 
 
 # restrain group to users groups
-class ChatMessage(BaseSerializer):
+class Message(BaseSerializer):
     class Meta:
-        model = models.ChatMessage
+        model = mod.Message
         fields = ['id', 'author', 'group', 'date', 'respond_to', 'body']
         extra_kwargs = {
             'date': {'format' : '%Y-%m-%dT%H:%M:%S.%fZ%z', 'default':timezone.now},
             'id': {'format' : 'hex_verbose', 'default': uuid4}
             }
 
-    author = UserRelatedField(queryset=models.ChatUser.objects.all(), required=False)
-    group = serializers.PrimaryKeyRelatedField(queryset=models.ChatGroup.objects.all(),
+    author = UserRelatedField(queryset=mod.User.objects.all(), required=False)
+    group = serializers.PrimaryKeyRelatedField(queryset=mod.Group.objects.all(),
                                             required=True,
                                             allow_null=False,
                                             pk_field=serializers.UUIDField(format='hex_verbose'))
 
 
-class ChatGroup(BaseSerializer):
+class GroupShip(BaseSerializer):
     class Meta:
-        model = models.ChatGroup
+        model = mod.GroupShip
+        fields = ['user', 'role', 'last_read']
+    user = UserRelatedField(queryset=mod.User.objects.all())
+    
+
+class Group(BaseSerializer):
+    class Meta:
+        model = mod.Group
         fields = ['id', 'name', 'members', 'messages']
 
-    members = UserRelatedField(queryset=models.ChatUser.objects.all(), many=True)
-    messages = ChatMessage(many=True, required=False, fields='id author date body')
+    members = GroupShip(source='memberships', many=True)
+    # members = UserRelatedField(queryset=mod.User.objects.all(), many=True)
+    messages = Message(many=True, required=False, fields='id author date body')
 
 
 # event serializer
@@ -105,7 +118,7 @@ OPERATIONS = [
     ('r', 'remove'),
 ]
 class EventContact(EventBaseSerializer):
-    name = UserRelatedField(queryset=models.ChatUser.objects.all())
+    name = UserRelatedField(queryset=mod.User.objects.all())
     relation = serializers.ChoiceField(choices=RELATIONS)
     operation = serializers.ChoiceField(choices=OPERATIONS, required=False)
 

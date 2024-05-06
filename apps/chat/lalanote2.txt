@@ -23,9 +23,11 @@ logique :
 
 
 private = gr with :
-    name = private ? blank ? special value?
+    name = private ? blank ? special value? @?
     members 2 user at w perm
     when blocked -> set all perm to r
+
+
 
 u1 = fk
 u2 = fk
@@ -41,7 +43,7 @@ u2 = fk
 
 
 gr :    id 
-        name
+        name -> a-zA-Z0-9!?-_().&#,<>
         members
         ->messages
         thr : 

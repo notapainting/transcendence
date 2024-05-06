@@ -60,18 +60,6 @@
 }
 
 {
-    "type":"message.private",
-    "data":
-    {
-        "to":"sam",
-        "body":"hello",
-        "respond_to": "",
-        "author":"",
-        "date":""
-    }
-}
-
-{
     "type":"message.group",
     "data":
     {
@@ -86,18 +74,6 @@
 
 
 {"client":"consumer"}
-
-{
-    "type":"message.private",
-    "data":
-    {
-        "to":"755b83ae-0cb9-461c-8639-b55ec589a6a5",
-        "body":"hello",
-        "respond_to": "",
-        "author":"",
-        "date":""
-    }
-}
 
 {
     "type":"message.group",
