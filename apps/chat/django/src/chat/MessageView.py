@@ -1,5 +1,5 @@
 from django.http import JsonResponse, HttpResponse
-from chat.models import ChatGroup, ChatUser
+from chat.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.utils import IntegrityError
 from django.views import View
@@ -26,7 +26,7 @@ class MessageApiView(View):
 
     def post(self, request, *args, **kwargs):
         try:
-            s = ser.ChatMessage(data=request.body)
+            s = ser.Message(data=request.body)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)

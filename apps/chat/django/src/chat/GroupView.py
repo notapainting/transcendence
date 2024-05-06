@@ -1,5 +1,5 @@
 from django.http import JsonResponse, HttpResponse
-from chat.models import ChatGroup, ChatUser
+from chat.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.utils import IntegrityError
 from django.views import View
@@ -27,7 +27,7 @@ class GroupApiView(View):
     def post(self, request, *args, **kwargs):
         try :
             data = ser.parse_json(request.body)
-            s = ser.ChatGroup(data=data)
+            s = ser.Group(data=data)
             if s.is_valid() is False:#trhow if user doesnt exit
                 print(s.errors)
                 return HttpResponse(status=400)
@@ -50,12 +50,12 @@ class GroupApiView(View):
             safe = True
             id = kwargs.get('id')
             if id == None:
-                qset = ChatGroup.objects.all()
+                qset = Group.objects.all()
                 many = True
                 safe = False
             else:
-                qset = ChatGroup.objects.get(id=id)
-            data = ser.ChatGroup(qset, many=many, fields=fields).data
+                qset = Group.objects.get(id=id)
+            data = ser.Group(qset, many=many, fields=fields).data
             data = ser.render_json(data)
             return HttpResponse(status=200, content=data)
 
@@ -70,8 +70,8 @@ class GroupApiView(View):
     def patch(self, request, *args, **kwargs):
         try :
 
-            group = ChatGroup.objects.get(id=kwargs.get('id'))
-            s = ser.ChatGroup(group, data=request.body, partial=True)
+            group = Group.objects.get(id=kwargs.get('id'))
+            s = ser.Group(group, data=request.body, partial=True)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)
@@ -91,7 +91,7 @@ class GroupApiView(View):
             ids = request.GET.get("id")
  
             if opt == 'all':
-                ChatGroup.objects.all().delete()
+                Group.objects.all().delete()
                 return HttpResponse(status=200)
             elif ids is None:
                 return HttpResponse(status=400)
@@ -99,7 +99,7 @@ class GroupApiView(View):
             if ids is not None:
                 ids = ids.split()
                 for id in ids:
-                    ChatGroup.objects.get(id=id).delete()
+                    Group.objects.get(id=id).delete()
                     logger.info("user %s, deleted", id)
 
             return HttpResponse(status=200)
