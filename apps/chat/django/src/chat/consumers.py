@@ -201,7 +201,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         ms = {}
         ms['type'] = type
         ms['data'] = data
-        if type == 'chat.message':
+        if type == 'message.group':
             self.message_handler(ms['data'])
             await self.channel_layer.group_send(ms['data']['group'], ms)
         elif type == 'status.update':

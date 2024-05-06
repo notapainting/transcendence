@@ -10,6 +10,45 @@ FIXME:
     - POST without body
 
 
+logique :
+    message.private : cl1 -> cl2
+        cl1 ->  cs1
+                |   check if cl2 is in contact /is blocked
+                |   store message in db
+                |   send message to cs2
+                |   cs2 send message to cl2
+
+
+    name -> gr id
+
+
+private = gr with :
+    name = private ? blank ? special value?
+    members 2 user at w perm
+    when blocked -> set all perm to r
+
+u1 = fk
+u2 = fk
+-> message
+
+    message.group : cl1 -> gr1
+        cl1 ->  cs1
+                |   check if gr1 is in groups
+                |   store message in db
+                |   send message to gr/cs   (include cs1)
+                |   each gr/cs check if author is blocked
+                |   if author not block -> send to gr/cl
+
+
+gr :    id 
+        name
+        members
+        ->messages
+        thr : 
+            authorisation (r,w,a,o)
+            last_read
+            date_joined
+
 
 list all conv
 list friend
