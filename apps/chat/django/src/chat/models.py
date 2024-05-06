@@ -18,15 +18,15 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 
-# class ChatUser(models.Model):
-#     def __str__(self):
-#         return self.name
+class ChatUser(models.Model):
+    def __str__(self):
+        return self.name
 
-#     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-#     name = models.CharField(max_length=20, unique=True)
-#     contacts = models.ManyToManyField('self')
-#     blockeds = models.ManyToManyField('self', related_name='blocked_by', symmetrical=False)
-#     invitations = models.ManyToManyField('self', related_name='invited_by', symmetrical=False)
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    name = models.CharField(max_length=20, unique=True)
+    contacts = models.ManyToManyField('self')
+    blockeds = models.ManyToManyField('self', related_name='blocked_by', symmetrical=False)
+    invitations = models.ManyToManyField('self', related_name='invited_by', symmetrical=False)
 
 class UserRelation(models.Model):
     class RelationType(models.TextChoices):
@@ -52,39 +52,40 @@ class UserRelation(models.Model):
     to_user = models.ForeignKey("ChatUser", related_name='inbox', on_delete=models.CASCADE)
     status = models.CharField(choices=RelationType)
 
-class ChatUser(models.Model):
-    def __str__(self):
-        return self.name
+# class ChatUser(models.Model):
+#     def __str__(self):
+#         return self.name
 
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    name = models.CharField(max_length=20, unique=True)
-    contacts = models.ManyToManyField('self',
-                                      through=UserRelation,
-                                      symmetrical=False,
-                                      related_name="+")
-
-    def add_relationship(self, target, status=UserRelation.RelationType.INVIT, symm=True):
-        relationship, created = UserRelation.objects.get_or_create(
-            from_user=self,
-            to_user=target)
-        if symm is True and status == UserRelation.RelationType.COMRADE:
-            target.add_relationship(self, status, False)
-        return relationship
+#     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+#     name = models.CharField(max_length=20, unique=True)
+#     contacts = models.ManyToManyField('self',
+#                                       through=UserRelation,
+#                                       symmetrical=False,
+#                                       related_name="+")
 
 
-    def get_contacts_by_status(self, status='C'):
-        return self.contacts.filter(
-            inbox__status=status)
+#     def add_relationship(self, target, status=UserRelation.RelationType.INVIT, symm=True):
+#         relationship, created = UserRelation.objects.get_or_create(
+#             from_user=self,
+#             to_user=target)
+#         if symm is True and status == UserRelation.RelationType.COMRADE:
+#             target.add_relationship(self, status, False)
+#         return relationship
 
 
-    def remove_relationship(self, target, symm=True):
-        r = UserRelation.objects.get(
-            from_user=self,
-            to_user=target)
+#     def get_contacts_by_status(self, status='C'):
+#         return self.contacts.filter(
+#             inbox__status=status)
+
+
+#     def remove_relationship(self, target, symm=True):
+#         r = UserRelation.objects.get(
+#             from_user=self,
+#             to_user=target)
         
-        if symm is True and r.status == UserRelation.RelationType.COMRADE:
-            target.remove_relationship(self, False)
-        r.delete()
+#         if symm is True and r.status == UserRelation.RelationType.COMRADE:
+#             target.remove_relationship(self, False)
+#         r.delete()
 
 
 class ChatGroup(models.Model):
@@ -101,7 +102,7 @@ class GroupShip(models.Model):
 
     user = models.ForeignKey(ChatUser, related_name="groupship", on_delete=models.CASCADE)
     group = models.ForeignKey(ChatGroup, related_name="groupships", on_delete=models.CASCADE)
-    last_read = models.DateTimeField(default=None)
+    last_read = models.DateTimeField(default=None, null=True)
 
     
 class ChatMessage(models.Model):
