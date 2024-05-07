@@ -3,118 +3,112 @@
 from django.db import models
 from uuid import uuid4
 
-from . import validators
-from django.core.exceptions import ValidationError
+import chat.validators as val
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.utils import timezone
 
 import logging
 logger = logging.getLogger('django')
 
-SEED = b'8d41fd76-abb5-48ba-b383-84082c3a7bdb'
 
+    # blockeds = models.ManyToManyField('self', related_name='blocked_by', symmetrical=False)
+    # invitations = models.ManyToManyField('self', related_name='invited_by', symmetrical=False)
 
+class UserRelation(models.Model):
+    class Types(models.TextChoices):
+        INVIT="I"
+        BLOCK="B"
+        COMRADE="C"
 
-import json
-from django.core.serializers.json import DjangoJSONEncoder
+    class Meta:
+        unique_together = ('from_user', 'to_user')
+
+    from_user = models.ForeignKey("User", related_name='outbox', on_delete=models.CASCADE)
+    to_user = models.ForeignKey("User", related_name='inbox', on_delete=models.CASCADE)
+    status = models.CharField(choices=Types)
+
+    def __str__(self):
+        return f'from {self.from_user.name} to {self.to_user.name}'
 
 
 class User(models.Model):
-    def __str__(self):
-        return self.name
-
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    name = models.CharField(max_length=20, unique=True)
-    contacts = models.ManyToManyField('self')
-    blockeds = models.ManyToManyField('self', related_name='blocked_by', symmetrical=False)
-    invitations = models.ManyToManyField('self', related_name='invited_by', symmetrical=False)
-
     class Roles(models.IntegerChoices):
         READER = 0
         WRITER = 1
         ADMIN = 2
         OWNER = 3
 
-class UserRelation(models.Model):
-    class RelationType(models.TextChoices):
-        INVIT="I"
-        BLOCK="B"
-        COMRADE="C"
-
-
-    class Meta:
-        unique_together = ('from_user', 'to_user')
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    name = models.CharField(max_length=20, unique=True)
+    contacts = models.ManyToManyField('self',
+                                      through=UserRelation,
+                                      symmetrical=False,
+                                      related_name="+")
 
     def __str__(self):
-        return f'from {self.from_user.name} to {self.to_user.name}'
+        return self.name
 
-    from_user = models.ForeignKey("User", related_name='outbox', on_delete=models.CASCADE)
-    to_user = models.ForeignKey("User", related_name='inbox', on_delete=models.CASCADE)
-    status = models.CharField(choices=RelationType)
+    def update_relation(self, target, status=UserRelation.Types.INVIT):
+        try :
+            rel = UserRelation.objects.get(from_user=self, to_user=target)
+            # self.outbox.get(to_user=target)
+            rel.status = status
+            rel.save()
+        except ObjectDoesNotExist:
+            UserRelation.objects.create(from_user=self, to_user=target, status=status)
+            # self.outbox.create(to_user=target, status=status)
 
-# class User(models.Model):
-#     def __str__(self):
-#         return self.name
+    def get_relation(self, target):
+        try :
+            return UserRelation.objects.get(from_user=self, to_user=target).status
+            # return self.outbox.get(to_user=target).status
+        except ObjectDoesNotExist:
+            return None
 
-#     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-#     name = models.CharField(max_length=20, unique=True)
-#     contacts = models.ManyToManyField('self',
-#                                       through=UserRelation,
-#                                       symmetrical=False,
-#                                       related_name="+")
+    def delete_relation(self, target):
+        UserRelation.objects.get(from_user=self, to_user=target).delete()
+        # self.outbox.get(from_user=self, to_user=target).delete()
 
+    def get_outbox_by_status(self, status='C'):
+        return UserRelation.objects.outbox.filter(from_user=self, status=status)
+        # return self.outbox.filter(status=status)
 
-#     def add_relationship(self, target, status=UserRelation.RelationType.INVIT, symm=True):
-#         relationship, created = UserRelation.objects.get_or_create(
-#             from_user=self,
-#             to_user=target)
-#         if symm is True and status == UserRelation.RelationType.COMRADE:
-#             target.add_relationship(self, status, False)
-#         return relationship
+    def get_inbox_by_statu(self):
+        return UserRelation.objects.inbox.filter(from_user=self, status=status)
+        # return self.inbox.filter(status=status)
 
-
-#     def get_contacts_by_status(self, status='C'):
-#         return self.contacts.filter(
-#             inbox__status=status)
-
-
-#     def remove_relationship(self, target, symm=True):
-#         r = UserRelation.objects.get(
-#             from_user=self,
-#             to_user=target)
-        
-#         if symm is True and r.status == UserRelation.RelationType.COMRADE:
-#             target.remove_relationship(self, False)
-#         r.delete()
+    def get_contacts(self, status='C'):
+        return self.contacts.filter(
+            inbox__status=status)
 
 
 class Group(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    name = models.CharField(max_length=200, validators=[val.offensive_name])
+    members = models.ManyToManyField(User, through='GroupShip', related_name='groups')
+
     def __str__(self):
         return str(self.id)
 
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    name = models.CharField(max_length=200, validators=[validators.offensive_name])
-    members = models.ManyToManyField(User, through='GroupShip', related_name='groups')
-
 
 class GroupShip(models.Model):
-    def __str__(self):
-        return f'from {self.user.name} to {self.group.name}'
-
     user = models.ForeignKey(User, related_name="groupships", on_delete=models.CASCADE)
     group = models.ForeignKey(Group, related_name="memberships", on_delete=models.CASCADE)
     role = models.PositiveSmallIntegerField(choices=User.Roles, default=User.Roles.WRITER)
     last_read = models.DateTimeField(default=None, null=True)
 
+    def __str__(self):
+        return f'from {self.user.name} to {self.group.name}'
+
 
 class Message(models.Model):
-    def __str__(self):
-        return self.body
+    class Meta:
+        default_related_name = "messages"
+        ordering = ["-date"]
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-
     date = models.DateTimeField(default=timezone.now, verbose_name="Publication date")
     respond_to = models.ForeignKey(
         'Message',
@@ -126,9 +120,8 @@ class Message(models.Model):
 
     body = models.CharField(max_length=512)
 
-    class Meta:
-        default_related_name = "messages"
-        ordering = ["-date"]
+    def __str__(self):
+        return self.body
 
 
 

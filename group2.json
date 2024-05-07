@@ -1,5 +1,8 @@
 {
-    "name":"private",
-    "members":["sam", "acheron"]
-
+    "name":"@",
+    "owner": "",
+    "admins": [],
+    "members":["sam", "acheron"],
+    "restricts": []
 }
+

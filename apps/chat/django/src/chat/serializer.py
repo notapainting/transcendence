@@ -10,6 +10,8 @@ from django.utils import timezone
 
 from channels.db import database_sync_to_async
 
+import chat.validators as val
+
 def parse_json(data):
     return JSONParser().parse(io.BytesIO(data))
 
@@ -30,7 +32,6 @@ class UserRelatedField(serializers.RelatedField):
             raise ValidationError({'User': 'User not found'})
 
 
-# https://stackoverflow.com/questions/17256724/include-intermediary-through-model-in-responses-in-django-rest-framework/17263583#17263583
 # serializer
 class   BaseSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
@@ -45,25 +46,24 @@ class   BaseSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
 
+class UserRelation(BaseSerializer):
+    class Meta:
+        model = mod.UserRelation
+        fields = ['from_user', 'to_user', 'status']
+        
+    from_user = UserRelatedField(queryset=mod.User.objects.all())
+    to_user = UserRelatedField(queryset=mod.User.objects.all())
+        
 
 class User(BaseSerializer):
     class Meta:
         model = mod.User
-        fields = ['name', 'contacts', 'blockeds', 'invitations', 'invited_by', 'groups']
+        fields = ['name', 'contacts', 'groups']
         extra_kwargs = {
                             'groups': {'required': False}
                         }
-    contacts = UserRelatedField(queryset=mod.User.objects.all(), many=True, required=False)
-    blockeds = UserRelatedField(queryset=mod.User.objects.all(), many=True, required=False)
-    invitations = UserRelatedField(queryset=mod.User.objects.all(), many=True, required=False)
-    invited_by = UserRelatedField(queryset=mod.User.objects.all(), many=True, required=False)
-    
+    # contacts = UserRelation(many=True)#source='contacts', 
 
-# import chat.serializer as ser
-# import chat.models as mod
-# g = mod.GroupShip.objects.all().get(id=11)
-# 
-# 
 
 # restrain group to users groups
 class Message(BaseSerializer):
@@ -85,18 +85,42 @@ class Message(BaseSerializer):
 class GroupShip(BaseSerializer):
     class Meta:
         model = mod.GroupShip
-        fields = ['user', 'role', 'last_read']
+        fields = ['user', 'group', 'role', 'last_read']
+
     user = UserRelatedField(queryset=mod.User.objects.all())
-    
+    # group = Group(fields='id')
 
 class Group(BaseSerializer):
     class Meta:
         model = mod.Group
         fields = ['id', 'name', 'members', 'messages']
 
-    members = GroupShip(source='memberships', many=True)
-    # members = UserRelatedField(queryset=mod.User.objects.all(), many=True)
+    members = GroupShip(source='memberships', many=True, fields='user role')
     messages = Message(many=True, required=False, fields='id author date body')
+
+
+class GroupCreater(serializers.Serializer):
+    name = serializers.CharField(validators=[val.offensive_name])
+    owner = UserRelatedField(queryset=mod.User.objects.all())
+    admins = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.all()), allow_empty=True)
+    members = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.all()), allow_empty=True)
+    restricts = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.all()), allow_empty=True)
+
+    def create(self, validated_data):
+        m = mod.Group.objects.create(name=validated_data['name'])
+        m.members.add(validated_data['owner'], through_defaults={'role':mod.User.Roles.OWNER})
+        
+        for admin in validated_data['admins']:
+            m.members.add(admin, through_defaults={'role':mod.User.Roles.ADMIN})
+            
+        for member in validated_data['members']:
+            m.members.add(member, through_defaults={'role':mod.User.Roles.WRITER})
+            
+        for restrict in validated_data['restricts']:
+            m.members.add(restrict, through_defaults={'role':mod.User.Roles.READER})
+        m.save()
+        return m
+
 
 
 # event serializer

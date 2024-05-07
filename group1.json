@@ -1,4 +1,7 @@
 {
     "name": "Stellaron Hunter Chatgroup's",
-    "members": ["sam", "luciole"]
+    "owner": "luciole",
+    "admins":["sam"],
+    "members": ["xueyi", "acheron"],
+    "restricts": ["fuxuan"]
 }
