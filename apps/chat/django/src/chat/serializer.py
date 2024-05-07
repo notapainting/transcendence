@@ -36,6 +36,14 @@ class UserRelatedField(serializers.RelatedField):
             raise ValidationError({'User': 'User not found'})
 
 
+class RolesChoiceField(serializers.ChoiceField):
+
+    def to_internal_value(self, data):
+        value = next((v for k, v in self.choices.items()), None)
+        if value is not None:
+            return value
+        return super().to_internal_value(data)
+
 # serializer
 class BaseSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
@@ -175,14 +183,10 @@ class EventBaseSerializer(serializers.Serializer):
 
 
 
-OPERATIONS = [
-    ('a', 'add'),
-    ('r', 'remove'),
-]
 class EventContact(EventBaseSerializer):
     name = UserRelatedField(queryset=mod.User.objects.all())
     relation = serializers.ChoiceField(choices=mod.UserRelation.Types)
-    operation = serializers.ChoiceField(choices=OPERATIONS, required=False)
+    operation = serializers.ChoiceField(choices=mod.Operations, required=False)
 
 
 class EventStatus(EventBaseSerializer):

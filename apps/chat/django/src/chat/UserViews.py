@@ -104,21 +104,17 @@ class UserApiView(View):
         try :
             opt = request.GET.get("opt")
             names = request.GET.get("name")
- 
             if opt == 'all':
                 mod.User.objects.all().delete()
                 return HttpResponse(status=200)
             elif names is None:
                 return HttpResponse(status=400)
-
             if names is not None:
                 names = names.split()
                 for name in names:
                     mod.User.objects.get(name=name).delete()	
                     logger.info("user %s, deleted", name)
-
             return HttpResponse(status=200)
-
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:

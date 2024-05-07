@@ -14,7 +14,9 @@ import logging
 logger = logging.getLogger('django')
 
 
-
+class Operations(models.TextChoices):
+    ADD="a"
+    REMOVE="r"
 
 
 

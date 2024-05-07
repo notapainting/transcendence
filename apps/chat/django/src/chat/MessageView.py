@@ -1,23 +1,19 @@
-from django.http import JsonResponse, HttpResponse
-from chat.models import Group, User
+from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.utils import IntegrityError
 from django.views import View
 from django.db.models import Q
+
+
 from django.views.decorators.csrf import csrf_exempt
-from json import loads as jloads
 from logging import getLogger
-from django.db.models import Count
 
 import chat.serializer as ser
+import chat.models as mod
 
 logger = getLogger('django')
 
-    # path("", MessageApiView.as_view()),
-    # path("<uuid:id>", MessageApiView.as_view()), # -> return message data (author/date/group/body)
-    # path("<uuid:id>/body/", MessageApiView.as_view()), # -> return message body
-
-
+ 
 class MessageApiView(View):
 
     @csrf_exempt
@@ -26,7 +22,8 @@ class MessageApiView(View):
 
     def post(self, request, *args, **kwargs):
         try:
-            s = ser.Message(data=request.body)
+            data = ser.parse_json(request.body)
+            s = ser.Message(data=data)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)
@@ -40,13 +37,51 @@ class MessageApiView(View):
             logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=500)
 
-    def get(self, *args, **kwargs):
-        pass
+    def get(self, request, *args, **kwargs):
+        try :
+            fields = request.GET.get("fields")
+            id = kwargs.get('id', None)
+            if id is None:
+                return HttpResponse(status=400)
+            qset = mod.Message.objects.get(id=id)
+            data = ser.Message(qset, fields=fields).data
+            data = ser.render_json(data)
+            return HttpResponse(status=200, content=data)
 
-    def patch(self, *args, **kwargs):
-        pass
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
 
-    def delete(self, *args, **kwargs):
-        pass
+    def patch(self, request, *args, **kwargs):
+        try :
+            message = mod.Message.objects.get(id=kwargs.get('id'))
+            data = ser.parse_json(request.body)
+            s = ser.Message(message, data=data, partial=True)
+            if s.is_valid() is False:
+                print(s.errors)
+                return HttpResponse(status=400)
+            print(s.validated_data)
+            s.update(s.instance, s.validated_data)
+            return HttpResponse(status=200)
+
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
+
+    def delete(self, request, *args, **kwargs):
+        try :
+            id = request.GET.get("id")
+            mod.Message.objects.get(id=id).delete()
+            logger.info("message %s, deleted", id)
+            return HttpResponse(status=200)
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
+        except BaseException as e:
+            logger.error(f"Internal : {e.args[0]}")
+            return HttpResponse(status=500)
 
 
