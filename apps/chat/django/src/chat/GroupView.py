@@ -27,7 +27,7 @@ class GroupApiView(View):
     def post(self, request, *args, **kwargs):
         try :
             data = ser.parse_json(request.body)
-            s = ser.Group(data=data)
+            s = ser.GroupCreater(data=data)
             if s.is_valid() is False:#trhow if user doesnt exit
                 print(s.errors)
                 return HttpResponse(status=400)
@@ -65,11 +65,8 @@ class GroupApiView(View):
             logger.error(f"Internal : {e.args[0]}")
             return HttpResponse(status=500)
 
-# add/remove members
-# chekc if user can manage group
     def patch(self, request, *args, **kwargs):
         try :
-
             group = Group.objects.get(id=kwargs.get('id'))
             s = ser.Group(group, data=request.body, partial=True)
             if s.is_valid() is False:
@@ -89,21 +86,17 @@ class GroupApiView(View):
         try :
             opt = request.GET.get("opt")
             ids = request.GET.get("id")
- 
             if opt == 'all':
                 Group.objects.all().delete()
                 return HttpResponse(status=200)
             elif ids is None:
                 return HttpResponse(status=400)
-                
             if ids is not None:
                 ids = ids.split()
                 for id in ids:
                     Group.objects.get(id=id).delete()
                     logger.info("user %s, deleted", id)
-
             return HttpResponse(status=200)
-        
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
         except BaseException as e:

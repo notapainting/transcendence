@@ -18,11 +18,7 @@ urls_group = [
 
 urls_message = [
     path("", MessageApiView.as_view()),
-    # path("<uuid:id>", MessageApiView.as_view()), # -> return message data (author/date/group/body)
-
-    # path("<uuid:id>/author/", MessageApiView.as_view()), # -> redirect to /users/id
-    # path("<uuid:id>/conv/", MessageApiView.as_view()), # -> redirect to /groups/id
-
+    path("<uuid:id>/", MessageApiView.as_view())
 ]
 
 urlspatterns = [
@@ -35,15 +31,3 @@ urls = [
     path('v1/', include(urlspatterns))
 ]
 
-
-# contact add/del
-# groups/<id> POST/DELETE/GET
-# users/<id>/block/<target> POST/DELETE
-# users/<id>/conv/<target> POST/DELETE
-
-# conv create/del/update
-# group/create
-# group/delete
-
-# group/<id>/add/<id>
-# group/<id>/remove/<id>

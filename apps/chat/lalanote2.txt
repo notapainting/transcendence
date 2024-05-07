@@ -5,6 +5,11 @@ TODO:
     - update event message.private/group logic
     - update dserializer
 
+check display with enum -> seri send back machine value 
+(use get_FOO_display? custom role field)?
+add logic to consumer
+
+
 
 {
     "name":"miss",
