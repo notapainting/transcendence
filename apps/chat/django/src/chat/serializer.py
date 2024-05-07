@@ -7,6 +7,10 @@ import io
 from uuid import uuid4
 
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
+
+from django.db.models import Prefetch
+from django.db.models import Q
 
 from channels.db import database_sync_to_async
 
@@ -28,12 +32,12 @@ class UserRelatedField(serializers.RelatedField):
     def to_internal_value(self, data):
         try :
             return mod.User.objects.get(name=data)
-        except BaseException:
+        except ObjectDoesNotExist:
             raise ValidationError({'User': 'User not found'})
 
 
 # serializer
-class   BaseSerializer(serializers.ModelSerializer):
+class BaseSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         fields = kwargs.pop('fields', None)
         super().__init__(*args, **kwargs)
@@ -50,19 +54,53 @@ class UserRelation(BaseSerializer):
     class Meta:
         model = mod.UserRelation
         fields = ['from_user', 'to_user', 'status']
-        
+
     from_user = UserRelatedField(queryset=mod.User.objects.all())
     to_user = UserRelatedField(queryset=mod.User.objects.all())
-        
+
 
 class User(BaseSerializer):
     class Meta:
         model = mod.User
-        fields = ['name', 'contacts', 'groups']
+        fields = ['name', 'contacts', 'groups', 'blockeds', 'blocked_by', 'invitations', 'invited_by']
         extra_kwargs = {
-                            'groups': {'required': False}
+                            'groups': {'required': False},
+                            'blockeds': {'required': False},
+                            'blockeds_by': {'required': False},
+                            'invitations': {'required': False},
+                            'invited_by': {'required': False},
                         }
-    # contacts = UserRelation(many=True)#source='contacts', 
+
+    def get_contacts(self, obj):
+        qset = obj.get_contacts()
+        ser = User(qset, many=True, fields='name')
+        return ser.data
+
+    def get_blockeds(self, obj):
+        qset = obj.get_outbox(status=mod.UserRelation.Types.BLOCK)
+        ser = UserRelation(qset, many=True, fields='to_user')
+        return ser.data
+    
+    def get_invitations(self, obj):
+        qset = obj.get_outbox(status=mod.UserRelation.Types.INVIT)
+        ser = UserRelation(qset, many=True, fields='to_user')
+        return ser.data
+
+    def get_blocked_by(self, obj):
+        qset = obj.get_inbox(status=mod.UserRelation.Types.BLOCK)
+        ser = UserRelation(qset, many=True, fields='from_user')
+        return ser.data
+
+    def get_invited_by(self, obj):
+        qset = obj.get_inbox(status=mod.UserRelation.Types.INVIT)
+        ser = UserRelation(qset, many=True, fields='from_user')
+        return ser.data
+
+    contacts = serializers.SerializerMethodField()
+    blockeds = serializers.SerializerMethodField()
+    blocked_by = serializers.SerializerMethodField()
+    invitations = serializers.SerializerMethodField()
+    invited_by = serializers.SerializerMethodField()
 
 
 # restrain group to users groups
@@ -121,6 +159,10 @@ class GroupCreater(serializers.Serializer):
         m.save()
         return m
 
+class UserCreater(serializers.Serializer):
+    name = UserRelatedField(queryset=mod.User.objects.all())
+    new_name = serializers.CharField()
+    
 
 
 # event serializer
@@ -132,40 +174,18 @@ class EventBaseSerializer(serializers.Serializer):
         # print(self.validated_data)
 
 
-RELATIONS = [
-    ('c', 'contact'),
-    ('b', 'blocked'),
-    ('i', 'invitation'),
-]
+
 OPERATIONS = [
     ('a', 'add'),
     ('r', 'remove'),
 ]
 class EventContact(EventBaseSerializer):
     name = UserRelatedField(queryset=mod.User.objects.all())
-    relation = serializers.ChoiceField(choices=RELATIONS)
+    relation = serializers.ChoiceField(choices=mod.UserRelation.Types)
     operation = serializers.ChoiceField(choices=OPERATIONS, required=False)
 
-STATUS = [
-    ('d', 'disconnected'),
-    ('o', 'online'),
-    ('a', 'afk'),
-]
+
 class EventStatus(EventBaseSerializer):
-    status = serializers.ChoiceField(choices=STATUS)
-
-# from client, invit is ignored
-
-# if invit -> error 400
+    status = serializers.ChoiceField(choices=mod.User.Status)
 
 
-
-
-# -> send invit : if author already invited by target, 
-#   -> accept and add to contact
-# -> user not in db -> 404
-
-
-
-content = b'{"id":"08c5e0ae-69b8-418e-84c5-9010ef8d1d1e","name":"luciole"}'
-new = b'{"id":"62e661f9-a68e-4558-b833-339a90cecd01", "name":"xueyi"}'

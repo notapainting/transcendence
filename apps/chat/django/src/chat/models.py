@@ -6,19 +6,23 @@ from uuid import uuid4
 import chat.validators as val
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.utils import timezone
+from django.db.models import Q
+
+
 
 import logging
 logger = logging.getLogger('django')
 
 
-    # blockeds = models.ManyToManyField('self', related_name='blocked_by', symmetrical=False)
-    # invitations = models.ManyToManyField('self', related_name='invited_by', symmetrical=False)
+
+
+
 
 class UserRelation(models.Model):
     class Types(models.TextChoices):
-        INVIT="I"
-        BLOCK="B"
-        COMRADE="C"
+        INVIT="i"
+        BLOCK="b"
+        COMRADE="c"
 
     class Meta:
         unique_together = ('from_user', 'to_user')
@@ -38,6 +42,11 @@ class User(models.Model):
         ADMIN = 2
         OWNER = 3
 
+    class Status(models.TextChoices):
+        DISCONNECTED="d"
+        ONLINE="o"
+        AFK="a"
+
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=20, unique=True)
     contacts = models.ManyToManyField('self',
@@ -50,36 +59,35 @@ class User(models.Model):
 
     def update_relation(self, target, status=UserRelation.Types.INVIT):
         try :
-            rel = UserRelation.objects.get(from_user=self, to_user=target)
-            # self.outbox.get(to_user=target)
+            rel = self.outbox.get(from_user=self, to_user=target)
             rel.status = status
             rel.save()
         except ObjectDoesNotExist:
-            UserRelation.objects.create(from_user=self, to_user=target, status=status)
-            # self.outbox.create(to_user=target, status=status)
+            self.outbox.create(to_user=target, status=status)
 
     def get_relation(self, target):
         try :
-            return UserRelation.objects.get(from_user=self, to_user=target).status
-            # return self.outbox.get(to_user=target).status
+            return self.outbox.get(to_user=target).status
         except ObjectDoesNotExist:
             return None
 
     def delete_relation(self, target):
-        UserRelation.objects.get(from_user=self, to_user=target).delete()
-        # self.outbox.get(from_user=self, to_user=target).delete()
+        self.outbox.get(to_user=target).delete()
 
-    def get_outbox_by_status(self, status='C'):
-        return UserRelation.objects.outbox.filter(from_user=self, status=status)
-        # return self.outbox.filter(status=status)
+    def get_outbox(self, status=None):
+        if status is not None:
+            return self.outbox.filter(status=status)
+        else:
+            return self.outbox.filter(Q(status='I') | Q(status='B'))
 
-    def get_inbox_by_statu(self):
-        return UserRelation.objects.inbox.filter(from_user=self, status=status)
-        # return self.inbox.filter(status=status)
+    def get_inbox(self, status=None):
+        if status is not None:
+            return self.inbox.filter(status=status)
+        else:
+            return self.inbox.filter(Q(status='I') | Q(status='B'))
 
     def get_contacts(self, status='C'):
-        return self.contacts.filter(
-            inbox__status=status)
+        return self.contacts.filter(inbox__status=status)
 
 
 class Group(models.Model):

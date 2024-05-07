@@ -6,6 +6,11 @@ TODO:
     - update dserializer
 
 
+{
+    "name":"miss",
+    "new_name":"acheron"
+}
+
 FIXME: 
 	- POST on /users without '/' -> 500
     - POST without body

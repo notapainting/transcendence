@@ -2,19 +2,13 @@
 from django.urls import path, include
 from django.views.generic.base import RedirectView 
 
-from .UserViews import UserApiView, UserContactApiView, UserBlockedApiView
-from .GroupView import GroupApiView
-from .MessageView import MessageApiView
+from chat.UserViews import UserApiView
+from chat.GroupView import GroupApiView
+from chat.MessageView import MessageApiView
 
 urls_user = [
     path("", UserApiView.as_view()),
     path("<name>/", UserApiView.as_view()),
-
-    path("<id>/contacts/", UserContactApiView.as_view()),
-    path("<id>/contacts/<target>/", UserContactApiView.as_view()),
-
-    path("<id>/blockeds/", UserBlockedApiView.as_view()),
-    path("<id>/blockeds/<target>/", UserBlockedApiView.as_view()),
 ]
 
 urls_group = [
