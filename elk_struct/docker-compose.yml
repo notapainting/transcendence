@@ -1,6 +1,3 @@
-version: "3.8"
-
-
 volumes:
  certs:
    driver: local
@@ -56,6 +53,10 @@ services:
          "    dns:\n"\
          "      - kibana\n"\
          "      - localhost\n"\
+         "  - name: logstash\n"\
+         "    dns:\n"\
+         "      - logstash\n"\
+         "      - localhost\n"\
          "    ip:\n"\
          "      - 127.0.0.1\n"\
          > config/certs/instances.yml;
@@ -67,6 +68,8 @@ services:
        find . -type d -exec chmod 750 \{\} \;;
        find . -type f -exec chmod 640 \{\} \;;
        echo "Waiting for Elasticsearch availability";
+       echo -e "${COLOR_GREEN}Convert the Logstash key to pkcs8${COLOR_RESET}"
+       openssl pkcs8 -inform PEM -in config/certs/logstash/logstash.key -topk8 -nocrypt -outform PEM -out config/certs/logstash/logstash.pkcs8.key
        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
        echo "Setting kibana_system password";
        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
