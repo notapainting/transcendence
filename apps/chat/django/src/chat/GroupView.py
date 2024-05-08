@@ -67,13 +67,13 @@ class GroupApiView(View):
 
     def patch(self, request, *args, **kwargs):
         try :
-            group = Group.objects.get(id=kwargs.get('id'))
-            s = ser.Group(group, data=request.body, partial=True)
+            data = ser.parse_json(request.body)
+            s = ser.GroupUpdater(data=data)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)
             print(s.validated_data)
-            s.update(s.instance, s.validated_data)
+            s.update(s.validated_data)
             return HttpResponse(status=200)
 
         except (ValidationError, ObjectDoesNotExist):
