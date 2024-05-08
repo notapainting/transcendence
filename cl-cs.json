@@ -1,3 +1,12 @@
+{"consumer":"consumer"}
+{
+    "type":"status.fetch"
+    "data":
+    {
+        "author":"target"
+    }
+}
+
 {"consumer":"client"}
 {
     "type":"group.summary",
@@ -6,8 +15,10 @@
             [
                 "id":"",
                 "name":"",
-                "members":"",
-                "messages":"",
+                "members":[],
+                "admins":[],
+                "restricts":[],
+                "messages":[],
                 "last_read":""
             ]
             [
@@ -22,7 +33,9 @@
         {
             "id":"",
             "name":"",
-            "members":"",
+            "members":[],
+            "admins":[],
+            "restricts":[],
             "last_read":""
         }
 }
@@ -87,14 +100,21 @@
     }
 }
 
+{
+    "type":"status.update",
+    "data":
+    {
+        "status":"online/afk"
+    }
+}
 
 {
     "type":"contact.update",
     "data":
     {
-        "name":"",
-        "status":"",
-        "rel":"contact/blocked/invitation"
+        "name":"target",
+        "operation":"add(set)/remove(unset)",
+        "relation":"contact/blocked/invitation"
     }
 }
 
@@ -104,6 +124,17 @@
     {
         "id":"",
         "name":"",
-        "members":""
+        "members":[],
+        "admins":[],
+        "restricts":[],
+        "remove":[],
+    }
+}
+
+{
+    "type":"group.quit",
+    "data":
+    {
+        "id":""
     }
 }

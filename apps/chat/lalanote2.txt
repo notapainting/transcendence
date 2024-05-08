@@ -12,12 +12,43 @@ check groupupdater/creater double user value in list
 
 add logic to consumer
 
+ALL EVENT SEND BACK CONFIRMATION EVENT (UPDATE) OR ERROR
+
+GROUP:
+    on connect: -> send .summary
+
+    on update/create: -> if accepted -> send back new/updated group
+                        | -> else : send 403
+
+.summary
+.update
 
 
-{
-    "name":"miss",
-    "new_name":"acheron"
-}
+CONTACT:
+    on connect; -> send summary
+    on update: -> update contact
+                | -> send target notification
+
+.summary
+.update
+
+
+STATUS:
+    on connect: -> send self status
+            |   -> fetch contact status
+    on update: -> send new status
+    on disconnect: like update
+
+.update
+.fetch
+
+MESSAGE:
+    on send: -> check permissions/ groups appartenance
+                | -> if ok send msg 
+                    | ELSED SEND 403
+
+
+
 
 FIXME: 
 	- POST on /users without '/' -> 500
