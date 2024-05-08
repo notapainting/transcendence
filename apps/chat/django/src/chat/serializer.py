@@ -243,15 +243,6 @@ class GroupCreater(serializers.Serializer):
 
 
 
-class UserCreater(serializers.Serializer):
-    name = UserRelatedField(queryset=mod.User.objects.all())
-    new_name = serializers.CharField()
-    
-
-
-
-
-
 # event serializer
 class EventBaseSerializer(serializers.Serializer):
     author = serializers.CharField(required=False)
