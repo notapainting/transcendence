@@ -15,8 +15,8 @@ logger = logging.getLogger('django')
 
 
 class Operations(models.TextChoices):
-    ADD="a"
-    REMOVE="r"
+    ADD="a", "add"
+    REMOVE="r", "remove"
 
 
 
@@ -39,10 +39,10 @@ class UserRelation(models.Model):
 
 class User(models.Model):
     class Roles(models.IntegerChoices):
-        READER = 0
-        WRITER = 1
-        ADMIN = 2
-        OWNER = 3
+        READER = 0, 'restrict'
+        WRITER = 1, 'member'
+        ADMIN = 2, 'admin'
+        OWNER = 3, 'owner'
 
     class Status(models.TextChoices):
         DISCONNECTED="d"
@@ -99,6 +99,12 @@ class Group(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    def get_members_by_role(self, role=User.Roles.WRITER):
+        return self.memberships.filter(role=role)
+
+
+
 
 
 class GroupShip(models.Model):

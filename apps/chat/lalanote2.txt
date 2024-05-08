@@ -6,7 +6,10 @@ TODO:
     - update dserializer
 
 check display with enum -> seri send back machine value 
-(use get_FOO_display? custom role field)?
+
+ 
+check groupupdater/creater double user value in list
+
 add logic to consumer
 
 
