@@ -91,15 +91,15 @@ class User(BaseSerializer):
     
     def get_invitations(self, obj):
         qset = obj.get_outbox(status=mod.Relation.Types.INVIT)
-        return Relation(qset, many=True, fields='to_user').data
+        return cleaner(Relation(qset, many=True, fields='to_user').data, 'to_user')
 
     def get_blocked_by(self, obj):
         qset = obj.get_inbox(status=mod.Relation.Types.BLOCK)
-        return Relation(qset, many=True, fields='from_user').data
+        return cleaner(Relation(qset, many=True, fields='from_user').data, 'from_user')
 
     def get_invited_by(self, obj):
         qset = obj.get_inbox(status=mod.Relation.Types.INVIT)
-        return Relation(qset, many=True, fields='from_user').data
+        return cleaner(Relation(qset, many=True, fields='from_user').data, 'from_user')
 
     contacts = serializers.SerializerMethodField()
     blockeds = serializers.SerializerMethodField()
@@ -114,15 +114,25 @@ class Message(BaseSerializer):
         model = mod.Message
         fields = ['id', 'author', 'group', 'date', 'respond_to', 'body']
         extra_kwargs = {
-            'date': {'format' : '%Y-%m-%dT%H:%M:%S.%fZ%z', 'default':timezone.now},
-            'id': {'format' : 'hex_verbose', 'default': uuid4}
+                'date': {'format' : '%Y-%m-%dT%H:%M:%S.%fZ%z', 'default':timezone.now},
+                'id': {'format' : 'hex_verbose', 'default': uuid4}
             }
 
     author = UserRelatedField(queryset=mod.User.objects.all(), required=False)
-    group = serializers.PrimaryKeyRelatedField(queryset=mod.Group.objects.all(),
-                                            required=True,
-                                            allow_null=False,
-                                            pk_field=serializers.UUIDField(format='hex_verbose'))
+    group = serializers.PrimaryKeyRelatedField(
+                queryset=mod.Group.objects.all(),
+                required=True,
+                allow_null=False,
+                pk_field=serializers.UUIDField(format='hex_verbose'))
+
+    def validate(self, data):
+        if mod.GroupShip.objects.filter(
+                group=data['group'], 
+                user__name=data['author'], 
+                role__gt=mod.GroupShip.Roles.READER).exists() is False: 
+            raise ValidationError('user unauthorised t owrite in this group', code=403)
+        return data
+
 
 # ???
 class RolesChoiceField(serializers.ChoiceField):
@@ -171,8 +181,26 @@ class Group(BaseSerializer):
     admins = serializers.SerializerMethodField()
     members = serializers.SerializerMethodField()
     restricts = serializers.SerializerMethodField()
-
     messages = Message(many=True, required=False, fields='id author date body')
+
+
+
+
+# event serializer
+class EventBaseSerializer(serializers.Serializer):
+    author = serializers.CharField(required=False)
+
+    def create(self, data):
+        pass
+        # print(self.validated_data)
+
+class EventContact(EventBaseSerializer):
+    name = UserRelatedField(queryset=mod.User.objects.all())
+    operation = serializers.ChoiceField(choices=enu.Operations)
+
+
+class EventStatus(EventBaseSerializer):
+    status = serializers.ChoiceField(choices=mod.User.Status)
 
 
 class GroupUpdater(serializers.Serializer):
@@ -217,8 +245,6 @@ class GroupUpdater(serializers.Serializer):
         print(Group(group).data)
 
 
-
-
 class GroupCreater(serializers.Serializer):
     name = serializers.CharField(validators=[val.offensive_name])
     owner = UserRelatedField(queryset=mod.User.objects.all())
@@ -241,26 +267,4 @@ class GroupCreater(serializers.Serializer):
         m.save()
         return m
     
-
-
-
-# event serializer
-class EventBaseSerializer(serializers.Serializer):
-    author = serializers.CharField(required=False)
-
-    def create(self, data):
-        pass
-        # print(self.validated_data)
-
-
-
-class EventContact(EventBaseSerializer):
-    name = UserRelatedField(queryset=mod.User.objects.all())
-    relation = serializers.ChoiceField(choices=mod.Relation.Types)
-    operation = serializers.ChoiceField(choices=enu.Operations, required=False)
-
-
-class EventStatus(EventBaseSerializer):
-    status = serializers.ChoiceField(choices=mod.User.Status)
-
 
