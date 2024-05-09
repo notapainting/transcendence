@@ -29,6 +29,10 @@ CONTACT:
     on update: -> update contact
                 | -> send target notification
 
+    update :    -invit -> resolve invit -> send invit   
+                                       | -> add contact -> create/link? private conv 
+                -block -> put private conv on R for all + update status
+                -unblock
 .summary
 .update
 
@@ -47,6 +51,9 @@ MESSAGE:
                 | -> if ok send msg 
                     | ELSED SEND 403
 
+.text
+.game
+.fetch
 
 
 

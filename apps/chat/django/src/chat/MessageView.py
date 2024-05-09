@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from logging import getLogger
 
-import chat.serializer as ser
+import chat.serializers as ser
 import chat.models as mod
 
 logger = getLogger('django')
