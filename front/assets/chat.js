@@ -1,7 +1,7 @@
 
 const roomName = "testRoom/";
 const host = window.location.host;
-
+const MESSAGE = 'message.text'
 
 var userName = 'anon';
 let chatSocket = undefined;
@@ -46,10 +46,10 @@ document.querySelector('#chat-submit-user').onclick = function(e)
 
     chatSocket.onmessage = function(e)
     {
-        console.log('msg')
         const data = JSON.parse(e.data);
         console.log(data);
-        document.querySelector('#chat-log').value += (data.data + '\n');
+        if (data.type == MESSAGE)
+            document.querySelector('#chat-log').value += (data.data.author + ": " + data.data.body + '\n');
     };
 
     chatSocket.onclose = function(e)
@@ -68,26 +68,39 @@ document.querySelector('#chat-enter-room').onclick = function(e)
         "data":
         {
             "name":"acheron",
-            "relation":"i",
-            "operation":"a"
+            "operation":"c",
         }
     }));
    messageInputDom.value = '';
 };
 
+// c/b/i
+
+// c/i
+// + c/i -> nop
+// +r rem
+// + b -> r + block
+
+// b
+// b -> nop
+// r/c/i -> remove
+
+
+
+// name -> target
+// update : c/i/b/r
 document.querySelector('#chat-submit-message').onclick = function(e)
 {
-    console.log(getCurrentDateTime());
     const messageInputDom = document.querySelector('#chat-input');
     const message = messageInputDom.value; 
     const now = getCurrentDateTime();
     chatSocket.send(JSON.stringify(
         {
-            'type': 'chat.message',
+            'type': MESSAGE,
             'data': 
                 {
                     'body':message,
-                    'group': '755b83ae-0cb9-461c-8639-b55ec589a6a5',
+                    'group': 'f820ea44-24c3-4130-a924-73c4100bac9e',
                     'date': now
                 }
         }

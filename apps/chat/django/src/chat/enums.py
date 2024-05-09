@@ -1,5 +1,5 @@
 from django.db.models import TextChoices
-
+from chat.models import Relation as rel
 
 class Event():
     def val(self):
@@ -29,6 +29,8 @@ class Event():
 
 
 class Operations(TextChoices):
-    ADD="a", "add"
-    REMOVE="r", "remove"
+    INVIT = rel.Types.INVIT
+    BLOCK = rel.Types.BLOCK
+    CONTACT = rel.Types.COMRADE
+    REMOVE = "r", "remove"
 

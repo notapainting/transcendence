@@ -35,14 +35,9 @@ from channels.db import database_sync_to_async
 #     ms.create(ms.validated_data)
 #     return ms.data
 
+CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
 
-async def get_serializer(type):
-    serializers = {
-        enu.Event.Message.TEXT : ser.Message,
-        enu.Event.Contact.UPDATE : ser.EventContact,
-        enu.Event.Status.UPDATE : ser.EventStatus,
-    }
-    return serializers[type]
+
 
 
 
@@ -59,12 +54,7 @@ def resolve_invitation(author, target):
         author.invitations.add(target)
         return False
 
-@database_sync_to_async
-def serializer_handler(serializer, data):
-    ser = serializer(data=data)
-    ser.is_valid(raise_exception=True)
-    ser.create(ser.validated_data)
-    return ser.data
+
 
 
 async def validate_data(username, data):
@@ -73,10 +63,26 @@ async def validate_data(username, data):
     if type is None or data is None:
         raise ValidationError("invalid event")
     data['author'] = username
-    if type in enu.Event:
+    if type in enu.Event.val(enu.Event):
         return type
     else:
         raise ValidationError(f"event type unknow : {type}")
+
+
+async def get_serializer(type):
+    serializers = {
+        enu.Event.Message.TEXT : ser.Message,
+        enu.Event.Contact.UPDATE : ser.EventContact,
+        enu.Event.Status.UPDATE : ser.EventStatus,
+    }
+    return serializers[type]
+
+@database_sync_to_async
+def serializer_handler(serializer, data):
+    ser = serializer(data=data)
+    ser.is_valid(raise_exception=True)
+    ser.create(ser.validated_data)
+    return ser.data
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
 
@@ -118,65 +124,59 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         for id in self.group_list:
             await self.channel_layer.group_add(id, self.channel_name)
 
+        # send status update
+        # fetch status update
+
     async def disconnect(self, close_code):
         for id in self.group_list:
             await self.channel_layer.group_discard(id, self.channel_name)
         await self.channel_layer.group_discard(self.user.name, self.channel_name)
         logger.info("%s Quit...", self.user.name)
 
-
     async def dispatch(self, message):
         print(f'msg type : {message['type']}')
         await super().dispatch(message)
 
 
-
     @database_sync_to_async
-    def get_contact_list(self):
-        contacts = ser.User(self.user, fields='contacts blockeds blocked_by invitations invited_by').data
-        return contacts
+    def get_contact_list(self, fields='contacts'):
+        return ser.User(self.user, fields=fields).data
 
 
-# add contact / add invit -> return invit or if success contact
-# add block -> return add block (same)
-# del block -> return del block (same)
-# del contact -> return del contact (same)
-# del invit -> return del invit (same)
-    # maj user from database
     @database_sync_to_async
     def contact_handler(self, data):
-        op = data.get('operation', None)
-        if op is None:
-            raise ValidationError('missing operation field', code=400)
         try :
             author = mod.User.objects.get(name=self.user.name)
             target = mod.User.objects.get(name=data['name'])
             if author == target:
                raise ValidationError('forbidden self operation on contact', code=403)
-            if data['relation'] == 'c':
-                if op == 'a':
-                    if resolve_invitation(author, target) is False:
-                        data['relation'] = 'i'
-                elif op == 'r':
-                    author.contacts.remove(target)
-            elif data['relation'] == 'b':
-                if op == 'a':
-                    author.contacts.remove(target)
-                    author.invitations.remove(target)
-                    target.invitations.remove(author)
-                    author.blockeds.add(target)
-                    # author.groups.all().filter(members=)
-                    # find a way to select private conv easily
-                elif op == 'r':
-                    author.blockeds.remove(target)
-            elif data['relation'] == 'i':
-                if op == 'a':                   
-                    if resolve_invitation(author, target) is True:
-                        data['relation'] = 'c'
-                elif op == 'r':
-                    author.invitations.remove(target)
-            return data
 
+            if data['operation'] == enu.Operations.REMOVE:
+                author.delete_relation(target)
+                target_rel = target.get_relation(author)
+                if target_rel is not None and target_rel != mod.Relation.Types.BLOCK:
+                    target.delete_relation(author)
+                    # unblock p-conv
+
+            elif data['operation'] == enu.Operations.BLOCK:
+                # block p-conv
+                author.update_relation(target, mod.Relation.Types.BLOCK)
+                if target.get_relation(author) != mod.Relation.Types.BLOCK:
+                    target.delete_relation(author)
+
+            else: # data['operation'] == enu.Operations.CONTACT or enu.Operations.INVIT
+                target_rel = target.get_relation(author)
+                if target_rel == mod.Relation.Types.BLOCK:
+                    raise ValidationError('your blocked, dont do this', code=403)
+                elif target_rel == mod.Relation.Types.INVIT:
+                    author.update_relation(target, mod.Relation.Types.COMRADE)
+                    target.update_relation(author, mod.Relation.Types.COMRADE)
+                    data['operation'] = enu.Operations.CONTACT
+                else:
+                    author.update_relation(target, mod.Relation.Types.INVIT)
+                    data['operation'] = enu.Operations.INVIT
+
+            return data
         except ObjectDoesNotExist:
             raise ValidationError('target not found', code=404)
         except ValidationError:
@@ -185,32 +185,28 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             print(e.args[0])
             raise ValidationError('INTERNAL', code=500)
 
-    # check if user is blocked ? 
-    @database_sync_to_async
-    def message_handler(self, data):
-        author = mod.User.get(name=self.user.name)
-        if author.groups.all().filter(id=data['group']).exist() is False:
-            raise ValidationError('author not in group', code=403)
-
 # contact -> username !! selfgroups ?? 
     async def event_handler(self, type, data):
         ms = {}
         ms['type'] = type
         ms['data'] = data
-        if type == 'message.group':
-            self.message_handler(ms['data'])
+        if type == enu.Event.Message.TEXT:
             await self.channel_layer.group_send(ms['data']['group'], ms)
-        elif type == 'status.update':
-            contacts = await self.get_contact_list();
-            for contact in contacts:
+        elif type ==  enu.Event.Status.UPDATE:
+            for contact in await self.get_contact_list():
                 await self.channel_layer.group_send(contact, ms)
-        elif type == 'contact.update':
+                await self.channel_layer.group_send(self.user.name, ms)
+        elif type ==  enu.Event.Contact.UPDATE:
             ret = await self.contact_handler(ms['data'])
             ms['data'] = ret
             await self.send_json(ms)
-            ret['author'], ret['name'] = ret['name'], ret['author']
-            print(ret)
-            await self.channel_layer.group_send(ms['data']['author'], ms)
+            await self.channel_layer.group_send(ms['data']['name'], ms)
+        elif type == enu.Event.Group.UPDATE:
+            pass
+        elif type == enu.Event.Message.FETCH:
+            pass
+        elif type == enu.Event.Message.GAMEE:
+            pass
 
 
     async def receive_json(self, text_data):
@@ -227,9 +223,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
 
     # Receive message from room group
-    async def chat_message(self, event):
+    async def message_text(self, event):
         # Send message to WebSocket
         await self.send_json(event)
+
 
     async def status_update(self, event):
         # Send message to WebSocket

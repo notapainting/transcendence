@@ -70,13 +70,13 @@ class User(models.Model):
         if status is not None:
             return self.outbox.filter(status=status)
         else:
-            return self.outbox.filter(Q(status='I') | Q(status='B'))
+            return self.outbox.filter(Q(status=Relation.Types.INVIT) | Q(status=Relation.Types.BLOCK))
 
     def get_inbox(self, status=None):
         if status is not None:
             return self.inbox.filter(status=status)
         else:
-            return self.inbox.filter(Q(status='I') | Q(status='B'))
+            return self.inbox.filter(Q(status=Relation.Types.INVIT) | Q(status=Relation.Types.BLOCK))
 
     def get_contacts(self, status='C'):
         return self.contacts.filter(inbox__status=status)
