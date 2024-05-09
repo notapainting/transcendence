@@ -68,7 +68,7 @@ services:
        find . -type d -exec chmod 750 \{\} \;;
        find . -type f -exec chmod 640 \{\} \;;
        echo "Waiting for Elasticsearch availability";
-       echo -e "${COLOR_GREEN}Convert the Logstash key to pkcs8${COLOR_RESET}"
+       echo -e "/////////////////////////////////////////////////////////////////Convert the Logstash key to pkcs8/////////////////////////////////////////////////////////////////"
        openssl pkcs8 -inform PEM -in config/certs/logstash/logstash.key -topk8 -nocrypt -outform PEM -out config/certs/logstash/logstash.pkcs8.key
        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
        echo "Setting kibana_system password";
@@ -154,28 +154,28 @@ services:
      interval: 10s
      timeout: 10s
      retries: 120
- metricbeat01:
-   depends_on:
-     es01:
-       condition: service_healthy
-     kibana:
-       condition: service_healthy
-   image: docker.elastic.co/beats/metricbeat:${STACK_VERSION}
-   user: root
-   volumes:
-     - certs:/usr/share/metricbeat/certs
-     - metricbeatdata01:/usr/share/metricbeat/data
-     - "./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro"
-     - "/var/run/docker.sock:/var/run/docker.sock:ro"
-     - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
-     - "/proc:/hostfs/proc:ro"
-     - "/:/hostfs:ro"
-   environment:
-     - ELASTIC_USER=elastic
-     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-     - ELASTIC_HOSTS=https://es01:9200
-     - KIBANA_HOSTS=http://kibana:5601
-     - LOGSTASH_HOSTS=http://logstash01:9600
+#  metricbeat01:
+#    depends_on:
+#      es01:
+#        condition: service_healthy
+#      kibana:
+#        condition: service_healthy
+#    image: docker.elastic.co/beats/metricbeat:${STACK_VERSION}
+#    user: root
+#    volumes:
+#      - certs:/usr/share/metricbeat/certs
+#      - metricbeatdata01:/usr/share/metricbeat/data
+#      - "./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro"
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
+#      - "/proc:/hostfs/proc:ro"
+#      - "/:/hostfs:ro"
+#    environment:
+#      - ELASTIC_USER=elastic
+#      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+#      - ELASTIC_HOSTS=https://es01:9200
+#      - KIBANA_HOSTS=http://kibana:5601
+#      - LOGSTASH_HOSTS=http://logstash01:9600
  filebeat01:
    depends_on:
      es01:
@@ -206,7 +206,7 @@ services:
      co.elastic.logs/module: logstash
    user: root
    volumes:
-     - certs:/usr/share/logstash/certs
+     - certs:/usr/share/logstash/certs:ro
      - logstashdata01:/usr/share/logstash/data
      - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
      - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
