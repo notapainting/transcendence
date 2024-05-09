@@ -1,20 +1,22 @@
 # chat/consumers.py
-import json
 
-from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.serializers import ValidationError
+from channels.exceptions import DenyConnection
+
+
 # Get an instance of a logger
 import logging
 logger = logging.getLogger('django')
-from channels.exceptions import DenyConnection
 
-from . import models
 
-import chat.serializer as ser
+
+import chat.serializers as ser
 import chat.models as mod
+import chat.enums as enu
+
 
 from channels.db import database_sync_to_async
 
@@ -33,15 +35,12 @@ from channels.db import database_sync_to_async
 #     ms.create(ms.validated_data)
 #     return ms.data
 
-EVENT_DOWN_TYPE = ['group.summary', 'group.update', 'contact.summary', 'contact.update', 'chat.message']
-EVENT_CLIENT_TYPE = ['group.update', 'contact.update', 'status.update', 'chat.message']
-
 
 async def get_serializer(type):
     serializers = {
-        'chat.message' : ser.Message,
-        'contact.update' : ser.EventContact,
-        'status.update' : ser.EventStatus,
+        enu.Event.Message.TEXT : ser.Message,
+        enu.Event.Contact.UPDATE : ser.EventContact,
+        enu.Event.Status.UPDATE : ser.EventStatus,
     }
     return serializers[type]
 
@@ -74,7 +73,7 @@ async def validate_data(username, data):
     if type is None or data is None:
         raise ValidationError("invalid event")
     data['author'] = username
-    if type in EVENT_CLIENT_TYPE:
+    if type in enu.Event:
         return type
     else:
         raise ValidationError(f"event type unknow : {type}")
@@ -85,20 +84,17 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def auth(self):
-        self.userName = self.scope['cookies'].get('userName')
+        name = self.scope['cookies'].get('userName')
         try:
-            return mod.User.objects.get(name=self.userName)
+            return mod.User.objects.get(name=name)
         except ObjectDoesNotExist:
-            return None
+            raise DenyConnection
 
     @database_sync_to_async
-    def get_group_list(self):
+    def get_group_summary(self):
         data = {}
         data['type'] = 'group.summary'
-        data['data'] = ser.Group(self.user.groups.all(), 
-                               many=True, 
-                               fields='id name members messages'
-                               ).data
+        data['data'] = ser.Group(self.user.groups.all(), many=True).data
         for group in data['data']:
             self.group_list.append(group['id'])
             group['messages'] = group['messages'][:2]
@@ -107,26 +103,26 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
         self.user = await self.auth()
-        if self.user == None:
-            raise DenyConnection
+
         #accept connectiont to client
         subprotocol = self.scope.get('subprotocol')
         await self.accept(subprotocol)
-        logger.info("%s Connected!", self.userName)
+        logger.info("%s Connected!", self.user.name)
 
         # send group summary
-        data = await self.get_group_list()
-        await self.send_json(data)
+        group_summary = await self.get_group_summary()
+        await self.send_json(group_summary)
 
         # add user to channel groups
-        await self.channel_layer.group_add(self.userName, self.channel_name)#attention au name
+        await self.channel_layer.group_add(self.user.name, self.channel_name)#attention au name
         for id in self.group_list:
             await self.channel_layer.group_add(id, self.channel_name)
 
     async def disconnect(self, close_code):
         for id in self.group_list:
             await self.channel_layer.group_discard(id, self.channel_name)
-        logger.info("%s Quit...", self.userName)
+        await self.channel_layer.group_discard(self.user.name, self.channel_name)
+        logger.info("%s Quit...", self.user.name)
 
 
     async def dispatch(self, message):
@@ -137,7 +133,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def get_contact_list(self):
-        contacts = ser.User(self.user).data['contacts']
+        contacts = ser.User(self.user, fields='contacts blockeds blocked_by invitations invited_by').data
         return contacts
 
 
@@ -153,7 +149,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if op is None:
             raise ValidationError('missing operation field', code=400)
         try :
-            author = mod.User.objects.get(name=self.userName)
+            author = mod.User.objects.get(name=self.user.name)
             target = mod.User.objects.get(name=data['name'])
             if author == target:
                raise ValidationError('forbidden self operation on contact', code=403)
@@ -192,7 +188,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     # check if user is blocked ? 
     @database_sync_to_async
     def message_handler(self, data):
-        author = mod.User.get(name=self.userName)
+        author = mod.User.get(name=self.user.name)
         if author.groups.all().filter(id=data['group']).exist() is False:
             raise ValidationError('author not in group', code=403)
 
@@ -220,7 +216,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, text_data):
         print(f'text : {text_data}')
         try :
-            type = await validate_data(username=self.userName, data=text_data)
+            type = await validate_data(username=self.user.name, data=text_data)
             serial = await get_serializer(type)
             ser_data = await serializer_handler(serial, text_data['data'])
             await self.event_handler(type, ser_data)

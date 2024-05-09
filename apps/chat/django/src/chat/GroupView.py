@@ -9,7 +9,7 @@ from json import loads as jloads
 from logging import getLogger
 from django.db.models import Count
 
-import chat.serializer as ser
+import chat.serializers as ser
 
 logger = getLogger('django')
 

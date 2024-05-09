@@ -2,7 +2,6 @@ from rest_framework import serializers
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.serializers import ValidationError
-import chat.models as mod
 import io
 from uuid import uuid4
 
@@ -15,6 +14,8 @@ from django.db.models import Q
 from channels.db import database_sync_to_async
 
 import chat.validators as val
+import chat.models as mod
+import chat.enums as enu
 
 def parse_json(data):
     return JSONParser().parse(io.BytesIO(data))
@@ -59,9 +60,9 @@ class BaseSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
 
-class UserRelation(BaseSerializer):
+class Relation(BaseSerializer):
     class Meta:
-        model = mod.UserRelation
+        model = mod.Relation
         fields = ['from_user', 'to_user', 'status']
 
     from_user = UserRelatedField(queryset=mod.User.objects.all())
@@ -85,20 +86,20 @@ class User(BaseSerializer):
         return cleaner(User(qset, many=True, fields='name').data, 'name')
 
     def get_blockeds(self, obj):
-        qset = obj.get_outbox(status=mod.UserRelation.Types.BLOCK)
-        return cleaner(UserRelation(qset, many=True, fields='to_user').data, 'to_user')
+        qset = obj.get_outbox(status=mod.Relation.Types.BLOCK)
+        return cleaner(Relation(qset, many=True, fields='to_user').data, 'to_user')
     
     def get_invitations(self, obj):
-        qset = obj.get_outbox(status=mod.UserRelation.Types.INVIT)
-        return UserRelation(qset, many=True, fields='to_user').data
+        qset = obj.get_outbox(status=mod.Relation.Types.INVIT)
+        return Relation(qset, many=True, fields='to_user').data
 
     def get_blocked_by(self, obj):
-        qset = obj.get_inbox(status=mod.UserRelation.Types.BLOCK)
-        return UserRelation(qset, many=True, fields='from_user').data
+        qset = obj.get_inbox(status=mod.Relation.Types.BLOCK)
+        return Relation(qset, many=True, fields='from_user').data
 
     def get_invited_by(self, obj):
-        qset = obj.get_inbox(status=mod.UserRelation.Types.INVIT)
-        return UserRelation(qset, many=True, fields='from_user').data
+        qset = obj.get_inbox(status=mod.Relation.Types.INVIT)
+        return Relation(qset, many=True, fields='from_user').data
 
     contacts = serializers.SerializerMethodField()
     blockeds = serializers.SerializerMethodField()
@@ -128,7 +129,7 @@ class RolesChoiceField(serializers.ChoiceField):
     def display_value(self, instance):
         return instance
     def to_representation(self, value):
-        return str(mod.User.Roles(value).label)
+        return str(mod.GroupShip.Roles(value).label)
     def to_internal_value(self, data):
         value = next((v for k, v in self.choices.items()), None)
         if value is not None:
@@ -141,7 +142,7 @@ class GroupShip(BaseSerializer):
         fields = ['user', 'group', 'role', 'last_read']
 
     user = UserRelatedField(queryset=mod.User.objects.all())
-    role = RolesChoiceField(choices=mod.User.Roles)
+    role = RolesChoiceField(choices=mod.GroupShip.Roles)
 
 
 
@@ -151,19 +152,19 @@ class Group(BaseSerializer):
         fields = ['id', 'name', 'owner', 'admins', 'members', 'restricts', 'messages']
 
     def get_owner(self, obj):
-        qset = obj.get_members_by_role(mod.User.Roles.OWNER)
+        qset = obj.get_members_by_role(mod.GroupShip.Roles.OWNER)
         return cleaner(GroupShip(qset, many=True, fields='user').data, 'user')
 
     def get_admins(self, obj):
-        qset = obj.get_members_by_role(mod.User.Roles.ADMIN)
+        qset = obj.get_members_by_role(mod.GroupShip.Roles.ADMIN)
         return cleaner(GroupShip(qset, many=True, fields='user').data, 'user')
 
     def get_members(self, obj):
-        qset = obj.get_members_by_role(mod.User.Roles.WRITER)
+        qset = obj.get_members_by_role(mod.GroupShip.Roles.WRITER)
         return cleaner(GroupShip(qset, many=True, fields='user').data, 'user')
 
     def get_restricts(self, obj):
-        qset = obj.get_members_by_role(mod.User.Roles.READER)
+        qset = obj.get_members_by_role(mod.GroupShip.Roles.READER)
         return cleaner(GroupShip(qset, many=True, fields='user').data, 'user')
 
     owner = serializers.SerializerMethodField()
@@ -193,21 +194,21 @@ class GroupUpdater(serializers.Serializer):
 
         for member in data['admins']:
             if group.members.filter(id=member.id).exists() is False:
-                group.members.add(member, through_defaults={'role':mod.User.Roles.ADMIN})
+                group.members.add(member, through_defaults={'role':mod.GroupShip.Roles.ADMIN})
             else:
-                group.memberships.get(user=member).role = mod.User.Roles.ADMIN
+                group.memberships.get(user=member).role = mod.GroupShip.Roles.ADMIN
 
         for member in data['members']:
             if group.members.filter(id=member.id).exists() is False:
-                group.members.add(member, through_defaults={'role':mod.User.Roles.WRITER})
+                group.members.add(member, through_defaults={'role':mod.GroupShip.Roles.WRITER})
             else:
-                group.memberships.get(user=member).role = mod.User.Roles.WRITER
+                group.memberships.get(user=member).role = mod.GroupShip.Roles.WRITER
 
         for member in data['restricts']:
             if group.members.filter(id=member.id).exists() is False:
-                group.members.add(member, through_defaults={'role':mod.User.Roles.READER})
+                group.members.add(member, through_defaults={'role':mod.GroupShip.Roles.READER})
             else:
-                group.memberships.get(user=member).role = mod.User.Roles.READER
+                group.memberships.get(user=member).role = mod.GroupShip.Roles.READER
 
         for member in data['remove']:
             group.members.remove(member)
@@ -227,16 +228,16 @@ class GroupCreater(serializers.Serializer):
 
     def create(self, validated_data):
         m = mod.Group.objects.create(name=validated_data['name'])
-        m.members.add(validated_data['owner'], through_defaults={'role':mod.User.Roles.OWNER})
+        m.members.add(validated_data['owner'], through_defaults={'role':mod.GroupShip.Roles.OWNER})
         
         for admin in validated_data['admins']:
-            m.members.add(admin, through_defaults={'role':mod.User.Roles.ADMIN})
+            m.members.add(admin, through_defaults={'role':mod.GroupShip.Roles.ADMIN})
             
         for member in validated_data['members']:
-            m.members.add(member, through_defaults={'role':mod.User.Roles.WRITER})
+            m.members.add(member, through_defaults={'role':mod.GroupShip.Roles.WRITER})
             
         for restrict in validated_data['restricts']:
-            m.members.add(restrict, through_defaults={'role':mod.User.Roles.READER})
+            m.members.add(restrict, through_defaults={'role':mod.GroupShip.Roles.READER})
         m.save()
         return m
     
@@ -255,8 +256,8 @@ class EventBaseSerializer(serializers.Serializer):
 
 class EventContact(EventBaseSerializer):
     name = UserRelatedField(queryset=mod.User.objects.all())
-    relation = serializers.ChoiceField(choices=mod.UserRelation.Types)
-    operation = serializers.ChoiceField(choices=mod.Operations, required=False)
+    relation = serializers.ChoiceField(choices=mod.Relation.Types)
+    operation = serializers.ChoiceField(choices=enu.Operations, required=False)
 
 
 class EventStatus(EventBaseSerializer):

@@ -14,13 +14,9 @@ import logging
 logger = logging.getLogger('django')
 
 
-class Operations(models.TextChoices):
-    ADD="a", "add"
-    REMOVE="r", "remove"
 
 
-
-class UserRelation(models.Model):
+class Relation(models.Model):
     class Types(models.TextChoices):
         INVIT="i"
         BLOCK="b"
@@ -38,12 +34,6 @@ class UserRelation(models.Model):
 
 
 class User(models.Model):
-    class Roles(models.IntegerChoices):
-        READER = 0, 'restrict'
-        WRITER = 1, 'member'
-        ADMIN = 2, 'admin'
-        OWNER = 3, 'owner'
-
     class Status(models.TextChoices):
         DISCONNECTED="d"
         ONLINE="o"
@@ -52,14 +42,14 @@ class User(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=20, unique=True)
     contacts = models.ManyToManyField('self',
-                                      through=UserRelation,
+                                      through=Relation,
                                       symmetrical=False,
                                       related_name="+")
 
     def __str__(self):
         return self.name
 
-    def update_relation(self, target, status=UserRelation.Types.INVIT):
+    def update_relation(self, target, status=Relation.Types.INVIT):
         try :
             rel = self.outbox.get(from_user=self, to_user=target)
             rel.status = status
@@ -91,30 +81,32 @@ class User(models.Model):
     def get_contacts(self, status='C'):
         return self.contacts.filter(inbox__status=status)
 
-
-class Group(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    name = models.CharField(max_length=200, validators=[val.offensive_name])
-    members = models.ManyToManyField(User, through='GroupShip', related_name='groups')
-
-    def __str__(self):
-        return str(self.id)
-
-    def get_members_by_role(self, role=User.Roles.WRITER):
-        return self.memberships.filter(role=role)
-
-
-
-
-
 class GroupShip(models.Model):
+    class Roles(models.IntegerChoices):
+        READER = 0, 'restrict'
+        WRITER = 1, 'member'
+        ADMIN = 2, 'admin'
+        OWNER = 3, 'owner'
+
     user = models.ForeignKey(User, related_name="groupships", on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, related_name="memberships", on_delete=models.CASCADE)
-    role = models.PositiveSmallIntegerField(choices=User.Roles, default=User.Roles.WRITER)
+    group = models.ForeignKey('Group', related_name="memberships", on_delete=models.CASCADE)
+    role = models.PositiveSmallIntegerField(choices=Roles, default=Roles.WRITER)
     last_read = models.DateTimeField(default=None, null=True)
 
     def __str__(self):
         return f'from {self.user.name} to {self.group.name}'
+
+class Group(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    name = models.CharField(max_length=200, validators=[val.offensive_name])
+    members = models.ManyToManyField(User, through=GroupShip, related_name='groups')
+
+    def __str__(self):
+        return str(self.id)
+
+    def get_members_by_role(self, role=GroupShip.Roles.WRITER):
+        return self.memberships.filter(role=role)
+
 
 
 class Message(models.Model):

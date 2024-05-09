@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 
 import chat.models as mod
-import chat.serializer as ser
+import chat.serializers as ser
 
 
 
