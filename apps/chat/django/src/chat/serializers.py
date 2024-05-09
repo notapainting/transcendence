@@ -118,7 +118,7 @@ class Message(BaseSerializer):
                 'id': {'format' : 'hex_verbose', 'default': uuid4}
             }
 
-    author = UserRelatedField(queryset=mod.User.objects.all(), required=False)
+    author = UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser), required=False)
     group = serializers.PrimaryKeyRelatedField(
                 queryset=mod.Group.objects.all(),
                 required=True,
@@ -151,11 +151,11 @@ class GroupShip(BaseSerializer):
         model = mod.GroupShip
         fields = ['user', 'group', 'role', 'last_read']
 
-    user = UserRelatedField(queryset=mod.User.objects.all())
+    user = UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
     role = RolesChoiceField(choices=mod.GroupShip.Roles)
 
 
-
+# drop owner and co if name == '@'
 class Group(BaseSerializer):
     class Meta:
         model = mod.Group
@@ -184,87 +184,85 @@ class Group(BaseSerializer):
     messages = Message(many=True, required=False, fields='id author date body')
 
 
-
-
 # event serializer
+
 class EventBaseSerializer(serializers.Serializer):
-    author = serializers.CharField(required=False)
+    author = UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
 
     def create(self, data):
         pass
         # print(self.validated_data)
 
 class EventContact(EventBaseSerializer):
-    name = UserRelatedField(queryset=mod.User.objects.all())
+    name = UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
     operation = serializers.ChoiceField(choices=enu.Operations)
-
 
 class EventStatus(EventBaseSerializer):
     status = serializers.ChoiceField(choices=mod.User.Status)
 
+class EventGroupCreatePrivate(EventBaseSerializer):
+    target = UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
+    body = serializers.CharField(required=False)
 
-class GroupUpdater(serializers.Serializer):
+    def validate(self, data):
+        if data['author'] == data['target']:
+            raise ValidationError('no pgroup with yourself!', code=403)
+        if mod.Group.objects.filter(members__name__in=[data['author'], data['target']], name='@').exists():
+            raise ValidationError('no pgroup with yourself!', code=403)
+        return data
+
+
+class EventGroupCreate(EventBaseSerializer):
+    name = serializers.CharField(validators=[val.offensive_name, val.special_name])
+    admins = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser)), allow_empty=True)
+    members = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser)), allow_empty=True)
+    restricts = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser)), allow_empty=True)
+
+    def create(self, validated_data):
+        group = mod.Group.objects.create(name=validated_data['name'])
+        group.members.add(validated_data['author'], through_defaults={'role':mod.GroupShip.Roles.OWNER})
+        for admin in validated_data['admins']:
+            group.members.add(admin, through_defaults={'role':mod.GroupShip.Roles.ADMIN})
+        for member in validated_data['members']:
+            group.members.add(member, through_defaults={'role':mod.GroupShip.Roles.WRITER})
+        for restrict in validated_data['restricts']:
+            group.members.add(restrict, through_defaults={'role':mod.GroupShip.Roles.READER})
+        group.save()
+        return group
+
+class EventGroupUpdate(EventBaseSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=mod.Group.objects.all())
     name = serializers.CharField(required=False, validators=[val.offensive_name])
-    admins = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.all()), allow_empty=True)
-    members = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.all()), allow_empty=True)
-    restricts = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.all()), allow_empty=True)
-    remove = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.all()), allow_empty=True)
+    admins = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser)), allow_empty=True)
+    members = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser)), allow_empty=True)
+    restricts = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser)), allow_empty=True)
+    remove = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser)), allow_empty=True)
 
-
-    def update(self, data):
+    def create(self, data):
         group = data['id']
         name = data.get('name', None)
-        print(Group(group).data)
-
         if name is not None:
             group.name = name
-
         for member in data['admins']:
             if group.members.filter(id=member.id).exists() is False:
                 group.members.add(member, through_defaults={'role':mod.GroupShip.Roles.ADMIN})
             else:
                 group.memberships.get(user=member).role = mod.GroupShip.Roles.ADMIN
-
         for member in data['members']:
             if group.members.filter(id=member.id).exists() is False:
                 group.members.add(member, through_defaults={'role':mod.GroupShip.Roles.WRITER})
             else:
                 group.memberships.get(user=member).role = mod.GroupShip.Roles.WRITER
-
         for member in data['restricts']:
             if group.members.filter(id=member.id).exists() is False:
                 group.members.add(member, through_defaults={'role':mod.GroupShip.Roles.READER})
             else:
                 group.memberships.get(user=member).role = mod.GroupShip.Roles.READER
-
         for member in data['remove']:
             group.members.remove(member)
-
         group.save()
         print(Group(group).data)
+        return group
 
 
-class GroupCreater(serializers.Serializer):
-    name = serializers.CharField(validators=[val.offensive_name])
-    owner = UserRelatedField(queryset=mod.User.objects.all())
-    admins = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.all()), allow_empty=True)
-    members = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.all()), allow_empty=True)
-    restricts = serializers.ListField(child=UserRelatedField(queryset=mod.User.objects.all()), allow_empty=True)
-
-    def create(self, validated_data):
-        m = mod.Group.objects.create(name=validated_data['name'])
-        m.members.add(validated_data['owner'], through_defaults={'role':mod.GroupShip.Roles.OWNER})
-        
-        for admin in validated_data['admins']:
-            m.members.add(admin, through_defaults={'role':mod.GroupShip.Roles.ADMIN})
-            
-        for member in validated_data['members']:
-            m.members.add(member, through_defaults={'role':mod.GroupShip.Roles.WRITER})
-            
-        for restrict in validated_data['restricts']:
-            m.members.add(restrict, through_defaults={'role':mod.GroupShip.Roles.READER})
-        m.save()
-        return m
-    
 

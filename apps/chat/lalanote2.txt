@@ -5,12 +5,13 @@ TODO:
     - update event message.private/group logic
     - update dserializer
 
-check display with enum -> seri send back machine value 
 
  
 check groupupdater/creater double user value in list
 
-add logic to consumer
+-check if pcon v exist better 
+- create pconv end
+
 
 ALL EVENT SEND BACK CONFIRMATION EVENT (UPDATE) OR ERROR
 

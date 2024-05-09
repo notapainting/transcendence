@@ -41,20 +41,6 @@ CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
 
 
 
-def resolve_invitation(author, target):
-    if author.blocked_by.all().filter(name=target.name).exist():
-        raise ValidationError('author is blocked', code=403)
-    if author.blockeds.all().filter(name=target.name).exist():
-        raise ValidationError('target is blocked by author.. dont be stupid plz', code=403)
-    if author.invited_by.all().filter(name=target.name).exists():
-        author.contacts.add(target)
-        target.invitations.remove(author)
-        return True
-    else:
-        author.invitations.add(target)
-        return False
-
-
 
 
 async def validate_data(username, data):
@@ -72,8 +58,11 @@ async def validate_data(username, data):
 async def get_serializer(type):
     serializers = {
         enu.Event.Message.TEXT : ser.Message,
-        enu.Event.Contact.UPDATE : ser.EventContact,
         enu.Event.Status.UPDATE : ser.EventStatus,
+        enu.Event.Contact.UPDATE : ser.EventContact,
+        enu.Event.Group.CREATE : ser.EventGroupCreate,
+        enu.Event.Group.CREATE_PRIVATE : ser.EventGroupCreatePrivate,
+        enu.Event.Group.UPDATE : ser.EventGroupUpdate,
     }
     return serializers[type]
 
@@ -83,6 +72,14 @@ def serializer_handler(serializer, data):
     ser.is_valid(raise_exception=True)
     ser.create(ser.validated_data)
     return ser.data
+
+
+def create_private_conv(user1, user2):
+    pgroup = mod.Group.create(name='@')
+    pgroup.members.add(enu.SpecialUser.ADMIN, through_defaults={'role':mod.GroupShip.Roles.OWNER})
+    pgroup.members.add(user1, through_defaults={'role':mod.GroupShip.Roles.WRITER})
+    pgroup.members.add(user2, through_defaults={'role':mod.GroupShip.Roles.WRITER})
+    return pgroup
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
 
@@ -185,27 +182,42 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             print(e.args[0])
             raise ValidationError('INTERNAL', code=500)
 
+    @database_sync_to_async
+    def group_create_handler(self, data):
+        pass
+
+    @database_sync_to_async
+    def group_create_private_handler(self, data):
+        print(data)
+
 # contact -> username !! selfgroups ?? 
-    async def event_handler(self, type, data):
+    async def client_event_handler(self, type, data):
         ms = {}
         ms['type'] = type
         ms['data'] = data
         if type == enu.Event.Message.TEXT:
             await self.channel_layer.group_send(ms['data']['group'], ms)
+        elif type == enu.Event.Message.FETCH:
+            pass
+        elif type == enu.Event.Message.GAME:
+            pass
         elif type ==  enu.Event.Status.UPDATE:
             for contact in await self.get_contact_list():
                 await self.channel_layer.group_send(contact, ms)
                 await self.channel_layer.group_send(self.user.name, ms)
+        elif type ==  enu.Event.Status.FETCH:
+            pass
+            # ?? 
         elif type ==  enu.Event.Contact.UPDATE:
             ret = await self.contact_handler(ms['data'])
             ms['data'] = ret
             await self.send_json(ms)
             await self.channel_layer.group_send(ms['data']['name'], ms)
+        elif type == enu.Event.Group.CREATE:
+            pass
+        elif type == enu.Event.Group.CREATE_PRIVATE:
+            await self.group_create_private_handler(ms['data'])
         elif type == enu.Event.Group.UPDATE:
-            pass
-        elif type == enu.Event.Message.FETCH:
-            pass
-        elif type == enu.Event.Message.GAMEE:
             pass
 
 
@@ -215,7 +227,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             type = await validate_data(username=self.user.name, data=text_data)
             serial = await get_serializer(type)
             ser_data = await serializer_handler(serial, text_data['data'])
-            await self.event_handler(type, ser_data)
+            await self.client_event_handler(type, ser_data)
 
         except ValidationError as e:
                 print(e.args[0])
@@ -227,11 +239,23 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # Send message to WebSocket
         await self.send_json(event)
 
+    async def message_game(self, event):
+        # Send message to WebSocket
+        await self.send_json(event)
 
     async def status_update(self, event):
         # Send message to WebSocket
         await self.send_json(event)
 
+    async def status_fetch(self, event):
+        # Send message to WebSocket
+        # should send back status_update
+        await self.send_json(event)
+
     async def contact_update(self, event):
+        # Send message to WebSocket
+        await self.send_json(event)
+
+    async def group_update(self, event):
         # Send message to WebSocket
         await self.send_json(event)

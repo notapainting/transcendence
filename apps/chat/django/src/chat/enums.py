@@ -10,6 +10,8 @@ class Event():
 
     class Group(TextChoices):
         SUMMARY = 'group.summary'
+        CREATE = 'group.create'
+        CREATE_PRIVATE = 'group.create.private'
         UPDATE = 'group.update'
 
     class Contact(TextChoices):
@@ -34,3 +36,5 @@ class Operations(TextChoices):
     CONTACT = rel.Types.COMRADE
     REMOVE = "r", "remove"
 
+class SpecialUser(TextChoices):
+    ADMIN = 'admin'
