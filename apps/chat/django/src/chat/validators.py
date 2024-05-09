@@ -24,6 +24,15 @@ def offensive_name(value):
 				params={'value': value}
 			)
 
+def special_name(value):
+	set = ['@']
+	for name in set:
+		if value == name:
+			raise ValidationError(
+				"Name is offensive",
+				params={'value': value}
+			)
+
 def is_uuid(val):
     from uuid import UUID
     try:
