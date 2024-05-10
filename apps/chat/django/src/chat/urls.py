@@ -2,9 +2,9 @@
 from django.urls import path, include
 from django.views.generic.base import RedirectView 
 
-from chat.UserViews import UserApiView
-from chat.GroupView import GroupApiView
-from chat.MessageView import MessageApiView
+from chat.views.UserViews import UserApiView
+from chat.views.GroupView import GroupApiView
+from chat.views.MessageView import MessageApiView
 
 urls_user = [
     path("", UserApiView.as_view()),
