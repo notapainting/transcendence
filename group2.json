@@ -1,6 +1,6 @@
 {
     "name":"@",
-    "owner": "",
+    "owner": "admin",
     "admins": [],
     "members":["sam", "acheron"],
     "restricts": []
