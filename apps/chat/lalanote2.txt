@@ -4,7 +4,7 @@ TODO:
     - check fo double user valu in groug create/update
     - first conv cant send first message because target not in group 
     -> implement group.Refresh/ use group/update ?
-
+    -> block/unblock pconv
 
  
 

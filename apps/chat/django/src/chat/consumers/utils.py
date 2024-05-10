@@ -1,12 +1,40 @@
-#chat/utils/db.py
+# chat/consumers/utils.py
 
 from channels.db import database_sync_to_async
+
 from django.core.exceptions import ObjectDoesNotExist
 from channels.exceptions import DenyConnection
+from rest_framework.serializers import ValidationError as DrfValidationError
 
 import chat.serializers as ser
 import chat.models as mod
 import chat.enums as enu
+
+
+# faire getgrouplist + ser group summary better
+
+async def validate_data(username, data):
+    type = data.get('type', None)
+    data = data.get('data', None)
+    if type is None or data is None:
+        raise DrfValidationError("invalid event")
+    data['author'] = username
+    if type in enu.Event.val(enu.Event):
+        return type
+    else:
+        raise DrfValidationError(f"event type unknow : {type}")
+
+async def get_serializer(type):
+    serializers = {
+        enu.Event.Message.TEXT : ser.Message,
+        enu.Event.Status.UPDATE : ser.EventStatus,
+        enu.Event.Contact.UPDATE : ser.EventContact,
+        enu.Event.Group.CREATE : ser.EventGroupCreate,
+        enu.Event.Group.CREATE_PRIVATE : ser.EventGroupCreatePrivate,
+        enu.Event.Group.UPDATE : ser.EventGroupUpdate,
+    }
+    return serializers[type]
+
 
 @database_sync_to_async
 def get_group_summary(user):
@@ -44,11 +72,4 @@ def auth(name):
         return mod.User.objects.exclude(name__in=enu.SpecialUser).get(name=name)
     except ObjectDoesNotExist:
         raise DenyConnection
-
-def create_private_conv(user1, user2):
-    pgroup = mod.Group.objects.create(name='@')
-    pgroup.members.set([user1, user2], through_defaults={'role':mod.GroupShip.Roles.WRITER})
-    pgroup.members.add(mod.User.objects.get(name=enu.SpecialUser.ADMIN), through_defaults={'role':mod.GroupShip.Roles.OWNER})
-    return pgroup
-
-
+    

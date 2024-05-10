@@ -5,13 +5,14 @@ from channels.db import database_sync_to_async
 import chat.serializers as ser
 import chat.models as mod
 import chat.enums as enu
+import chat.utils as uti
 
 # contact
 # group_create
 # group_create_private
 
 @database_sync_to_async
-def contact_handler(user, data):
+def contact(user, data):
     try :
         author = user
         target = mod.User.objects.get(name=data['name'])
@@ -42,8 +43,8 @@ def contact_handler(user, data):
             else:
                 author.update_relation(target, mod.Relation.Types.INVIT)
                 data['operation'] = enu.Operations.INVIT
-
         return data
+
     except ObjectDoesNotExist:
         raise DrfValidationError('target not found', code=404)
     except DrfValidationError:
@@ -53,13 +54,13 @@ def contact_handler(user, data):
         raise DrfValidationError('INTERNAL', code=500)
 
 @database_sync_to_async
-def group_create_handler(user, data):
+def group_create(user, data):
     pass
 
 @database_sync_to_async
-def group_create_private_handler(user, data):
+def group_create_private(user, data):
     logger.info(data)
-    pgroup = create_private_conv(user, mod.User.objects.get(name=data['target']))
+    pgroup = uti.create_private_conv(user, mod.User.objects.get(name=data['target']))
     logger.info(ser.Group(pgroup).data)
     if  data.get('body', None) is not None:
         s = ser.Message(data={'author':user.name, 'group':pgroup.id, 'body':data['body']})

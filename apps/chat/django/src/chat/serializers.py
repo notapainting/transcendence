@@ -260,9 +260,6 @@ class EventGroupUpdate(EventBaseSerializer):
         for member in data['remove']:
             group.members.remove(member)
         group.save()
-        print(Group(group).data)
         return group
-
-
 
 

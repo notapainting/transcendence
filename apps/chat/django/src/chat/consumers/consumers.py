@@ -1,4 +1,4 @@
-# chat/consumers.py
+# chat/consumers/consumers.py
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
@@ -6,24 +6,18 @@ from django.core.exceptions import ObjectDoesNotExist
 from channels.exceptions import DenyConnection
 from rest_framework.serializers import ValidationError as DrfValidationError
 
+import chat.serializers as ser
+import chat.models as mod
+import chat.enums as enu
+
+import chat.consumers.handler as handler
+import chat.consumers.utils as cuti
 
 
 from logging import getLogger
 logger = getLogger('django')
 
-
-import chat.serializers as ser
-import chat.models as mod
-import chat.enums as enu
-import chat.utils.asynchonous as uas
-import chat.utils.db as udb
-import chat.consumers.handler as handler
-
-from channels.db import database_sync_to_async
-
-
 CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
-
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
@@ -33,7 +27,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     user = None
 
     async def connect(self):
-        self.user = await udb.auth(self.scope['cookies'].get('userName'))
+        self.user = await cuti.auth(self.scope['cookies'].get('userName'))
 
         #accept connectiont to client
         subprotocol = self.scope.get('subprotocol')
@@ -41,7 +35,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         logger.info("%s Connected!", self.user.name)
 
         # send group summary
-        self.group_list, group_summary = await udb.get_group_summary(self.user)
+        self.group_list, group_summary = await cuti.get_group_summary(self.user)
         await self.send_json(group_summary)
 
         # add user to channel groups,
@@ -50,8 +44,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_add(id, self.channel_name)
 
         #  send status, fetch status
-
-        for contact in await udb.get_contact_list(self.user):
+        for contact in await cuti.get_contact_list(self.user):
             await self.channel_layer.group_send(contact, {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":"o"}})
             await self.channel_layer.group_send(contact, {"type":enu.Event.Status.FETCH, "data":{"author":self.user.name}})
 
@@ -61,7 +54,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         for id in self.group_list:
             await self.channel_layer.group_discard(id, self.channel_name)
 
-        for contact in await udb.get_contact_list(self.user):
+        for contact in await cuti.get_contact_list(self.user):
             await self.channel_layer.group_send(id, {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":"d"}})
         await self.channel_layer.group_discard(self.user.name, self.channel_name)
         logger.info("%s Quit...", self.user.name)
@@ -85,20 +78,20 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         elif type == enu.Event.Message.GAME:
             pass
         elif type ==  enu.Event.Status.UPDATE:
-            for contact in await udb.get_contact_list(self.user):
+            for contact in await cuti.get_contact_list(self.user):
                 await self.channel_layer.group_send(contact, ms)
                 await self.channel_layer.group_send(self.user.name, ms)
         elif type ==  enu.Event.Status.FETCH:
             pass
         elif type ==  enu.Event.Contact.UPDATE:
-            ms['data'] = await handler.contact_handler(self.user, ms['data'])
+            ms['data'] = await handler.contact(self.user, ms['data'])
             await self.send_json(ms)
             await self.channel_layer.group_send(ms['data']['name'], ms)
         elif type == enu.Event.Group.CREATE:
-            await handler.group_create_handler(self.user, ms['data'])
+            await handler.group_create(self.user, ms['data'])
         elif type == enu.Event.Group.CREATE_PRIVATE:
             ms['type'] = enu.Event.Group.UPDATE
-            target, ms['data'] = await handler.group_create_private_handler(self.user, ms['data'])
+            target, ms['data'] = await handler.group_create_private(self.user, ms['data'])
             await self.channel_layer.group_send(target, ms)
         elif type == enu.Event.Group.UPDATE:
             pass
@@ -107,9 +100,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, text_data):
         logger.info(f'text : {text_data}')
         try :
-            type = await uas.validate_data(username=self.user.name, data=text_data)
-            serial = await uas.get_serializer(type)
-            ser_data = await udb.serializer_wrapper(serial, text_data['data'])
+            type = await cuti.validate_data(username=self.user.name, data=text_data)
+            serial = await cuti.get_serializer(type)
+            ser_data = await cuti.serializer_wrapper(serial, text_data['data'])
             await self.client_event_handler(type, ser_data)
 
         except DrfValidationError as e:
