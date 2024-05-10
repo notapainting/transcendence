@@ -68,6 +68,7 @@ document.querySelector('#chat-enter-room').onclick = function(e)
         "data":
         {
             "target":"luciole",
+            "body":'cc cv ?'
         }
     }));
    messageInputDom.value = '';

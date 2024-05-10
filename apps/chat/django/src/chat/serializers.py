@@ -206,8 +206,8 @@ class EventGroupCreatePrivate(EventBaseSerializer):
     def validate(self, data):
         if data['author'] == data['target']:
             raise ValidationError('no pgroup with yourself!', code=403)
-        if mod.Group.objects.filter(members__name__in=[data['author'], data['target']], name='@').exists():
-            raise ValidationError('no pgroup with yourself!', code=403)
+        if mod.Group.objects.filter(name='@').filter(members__name=data['author']).filter(members__name=data['target']).exists() is True:
+            raise ValidationError('pgroup already exist', code=403)
         return data
 
 

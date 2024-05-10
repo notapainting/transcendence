@@ -50,6 +50,7 @@ async def get_serializer(type):
 
 @database_sync_to_async
 def serializer_handler(serializer, data):
+    print(data)
     ser = serializer(data=data)
     ser.is_valid(raise_exception=True)
     ser.create(ser.validated_data)
@@ -57,10 +58,9 @@ def serializer_handler(serializer, data):
 
 
 def create_private_conv(user1, user2):
-    pgroup = mod.Group.create(name='@')
-    pgroup.members.add(enu.SpecialUser.ADMIN, through_defaults={'role':mod.GroupShip.Roles.OWNER})
-    pgroup.members.add(user1, through_defaults={'role':mod.GroupShip.Roles.WRITER})
-    pgroup.members.add(user2, through_defaults={'role':mod.GroupShip.Roles.WRITER})
+    pgroup = mod.Group.objects.create(name='@')
+    pgroup.members.set([user1, user2], through_defaults={'role':mod.GroupShip.Roles.WRITER})
+    pgroup.members.add(mod.User.objects.get(name=enu.SpecialUser.ADMIN), through_defaults={'role':mod.GroupShip.Roles.OWNER})
     return pgroup
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
@@ -180,6 +180,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     @database_sync_to_async
     def group_create_private_handler(self, data):
         logger.info(data)
+        pgroup = create_private_conv(self.user, mod.User.objects.get(name=data['target']))
+        logger.info(pgroup)
+        if  data.get('body', None) is not None:
+            s = ser.Message(data={'author':self.user.name, 'group':pgroup.id, 'body':data['body']})
+            s.is_valid(raise_exception=True)
+            s.create(s.validated_data)
+            print(s.data)
+            return s.data
+        return None
 
 # contact -> username !! selfgroups ?? 
     async def client_event_handler(self, type, data):
@@ -205,9 +214,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.send_json(ms)
             await self.channel_layer.group_send(ms['data']['name'], ms)
         elif type == enu.Event.Group.CREATE:
-            pass
+            await self.group_create_handler(ms['data'])
         elif type == enu.Event.Group.CREATE_PRIVATE:
-            await self.group_create_private_handler(ms['data'])
+            ms['data'] = await self.group_create_private_handler(ms['data'])
+            if ms['data'] is not None:
+                await self.channel_layer.group_send(t, ms)
         elif type == enu.Event.Group.UPDATE:
             pass
 
@@ -240,6 +251,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(event)
 
     async def status_fetch(self, event):
+        logger.info(event)
         await self.channel_layer.group_send(event['data']['author'], {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":"o"}})
 
         # Send message to WebSocket
