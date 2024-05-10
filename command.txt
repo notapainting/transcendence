@@ -9,3 +9,5 @@ curl -X POST -d @useradmin.json  http://localhost:8000/chat/api/v1/users/; echo;
 
 curl -X POST -d @group1.json  http://localhost:8000/chat/api/v1/groups/; echo;
 curl -X POST -d @group3.json  http://localhost:8000/chat/api/v1/groups/; echo;
+
+curl -X GET  http://localhost:8000/chat/api/v1/users/acheron/; echo;
