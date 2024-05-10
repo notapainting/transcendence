@@ -38,3 +38,4 @@ class Operations(TextChoices):
 
 class SpecialUser(TextChoices):
     ADMIN = 'admin'
+    SYSTEM = 'system'
