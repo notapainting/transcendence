@@ -27,7 +27,7 @@ class GroupApiView(View):
     def post(self, request, *args, **kwargs):
         try :
             data = ser.parse_json(request.body)
-            s = ser.GroupCreater(data=data)
+            s = ser.EventGroupCreate(data=data)
             if s.is_valid() is False:#trhow if user doesnt exit
                 print(s.errors)
                 return HttpResponse(status=400)
@@ -68,7 +68,7 @@ class GroupApiView(View):
     def patch(self, request, *args, **kwargs):
         try :
             data = ser.parse_json(request.body)
-            s = ser.GroupUpdater(data=data)
+            s = ser.EventGroupUpdate(data=data)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)

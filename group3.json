@@ -1,4 +1,7 @@
 {
     "name": "nerd hideout",
-    "members": ["sam", "acheron", "luciole"]
+    "author": "acheron",
+    "admins":[],
+    "members": ["sam", "luciole"],
+    "restricts": []
 }

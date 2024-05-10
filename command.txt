@@ -1,0 +1,11 @@
+curl -X POST -d @user1.json  http://localhost:8000/chat/api/v1/users/; echo;
+curl -X POST -d @user2.json  http://localhost:8000/chat/api/v1/users/; echo;
+curl -X POST -d @user3.json  http://localhost:8000/chat/api/v1/users/; echo;
+curl -X POST -d @user4.json  http://localhost:8000/chat/api/v1/users/; echo;
+curl -X POST -d @user5.json  http://localhost:8000/chat/api/v1/users/; echo;
+
+curl -X POST -d @useradmin.json  http://localhost:8000/chat/api/v1/users/; echo;
+
+
+curl -X POST -d @group1.json  http://localhost:8000/chat/api/v1/groups/; echo;
+curl -X POST -d @group3.json  http://localhost:8000/chat/api/v1/groups/; echo;
