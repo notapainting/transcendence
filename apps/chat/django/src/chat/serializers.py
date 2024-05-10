@@ -190,8 +190,7 @@ class EventBaseSerializer(serializers.Serializer):
     author = UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
 
     def create(self, data):
-        pass
-        # print(self.validated_data)
+        print(self.validated_data)
 
 class EventContact(EventBaseSerializer):
     name = UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))

@@ -1,13 +1,11 @@
 TODO: 
 	-check for no async ORM in API 
-    - add relationship -> update or create better
-    - update cRUD API group
-    - update event message.private/group logic
-    - update dserializer
+    - better status system if multi session (connect/disconnect)
+    - check fo double user valu in groug create/update
 
 
  
-check groupupdater/creater double user value in list
+
 
 -check if pcon v exist better 
 - create pconv end
