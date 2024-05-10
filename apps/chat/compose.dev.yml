@@ -1,0 +1,62 @@
+services:
+  django:
+    container_name: ${APP_NAME}
+    build:
+      context: django/
+      dockerfile: Dockerfile.dev
+    image: ${APP_NAME}_dev_image
+    env_file:
+      - app.env.example
+    environment:
+      DB_HOST: ${DB_NAME}
+    volumes:
+      - source_code:/app
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    networks: 
+      - dev_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    stdin_open: true 
+    tty: true
+
+  postgres:
+    container_name: ${DB_NAME}
+    build: postgres/
+    image: ${DB_NAME}_image
+    env_file:
+      - app.env.example
+    environment:
+      PGDATA: ${PGDATA}
+    volumes:
+      - pgdata:${PGDATA}
+    networks: 
+      - dev_network
+    restart: unless-stopped
+
+  redis:
+    container_name: redis-cache
+    image: redis:5
+    networks: 
+      - dev_network
+    restart: unless-stopped
+
+volumes:
+  source_code:
+    name: ${APP_VOLUME} 
+    driver: local
+    driver_opts:
+      type: none
+      device: django/src
+      o: bind
+
+  pgdata:
+    name: ${DB_VOLUME}
+    driver: local
+
+networks:
+  dev_network:
+    name: dev_network
+    driver: bridge
+
