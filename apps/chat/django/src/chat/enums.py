@@ -29,7 +29,7 @@ class Event():
 
     choices = [Group, Contact, Status, Message]
 
-
+# change to Event.Contact.Operations
 class Operations(TextChoices):
     INVIT = rel.Types.INVIT
     BLOCK = rel.Types.BLOCK
