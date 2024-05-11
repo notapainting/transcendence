@@ -154,28 +154,6 @@ services:
      interval: 10s
      timeout: 10s
      retries: 120
-#  metricbeat01:
-#    depends_on:
-#      es01:
-#        condition: service_healthy
-#      kibana:
-#        condition: service_healthy
-#    image: docker.elastic.co/beats/metricbeat:${STACK_VERSION}
-#    user: root
-#    volumes:
-#      - certs:/usr/share/metricbeat/certs
-#      - metricbeatdata01:/usr/share/metricbeat/data
-#      - "./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro"
-#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-#      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
-#      - "/proc:/hostfs/proc:ro"
-#      - "/:/hostfs:ro"
-#    environment:
-#      - ELASTIC_USER=elastic
-#      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-#      - ELASTIC_HOSTS=https://es01:9200
-#      - KIBANA_HOSTS=http://kibana:5601
-#      - LOGSTASH_HOSTS=http://logstash01:9600
  filebeat01:
    depends_on:
      es01:
