@@ -15,14 +15,14 @@ SYSTEM		=	docker system
 all:
 	$(COMPOSE_F) $(DOCKER_FILE) --env-file $(ENV_FILE) up -d --build
 
-prune:
+down:
+	$(COMPOSE) down
+
+prune: down
 	- $(STOP) $$(docker compose ps -qa)
 	- $(RM) $$(docker compose ps -qa)
 	- $(SYSTEM) prune -af
 	- $(VOLUME) prune -af
-
-down:
-	$(COMPOSE) down
 
 
 kill:
