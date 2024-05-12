@@ -6,11 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from channels.exceptions import DenyConnection
 from rest_framework.serializers import ValidationError as DrfValidationError
 
-import chat.serializers as ser
-import chat.models as mod
 import chat.enums as enu
-
-import chat.consumers.handler as handler
 import chat.consumers.utils as cuti
 
 
@@ -55,7 +51,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_discard(id, self.channel_name)
 
         for contact in await cuti.get_contact_list(self.user):
-            await self.channel_layer.group_send(id, {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":"d"}})
+            await self.channel_layer.group_send(contact, {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":"d"}})
         await self.channel_layer.group_discard(self.user.name, self.channel_name)
         logger.info("%s Quit...", self.user.name)
 
@@ -64,41 +60,38 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await super().dispatch(message)
 
 
-    
-
 # contact -> username !! selfgroups ?? 
     async def client_event_handler(self, type, data):
         ms = {}
         ms['type'] = type
         ms['data'] = data
+
         if type == enu.Event.Message.TEXT:
-            await self.channel_layer.group_send(ms['data']['group'], ms)
+            targets = ms['data']['group']
+        elif type == enu.Event.Message.FIRST:
+            targets = ms["data"]["members"]
         elif type == enu.Event.Message.FETCH:
-            pass
-        elif type == enu.Event.Message.GAME:
-            pass
-        elif type ==  enu.Event.Status.UPDATE:
-            for contact in await cuti.get_contact_list(self.user):
-                await self.channel_layer.group_send(contact, ms)
-                await self.channel_layer.group_send(self.user.name, ms)
-        elif type ==  enu.Event.Status.FETCH:
-            pass
-        elif type ==  enu.Event.Contact.UPDATE:
-            ms['data'] = await handler.contact(self.user, ms['data'])
             await self.send_json(ms)
-            await self.channel_layer.group_send(ms['data']['name'], ms)
-        elif type == enu.Event.Group.CREATE:
-            await handler.group_create(self.user, ms['data'])
-        elif type == enu.Event.Group.CREATE_PRIVATE:
+            targets = 'self.local'
+            return
+        elif type == enu.Event.Message.GAME:
+            await self.send_json(ms)
+            targets = 'self.local, cible'
+            return
+        elif type == enu.Event.Status.UPDATE:
+            targets = cuti.get_contact_list(self.user) + [self.user.name]
+        elif type == enu.Event.Contact.UPDATE:
+            targets = [self.user.name, ms['data']['name']]
+        elif type in enu.Event.Group.values:
             ms['type'] = enu.Event.Group.UPDATE
-            target, ms['data'] = await handler.group_create_private(self.user, ms['data'])
-            await self.channel_layer.group_send(target, ms)
-        elif type == enu.Event.Group.UPDATE:
-            pass
+            targets = ms["data"]["owner"] + ms["data"]["members"] + ms["data"]["admins"] + ms["data"]["restricts"]
+
+        for user in targets:
+            await self.channel_layer.group_send(user, ms)
 
 
     async def receive_json(self, text_data):
-        logger.info(f'text : {text_data}')
+        # logger.info(f'text : {text_data}')
         try :
             type = await cuti.validate_data(username=self.user.name, data=text_data)
             serial = await cuti.get_serializer(type)

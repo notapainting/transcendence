@@ -4,23 +4,19 @@ from django.db import models
 from uuid import uuid4
 
 import chat.validators as val
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.db.models import Q
-
-
 
 import logging
 logger = logging.getLogger('django')
 
 
-
-
 class Relation(models.Model):
     class Types(models.TextChoices):
-        INVIT="i"
-        BLOCK="b"
-        COMRADE="c"
+        INVIT="invitation"
+        BLOCK="block"
+        COMRADE="contact"
 
     class Meta:
         unique_together = ('from_user', 'to_user')
@@ -35,9 +31,9 @@ class Relation(models.Model):
 
 class User(models.Model):
     class Status(models.TextChoices):
-        DISCONNECTED="d"
-        ONLINE="o"
-        AFK="a"
+        DISCONNECTED="disconnected"
+        ONLINE="online"
+        AFK="afk"
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=20, unique=True)
@@ -64,7 +60,10 @@ class User(models.Model):
             return None
 
     def delete_relation(self, target):
-        self.outbox.get(to_user=target).delete()
+        try:
+            return self.outbox.get(to_user=target).delete()
+        except ObjectDoesNotExist:
+            return None
 
     def get_outbox(self, status=None):
         if status is not None:

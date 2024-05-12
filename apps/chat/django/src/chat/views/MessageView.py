@@ -1,15 +1,17 @@
 from django.http import HttpResponse
+from django.views import View
+
+
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.utils import IntegrityError
-from django.views import View
-from django.db.models import Q
 
 
 from django.views.decorators.csrf import csrf_exempt
 from logging import getLogger
 
-import chat.serializers as ser
+import chat.serializers.db as ser
 import chat.models as mod
+import chat.utils as uti
 
 logger = getLogger('django')
 
@@ -22,7 +24,7 @@ class MessageApiView(View):
 
     def post(self, request, *args, **kwargs):
         try:
-            data = ser.parse_json(request.body)
+            data = uti.parse_json(request.body)
             s = ser.Message(data=data)
             if s.is_valid() is False:
                 print(s.errors)
@@ -45,7 +47,7 @@ class MessageApiView(View):
                 return HttpResponse(status=400)
             qset = mod.Message.objects.get(id=id)
             data = ser.Message(qset, fields=fields).data
-            data = ser.render_json(data)
+            data = uti.render_json(data)
             return HttpResponse(status=200, content=data)
 
         except (ValidationError, ObjectDoesNotExist):
@@ -57,7 +59,7 @@ class MessageApiView(View):
     def patch(self, request, *args, **kwargs):
         try :
             message = mod.Message.objects.get(id=kwargs.get('id'))
-            data = ser.parse_json(request.body)
+            data = uti.parse_json(request.body)
             s = ser.Message(message, data=data, partial=True)
             if s.is_valid() is False:
                 print(s.errors)

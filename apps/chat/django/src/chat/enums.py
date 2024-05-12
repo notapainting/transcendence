@@ -11,8 +11,9 @@ class Event():
     class Group(TextChoices):
         SUMMARY = 'group.summary'
         CREATE = 'group.create'
-        CREATE_PRIVATE = 'group.create.private'
         UPDATE = 'group.update'
+        QUIT = 'group.quit'
+        DELETE = 'group.delete'
 
     class Contact(TextChoices):
         SUMMARY = 'contact.summary'
@@ -23,9 +24,10 @@ class Event():
         FETCH = 'status.fetch'
 
     class Message(TextChoices):
+        FIRST = 'message.first'
         TEXT = 'message.text'
-        GAME = 'message.game'
         FETCH = 'message.fetch'
+        GAME = 'message.game'
 
     choices = [Group, Contact, Status, Message]
 
@@ -34,7 +36,7 @@ class Operations(TextChoices):
     INVIT = rel.Types.INVIT
     BLOCK = rel.Types.BLOCK
     CONTACT = rel.Types.COMRADE
-    REMOVE = "r", "remove"
+    REMOVE = "remove"
 
 class SpecialUser(TextChoices):
     ADMIN = 'admin'

@@ -1,17 +1,17 @@
 # chat/views.py
 from django.http import  HttpResponse
+from django.views import View
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.utils import IntegrityError
 
-from django.views import View
-from django.db.models import Q
 
 from django.views.decorators.csrf import csrf_exempt
 
+import chat.serializers.db as ser
+import chat.serializers.events as event
 import chat.models as mod
-import chat.serializers as ser
-
+import chat.utils as uti
 
 
 from logging import getLogger
@@ -32,7 +32,7 @@ class UserApiView(View):
 
     def post(self, request, *args, **kwargs):
         try :
-            data = ser.parse_json(data=request.body)
+            data = uti.parse_json(data=request.body)
             s = ser.User(data=data)
             if s.is_valid() is False:
                 print(s.errors)
@@ -57,7 +57,7 @@ class UserApiView(View):
             else:
                 qset = mod.User.objects.get(name=name)
             data = ser.User(qset, many=many, fields=fields).data
-            data = ser.render_json(data)
+            data = uti.render_json(data)
             return HttpResponse(status=200, content=data)
 
         except (ValidationError, ObjectDoesNotExist):
@@ -68,7 +68,7 @@ class UserApiView(View):
 
     def patch(self, request, *args, **kwargs):
         try :
-            data = ser.parse_json(request.body)
+            data = uti.parse_json(request.body)
             name = kwargs.get('name', data['name'])
             new_name = data.get('new_name', None)
             user = mod.User.objects.get(name=name)
@@ -82,7 +82,7 @@ class UserApiView(View):
             data_update = data.get('contact', None)
             if data_update is None:
                 return HttpResponse(status=400)
-            s = ser.EventContact(data=data_update)
+            s = event.ContactUpdate(data=data_update)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)

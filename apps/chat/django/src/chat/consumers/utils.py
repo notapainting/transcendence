@@ -6,7 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from channels.exceptions import DenyConnection
 from rest_framework.serializers import ValidationError as DrfValidationError
 
-import chat.serializers as ser
+import chat.serializers.db as ser
+import chat.serializers.events as event
 import chat.models as mod
 import chat.enums as enu
 
@@ -26,12 +27,12 @@ async def validate_data(username, data):
 
 async def get_serializer(type):
     serializers = {
+        enu.Event.Message.FIRST : event.MessageFirst,
         enu.Event.Message.TEXT : ser.Message,
-        enu.Event.Status.UPDATE : ser.EventStatus,
-        enu.Event.Contact.UPDATE : ser.EventContact,
-        enu.Event.Group.CREATE : ser.EventGroupCreate,
-        enu.Event.Group.CREATE_PRIVATE : ser.EventGroupCreatePrivate,
-        enu.Event.Group.UPDATE : ser.EventGroupUpdate,
+        enu.Event.Status.UPDATE : event.Status,
+        enu.Event.Contact.UPDATE : event.ContactUpdate,
+        enu.Event.Group.CREATE : event.GroupCreate,
+        enu.Event.Group.UPDATE : event.GroupUpdate,
     }
     return serializers[type]
 
@@ -60,7 +61,6 @@ def get_group_list(user, fields='id'):
 
 @database_sync_to_async
 def serializer_wrapper(serializer, data):
-    print(data)
     ser = serializer(data=data)
     ser.is_valid(raise_exception=True)
     ser.create(ser.validated_data)
