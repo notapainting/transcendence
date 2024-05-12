@@ -64,11 +64,13 @@ document.querySelector('#chat-enter-room').onclick = function(e)
     const messageInputDom = document.querySelector('#chat-input').value;
     const room  = messageInputDom; 
     chatSocket.send(JSON.stringify({
-        "type":"group.create.private",
+        "type":"group.create",
         "data":
         {
-            "target":"luciole",
-            "body":'cc cv ?'
+            "name":"nice try",
+            "members":["micha", "himeko"],
+            "admins":[],
+            "restricts":[],
         }
     }));
    messageInputDom.value = '';

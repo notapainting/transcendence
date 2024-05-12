@@ -1,16 +1,18 @@
-from django.http import JsonResponse, HttpResponse
-from chat.models import Group, User
+from django.http import HttpResponse
+from chat.models import Group
+from django.views import View
+
+
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.utils import IntegrityError
-from django.views import View
-from django.db.models import Q
+
 from django.views.decorators.csrf import csrf_exempt
-from json import loads as jloads
+
+import chat.serializers.db as ser
+import chat.serializers.events as event
+import chat.utils as uti
+
 from logging import getLogger
-from django.db.models import Count
-
-import chat.serializers as ser
-
 logger = getLogger('django')
 
 
@@ -26,8 +28,8 @@ class GroupApiView(View):
     # check if user cant create conv (ie for private has un contact)
     def post(self, request, *args, **kwargs):
         try :
-            data = ser.parse_json(request.body)
-            s = ser.EventGroupCreate(data=data)
+            data = uti.parse_json(request.body)
+            s = event.GroupCreate(data=data)
             if s.is_valid() is False:#trhow if user doesnt exit
                 print(s.errors)
                 return HttpResponse(status=400)
@@ -56,7 +58,7 @@ class GroupApiView(View):
             else:
                 qset = Group.objects.get(id=id)
             data = ser.Group(qset, many=many, fields=fields).data
-            data = ser.render_json(data)
+            data = uti.render_json(data)
             return HttpResponse(status=200, content=data)
 
         except (ValidationError, ObjectDoesNotExist):
@@ -67,8 +69,8 @@ class GroupApiView(View):
 
     def patch(self, request, *args, **kwargs):
         try :
-            data = ser.parse_json(request.body)
-            s = ser.EventGroupUpdate(data=data)
+            data = uti.parse_json(request.body)
+            s = event.GroupUpdate(data=data)
             if s.is_valid() is False:
                 print(s.errors)
                 return HttpResponse(status=400)

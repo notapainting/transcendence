@@ -59,8 +59,7 @@
     "data":
     {
         "name":"",
-        "relation":"c/b/i",
-        "operation":"a/r"
+        "operation":"c/b/i/r",
     }
 }
 
@@ -113,8 +112,7 @@
     "data":
     {
         "name":"target",
-        "operation":"add(set)/remove(unset)",
-        "relation":"contact/blocked/invitation"
+        "operation":"contact/blocked/invitation/remove"
     }
 }
 
