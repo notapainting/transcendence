@@ -1,0 +1,44 @@
+services:
+  django:
+    container_name: ${APP_NAME_1}
+    build:
+      context: apps/auth-service/django/
+      dockerfile: Dockerfile.dev
+    image: ${APP_NAME_1}_image
+    env_file:
+      - apps/auth-service/app.env.example
+    volumes:
+      - source_code:/app
+      - ./logs:/logs
+    networks:
+      - app_network
+    restart: unless-stopped
+    stdin_open: true 
+    tty: true
+    # entrypoint: ["python", "/app/manage.py", "runserver", "0.0.0.0:${APP_PORT_1}"]
+
+  postgres:
+    container_name: ${DB_NAME_1}
+    build: apps/auth-service/postgres/
+    image: ${DB_NAME_1}_image
+    env_file:
+      - apps/auth-service/app.env.example
+    volumes:
+      - pgdata:${PGDATA}
+      - ./logs:/logs
+    networks: 
+      - app_network
+    restart: unless-stopped
+
+volumes:
+  source_code:
+    name: ${APP_VOLUME_1}
+    driver: local
+    driver_opts:
+      type: none
+      device: apps/auth-service/django/src
+      o: bind
+
+  pgdata:
+    name: ${DB_VOLUME_1}
+    driver: local

@@ -3,7 +3,7 @@ MAKE	=	make -sj
 
 #========#	compose	#========#
 APP_DIR		=	compose/
-APP_FILE	=	compose.chat.yml
+APP_FILE	=	compose.auth_service.yml compose.user_managment.yml compose.chat.yml
 
 PROXY_FILE	=	compose.proxy.waf.yml
 
