@@ -5,7 +5,6 @@ import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/
 import { animationData } from './animation.js';
 import { animate } from './animation.js';
 import * as utils from './utils.js';
-import * as load from './loader.js';
 
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
 
@@ -15,11 +14,14 @@ var height = window.innerHeight
 export const scene = new THREE.Scene();
 export const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
-scene.background = new THREE.Color(0x0d3452);
-renderer.setSize(width, height);
-camera.position.set( 0, 0, 500 ); 
-camera.rotation.set( -Math.PI / 6, 0, 0 ); 
-// camera.position.set( 0, -155, 80 ); // position de la camera pour le jeu
+// scene.background = new THREE.Color(0x000000);
+scene.background = new THREE.Color(0x031d44);
+renderer.setSize(1920, 1080);
+camera.position.set( 0, -115, 95); 
+// camera.rotation.set( -Math.PI / 6, 0, 0 ); 
+// camera.position.set( 0, -100, 85 ); // position de la camera pour le jeu
+
+import * as load from './loader.js';
 
 var trailPositions = [];
 
@@ -27,20 +29,21 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 // Light
 // const light = new THREE.DirectionalLight(0x0096c7, 1.5);
-const light = new THREE.DirectionalLight(0xFF85FB, 2);
-light.position.set(0, 0, 10);
+const light = new THREE.AmbientLight(0x3a86ff, 4);
+light.position.set(0, 0, 0);
+const lightWall = new THREE.DirectionalLight(0x3a86ff, 0);
+lightWall.position.set(0, -400, 50);
 
 const geometryBall1 = new THREE.SphereGeometry(0, 10, 10);
 const materialBall1 = new THREE.MeshToonMaterial({ color: 0xfcca46});
 let spotLight = new THREE.Mesh(geometryBall1, materialBall1);
-spotLight.position.set(20, 50, -15);
-scene.add(spotLight);
+spotLight.position.set(-90, 60, 1);
 
-const spotLight1 = new THREE.DirectionalLight(0xffcb77, 1);
-spotLight1.position.set(100, 0, 60);
+const spotLight1 = new THREE.DirectionalLight(0x0e7b7f, 7);
+spotLight1.position.set(90, 60, 5);
 
-const spotLight2 = new THREE.AmbientLight(0x00b4d8, 0.1);
-spotLight2.position.set(0, 50, -400);
+const spotLight2 = new THREE.DirectionalLight(0x0e7b7f, 7);
+spotLight2.position.set(-90, 60, 1);
 
 // Activate shadows in the renderer
 renderer.shadowMap.enabled = true;
@@ -84,9 +87,10 @@ animate();
 export function gameRenderer(data) {
 	utils.clearScene(); 
     animationData.ballFall = true;
-    scene.add(load.tree);
+    scene.add(load.intro);
     scene.add(spotLight);
 	scene.add(light);
+	scene.add(lightWall);
 	scene.add(spotLight1);
 	scene.add(spotLight2);
 
@@ -97,11 +101,11 @@ export function gameRenderer(data) {
 	// Game limits
 	const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
 	const points = [];
-	points.push(new THREE.Vector3(data.width, -data.height, 0));
-	points.push(new THREE.Vector3(data.width, data.height, 0));
-	points.push(new THREE.Vector3(-data.width, data.height, 0));
-	points.push(new THREE.Vector3(-data.width, -data.height, 0));
-	points.push(new THREE.Vector3(data.width, -data.height, 0));
+	points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
+	points.push(new THREE.Vector3(data.width + 5, data.height, 0));
+	points.push(new THREE.Vector3(-data.width - 5, data.height, 0));
+	points.push(new THREE.Vector3(-data.width - 5, -data.height, 0));
+	points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
 	points.push(new THREE.Vector3(0, -data.height, 0));
 	points.push(new THREE.Vector3(data.heigt, 0, 0));
 	points.push(new THREE.Vector3(0, data.height, 0));
@@ -121,16 +125,16 @@ export function gameRenderer(data) {
 	const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
 	cylinderRight = new THREE.Mesh(geometry, material);
 	cylinderLeft = new THREE.Mesh(geometry, material);
-	cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY + sceneHeight, 0);
-	cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY + sceneHeight, 0);
+	cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY, 0);
+	cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY, 0);
 	cylinderRight.castShadow = true; 
 	cylinderLeft.castShadow = true; 
 	
 	// Ball
-	const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 20);
+	const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 10);
 	const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
 	sphere = new THREE.Mesh(geometryBall, materialBall);
-	sphere.position.set(data.x, data.y + sceneHeight, 0);
+	sphere.position.set(data.x, data.y, 0);
 	// sphere.position.set(20, 50, -15);
 
 	// if (start) {
@@ -203,16 +207,20 @@ export function gameRenderer(data) {
 	light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
 	light3.position.set(data.x, data.y, sphere.position.z);
 
-	if (animationData.intro === 4){
+	// if (animationData.intro === 4){
 		scene.add(light2);
 		scene.add(light1);
 		scene.add(light3);
 
 		scene.add(line);
+		// line.rotation.x += Math.PI / 2;
 		scene.add(cylinderRight);
+		// cylinderRight.rotation.x += Math.PI / 2;
 		scene.add(cylinderLeft);
+		// cylinderLeft.rotation.x += Math.PI / 2;
 		scene.add(sphere);
-	}
+		// sphere.rotation.x += Math.PI / 2;
+	// }
 	
 
 	// Explosion collision

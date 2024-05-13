@@ -3,73 +3,69 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './game.js';
 
 const loader = new GLTFLoader();
-export var tree;
+export var intro;
 export var round1;
 export var sky;
 export var clouds;
 export var mixer;
 export var clips;
 
-loader.load('./tree/scene.gltf', function ( gltf ) {
+loader.load('./scene3.glb', function ( gltf ) {
 
-    tree = gltf.scene;
+    intro = gltf.scene;
 
-    tree.position.set(0, 0, 0);
+    intro.position.set(0,0,-20);
 
-    tree.scale.set(1, 1, 1); 
+    intro.scale.set(10, 10, 10); 
 
-    tree.rotation.y = Math.PI / 2; 
+    intro.rotation.x += Math.PI / 2;
 
-    scene.add(tree);
+    scene.add(intro);
 
-	mixer = new THREE.AnimationMixer(tree);
+	mixer = new THREE.AnimationMixer(intro);
     clips = gltf.animations;
     if (clips && clips.length) {
         clips.forEach(function (clip) {
             mixer.clipAction(clip).play();
         });
     }
+
+	gltf.scene.traverse( function ( child ) {
+		if ( child.isMesh ) {
+			child.material = new THREE.MeshStandardMaterial({
+				color: child.material.color,
+				map: child.material.map
+			});
+		}
+	});
+	
 }, undefined, function ( error ) {
 	console.error( error );
 } );
 
-loader.load('./round1/scene.gltf', function ( gltf ) {
+// loader.load('./round1/scene.gltf', function ( gltf ) {
 
-    round1 = gltf.scene;
+//     round1 = gltf.scene;
 
-    round1.position.set(-600, 0, -200);
+//     round1.position.set(-600, 0, -200);
 
-    round1.scale.set(10, 10, 10); 
+//     round1.scale.set(10, 10, 10); 
 
-    scene.add(round1);
+//     scene.add(round1);
 
-}, undefined, function ( error ) {
-	console.error( error );
-} );
+// }, undefined, function ( error ) {
+// 	console.error( error );
+// } );
 
-loader.load('./nightSky/scene.glb', function ( gltf ) {
+// loader.load('./nightSky/scene.glb', function ( gltf ) {
 
-    sky = gltf.scene;
+//     sky = gltf.scene;
 
-    sky.position.set(0, 0, 200);
+//     sky.position.set(0, 0, 200);
 
-    sky.scale.set(25, 25, 25); 
+//     sky.scale.set(25, 25, 25); 
 
-    scene.add(sky);
-
-}, undefined, function ( error ) {
-	console.error( error );
-} );
-
-// loader.load('./clouds/scene.gltf', function ( gltf ) {
-
-//     clouds = gltf.scene;
-
-//     clouds.position.set(0, -100, 0);
-
-//     clouds.scale.set(20, 20, 20); 
-
-//     scene.add(clouds);
+//     scene.add(sky);
 
 // }, undefined, function ( error ) {
 // 	console.error( error );
