@@ -3,9 +3,8 @@ TODO:
     - better status system if multi session (connect/disconnect)
     - check fo double user valu in groug create/update
 
-    -> message fetch 
     -> groupe delete ? 
-    -> factorise consumer handler
+
 
 
  
