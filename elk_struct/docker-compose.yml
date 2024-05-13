@@ -154,20 +154,20 @@ services:
      interval: 10s
      timeout: 10s
      retries: 120
-#  filebeat01:
-#    depends_on:
-#      es01:
-#        condition: service_healthy
-#    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
-#    user: root
-#    volumes:
-#      - certs:/usr/share/filebeat/certs
-#      - filebeatdata01:/usr/share/filebeat/data
-#      - "./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/"
-#      - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
-#      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
-#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-#      - /home/bjill/transcendence/nginx_logs:/usr/share/filebeat/nginx_logs
+ filebeat01:
+   depends_on:
+     es01:
+       condition: service_healthy
+   image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+   user: root
+   volumes:
+     - certs:/usr/share/filebeat/certs
+     - filebeatdata01:/usr/share/filebeat/data
+     - "./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/"
+     - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+     - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+     - "/var/run/docker.sock:/var/run/docker.sock:ro"
+     - /home/bjill/transcendence/nginx_logs:/usr/share/filebeat/nginx_logs
   #  volumes:
   #    - certs:/usr/share/filebeat/certs
   #    - filebeatdata01:/usr/share/filebeat/data
