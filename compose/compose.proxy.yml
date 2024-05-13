@@ -13,4 +13,5 @@ services:
     volumes:
       - ./server/certs/:/certs
       - ./front:/var/www/static
+      - ./nginx_logs:/var/log/nginx  # Assurez-vous que Nginx est configuré pour écrire les logs ici
     restart: unless-stopped

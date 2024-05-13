@@ -1,8 +1,15 @@
 filebeat.inputs:
-  - type: filestream
-    id: default-filestream
-    paths:
-      - ingest_data/*.log
+- type: container
+  enabled: true
+  paths:
+    - /var/lib/docker/containers/*/*.log
+  processors:
+    - add_docker_metadata: ~
+
+- type: filestream
+  id: nginx-access-filestream
+  paths:
+    - /usr/share/filebeat/nginx_logs/*.log
 
 
 filebeat.autodiscover:

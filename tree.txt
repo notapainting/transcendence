@@ -1,0 +1,197 @@
+.
+├── apps
+│   ├── auth-service
+│   │   ├── app.env.example
+│   │   ├── compose.dev.yml
+│   │   ├── django
+│   │   │   ├── Dockerfile.dev
+│   │   │   ├── Dockerfile.prod
+│   │   │   ├── requirements_base.txt
+│   │   │   └── src
+│   │   │       ├── auth_service
+│   │   │       │   ├── asgi.py
+│   │   │       │   ├── __init__.py
+│   │   │       │   ├── migrations
+│   │   │       │   │   ├── 0001_initial.py
+│   │   │       │   │   ├── 0002_customuser_verification_key_alter_customuser_email.py
+│   │   │       │   │   ├── 0003_customuser_is_2fa_enabled.py
+│   │   │       │   │   └── __init__.py
+│   │   │       │   ├── models.py
+│   │   │       │   ├── serializers.py
+│   │   │       │   ├── settings.py
+│   │   │       │   ├── templates
+│   │   │       │   │   └── password_reset_confirm.html
+│   │   │       │   ├── urls.py
+│   │   │       │   ├── views.py
+│   │   │       │   └── wsgi.py
+│   │   │       └── manage.py
+│   │   ├── how-to-use.txt
+│   │   ├── Makefile
+│   │   └── postgres
+│   │       ├── Dockerfile
+│   │       └── init-script.sh
+│   ├── chat
+│   │   ├── app.env.example
+│   │   ├── compose.dev.yml
+│   │   ├── django
+│   │   │   ├── Dockerfile.dev
+│   │   │   ├── Dockerfile.prod
+│   │   │   ├── requirements_base.txt
+│   │   │   ├── src
+│   │   │   │   ├── chat
+│   │   │   │   │   ├── consumers.py
+│   │   │   │   │   ├── enums.py
+│   │   │   │   │   ├── GroupView.py
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── MessageView.py
+│   │   │   │   │   ├── migrations
+│   │   │   │   │   │   ├── 0001_initial.py
+│   │   │   │   │   │   ├── 0002_alter_userrelation_status.py
+│   │   │   │   │   │   ├── 0003_rename_userrelation_relation_alter_groupship_role.py
+│   │   │   │   │   │   └── __init__.py
+│   │   │   │   │   ├── models.py
+│   │   │   │   │   ├── routing.py
+│   │   │   │   │   ├── serializer.py
+│   │   │   │   │   ├── serializers.py
+│   │   │   │   │   ├── urls.py
+│   │   │   │   │   ├── UserViews.py
+│   │   │   │   │   └── validators.py
+│   │   │   │   ├── manage.py
+│   │   │   │   └── project
+│   │   │   │       ├── asgi.py
+│   │   │   │       ├── __init__.py
+│   │   │   │       ├── settings.py
+│   │   │   │       └── urls.py
+│   │   │   └── wsgi.py
+│   │   ├── lalanote2.txt
+│   │   ├── Makefile
+│   │   └── postgres
+│   │       ├── Dockerfile
+│   │       └── init-script.sh
+│   ├── how-to-use.txt.txt
+│   └── user-managment
+│       ├── app.env.example
+│       ├── compose.dev.yml
+│       ├── django
+│       │   ├── Dockerfile.dev
+│       │   ├── Dockerfile.prod
+│       │   ├── requirements_base.txt
+│       │   └── src
+│       │       ├── manage.py
+│       │       ├── test
+│       │       └── user_managment
+│       │           ├── asgi.py
+│       │           ├── img
+│       │           │   └── default_profile_picture.png
+│       │           ├── __init__.py
+│       │           ├── migrations
+│       │           │   ├── 0001_initial.py
+│       │           │   ├── 0002_customuser_date_of_birth_customuser_gender_and_more.py
+│       │           │   └── __init__.py
+│       │           ├── models.py
+│       │           ├── serializers.py
+│       │           ├── settings.py
+│       │           ├── urls.py
+│       │           ├── views.py
+│       │           └── wsgi.py
+│       ├── how-to-use.txt
+│       ├── Makefile
+│       └── postgres
+│           ├── Dockerfile
+│           └── init-script.sh
+├── archives
+│   ├── Dockerfile.dev.basic
+│   ├── nginx.proxy.conf
+│   └── ZAP_report
+│       ├── 2024-03-04-ZAP-Report-localhost
+│       │   ├── normalize
+│       │   │   ├── LICENSE.md
+│       │   │   └── normalize.css
+│       │   ├── themes
+│       │   │   └── original
+│       │   │       ├── colors.css
+│       │   │       └── main.css
+│       │   └── zap32x32.png
+│       └── 2024-03-04-ZAP-Report-localhost.html
+├── cl-cs.json
+├── command.txt
+├── compose
+│   ├── compose.auth_service.yml
+│   ├── compose.chat.yml
+│   ├── compose.proxy.waf.yml
+│   ├── compose.proxy.yml
+│   ├── compose.user_managment.yml
+│   └── how-to-use.txt
+├── compose.network.yml
+├── doc
+│   ├── do_not_use_pg_hba.conf
+│   ├── do_not_use_postgres.conf
+│   ├── en.transcendence.subject.pdf
+│   ├── fr.transcendence.subject.pdf
+│   └── LICENSE
+├── docker
+│   ├── django_dev
+│   │   ├── app.env.example
+│   │   ├── compose.dev.yml
+│   │   ├── django
+│   │   │   ├── Dockerfile.dev
+│   │   │   ├── Dockerfile.prod
+│   │   │   └── requirements_base.txt
+│   │   └── Makefile
+│   ├── docker-full-clear.sh
+│   └── note.txt
+├── elk_struct
+│   ├── docker-compose.yml
+│   ├── filebeat_ingest_data
+│   │   └── Air_Quality.log
+│   ├── filebeat.yml
+│   ├── logstash.conf
+│   ├── logstash_ingest_data
+│   │   ├── Air_Quality.csv
+│   │   └── logstash_completed.log
+│   └── Makefile
+├── env.dev
+├── front
+│   ├── assets
+│   │   ├── app.js
+│   │   ├── chat.js
+│   │   ├── connexion.js
+│   │   ├── game.js
+│   │   ├── style-chat.css
+│   │   └── style.css
+│   └── index.html
+├── group1.json
+├── group2.json
+├── group3.json
+├── groupmod1.json
+├── main.conf
+├── Makefile
+├── Makefile.var
+├── message1.json
+├── message2.json
+├── message3.json
+├── README.md
+├── script
+│   └── script.sh
+├── server
+│   ├── certs
+│   │   ├── nginx-selfsigned.crt
+│   │   └── nginx-selfsigned.key
+│   ├── Dockerfile.nginx
+│   ├── Dockerfile.waf
+│   ├── Dockerfile.waf.tmp
+│   ├── how-to-use.txt
+│   ├── nginx.conf
+│   ├── nginx_unsecure.conf
+│   ├── proxy_unsecure.conf
+│   └── proxy_waf.conf
+├── tree.txt
+├── user1.json
+├── user2.json
+├── user3.json
+├── user4.json
+├── user5.json
+├── useradmin.json
+└── why-doesnt-it-work?.txt
+
+42 directories, 153 files
