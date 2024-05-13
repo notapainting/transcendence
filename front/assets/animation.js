@@ -22,7 +22,7 @@ export const animationData = {
   }; // A REMETTRE A FALSE
 
 localGameButton.addEventListener('click', () => {
-	animationData.intro = 2;
+	animationData.intro = 1;
 	// startGameButton.style.display = 'none';
 	localGameButton.style.display = 'none';
 	exitButton.style.display = 'none';
@@ -62,49 +62,41 @@ export async function animate() {
 		load.sky.rotation.y += 0.001;
 
 	// animation rotation arbre premiere scene
-	if (load.tree && animationData.intro === 0) {
-		var initialPos = new THREE.Vector3(0, 0, 0);
-		var finalPos = new THREE.Vector3(20, -60, 400);
+	// if (load.tree && animationData.intro === 0) {
+	// 	var initialPos = new THREE.Vector3(0, 0, 0);
+	// 	var finalPos = new THREE.Vector3(20, -60, 400);
 		
-		var initialAng = new THREE.Vector3(0, Math.PI / 2, 0);
-		var finalAng = new THREE.Vector3(Math.PI / 16, -Math.PI / 8, 0);
+	// 	var initialAng = new THREE.Vector3(0, Math.PI / 2, 0);
+	// 	var finalAng = new THREE.Vector3(Math.PI / 16, -Math.PI / 8, 0);
 		
-		utils.transRot3D(load.tree, initialPos, finalPos, initialAng, finalAng, 75, 1);
-	}
+	// 	utils.transRot3D(load.tree, initialPos, finalPos, initialAng, finalAng, 75, 1);
+	// }
 	
 	// afficher les boutons
-	if (animationData.intro === 1) {
+	if (animationData.intro === 0) {
 		startGameButton.style.display = 'block';
-		localGameButton.style.display = 'block';
-		exitButton.style.display = 'block';
+		localGameButton.style.display = 'none';
+		exitButton.style.display = 'none';
 	}
 
 	// entrer en jeu
-	if (animationData.intro === 2) {
-		var initialPos = new THREE.Vector3(-600, 0, -200);
-		var finalPos = new THREE.Vector3(0, 0, 0);
-
-		var initialPosCam = new THREE.Vector3( 0, 0, 500 );
-		var finalPosCam = new THREE.Vector3(-400, 115, 269);
-
-		utils.translationXYZ(load.round1, initialPos, finalPos, 100, 2);
-		utils.translationCameraXYZ(game.camera, new THREE.Vector3(0, 0, 0), initialPosCam, finalPosCam, 100, 3);
-
-		// PENSER A VIRER L'ARBRE DU DEBUT
+	if (animationData.intro === 1) {
+		if (load.intro.position.z < 10)
+		load.intro.position.z += 0.05;
 	}
 
-	if (animationData.intro === 3) {
-		await sleep(1000);
+	// if (animationData.intro === 3) {
+	// 	await sleep(1000);
 
-		var initialPosCam = new THREE.Vector3(-400, 115, 269);
-		var finalPosCam = new THREE.Vector3(-100, 160, 75);
+	// 	var initialPosCam = new THREE.Vector3(-400, 115, 269);
+	// 	var finalPosCam = new THREE.Vector3(-100, 160, 75);
 
-		var initialTarget = new THREE.Vector3(0, 0, 0);
-		var finalTarget = new THREE.Vector3(20, 50, -15);
+	// 	var initialTarget = new THREE.Vector3(0, 0, 0);
+	// 	var finalTarget = new THREE.Vector3(20, 50, -15);
 
-		utils.translationTargetXYZ(target, initialTarget, finalTarget, 100, 3);
-		utils.translationCameraXYZ(game.camera, target, initialPosCam, finalPosCam, 130, 4);
-	}
+	// 	utils.translationTargetXYZ(target, initialTarget, finalTarget, 100, 3);
+	// 	utils.translationCameraXYZ(game.camera, target, initialPosCam, finalPosCam, 130, 4);
+	// }
 
 	if (animationData.intro === 4){
 		game.scene.add(game.sphere);

@@ -49,8 +49,8 @@ class GameState:
         'width' : 150,
         'height' : 50,
         'leftPaddleY' : 0,
-        'leftPaddleX' : -width + 5,
-        'rightPaddleX' : width - 5,
+        'leftPaddleX' : -width,
+        'rightPaddleX' : width,
         'rightPaddleY' : 0,
         'paddleWidth' : 1,
         'paddleHeight' : 10, 
@@ -158,12 +158,12 @@ class GameState:
             elif self.status['ballY'] <= left_paddle_bottom + self.status['paddleHeight'] / 4:
                 self.status['ballSpeedY'] = -abs(self.status['ballSpeedY'])
     
-        if self.status['ballX'] <= self.status['leftPaddleX'] - 3: # a changer pour le bug des paddle
+        if self.status['ballX'] <= self.status['leftPaddleX']: # a changer pour le bug des paddle
             self.status['rightPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
             self.reset()
-        elif self.status['ballX'] >= self.status['rightPaddleX'] + 3: # a changer pour le bug des paddle
+        elif self.status['ballX'] >= self.status['rightPaddleX']: # a changer pour le bug des paddle
             self.status['leftPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
