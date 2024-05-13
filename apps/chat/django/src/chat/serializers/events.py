@@ -27,53 +27,6 @@ class Status(BaseSerializer):
     status = serializers.ChoiceField(choices=mod.User.Status)
 
 
-
-class ContactUpdate(BaseSerializer):
-    name = ser.UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
-    operation = serializers.ChoiceField(choices=enu.Operations)
-
-    def validate(self, data):
-        if data['author'] == data['target']:
-            raise ValidationError('no self contact operation with yourself!', code=403)
-        if data['operation'] in [enu.Operations.CONTACT, enu.Operations.INVIT]:
-            if data['target'].get_relation(data['author']) is mod.Relation.Types.BLOCK:
-                raise ValidationError('your blocked', code=403)
-
-    def alter_pgroup_if(self, userA, userB, new_role):
-        try : 
-            group = mod.Group.objects.filter(name='@').filter(members__name=userA).filter(members__name=userB).get()
-            group.memberships.get(user=userA).role = new_role
-            group.memberships.get(user=userB).role = new_role
-            group.save()
-            logger.info(f"UNBLOCK - pgroup :{group.id}")
-        except ObjectDoesNotExist:
-            pass
-
-    def create(self, data):
-        if data['operation'] == enu.Operations.REMOVE:
-            data['author'].delete_relation(data['target'])
-            target_rel = data['target'].get_relation(data['author'])
-            if target_rel is not None and target_rel != mod.Relation.Types.BLOCK:
-                data['target'].delete_relation(data['author'])
-                self.alter_pgroup_if(data['author'], data['target'], mod.GroupShip.Roles.WRITER)
-
-        elif data['operation'] == enu.Operations.BLOCK:
-            self.alter_pgroup_if(data['author'], data['target'], mod.GroupShip.Roles.READER)
-            data['author'].update_relation(data['target'], mod.Relation.Types.BLOCK)
-            if data['target'].get_relation(data['author']) != mod.Relation.Types.BLOCK:
-                data['target'].delete_relation(data['author'])
-
-        else:
-            if data['target'].get_relation(data['author']) == mod.Relation.Types.INVIT:
-                data['author'].update_relation(data['target'], mod.Relation.Types.COMRADE)
-                data['target'].update_relation(data['author'], mod.Relation.Types.COMRADE)
-                data['operation'] = enu.Operations.CONTACT
-            else:
-                data['author'].update_relation(data['target'], mod.Relation.Types.INVIT)
-                data['operation'] = enu.Operations.INVIT
-
-        return data
-
 class MessageFirst(BaseSerializer):
     target = ser.UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
     body = serializers.CharField(required=False)
@@ -97,6 +50,76 @@ class MessageFirst(BaseSerializer):
     
     def to_representation(self, instance):
         return ser.Group(self.obj).data
+
+
+class MessageFetch(BaseSerializer):
+    group = serializers.PrimaryKeyRelatedField(
+                queryset=mod.Group.objects.all(),
+                allow_null=False,
+                pk_field=serializers.UUIDField(format='hex_verbose'))
+    date = serializers.DateTimeField(format=ser.DATETIME_FORMAT)
+
+    def validate(self, data):
+        group = data['group']
+        if group.memberships.filter(user=data['author']).exists() is False:
+            raise ValidationError("can't fetch group message if not in", code=403)
+        return data
+
+    def create(self, data):
+        self.qset = data['group'].messages.filter(date__lt=data['date'])[:10]
+        self.obj = ser.Message(self.qset, many=True).data
+        return data
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['history'] = self.obj
+        return ret
+
+class ContactUpdate(BaseSerializer):
+    name = ser.UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
+    operation = serializers.ChoiceField(choices=enu.Operations)
+
+    def validate(self, data):
+        if data['author'] == data['target']:
+            raise ValidationError('no self contact operation with yourself!', code=403)
+        if data['operation'] in [enu.Operations.CONTACT, enu.Operations.INVIT]:
+            if data['target'].get_relation(data['author']) is mod.Relation.Types.BLOCK:
+                raise ValidationError('your blocked', code=403)
+
+    def alter_pgroup_if_exist(self, userA, userB, new_role):
+        try : 
+            group = mod.Group.objects.filter(name='@').filter(members__name=userA).filter(members__name=userB).get()
+            group.memberships.get(user=userA).role = new_role
+            group.memberships.get(user=userB).role = new_role
+            group.save()
+            logger.info(f"UNBLOCK - pgroup :{group.id}")
+        except ObjectDoesNotExist:
+            pass
+
+    def create(self, data):
+        if data['operation'] == enu.Operations.REMOVE:
+            data['author'].delete_relation(data['target'])
+            target_rel = data['target'].get_relation(data['author'])
+            if target_rel is not None and target_rel != mod.Relation.Types.BLOCK:
+                data['target'].delete_relation(data['author'])
+                self.alter_pgroup_if_exist(data['author'], data['target'], mod.GroupShip.Roles.WRITER)
+
+        elif data['operation'] == enu.Operations.BLOCK:
+            self.alter_pgroup_if(data['author'], data['target'], mod.GroupShip.Roles.READER)
+            data['author'].update_relation(data['target'], mod.Relation.Types.BLOCK)
+            if data['target'].get_relation(data['author']) != mod.Relation.Types.BLOCK:
+                data['target'].delete_relation(data['author'])
+
+        else:
+            if data['target'].get_relation(data['author']) == mod.Relation.Types.INVIT:
+                data['author'].update_relation(data['target'], mod.Relation.Types.COMRADE)
+                data['target'].update_relation(data['author'], mod.Relation.Types.COMRADE)
+                data['operation'] = enu.Operations.CONTACT
+            else:
+                data['author'].update_relation(data['target'], mod.Relation.Types.INVIT)
+                data['operation'] = enu.Operations.INVIT
+
+        return data
 
 class GroupCreate(BaseSerializer):
     name = serializers.CharField(validators=[val.offensive_name, val.special_name])

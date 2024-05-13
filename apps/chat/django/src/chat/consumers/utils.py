@@ -28,6 +28,7 @@ async def validate_data(username, data):
 async def get_serializer(type):
     serializers = {
         enu.Event.Message.FIRST : event.MessageFirst,
+        enu.Event.Message.FETCH : event.MessageFetch,
         enu.Event.Message.TEXT : ser.Message,
         enu.Event.Status.UPDATE : event.Status,
         enu.Event.Contact.UPDATE : event.ContactUpdate,
@@ -53,7 +54,7 @@ def get_contact_list(user, fields='contacts'):
     if fields == 'contacts':
         return ser.User(user, fields=fields).data['contacts']
     else:
-        return ser.User(user, fields=fields).data
+        return {"type":enu.Event.Contact.SUMMARY, "data":ser.User(user, fields=fields).data}
 
 @database_sync_to_async
 def get_group_list(user, fields='id'):

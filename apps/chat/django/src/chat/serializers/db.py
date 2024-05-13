@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from uuid import uuid4
 
-from django.utils import timezone
+from django.utils.timezone import now
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -13,6 +13,8 @@ import chat.utils as uti
 
 from logging import getLogger
 logger = getLogger('django')
+
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 # fields
 class UserRelatedField(serializers.RelatedField):
@@ -25,6 +27,7 @@ class UserRelatedField(serializers.RelatedField):
             return mod.User.objects.get(name=data)
         except ObjectDoesNotExist:
             raise ValidationError({'User': 'User not found'})
+
 
 # a check ??
 class RolesChoiceField(serializers.ChoiceField):
@@ -44,7 +47,7 @@ class BaseSerializer(serializers.ModelSerializer):
         fields = kwargs.pop('fields', None)
         super().__init__(*args, **kwargs)
 
-        if fields is not None:
+        if fields is not None and fields != '__all__':
             fields = fields.split()
             allowed = set(fields)
             existing = set(self.fields)
@@ -64,13 +67,13 @@ class User(BaseSerializer):
     class Meta:
         model = mod.User
         fields = ['name', 'contacts', 'groups', 'blockeds', 'blocked_by', 'invitations', 'invited_by']
-        extra_kwargs = {
-                            'groups': {'required': False},
-                            'blockeds': {'required': False},
-                            'blockeds_by': {'required': False},
-                            'invitations': {'required': False},
-                            'invited_by': {'required': False},
-                        }
+        # extra_kwargs = {
+        #                     'groups': {'read_only': False},
+        #                     'blockeds': {'required': False},
+        #                     'blockeds_by': {'required': False},
+        #                     'invitations': {'required': False},
+        #                     'invited_by': {'required': False},
+        #                 }
 
     def get_contacts(self, obj):
         qset = obj.get_contacts()
@@ -92,11 +95,16 @@ class User(BaseSerializer):
         qset = obj.get_inbox(status=mod.Relation.Types.INVIT)
         return uti.cleaner(Relation(qset, many=True, fields='from_user').data, 'from_user')
 
-    contacts = serializers.SerializerMethodField()
-    blockeds = serializers.SerializerMethodField()
-    blocked_by = serializers.SerializerMethodField()
-    invitations = serializers.SerializerMethodField()
-    invited_by = serializers.SerializerMethodField()
+    groups = serializers.PrimaryKeyRelatedField(queryset=mod.Group.objects.all(), 
+                                                many=True, 
+                                                pk_field=serializers.UUIDField(format='hex_verbose'),
+                                                required=False)
+
+    contacts = serializers.SerializerMethodField(required=False)
+    blockeds = serializers.SerializerMethodField(required=False)
+    blocked_by = serializers.SerializerMethodField(required=False)
+    invitations = serializers.SerializerMethodField(required=False)
+    invited_by = serializers.SerializerMethodField(required=False)
 
 
 class Message(BaseSerializer):
@@ -104,8 +112,8 @@ class Message(BaseSerializer):
         model = mod.Message
         fields = ['id', 'author', 'group', 'date', 'respond_to', 'body']
         extra_kwargs = {
-                'date': {'format' : '%Y-%m-%dT%H:%M:%S.%fZ%z', 'default':timezone.now},
-                'id': {'format' : 'hex_verbose', 'default': uuid4}
+                'date': {'format': DATETIME_FORMAT, 'default': now},
+                'id': {'format': 'hex_verbose', 'default': uuid4}
             }
 
     author = UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser), required=False)
@@ -119,7 +127,7 @@ class Message(BaseSerializer):
                 group=data['group'], 
                 user__name=data['author'], 
                 role__gt=mod.GroupShip.Roles.READER).exists() is False: 
-            raise ValidationError('user unauthorised t owrite in this group', code=403)
+            raise ValidationError('user unauthorised to write in this group', code=403)
         return data
 
 
@@ -130,7 +138,6 @@ class GroupShip(BaseSerializer):
 
     user = UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
     role = RolesChoiceField(choices=mod.GroupShip.Roles)
-
 
 
 class Group(BaseSerializer):

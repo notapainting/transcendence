@@ -34,13 +34,20 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.group_list, group_summary = await cuti.get_group_summary(self.user)
         await self.send_json(group_summary)
 
+        # send contact summary
+        self.contact_list = await cuti.get_contact_list(self.user)
+        contact_summary = await cuti.get_contact_list(self.user, fields='contacts blockeds blocked_by invitations invited_by')
+        print(contact_summary)
+        await self.send_json(contact_summary)
+
+
         # add user to channel groups,
         await self.channel_layer.group_add(self.user.name, self.channel_name)#attention au name
         for id in self.group_list:
             await self.channel_layer.group_add(id, self.channel_name)
 
         #  send status, fetch status
-        for contact in await cuti.get_contact_list(self.user):
+        for contact in  self.contact_list:
             await self.channel_layer.group_send(contact, {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":"o"}})
             await self.channel_layer.group_send(contact, {"type":enu.Event.Status.FETCH, "data":{"author":self.user.name}})
 
@@ -67,10 +74,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         ms['data'] = data
 
         if type == enu.Event.Message.TEXT:
-            targets = ms['data']['group']
+            targets = [ms['data']['group']]
         elif type == enu.Event.Message.FIRST:
             targets = ms["data"]["members"]
         elif type == enu.Event.Message.FETCH:
+            print(ms['data'])
             await self.send_json(ms)
             targets = 'self.local'
             return
@@ -86,8 +94,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             ms['type'] = enu.Event.Group.UPDATE
             targets = ms["data"]["owner"] + ms["data"]["members"] + ms["data"]["admins"] + ms["data"]["restricts"]
 
-        for user in targets:
-            await self.channel_layer.group_send(user, ms)
+        for target in targets:
+            await self.channel_layer.group_send(target, ms)
 
 
     async def receive_json(self, text_data):
