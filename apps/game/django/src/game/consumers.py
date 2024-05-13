@@ -6,13 +6,14 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 width = 50
 height = 30
-maxScore = 5
+maxScore = 50
 paddleHeight = 80
 paddleWidth = 10
 ballSpeedX = 0.8
 acceleration = 0.01
 reset = 0
 counter = 0
+max_speed = 2
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -105,9 +106,9 @@ class GameState:
         'rightPlayerScore' : self.status['rightPlayerScore'],
         'winner' : self.status['winner']
     }
-    
+
     def update(self):
-        global reset
+        global reset, max_speed
 
         if reset == 1:
             reset = 2
@@ -143,20 +144,18 @@ class GameState:
                 self.status['ballY'] <= right_paddle_top and 
                 self.status['ballSpeedX'] > 0):
             self.status['ballSpeedX'] *= -1 - acceleration
-            if self.status['ballY'] >= right_paddle_top - self.status['paddleHeight'] / 4:
-                self.status['ballSpeedY'] = abs(self.status['ballSpeedY'])
-            elif self.status['ballY'] <= right_paddle_bottom + self.status['paddleHeight'] / 4:
-                self.status['ballSpeedY'] = -abs(self.status['ballSpeedY'])
+            
+            hit_pos = (self.status['rightPaddleY'] - self.status['ballY']) / self.status['paddleHeight']
+            self.status['ballSpeedY'] = hit_pos * max_speed
 
         if (self.status['ballX'] - self.status['ballRadius'] < self.status['leftPaddleX'] + self.status['paddleWidth'] and
                 self.status['ballY'] >= left_paddle_bottom and
                 self.status['ballY'] <= left_paddle_top and
                 self.status['ballSpeedX'] < 0):
             self.status['ballSpeedX'] *= -1 - acceleration
-            if self.status['ballY'] >= left_paddle_top - self.status['paddleHeight'] / 4:
-                self.status['ballSpeedY'] = abs(self.status['ballSpeedY'])
-            elif self.status['ballY'] <= left_paddle_bottom + self.status['paddleHeight'] / 4:
-                self.status['ballSpeedY'] = -abs(self.status['ballSpeedY'])
+
+            hit_pos = (self.status['leftPaddleY'] - self.status['ballY']) / self.status['paddleHeight']
+            self.status['ballSpeedY'] = hit_pos * max_speed
     
         if self.status['ballX'] <= self.status['leftPaddleX']: # a changer pour le bug des paddle
             self.status['rightPlayerScore'] += 1

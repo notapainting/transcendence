@@ -3,6 +3,14 @@ import * as load from './loader.js';
 import { composer } from './game.js';
 import * as game from './game.js';
 import * as utils from './utils.js';
+import { gameData } from './game.js';
+
+export var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
+export var colorsGreen = [0x132A13, 0x31572C, 0x4F772D, 0x90A955, 0xECF39E, 0x90A955, 0x4F772D, 0x31572C];
+export var colorsYellow = [0xFCEC5D, 0xFCDC5D, 0xFCCC5D, 0xFCB75D, 0xFCAC5D, 0xFCB75D, 0xFCDC5D, 0xFCDC5D];
+export var colorsOrange = [0xFF9E00, 0xFF8500, 0xFF6D00, 0xFF5400, 0xFF4800, 0xFF5400, 0xFF6D00, 0xFF8500];
+export var colorPalettes = [colorsBlue, colorsGreen, colorsYellow, colorsOrange];
+export let colorBall = colorsBlue;
 
 let acceleration = 9.8;
 let bounce_distance = 40;
@@ -54,58 +62,22 @@ function sleep(ms) {
 export async function animate() {
     requestAnimationFrame(animate);
 
-	// animation balançoire
 	if (load.mixer)
 		load.mixer.update(0.01);
-
-	if (load.sky)
-		load.sky.rotation.y += 0.001;
-
-	// animation rotation arbre premiere scene
-	// if (load.tree && animationData.intro === 0) {
-	// 	var initialPos = new THREE.Vector3(0, 0, 0);
-	// 	var finalPos = new THREE.Vector3(20, -60, 400);
-		
-	// 	var initialAng = new THREE.Vector3(0, Math.PI / 2, 0);
-	// 	var finalAng = new THREE.Vector3(Math.PI / 16, -Math.PI / 8, 0);
-		
-	// 	utils.transRot3D(load.tree, initialPos, finalPos, initialAng, finalAng, 75, 1);
-	// }
 	
-	// afficher les boutons
-	if (animationData.intro === 0) {
-		startGameButton.style.display = 'block';
-		localGameButton.style.display = 'none';
-		exitButton.style.display = 'none';
+	if (load.mixer2) {
+		load.mixer2.update(0.0167); 
 	}
 
-	// entrer en jeu
-	if (animationData.intro === 1) {
-		if (load.intro.position.z < 10)
-		load.intro.position.z += 0.05;
+	if (load.mixer2 && load.mixer2.time >= load.clips2[0].duration) {
+		game.scene.remove(load.effect);
+		// load.mixer2 = null; 
 	}
+	
+	startGameButton.style.display = 'block';
 
-	// if (animationData.intro === 3) {
-	// 	await sleep(1000);
-
-	// 	var initialPosCam = new THREE.Vector3(-400, 115, 269);
-	// 	var finalPosCam = new THREE.Vector3(-100, 160, 75);
-
-	// 	var initialTarget = new THREE.Vector3(0, 0, 0);
-	// 	var finalTarget = new THREE.Vector3(20, 50, -15);
-
-	// 	utils.translationTargetXYZ(target, initialTarget, finalTarget, 100, 3);
-	// 	utils.translationCameraXYZ(game.camera, target, initialPosCam, finalPosCam, 130, 4);
-	// }
-
-	if (animationData.intro === 4){
-		game.scene.add(game.sphere);
-		game.scene.add(game.cylinderLeft);
-		game.scene.add(game.cylinderRight);
-	}
-
-	if (game.sceneHandler === 1)
-	{
+	// if (game.sceneHandler === 1)
+	// {
 		if(animationData.ballFall === true)
 		{
 			game.scene.add(game.sphere);
@@ -117,32 +89,33 @@ export async function animate() {
 			game.sphere.position.z = 0 + adjusted_initial_speed * time_counter - 0.5 * acceleration * time_counter * time_counter;
 			if (game.sphere.position.z <= 0 && adjusted_initial_speed <= 0.5) {
 				animationData.ballFall = false;
-				game.start = true;
+				gameData.start = true;
 			} else {
 				time_counter += time_step;
-				gamelight3.position.set(game.sphere.position.x, game.sphere.position.y, game.sphere.position.z);
+				game.light3.position.set(game.sphere.position.x, game.sphere.position.y, game.sphere.position.z);
 			}
 		}
-		if (game.explosion === true) {
+		if (gameData.explosion === true) {
+			console.log("BOOM!");
 			game.scene.children
 				.filter(obj => obj.userData.isTrailSphere)
 				.forEach(obj => game.scene.remove(obj));
 			for (var i = 0; i < 100; i++) {
-				createParticle();
+				utils.createParticle();
 			}
-			game.explosion = false;
+			gameData.explosion = false;
 		} 
-		if (game.collisionPaddle === true)
+		if (gameData.collisionPaddle === true)
 		{
 			var randomIndex;
 			do {
-				randomIndex = Math.floor(Math.random() * game.colorPalettes.length);
-			} while (game.colorBall === colorPalettes[randomIndex]);
+				randomIndex = Math.floor(Math.random() * colorPalettes.length);
+			} while (colorBall === colorPalettes[randomIndex]);
 		
-			game.colorBall = game.colorPalettes[randomIndex];
-			game.collisionPaddle = false;
+			colorBall = colorPalettes[randomIndex];
+			gameData.collisionPaddle = false;
 		}
-	}
+	// }
 
 
     composer.render();

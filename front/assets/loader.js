@@ -4,13 +4,13 @@ import { scene } from './game.js';
 
 const loader = new GLTFLoader();
 export var intro;
-export var round1;
-export var sky;
-export var clouds;
+export var effect;
 export var mixer;
+export var mixer2;
 export var clips;
+export var clips2;
 
-loader.load('./scene3.glb', function ( gltf ) {
+loader.load('./models/scene.glb', function ( gltf ) {
 
     intro = gltf.scene;
 
@@ -20,7 +20,7 @@ loader.load('./scene3.glb', function ( gltf ) {
 
     intro.rotation.x += Math.PI / 2;
 
-    scene.add(intro);
+    // scene.add(intro);
 
 	mixer = new THREE.AnimationMixer(intro);
     clips = gltf.animations;
@@ -43,30 +43,28 @@ loader.load('./scene3.glb', function ( gltf ) {
 	console.error( error );
 } );
 
-// loader.load('./round1/scene.gltf', function ( gltf ) {
 
-//     round1 = gltf.scene;
+loader.load('./models/effect.glb', function ( gltf ) {
 
-//     round1.position.set(-600, 0, -200);
+    effect = gltf.scene;
 
-//     round1.scale.set(10, 10, 10); 
+    effect.position.set(10,10,0);
 
-//     scene.add(round1);
+    effect.scale.set(2, 2, 2); 
 
-// }, undefined, function ( error ) {
-// 	console.error( error );
-// } );
+    effect.rotation.x += Math.PI / 2;
 
-// loader.load('./nightSky/scene.glb', function ( gltf ) {
+    // scene.add(effect);
 
-//     sky = gltf.scene;
+	mixer2 = new THREE.AnimationMixer(effect);
+    clips2 = gltf.animations;
+    if (clips2 && clips2.length) {
+        clips2.forEach(function (clip) {
+            mixer2.clipAction(clip).play();
+        });
+    }
+	
+}, undefined, function ( error ) {
+	console.error( error );
+} );
 
-//     sky.position.set(0, 0, 200);
-
-//     sky.scale.set(25, 25, 25); 
-
-//     scene.add(sky);
-
-// }, undefined, function ( error ) {
-// 	console.error( error );
-// } );

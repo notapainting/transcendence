@@ -1,7 +1,9 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 import { scene } from "./game.js";
 import { animationData } from './animation.js';
+import * as anim from './animation.js';
 import { camera } from './game.js';
+import * as game from './game.js';
 
 export var colorTransitionTime = 3000;
 export var colorStartTime = Date.now();
@@ -271,11 +273,11 @@ export function clearScene() {
 
 export function createParticle() {
     var geometry = new THREE.BufferGeometry();
-    var vertices = new Float32Array([collisionX, collisionY, 0]);
+    var vertices = new Float32Array([game.collisionX, game.collisionY, 0]);
 
     geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
-    var randomColor = colorBall[Math.floor(Math.random() * colorBall.length)];
+    var randomColor = anim.colorBall[Math.floor(Math.random() * anim.colorBall.length)];
     var material = new THREE.PointsMaterial({ color: randomColor, size: 1.5 });
 
     var particle = new THREE.Points(geometry, material);
