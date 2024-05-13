@@ -15,11 +15,12 @@ function getCurrentDateTime() {
     let minutes = String(currentDate.getMinutes()).padStart(2, '0');
     let seconds = String(currentDate.getSeconds()).padStart(2, '0');
     let milliseconds = String(currentDate.getMilliseconds()).padStart(6, '0');
-    let tzoffsetvalue = -(currentDate.getTimezoneOffset() / 60)
-    let offsetOperator = tzoffsetvalue > 0 ? '+' : '-'
-    let tzoffset = String(Math.abs(tzoffsetvalue)).padEnd(4, '0');
+    // let tzoffsetvalue = -(currentDate.getTimezoneOffset() / 60)
+    // let offsetOperator = tzoffsetvalue > 0 ? '+' : '-'
+    // let tzoffset = String(Math.abs(tzoffsetvalue)).padEnd(2, '0'); ;${offsetOperator}${tzoffset}
 
-    let formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${offsetOperator}${tzoffset}`;
+    let formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`;
+    
     return formattedDateTime;
 }
 
@@ -64,13 +65,11 @@ document.querySelector('#chat-enter-room').onclick = function(e)
     const messageInputDom = document.querySelector('#chat-input').value;
     const room  = messageInputDom; 
     chatSocket.send(JSON.stringify({
-        "type":"group.create",
+        "type":"message.fetch",
         "data":
         {
-            "name":"nice try",
-            "members":["micha", "himeko"],
-            "admins":[],
-            "restricts":[],
+            "group":"bff768c5-de7c-42e7-ac2b-b4dd2760ffc4",
+            "date":"2024-05-13T13:29:26.000447",
         }
     }));
    messageInputDom.value = '';
@@ -96,13 +95,14 @@ document.querySelector('#chat-submit-message').onclick = function(e)
     const messageInputDom = document.querySelector('#chat-input');
     const message = messageInputDom.value; 
     const now = getCurrentDateTime();
+    console.log(now)
     chatSocket.send(JSON.stringify(
         {
             'type': MESSAGE,
             'data': 
                 {
                     'body':message,
-                    'group': 'f820ea44-24c3-4130-a924-73c4100bac9e',
+                    'group': 'bff768c5-de7c-42e7-ac2b-b4dd2760ffc4',
                     'date': now
                 }
         }

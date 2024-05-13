@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import chat.validators as val
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils import timezone
+from django.utils.timezone import now 
 from django.db.models import Q
 
 import logging
@@ -107,7 +107,6 @@ class Group(models.Model):
         return self.memberships.filter(role=role)
 
 
-
 class Message(models.Model):
     class Meta:
         default_related_name = "messages"
@@ -116,7 +115,7 @@ class Message(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    date = models.DateTimeField(default=timezone.now, verbose_name="Publication date")
+    date = models.DateTimeField(default=now)
     respond_to = models.ForeignKey(
         'Message',
         on_delete=models.SET_NULL, 

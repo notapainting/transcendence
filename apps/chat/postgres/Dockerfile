@@ -1,5 +1,6 @@
 FROM postgres:16-alpine3.19
 
+ENV TZ=Europe/Paris
 RUN mkdir -p \
 	${PGDATA} \
 	/logs
