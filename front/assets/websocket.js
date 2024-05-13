@@ -1,4 +1,5 @@
 import * as game from './game.js';
+import { gameData } from './game.js';
 
 const gameSocket = new WebSocket(
 	'wss://'
@@ -37,7 +38,7 @@ document.querySelector('#backButton').onclick = function(e) {
 };
 
 document.querySelector('#startButton').onclick = function(e) {
-    if (game.start)
+    if (gameData.start)
     {
         gameSocket.send(JSON.stringify({
             'message': 'startButton'
