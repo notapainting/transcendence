@@ -135,8 +135,9 @@ let loginRequest = (event) => {
         body: JSON.stringify(data)
     })
     .then(response => {
-        if (response.ok)
+        if (response.ok){
             return response.json();
+        }
         else {
             throw new Error("Identifiant ou mot de passe incorrect");
         }
