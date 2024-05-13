@@ -33,7 +33,7 @@ class GroupApiView(View):
             if s.is_valid() is False:#trhow if user doesnt exit
                 print(s.errors)
                 return HttpResponse(status=400)
-            print(s.validated_data)
+
             # implementer verification doublon conv ? 
             s.create(s.validated_data)
             return HttpResponse(status=201)
