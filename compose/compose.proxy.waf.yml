@@ -6,8 +6,8 @@ services:
       dockerfile: Dockerfile.waf
     image: proxy-waf
     ports:
-     - "8443:443"
-     - "8080:80"
+     - "443:443"
+     - "80:80"
     networks: 
       - app_network
     volumes:
