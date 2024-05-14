@@ -42,7 +42,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  chat_source_code:
+  chat_volume:
     name: ${APP_VOLUME_3}
     driver: local
     driver_opts:
