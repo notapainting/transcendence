@@ -79,6 +79,12 @@ export async function animate() {
 
 	if (bonusState === true)
 	{	
+		var i;
+		do {
+			i = Math.floor(Math.random() * game.randBonus.length);
+		} while (gameData.bonus === game.randBonus[i]);
+	
+		gameData.bonus = game.randBonus[i];
 		load.effect.position.set(gameData.randomPoint.x, gameData.randomPoint.y, 0);
 		game.scene.add(load.effect);
 	}
