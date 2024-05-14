@@ -1,6 +1,10 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
 
+function updateTimer() {
+	gameData.elapsedTime += 1;
+}
+
 const gameSocket = new WebSocket(
 	'wss://'
 	+ window.location.host
@@ -43,13 +47,23 @@ document.querySelector('#startButton').onclick = function(e) {
         gameSocket.send(JSON.stringify({
             'message': 'startButton'
         }));
+
+		if (!gameData.timerInterval) {
+			gameData.timerInterval = setInterval(updateTimer, 1000);
+		}
     }
+
 };
 
 document.querySelector('#stopButton').onclick = function(e) {
 	gameSocket.send(JSON.stringify({
 		'message': 'stopButton'
 	}));
+	
+	if (gameData.timerInterval) {
+		clearInterval(gameData.timerInterval);
+		gameData.timerInterval = null;
+	}
 };
 
 document.addEventListener('keydown', function(event) {
@@ -98,3 +112,4 @@ document.addEventListener('keyup', function(event) {
 		}));
 	}
 });
+
