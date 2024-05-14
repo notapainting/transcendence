@@ -10,6 +10,10 @@ export var mixer2;
 export var clips;
 export var clips2;
 
+export const loadData = {
+	mixer2: null
+  };
+
 loader.load('./models/scene.glb', function ( gltf ) {
 
     intro = gltf.scene;
@@ -56,11 +60,11 @@ loader.load('./models/effect.glb', function ( gltf ) {
 
     // scene.add(effect);
 
-	mixer2 = new THREE.AnimationMixer(effect);
+	loadData.mixer2 = new THREE.AnimationMixer(effect);
     clips2 = gltf.animations;
     if (clips2 && clips2.length) {
         clips2.forEach(function (clip) {
-            mixer2.clipAction(clip).play();
+            loadData.mixer2.clipAction(clip).play();
         });
     }
 	

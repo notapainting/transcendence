@@ -12,13 +12,13 @@ var width = window.innerWidth;
 var height = window.innerHeight
 
 export const scene = new THREE.Scene();
-export const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
+// export const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
+export const camera = new THREE.PerspectiveCamera(45, 600/900, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
-// scene.background = new THREE.Color(0x000000);
 scene.background = new THREE.Color(0x031d44);
-renderer.setSize(width, height);
-camera.position.set( 0, -200, 115); 
-// camera.rotation.set( -Math.PI / 6, 0, 0 ); 
+// renderer.setSize(width, height);
+renderer.setSize(600, 900);
+camera.position.set( 0, -200, 115);
 // camera.position.set( 0, -100, 85 ); // position de la camera pour le jeu
 
 import * as load from './loader.js';
@@ -59,9 +59,6 @@ export var cylinderLeft;
 
 export let scoreRight = 0
 export let scoreLeft = 0
-// let explosion = false;
-// let collisionPaddle = false;
-// export default {explosion, collisionPaddle};
 export let collisionX = 0;
 export let collisionY = 0;
 export let initialSpeed = 0.8;
@@ -73,17 +70,30 @@ export let light3;
 export var sceneHeight = 70;
 
 // scenes
-// export var start = false; 
 export var sceneHandler = 1;
+
+export var randBonus = ['longPaddle', 'speedBall', 'boost'];
+export var randMalus = ['slow', 'shortPaddle'];
+export var randEffect = ['hurricane', 'earthquake', 'glitch'];
+
+var p1 = { x: -45, y: -25 };
+var p2 = { x: 45, y: -25 };
+var p3 = { x: 45, y: 25 };
+var p4 = { x: -45, y: 25 };
 
 export const gameData = {
 	explosion: false,
 	collisionPaddle: false,
-	start: false
-  }; 
-
-
-animate();
+	start: false,
+	elapsedTime: 0,
+	timerInterval: null,
+	width: 0,
+	height: 0,
+	randomPoint: utils.getRandomPointInRectangle(p1, p2, p3, p4),
+	bonus: null,
+	malus: null,
+	effect: null
+};
 
 export function gameRenderer(data) {
 	utils.clearScene(); 
@@ -94,6 +104,9 @@ export function gameRenderer(data) {
 	// scene.add(lightWall);
 	// scene.add(spotLight1);
 	// scene.add(spotLight2);
+
+	gameData.width = data.width;
+	gameData.height = data.height;
 
 	// Game limits
 	const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
@@ -109,21 +122,6 @@ export function gameRenderer(data) {
 	const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
 	const line = new THREE.Line(geometryLine, materialLine);
 
-	function randomPointBetweenVectors(vec1, vec2) {
-		const factor = Math.random();
-		const result = new THREE.Vector3();
-		return result.lerpVectors(vec1, vec2, factor);
-	}
-	
-	const randomIndex1 = Math.floor(Math.random() * (points.length - 1));
-	const randomIndex2 = randomIndex1 === points.length - 1 ? 0 : randomIndex1 + 1;
-	
-	const randomPoint = randomPointBetweenVectors(points[randomIndex1], points[randomIndex2]);
-	console.log(randomPoint);
-
-	// load.effect.position.set(randomPoint.x, randomPoint.y, randomPoint.z);
-	load.effect.position.set(20, 20, 0);
-	
 	// Background plane
 	const geometryPlane = new THREE.PlaneGeometry((data.width + 5) * 2, data.height * 2);
 	const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5 });
@@ -251,10 +249,9 @@ export function gameRenderer(data) {
 		gameData.collisionPaddle = true;
 		initialSpeed = data.speed;
 	}
-
     
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     composer.render();
 }
 
-
+animate();

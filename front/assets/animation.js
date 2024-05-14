@@ -4,6 +4,7 @@ import { composer } from './game.js';
 import * as game from './game.js';
 import * as utils from './utils.js';
 import { gameData } from './game.js';
+import { loadData } from './loader.js';
 
 export var colorsBlue = [0x00f9ff, 0x00d2ff, 0x009fff, 0x0078ff, 0x0051ff, 0x0078ff, 0x009fff, 0x00d2ff];
 export var colorsGreen = [0x132A13, 0x31572C, 0x4F772D, 0x90A955, 0xECF39E, 0x90A955, 0x4F772D, 0x31572C];
@@ -19,6 +20,14 @@ let time_counter = Math.sqrt(bounce_distance * 2 / acceleration);
 let initial_speed = acceleration * time_counter;
 let bounce_height_factor = 1;
 var target = new THREE.Vector3(0, 0, 0);
+var bonusState = false;
+
+var p1 = { x: -45, y: -25 };
+var p2 = { x: 45, y: -25 };
+var p3 = { x: 45, y: 25 };
+var p4 = { x: -45, y: 25 };
+
+export var bonusTime = 1;
 
 const startGameButton = document.getElementById('startGame');
 const localGameButton = document.getElementById('localGame');
@@ -30,7 +39,6 @@ export const animationData = {
   }; // A REMETTRE A FALSE
 
 localGameButton.addEventListener('click', () => {
-	animationData.intro = 1;
 	// startGameButton.style.display = 'none';
 	localGameButton.style.display = 'none';
 	exitButton.style.display = 'none';
@@ -62,19 +70,36 @@ function sleep(ms) {
 export async function animate() {
     requestAnimationFrame(animate);
 
+	// console.log(gameData.elapsedTime);
+	if (gameData.elapsedTime === bonusTime)
+		bonusState = true;
+
 	if (load.mixer)
 		load.mixer.update(0.01);
+
+	if (bonusState === true)
+	{	
+		load.effect.position.set(gameData.randomPoint.x, gameData.randomPoint.y, 0);
+		game.scene.add(load.effect);
+	}
 	
-	if (load.mixer2) {
-		load.mixer2.update(0.0167); 
+	if (loadData.mixer2) {
+		loadData.mixer2.update(0.0167); 
 	}
 
-	if (load.mixer2 && load.mixer2.time >= load.clips2[0].duration) {
+	if (loadData.mixer2 && loadData.mixer2.time >= load.clips2[0].duration && bonusState === true) {
 		game.scene.remove(load.effect);
-		// load.mixer2 = null; 
+		bonusState = false;
+		gameData.randomPoint = utils.getRandomPointInRectangle(p1, p2, p3, p4);
+		const randomNumber = Math.floor(Math.random() * (10 - 3 + 1)) + 3;
+		bonusTime = gameData.elapsedTime + randomNumber;
+		// loadData.mixer2 = null; 
+		loadData.mixer2.time = 0;
+		loadData.mixer2 = new THREE.AnimationMixer(load.effect);
+		loadData.mixer2.clipAction(load.clips2[0]).play();
 	}
 	
-	startGameButton.style.display = 'block';
+	startGameButton.style.display = 'none';
 
 	// if (game.sceneHandler === 1)
 	// {
@@ -96,7 +121,6 @@ export async function animate() {
 			}
 		}
 		if (gameData.explosion === true) {
-			console.log("BOOM!");
 			game.scene.children
 				.filter(obj => obj.userData.isTrailSphere)
 				.forEach(obj => game.scene.remove(obj));
@@ -116,7 +140,6 @@ export async function animate() {
 			gameData.collisionPaddle = false;
 		}
 	// }
-
 
     composer.render();
 }

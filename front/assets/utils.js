@@ -309,3 +309,34 @@ export function createParticle() {
         animationId = requestAnimationFrame(animate);
     });
 }
+
+export function getRandomPointInRectangle(p1, p2, p3, p4) {
+    const r1 = Math.random();
+    const r2 = Math.random();
+
+    const points = [p1, p2, p3, p4];
+    if (isClockwise(points)) {
+        points.reverse();
+    }
+
+    const [a, b, c, d] = points;
+
+    const x1 = a.x + r1 * (b.x - a.x);
+    const y1 = a.y + r1 * (b.y - a.y);
+    const x2 = d.x + r1 * (c.x - d.x);
+    const y2 = d.y + r1 * (c.y - d.y);
+
+    const x = x1 + r2 * (x2 - x1);
+    const y = y1 + r2 * (y2 - y1);
+
+    return { x, y };
+}
+
+export function isClockwise(points) {
+    const [p1, p2, p3, p4] = points;
+    const sum = (p2.x - p1.x) * (p2.y + p1.y) +
+                (p3.x - p2.x) * (p3.y + p2.y) +
+                (p4.x - p3.x) * (p4.y + p3.y) +
+                (p1.x - p4.x) * (p1.y + p4.y);
+    return sum > 0;
+}
