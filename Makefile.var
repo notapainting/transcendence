@@ -3,16 +3,16 @@ MAKE	=	make -sj
 
 #========#	compose	#========#
 APP_DIR		=	compose/
-APP_FILE	=	compose.auth_service.yml compose.user_managment.yml
+APP_FILE	=	compose.auth-service.yml compose.user-managment.yml compose.chat.yml
 
-PROXY_FILE	=	compose.proxy.yml
+PROXY_FILE	=	compose.proxy.waf.yml
 
 APP_FILE	+= ${PROXY_FILE}
 
 FILE	=	${addprefix --file , ${addprefix ${APP_DIR}, ${APP_FILE}}}
 
 
-BASE	=	docker compose \
+BASE	=	docker-compose \
 				--env-file env.dev \
 				--file compose.network.yml 
 
