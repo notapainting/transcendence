@@ -67,10 +67,5 @@ def serializer_wrapper(serializer, data):
     ser.create(ser.validated_data)
     return ser.data
 
-@database_sync_to_async
-def auth(name):
-    try:
-        return mod.User.objects.exclude(name__in=enu.SpecialUser).get(name=name)
-    except ObjectDoesNotExist:
-        raise DenyConnection
+
     

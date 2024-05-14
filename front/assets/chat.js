@@ -41,7 +41,13 @@ document.querySelector('#chat-submit-user').onclick = function(e)
     const messageInputDom = document.querySelector('#chat-input');
     userName = messageInputDom.value;
 
-    document.cookie = 'userName=' + userName + ';';
+    // document.cookie = 'userName=' + userName + ';';
+        // browser.cookies.set('refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcxNjI4MzA5MSwiaWF0IjoxNzE1Njc4MjkxLCJqdGkiOiI4Y2ZhZWYzNzQ2MzE0MWRjODM2NWFlYmQ3YTM4NjYxMiIsInVzZXJfaWQiOjF9.7iOjkseJJPQ0LiiGcnSwxPKDf9O0WU9grxjdLaynkjg; HttpOnly; Path=/')
+        // browser.cookies.set('access=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1Njc4MzExLCJpYXQiOjE3MTU2NzgyOTEsImp0aSI6IjNhZjVkYTcxNDk3ZjQ0MGI5NGUxYWMwYTAyNGU3NDc1IiwidXNlcl9pZCI6MX0.c1yxgR6BiW1AIJ4Q6zf0usoYX5w6jVsHWcDgmf2SLTk; HttpOnly; Path=/')
+
+    document.cookie = 'access=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1Njc4MzExLCJpYXQiOjE3MTU2NzgyOTEsImp0aSI6IjNhZjVkYTcxNDk3ZjQ0MGI5NGUxYWMwYTAyNGU3NDc1IiwidXNlcl9pZCI6MX0.c1yxgR6BiW1AIJ4Q6zf0usoYX5w6jVsHWcDgmf2SLTk;';
+    document.cookie = 'refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcxNjI4MzA5MSwiaWF0IjoxNzE1Njc4MjkxLCJqdGkiOiI4Y2ZhZWYzNzQ2MzE0MWRjODM2NWFlYmQ3YTM4NjYxMiIsInVzZXJfaWQiOjF9.7iOjkseJJPQ0LiiGcnSwxPKDf9O0WU9grxjdLaynkjg;';
+
     messageInputDom.value = '';
     chatSocket = new WebSocket('wss://' + host  + '/chat/');
 

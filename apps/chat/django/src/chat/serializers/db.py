@@ -67,13 +67,6 @@ class User(BaseSerializer):
     class Meta:
         model = mod.User
         fields = ['name', 'contacts', 'groups', 'blockeds', 'blocked_by', 'invitations', 'invited_by']
-        # extra_kwargs = {
-        #                     'groups': {'read_only': False},
-        #                     'blockeds': {'required': False},
-        #                     'blockeds_by': {'required': False},
-        #                     'invitations': {'required': False},
-        #                     'invited_by': {'required': False},
-        #                 }
 
     def get_contacts(self, obj):
         qset = obj.get_contacts()

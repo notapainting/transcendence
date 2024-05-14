@@ -88,7 +88,7 @@
 {"client":"consumer"}
 
 {
-    "type":"message.group",
+    "type":"message.text",
     "data":
     {
         "to":"755b83ae-0cb9-461c-8639-b55ec589a6a5",
@@ -96,6 +96,14 @@
         "respond_to": "",
         "author":"",
         "date":""
+    }
+}
+
+{
+    "type":"message.fetch",
+    "data":
+    {
+        "date":"2024-05-15T12:02:01.005411"
     }
 }
 
@@ -130,7 +138,27 @@
 }
 
 {
+    "type":"group.create",
+    "data":
+    {
+        "author":"",
+        "name":"",
+        "members":[],
+        "admins":[],
+        "restricts":[],
+    }
+}
+
+{
     "type":"group.quit",
+    "data":
+    {
+        "id":""
+    }
+}
+
+{
+    "type":"group.delete",
     "data":
     {
         "id":""
