@@ -12,12 +12,12 @@ var width = window.innerWidth;
 var height = window.innerHeight
 
 export const scene = new THREE.Scene();
-// export const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
-export const camera = new THREE.PerspectiveCamera(45, 600/900, 0.1, 1000);
+export const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
+// export const camera = new THREE.PerspectiveCamera(45, 600/900, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
 scene.background = new THREE.Color(0x031d44);
-// renderer.setSize(width, height);
-renderer.setSize(600, 900);
+renderer.setSize(width, height);
+// renderer.setSize(600, 900);
 camera.position.set( 0, -200, 115);
 // camera.position.set( 0, -100, 85 ); // position de la camera pour le jeu
 
@@ -72,8 +72,9 @@ export var sceneHeight = 70;
 // scenes
 export var sceneHandler = 1;
 
-export var randBonus = ['longPaddle', 'speedBall', 'boost'];
-export var randMalus = ['slow', 'shortPaddle'];
+export var randBonus = ['longPaddle'];
+// export var randBonus = ['longPaddle', 'boost'];
+export var randMalus = ['slow', 'shortPaddle', 'invertedKey'];
 export var randEffect = ['hurricane', 'earthquake', 'glitch'];
 
 var p1 = { x: -45, y: -25 };
@@ -99,7 +100,7 @@ export function gameRenderer(data) {
 	utils.clearScene(); 
     animationData.ballFall = true;
     // scene.add(load.intro);
-    scene.add(spotLight);
+    // scene.add(spotLight);
 	// scene.add(light);
 	// scene.add(lightWall);
 	// scene.add(spotLight1);
