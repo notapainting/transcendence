@@ -1,0 +1,259 @@
+TODO: 
+	-check for no async ORM in API 
+    - better status system if multi session (connect/disconnect)
+    - check fo double user valu in groug create/update
+    -> better raise auth obj not found
+    -> groupe delete ? 
+    -> fix groupview PATCH/DELETE, userview PATCH
+
+
+Set-Cookie: access=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1Njc4MzExLCJpYXQiOjE3MTU2NzgyOTEsImp0aSI6IjNhZjVkYTcxNDk3ZjQ0MGI5NGUxYWMwYTAyNGU3NDc1IiwidXNlcl9pZCI6MX0.c1yxgR6BiW1AIJ4Q6zf0usoYX5w6jVsHWcDgmf2SLTk; HttpOnly; Path=/
+
+Set-Cookie: refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcxNjI4MzA5MSwiaWF0IjoxNzE1Njc4MjkxLCJqdGkiOiI4Y2ZhZWYzNzQ2MzE0MWRjODM2NWFlYmQ3YTM4NjYxMiIsInVzZXJfaWQiOjF9.7iOjkseJJPQ0LiiGcnSwxPKDf9O0WU9grxjdLaynkjg; HttpOnly; Path=/
+
+
+
+({'date': '2024-05-14T19:29:16.000949', 'body': 'message in the pastabox 2222 !'}), 
+({'date': '2024-05-14T10:29:16.000949', 'body': 'message in the past !'}), 
+
+({'date': '2024-05-13T13:29:41.000262', 'body': 'how r u'}), 
+({'date': '2024-05-13T13:29:26.000447', 'body': 'hello'}), 
+({'date': '2024-05-13T13:29:19.000198', 'body': 'lulu!'}), 
+({'date': '2024-05-13T13:29:16.000949', 'body': "it's me!"}), 
+({'date': '2024-05-13T13:29:11.000990', 'body': 'hy'}), 
+({'date': '2024-05-12T19:29:16.000949', 'body': 'message in the pastabox 2222 !'}), 
+({'date': '2024-05-12T10:29:16.000949', 'body': 'message in the past !'})
+
+
+
+
+ALL EVENT SEND BACK CONFIRMATION EVENT (UPDATE) OR ERROR
+
+GROUP:
+    on connect: -> send .summary
+
+    on update/create: -> if accepted -> send back new/updated group
+                        | -> else : send 403
+
+.summary
+.update
+
+
+CONTACT:
+    on connect; -> send summary
+    on update: -> update contact
+                | -> send target notification
+
+    update :    -invit -> resolve invit -> send invit   
+                                       | -> add contact -> create/link? private conv 
+                -block -> put private conv on R for all + update status
+                -unblock
+.summary
+.update
+
+
+STATUS:
+    on connect: -> send self status
+            |   -> fetch contact status
+    on update: -> send new status
+    on disconnect: like update
+
+.update
+.fetch
+
+MESSAGE:
+    on send: -> check permissions/ groups appartenance
+                | -> if ok send msg 
+                    | ELSED SEND 403
+
+.text
+.game
+.fetch
+
+
+
+FIXME: 
+	- POST on /users without '/' -> 500
+    - POST without body
+
+
+logique :
+    message.private : cl1 -> cl2
+        cl1 ->  cs1
+                |   check if cl2 is in contact /is blocked
+                |   store message in db
+                |   send message to cs2
+                |   cs2 send message to cl2
+
+
+    name -> gr id
+
+
+private = gr with :
+    name = private ? blank ? special value? @?
+    members 2 user at w perm
+    when blocked -> set all perm to r
+
+
+
+u1 = fk
+u2 = fk
+-> message
+
+    message.group : cl1 -> gr1
+        cl1 ->  cs1
+                |   check if gr1 is in groups
+                |   store message in db
+                |   send message to gr/cs   (include cs1)
+                |   each gr/cs check if author is blocked
+                |   if author not block -> send to gr/cl
+
+
+gr :    id 
+        name -> a-zA-Z0-9!?-_().&#,<>
+        members
+        ->messages
+        thr : 
+            authorisation (r,w,a,o)
+            last_read
+            date_joined
+
+
+list all conv
+list friend
+
+
+
+755b83ae-0cb9-461c-8639-b55ec589a6a5
+
+./manage.py makemigrations
+./manage.py shell
+
+
+
+APIv1 : /api/v1/
+
+USER: /users/ 
+'' 
+	-> GET -> list of users
+
+':id/'	-> id is a uuid
+	-> POST -> create user <id> with payload, payload only accept 'name' field
+from now ':id/' in USER can be a name
+		-> GET -> user <id> data
+		-> PUT -> change user <id> data from payload, payload only accept 'name' field
+		-> DELETE -> delete user <id>
+
+':id/contacts/'
+	-> POST
+
+
+https://stackoverflow.com/questions/30752268/how-to-filter-objects-for-count-annotation-in-django
+
+
+
+
+
+
+Tuc: Two users conv
+Muc: Multiple users conv
+Ssu: Single session user
+Msu: Multiple sessions user
+
+
+conv-groups arch: (G = O(n), n is number of conv)
+	Ssu: session add to group on connect
+	Msu: each session add to group on connect
+	
+	1 conv (Tuc/Muc) = 1 group
+
+db store
+-> list of conv : unique group_name
+-> 
+
+
+websocket auth : 
+(see https://devcenter.heroku.com/articles/websocket-security)
+	- pass JWT in query string (see code in java)
+	- auth extern 
+	- Smuggle access tokens inside Sec-WebSocket-Protocol
+
+Since the only header a browser will let you control is Sec-WebSocket-Protocol, 
+you can abuse it to emulate any other header. Interestingly (or rather comically),
+ this is what Kubernetes is doing. In short, you append whatever you need for 
+ authentication as an extra supported subprotocol inside Sec-WebSocket-Protocol:
+
+var ws = new WebSocket("ws://example.com/path", ["realProtocol", "yourAccessTokenOrSimilar"]);
+
+Then, on the server, you add some sort of middleware that transforms the request 
+back to its saner form before passing it further into the system. Terrible, yes, 
+but so far the best solution. No tokens in the URL, no custom authentication save 
+for the little middleware, no extra state on the server needed. 
+ Do not forget to include the real subprotocol, as various tools will 
+ reject a connection without one.
+
+dont:
+	- via cookie (very unsecure with ws)
+
+https://asgi.readthedocs.io/en/latest/specs/www.html#websocket
+
+TODO:2
+	- read activitypub
+	- simple chat with 2 user
+		- front basic
+		- back
+	- dummy auth via ws:// ?username
+	- add chat history 
+	- make chat private
+	- make contact list
+	- 
+
+
+
+arch server/app:
+	-chat app server 
+		- chat
+		- notification
+		- see/writing/online...
+		- profile
+		- contact list managment
+		-
+	-bot
+	- pictures/file
+		-sticker bank
+		-file transfert server 
+		-pictures integration
+		-theme bank ?
+		-gif
+
+	
+
+
+OBJ:
+	-auth via auth api
+	-chat prive
+	-chat multi-session 
+	-chat group
+	-contact list
+	-block/restrain user 
+	-user creation in chat db
+	-game invitation
+	-notification 
+	-response to message
+	-profile link
+
+
+BONUS:
+	-links preview/alert when quit
+	-end-to-end ecnrypt
+	-bot
+	-image integration
+	-stickers bank
+	-tone indicator https://toneindicators.carrd.co/
+	-file transfert
+	-conv theme ? 
+	- db cluster ?
+	- access control : user roles and permissions, or IP-based access restrictions
+
+
+

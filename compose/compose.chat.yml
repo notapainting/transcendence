@@ -1,0 +1,54 @@
+services:
+  chat:
+    container_name: ${CHAT}
+    build:
+      context: apps/${CHAT}/django/
+      dockerfile: Dockerfile.dev
+    image: ${CHAT}_image
+    env_file:
+      - env.example/${CHAT}-common.env.example
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${CHAT}_volume:/app
+    networks:
+      - app_network
+    restart: unless-stopped
+    depends_on:
+      - ${CHAT}-db
+    stdin_open: true 
+    tty: true
+    # entrypoint: ["bash", "/conf/init.sh"]
+
+  chat-db:
+    container_name: ${CHAT}-db
+    build: apps/${CHAT}/postgres/
+    image: ${CHAT}-db_image
+    env_file:
+      - env.example/${CHAT}-common.env.example
+      - env.example/${CHAT}-db.env.example
+    volumes:
+      - ${CHAT}-db_volume:${PGDATA}
+    networks: 
+      - app_network
+    restart: unless-stopped
+
+  chat-redis:
+    container_name: ${CHAT}-redis
+    image: redis:7.2.4-alpine
+    networks: 
+      - app_network
+    restart: unless-stopped
+
+volumes:
+  chat_volume:
+    name: ${CHAT}
+    driver: local
+    driver_opts:
+      type: none
+      device: apps/${CHAT}/django/src
+      o: bind
+
+  chat-db_volume:
+    name: ${CHAT}-db
+    driver: local

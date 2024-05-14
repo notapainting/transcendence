@@ -7,7 +7,7 @@ services:
     image: proxy-waf
     ports:
      - "443:443"
-     - "443:443"
+     - "80:80"
     networks: 
       - app_network
     volumes:

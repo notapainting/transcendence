@@ -1,0 +1,292 @@
+API doc
+
+<format:thing> is optionnal
+all endpoint should end by '/'
+
+API HTTP:
+    endpoint:   /api/v1/users/<name>/
+    methods:     
+        - POST
+            - do: create ChatUser
+            - <name> : no
+            - expecting payload: yes
+            - example payload: {
+                                    "name":"borys"
+                                }
+            - return: 201/400
+        - GET
+            - do: return user with <name> data or lists users if <name> empty
+            - <name> : optionnal
+            - expecting payload: no
+            - return: 200/404, payload
+            - misc: you can filter users fields by passing fields in querystring,
+                    example: ?fields=name+id
+        - PATCH !bokren (only update name is working)
+            - do: update ChatUser
+            - <name> : optionnal
+            - expecting payload: yes
+            - example payload: {
+                                    "name":"borys",
+                                    "new_name"
+                                }
+                                    or 
+                                {
+                                    "data": {
+                                                "name":"borys",
+                                                "operation":"c/b/i/r"
+                                            }
+                                }
+            - return: 200/400
+            - misc: user name can be in endpoint or payload
+        - DELETE
+            - do: delete ChatUser
+            - <name> : yes
+            - expecting payload: no
+            - return: 200/400
+
+    endpoint:   /api/v1/groups/<uuid:id>/
+    methods:     
+        - POST
+            - do: create ChatGroup
+            - <id> : no
+            - expecting payload: yes
+            - example payload: {
+                                    "name": "Stellaron Hunter Chatgroup's",
+                                    "author": "luciole",
+                                    "admins":["sam"],
+                                    "members": ["xueyi", "acheron"],
+                                    "restricts": []
+                                }
+            - return: 201/400
+            - misc: - all payload fields are all mandatory, list can be empty (not author)
+                    - 'author' = owner
+        - GET
+            - do: return group with <id> data or lists groups if <id> empty
+            - <id> : optionnal
+            - expecting payload: no
+            - return: 200/404, payload
+            - misc: you can filter group fields by passing fields in querystring,
+                    example: ?fields=name+id
+        - PATCH
+            - do: update ChatGroup
+            - <name> : optionnal
+            - expecting payload: yes
+            - example payload: {
+                                    "name": "New Super Cool New Name",
+                                    "admins":["fuxuan"],
+                                    "members": ["xueyi", "acheron"],
+                                    "restricts": [], 
+                                    "remove":["sam]
+                                }
+            - return: 200/400
+            - misc: - group id must be in payload
+                    - all payload fields are all mandatory, list can be empty 
+                    - cant update owner
+        - DELETE
+            - do: delete ChatGroup
+            - <id> : yes
+            - expecting payload: no
+            - return: 200/404
+
+    endpoint:   /api/v1/messages/<uuid:id>/
+    note: shouldn't be used
+    methods:
+        - POST
+            - do: create ChatMessage
+            - <id> : no
+            - expecting payload: yes
+             - example payload: {
+                                    "author":"luciole",
+                                    "group": "bff768c5-de7c-42e7-ac2b-b4dd2760ffc4",
+                                    "respond_to": "",
+                                    "date":"2024-05-12T10:29:16.000949",
+                                    "body": "message in the past !"
+                                }
+            - return: 201/400/404
+            - misc: - all payload fields are all mandatory, 'respond_to' can be empty
+        - GET
+            - do: return message with <id> data 
+            - <id> : no
+            - expecting payload: no
+            - return: 200/400/404, payload
+            - misc: you can filter message fields by passing fields in querystring,
+                    example: ?fields=name+id
+        - PATCH
+            - do: update ChatMessage with <id>
+            - <id> : yes
+            - expecting payload: yes
+             - example payload: {
+                                    "author":"luciole",
+                                    "group": "bff768c5-de7c-42e7-ac2b-b4dd2760ffc4",
+                                    "respond_to": "",
+                                    "date":"2024-05-12T10:29:16.000949",
+                                    "body": "message in the past !"
+                                }
+            - return: 201/400/404
+            - misc: - all payload fields are all mandatory, 'respond_to' can be empty
+        - DELETE
+            - do: delete ChatMessage
+            - <id> : yes
+            - expecting payload: no
+            - return: 200/404
+
+
+WebSocket :
+    handhake endpoint:   /chat/
+    auth: JWT in cookies
+
+    events:
+        all event are formed with a 'type' key and a data 'key'
+        data value depend of 'type' key but should always contain 'author' field with username (but automatically set by backend)
+        all update/delete/message operation are verified in backend but front shouldn't let pass unauthorized operation
+        SHORT:
+            type key possible:
+                message.text
+                message.first
+                message.fetch
+                message.game (not implemented)
+                status.update
+                contact.update
+                group.create
+                group.update
+                group.quit
+                group.delete (not implemented)
+            !only from backend to client!
+                contact.summary
+                group.summary
+        LONG:
+            type key possible:
+                message.text
+                    {
+                        "type":"message.text",
+                        "data":
+                        {
+                            "to":"755b83ae-0cb9-461c-8639-b55ec589a6a5",
+                            "body":"hello",
+                            "respond_to": "",
+                            "author":"",
+                            "date":""
+                        }
+                    }
+                message.first
+                 {
+                        "type":"message.first",
+                        "data":
+                        {
+                            "target":"",
+                            "body":""
+                        }
+                    }
+
+
+                message.fetch
+                    {
+                        "type":"message.fetch",
+                        "data":
+                        {
+                            "date":"2024-05-15T12:02:01.005411"
+                        }
+                    }
+
+                message.game (not implemented)
+
+                status.update
+                    {
+                        "type":"status.update",
+                        "data":
+                        {
+                            "status":"online/afk/disconnected"
+                        }
+                    }
+
+                contact.update
+                    {
+                        "type":"contact.update",
+                        "data":
+                        {
+                            "name":"target",
+                            "operation":"contact/blocked/invitation/remove"
+                        }
+                    }
+
+                group.create
+                    {
+                        "type":"group.create",
+                        "data":
+                        {
+                            "author":"",
+                            "name":"",
+                            "members":[],
+                            "admins":[],
+                            "restricts":[],
+                        }
+                    }
+
+                group.update
+                    {
+                        "type":"group.update",
+                        "data":
+                        {
+                            "id":"",
+                            "name":"",
+                            "members":[],
+                            "admins":[],
+                            "restricts":[],
+                            "remove":[],
+                        }
+                    }
+
+                group.quit
+                    {
+                        "type":"group.quit",
+                        "data":
+                        {
+                            "id":""
+                        }
+                    }
+
+                group.delete (not implemented)
+                    {
+                        "type":"group.delete",
+                        "data":
+                        {
+                            "id":""
+                        }
+                    }
+
+            !only from backend to client!
+                 group.summary
+                    {
+                        "type":"group.summary",
+                        "data":
+                            {
+                                [
+                                    "id":"",
+                                    "name":"",
+                                    "members":[],
+                                    "admins":[],
+                                    "restricts":[],
+                                    "messages":[],
+                                    "last_read":"" (not implemented)
+                                ]
+                                [
+                                    ...
+                                ]
+                            }
+                    }
+
+                contact.summary
+                    {
+                        "type":"contact.summary",
+                        "data":
+                        {
+                            [
+                                "name":"",
+                                "relation":"contact/blocked/invitation/remove"
+                            ]
+                            [
+                                ...
+                            ]
+                        }
+                    }
+
