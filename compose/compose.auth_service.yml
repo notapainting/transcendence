@@ -13,9 +13,9 @@ services:
     networks:
       - app_network
     restart: unless-stopped
-    # stdin_open: true 
-    # tty: true
-    entrypoint: ["python", "/app/manage.py", "runserver", "0.0.0.0:${APP_PORT_1}"]
+    stdin_open: true 
+    tty: true
+    # entrypoint: ["python", "/app/manage.py", "runserver", "0.0.0.0:${APP_PORT_1}"]
 
   postgres:
     container_name: ${DB_NAME_1}

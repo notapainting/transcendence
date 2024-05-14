@@ -87,17 +87,14 @@ class GroupApiView(View):
     def delete(self, request, *args, **kwargs):
         try :
             opt = request.GET.get("opt")
-            ids = request.GET.get("id")
+            id = kwargs.get('id')
             if opt == 'all':
                 Group.objects.all().delete()
                 return HttpResponse(status=200)
-            elif ids is None:
+            elif id is None:
                 return HttpResponse(status=400)
-            if ids is not None:
-                ids = ids.split()
-                for id in ids:
-                    Group.objects.get(id=id).delete()
-                    logger.info("user %s, deleted", id)
+            Group.objects.get(id=id).delete()
+            logger.info("group %s, deleted", id)
             return HttpResponse(status=200)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)

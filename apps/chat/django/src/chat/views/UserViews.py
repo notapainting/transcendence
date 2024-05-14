@@ -87,11 +87,7 @@ class UserApiView(View):
                 print(s.errors)
                 return HttpResponse(status=400)
             logger.info(s.validated_data)
-            target = mod.User.objects.get(name=s.data['name'])
-            if s.data['operation'] == 'a':
-                user.update_relation(target, status=s.data['relation'])
-            else:
-                user.delete_relation(target)
+            s.create(s.validated_data)
             return HttpResponse(status=200)
 
         except (ValidationError, ObjectDoesNotExist):

@@ -47,7 +47,7 @@ class MessageFirst(BaseSerializer):
         self.obj = group
         logger.info(f"CREATE private group {group.id} by {data['author']}")
         return group
-    
+
     def to_representation(self, instance):
         return ser.Group(self.obj).data
 

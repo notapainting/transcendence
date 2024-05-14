@@ -2,12 +2,14 @@ TODO:
 	-check for no async ORM in API 
     - better status system if multi session (connect/disconnect)
     - check fo double user valu in groug create/update
-
+    -> better raise auth obj not found
     -> groupe delete ? 
+    -> fix groupview PATCH/DELETE, userview PATCH
 
 
+Set-Cookie: access=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1Njc4MzExLCJpYXQiOjE3MTU2NzgyOTEsImp0aSI6IjNhZjVkYTcxNDk3ZjQ0MGI5NGUxYWMwYTAyNGU3NDc1IiwidXNlcl9pZCI6MX0.c1yxgR6BiW1AIJ4Q6zf0usoYX5w6jVsHWcDgmf2SLTk; HttpOnly; Path=/
 
- 
+Set-Cookie: refresh=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcxNjI4MzA5MSwiaWF0IjoxNzE1Njc4MjkxLCJqdGkiOiI4Y2ZhZWYzNzQ2MzE0MWRjODM2NWFlYmQ3YTM4NjYxMiIsInVzZXJfaWQiOjF9.7iOjkseJJPQ0LiiGcnSwxPKDf9O0WU9grxjdLaynkjg; HttpOnly; Path=/
 
 
 

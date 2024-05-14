@@ -20,10 +20,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     group_list = []
     contact_list = []
-    user = None
 
     async def connect(self):
-        self.user = await cuti.auth(self.scope['cookies'].get('userName'))
+        self.user = self.scope['user']
+        if self.user is None:
+            raise DenyConnection()
 
         #accept connectiont to client
         subprotocol = self.scope.get('subprotocol')
