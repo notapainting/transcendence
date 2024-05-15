@@ -271,14 +271,14 @@ export function clearScene() {
     });
 }
 
-export function createParticle() {
+export function createParticle(positionX, positionY, particuleSize, distance) {
     var geometry = new THREE.BufferGeometry();
-    var vertices = new Float32Array([game.collisionX, game.collisionY, 0]);
+    var vertices = new Float32Array([positionX, positionY, 0]);
 
     geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
     var randomColor = anim.colorBall[Math.floor(Math.random() * anim.colorBall.length)];
-    var material = new THREE.PointsMaterial({ color: randomColor, size: 1.5 });
+    var material = new THREE.PointsMaterial({ color: randomColor, size: particuleSize });
 
     var particle = new THREE.Points(geometry, material);
     scene.add(particle);
@@ -289,8 +289,7 @@ export function createParticle() {
         Math.random() - 0.5
     ).normalize();
 
-    var speed = 0.6; 
-    var distance = 10;
+    var speed = 0.6;
     var update = function () {
         var positionAttribute = particle.geometry.getAttribute('position');
         var currentPosition = new THREE.Vector3().fromBufferAttribute(positionAttribute, 0);

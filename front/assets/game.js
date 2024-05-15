@@ -4,6 +4,7 @@ import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/
 
 import { animationData } from './animation.js';
 import { animate, colorBall } from './animation.js';
+import { gameSocket } from './websocket.js';
 import * as utils from './utils.js';
 
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
@@ -84,13 +85,16 @@ var p4 = { x: -45, y: 25 };
 
 export const gameData = {
 	explosion: false,
+	catchBonus: false,
 	collisionPaddle: false,
 	start: false,
 	elapsedTime: 0,
 	timerInterval: null,
 	width: 0,
 	height: 0,
-	randomPoint: utils.getRandomPointInRectangle(p1, p2, p3, p4),
+	randomPointB: utils.getRandomPointInRectangle(p1, p2, p3, p4),
+	randomPointM: utils.getRandomPointInRectangle(p1, p2, p3, p4),
+	randomPointE: utils.getRandomPointInRectangle(p1, p2, p3, p4),
 	bonus: null,
 	malus: null,
 	effect: null
@@ -132,10 +136,11 @@ export function gameRenderer(data) {
 	scene.add(plane);
 	
 	// Paddles
-	const geometry = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeight - 1, 20);
+	const geometryR = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightR - 1, 20);
+	const geometryL = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightL - 1, 20);
 	const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
-	cylinderRight = new THREE.Mesh(geometry, material);
-	cylinderLeft = new THREE.Mesh(geometry, material);
+	cylinderRight = new THREE.Mesh(geometryR, material);
+	cylinderLeft = new THREE.Mesh(geometryL, material);
 	cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY, 0);
 	cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY, 0);
 	cylinderRight.castShadow = true; 
@@ -249,6 +254,25 @@ export function gameRenderer(data) {
 	{
 		gameData.collisionPaddle = true;
 		initialSpeed = data.speed;
+	}
+
+	if (gameData.randomPointB.x !== 1000 && gameData.bonus !== null){
+		const targetPosition = new THREE.Vector3(gameData.randomPointB.x, gameData.randomPointB.y, gameData.randomPointB.z);
+
+		const targetRadius = 5;
+		const spherePosition = sphere.position;
+		const sphereRadius = sphere.geometry.parameters.radius;
+		const distance = spherePosition.distanceTo(targetPosition);
+
+		if (distance <= sphereRadius + targetRadius) {
+			gameData.catchBonus = true;
+			gameSocket.send(JSON.stringify({
+				'message': 'bonus',
+				'bonus': gameData.bonus
+			}));
+			gameData.bonus = null;
+			gameData.randomPointB.x = 1000;
+		} 
 	}
     
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
