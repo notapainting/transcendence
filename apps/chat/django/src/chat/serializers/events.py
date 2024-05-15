@@ -51,6 +51,24 @@ class MessageFirst(BaseSerializer):
     def to_representation(self, instance):
         return ser.Group(self.obj).data
 
+class MessageRead(BaseSerializer):
+    group = serializers.PrimaryKeyRelatedField(
+                queryset=mod.Group.objects.all(),
+                allow_null=False,
+                pk_field=serializers.UUIDField(format='hex_verbose'))
+    date = serializers.DateTimeField(format=ser.DATETIME_FORMAT)
+
+    def validate(self, data):
+        group = data['group']
+        if group.memberships.filter(user=data['author']).exists() is False:
+            raise ValidationError("can't fetch group message if not in", code=403)
+        return data
+
+    def create(self, data):
+        membership = data['group'].memberships.get(user=data['author'])
+        membership.last_read = data['date']
+        membership.save()
+        return data
 
 class MessageFetch(BaseSerializer):
     group = serializers.PrimaryKeyRelatedField(

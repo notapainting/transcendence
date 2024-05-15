@@ -28,7 +28,18 @@ class Event():
         TEXT = 'message.text'
         FETCH = 'message.fetch'
         GAME = 'message.game'
+        READ = 'message.read'
 
+    CLIENT = [
+                Message.FIRST,
+                Message.READ,
+                Message.TEXT,
+                Message.FETCH,
+                Status.UPDATE,
+                Contact.UPDATE,
+                Group.CREATE,
+                Group.UPDATE
+        ]
     choices = [Group, Contact, Status, Message]
 
 # change to Event.Contact.Operations

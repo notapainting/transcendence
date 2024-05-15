@@ -31,14 +31,17 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.accept(subprotocol)
         logger.info("%s Connected!", self.user.name)
 
+        self.group_list = await cuti.get_group_list(self.user)
+        self.contact_list = await cuti.get_contact_list(self.user)
+
+        print(f"clist {self.contact_list}")
+        print(f"glist {self.group_list}")
         # send group summary
-        self.group_list, group_summary = await cuti.get_group_summary(self.user)
+        group_summary = await cuti.get_group_summary(self.user, n_messages=2)
         await self.send_json(group_summary)
 
         # send contact summary
-        self.contact_list = await cuti.get_contact_list(self.user)
-        contact_summary = await cuti.get_contact_list(self.user, fields='contacts blockeds blocked_by invitations invited_by')
-        print(contact_summary)
+        contact_summary = await cuti.get_contact_summary(self.user)
         await self.send_json(contact_summary)
 
 
@@ -48,14 +51,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_add(id, self.channel_name)
 
         #  send status, fetch status
-        for contact in  self.contact_list:
+        for contact in await cuti.get_contact_list(self.user):
             await self.channel_layer.group_send(contact, {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":"o"}})
             await self.channel_layer.group_send(contact, {"type":enu.Event.Status.FETCH, "data":{"author":self.user.name}})
 
     async def disconnect(self, close_code):
         if self.user is None: #change to hasattr
             return
-        for id in self.group_list:
+
+        for id in await cuti.get_group_list(self.user):
             await self.channel_layer.group_discard(id, self.channel_name)
 
         for contact in await cuti.get_contact_list(self.user):
@@ -83,6 +87,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.send_json(ms)
             targets = 'self.local'
             return
+        elif type == enu.Event.Message.READ:
+            targets = [ms["data"]["group"]]
         elif type == enu.Event.Message.GAME:
             await self.send_json(ms)
             targets = 'self.local, cible'
@@ -121,6 +127,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # Send message to WebSocket
         await self.send_json(event)
 
+    async def message_read(self, event):
+        # Send message to WebSocket
+        await self.send_json(event)
+
     async def status_update(self, event):
         # Send message to WebSocket
         logger.info(event)
@@ -130,9 +140,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         logger.info(event)
         await self.channel_layer.group_send(event['data']['author'], {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":"o"}})
 
-        # Send message to WebSocket
-        # should send back status_update
-        # await self.send_json(event)
 
     async def contact_update(self, event):
         # Send message to WebSocket

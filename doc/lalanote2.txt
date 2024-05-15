@@ -1,5 +1,6 @@
 TODO: 
 	-check for no async ORM in API 
+    - lsat read ?
     - better status system if multi session (connect/disconnect)
     - check fo double user valu in groug create/update
     -> better raise auth obj not found

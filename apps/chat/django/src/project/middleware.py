@@ -26,13 +26,14 @@ class CustomAuthMiddleware(BaseMiddleware):
     sync_capable = False
 
     async def __call__(self, scope, receive, send):
-        promise = await httpx.AsyncClient().post(url='http://auth-service:8000/auth/validate_token/', headers=dict(scope['headers']))
+        # promise = await httpx.AsyncClient().post(url='http://auth-service:8000/auth/validate_token/', headers=dict(scope['headers']))
 
-        print(promise.status_code)
-        print(promise.json())
-        if httpx.codes.is_error(promise.status_code) is True:
-            scope['user'] = None
-        else:
-            scope['user'] = await get_user(name=promise.json()['name'])
+        # print(promise.status_code)
+        # print(promise.json())
+        # if httpx.codes.is_error(promise.status_code) is True:
+        #     scope['user'] = None
+        # else:
+        #     scope['user'] = await get_user(name=promise.json()['name'])
+        scope['user'] = await get_user(name='sam')
         return await self.inner(scope, receive, send)
 

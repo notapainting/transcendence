@@ -16,6 +16,8 @@ services:
     restart: unless-stopped
     depends_on:
       - ${CHAT}-db
+    ports:
+      - "8000:8000"
     stdin_open: true 
     tty: true
     # entrypoint: ["bash", "/conf/init.sh"]
