@@ -38,8 +38,11 @@ class Event():
                 Status.UPDATE,
                 Contact.UPDATE,
                 Group.CREATE,
-                Group.UPDATE
+                Group.UPDATE,
+                Group.QUIT,
+                Group.DELETE
         ]
+    
     choices = [Group, Contact, Status, Message]
 
 # change to Event.Contact.Operations
@@ -52,3 +55,7 @@ class Operations(TextChoices):
 class SpecialUser(TextChoices):
     ADMIN = 'admin'
     SYSTEM = 'system'
+
+class Self(TextChoices):
+    LOCAL = 'local'
+

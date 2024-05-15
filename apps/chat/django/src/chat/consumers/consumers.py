@@ -72,37 +72,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await super().dispatch(message)
 
 
-# contact -> username !! selfgroups ?? 
-    async def client_event_handler(self, type, data):
-        ms = {}
-        ms['type'] = type
-        ms['data'] = data
+    async def send_back(self, type, data):
+        targets, event = await cuti.get_targets(self.user, type, data)
 
-        if type == enu.Event.Message.TEXT:
-            targets = [ms['data']['group']]
-        elif type == enu.Event.Message.FIRST:
-            targets = ms["data"]["members"]
-        elif type == enu.Event.Message.FETCH:
-            print(ms['data'])
-            await self.send_json(ms)
-            targets = 'self.local'
-            return
-        elif type == enu.Event.Message.READ:
-            targets = [ms["data"]["group"]]
-        elif type == enu.Event.Message.GAME:
-            await self.send_json(ms)
-            targets = 'self.local, cible'
-            return
-        elif type == enu.Event.Status.UPDATE:
-            targets = cuti.get_contact_list(self.user) + [self.user.name]
-        elif type == enu.Event.Contact.UPDATE:
-            targets = [self.user.name, ms['data']['name']]
-        elif type in enu.Event.Group.values:
-            ms['type'] = enu.Event.Group.UPDATE
-            targets = ms["data"]["owner"] + ms["data"]["members"] + ms["data"]["admins"] + ms["data"]["restricts"]
-
+        if targets[0] == enu.Self.LOCAL:
+            local = targets.pop(0)
+            await self.send_json(event)
         for target in targets:
-            await self.channel_layer.group_send(target, ms)
+            await self.channel_layer.group_send(target, event)
 
 
     async def receive_json(self, text_data):
@@ -111,7 +88,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             type = await cuti.validate_data(username=self.user.name, data=text_data)
             serial = await cuti.get_serializer(type)
             ser_data = await cuti.serializer_wrapper(serial, text_data['data'])
-            await self.client_event_handler(type, ser_data)
+            await self.send_back(type, ser_data)
 
         except DrfValidationError as e:
                 logger.info(e.args[0])

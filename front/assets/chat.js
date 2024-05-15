@@ -65,7 +65,7 @@ document.querySelector('#chat-enter-room').onclick = function(e)
     const now = getCurrentDateTime();
 
     chatSocket.send(JSON.stringify({
-        "type":"message.read",
+        "type":"message.fetch",
         "data":
         {
             "group":"782e184c-8167-4c93-9f76-e7d15fe8eea3",
@@ -74,6 +74,13 @@ document.querySelector('#chat-enter-room').onclick = function(e)
     }));
    messageInputDom.value = '';
 };
+
+// "type":"message.read",
+// "data":
+// {
+//     "group":"782e184c-8167-4c93-9f76-e7d15fe8eea3",
+//     "date":now,
+// }
 
 document.querySelector('#chat-submit-message').onclick = function(e)
 {

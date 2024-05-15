@@ -12,9 +12,6 @@ import chat.models as mod
 import chat.enums as enu
 import chat.utils as uti
 
-
-# faire getgrouplist + ser group summary better
-
 async def validate_data(username, data):
     type = data.get('type', None)
     data = data.get('data', None)
@@ -39,15 +36,64 @@ async def get_serializer(type):
     }
     return serializers[type]
 
+async def get_targets2(user, type, data):
+    if type == enu.Event.Message.TEXT:
+        targets = [data['group']]
+    elif type == enu.Event.Message.FIRST:
+        targets = data["members"]
+    elif type == enu.Event.Message.FETCH:
+        targets = [enu.Self.LOCAL]
+    elif type == enu.Event.Message.READ:
+        targets = [data["group"]]
+    elif type == enu.Event.Message.GAME:
+        targets = [enu.Self.LOCAL, data['target']]
+    elif type == enu.Event.Status.UPDATE:
+        targets = cuti.get_contact_list(user) + [user.name]
+    elif type == enu.Event.Contact.UPDATE:
+        targets = [user.name, data['name']]
+    elif type in enu.Event.Group.values:
+        type = enu.Event.Group.UPDATE
+        targets = data["owner"] + data["members"] + data["admins"] + data["restricts"]
+
+    event = {}
+    event['type'] = type
+    event['data'] = data
+    return targets, event
+
+async def get_targets(user, type, data):
+    match type:
+        case enu.Event.Message.TEXT: targets = [data['group']]
+        case enu.Event.Message.FIRST: targets = data["members"]
+        case enu.Event.Message.values: targets = [enu.Self.LOCAL]
+        case enu.Event.Message.READ: targets = [data["group"]]
+        case enu.Event.Message.GAME: targets = [enu.Self.LOCAL, data['target']]
+        case enu.Event.Status.UPDATE: targets = cuti.get_contact_list(user) + [user.name]
+        case enu.Event.Contact.UPDATE: targets = [user.name, data['name']]
+        # case enu.Event.Group.CREATE: 
+        # case enu.Event.Group.UPDATE:
+        # case enu.Event.Group.QUIT:
+        case enu.Event.Group.DELETE:
+            type = enu.Event.Group.UPDATE
+            targets = data["owner"] + data["members"] + data["admins"] + data["restricts"]
+
+    event = {}
+    event['type'] = type
+    event['data'] = data
+    return targets, event
+
+async def extract_value(data, key):
+    ret = data[key]
+    if type(ret) is list:
+        return ret
+    else:
+        return [ret]
+
 @database_sync_to_async
 def serializer_wrapper(serializer, data):
     ser = serializer(data=data)
     ser.is_valid(raise_exception=True)
     ser.create(ser.validated_data)
     return ser.data
-
-# import datetime
-
 
 @database_sync_to_async
 def get_group_summary(user, n_messages=20):
