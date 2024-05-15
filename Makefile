@@ -42,7 +42,6 @@ no-waf:
 #========#	start/stop rule	#========#
 start: -waf-warn
 	${CMP} up -d --build
-	${MAKE} -C elk_struct/
 
 clear:
 	${CMP} down -v --remove-orphans --rmi all
