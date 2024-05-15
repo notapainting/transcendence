@@ -5,7 +5,7 @@ function updateTimer() {
 	gameData.elapsedTime += 1;
 }
 
-const gameSocket = new WebSocket(
+export const gameSocket = new WebSocket(
 	'wss://'
 	+ window.location.host
 	+ '/ws/ws-game/'

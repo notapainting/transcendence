@@ -79,13 +79,10 @@ export async function animate() {
 
 	if (bonusState === true)
 	{	
-		var i;
-		do {
-			i = Math.floor(Math.random() * game.randBonus.length);
-		} while (gameData.bonus === game.randBonus[i]);
+		var i = Math.floor(Math.random() * game.randBonus.length);
 	
 		gameData.bonus = game.randBonus[i];
-		load.effect.position.set(gameData.randomPoint.x, gameData.randomPoint.y, 0);
+		load.effect.position.set(gameData.randomPointB.x, gameData.randomPointB.y, 0);
 		game.scene.add(load.effect);
 	}
 	
@@ -96,13 +93,13 @@ export async function animate() {
 	if (loadData.mixer2 && loadData.mixer2.time >= load.clips2[0].duration && bonusState === true) {
 		game.scene.remove(load.effect);
 		bonusState = false;
-		gameData.randomPoint = utils.getRandomPointInRectangle(p1, p2, p3, p4);
+		gameData.randomPointB = utils.getRandomPointInRectangle(p1, p2, p3, p4);
 		const randomNumber = Math.floor(Math.random() * (10 - 3 + 1)) + 3;
 		bonusTime = gameData.elapsedTime + randomNumber;
-		// loadData.mixer2 = null; 
 		loadData.mixer2.time = 0;
 		loadData.mixer2 = new THREE.AnimationMixer(load.effect);
 		loadData.mixer2.clipAction(load.clips2[0]).play();
+		gameData.bonus = null;
 	}
 	
 	startGameButton.style.display = 'none';
@@ -130,10 +127,19 @@ export async function animate() {
 			game.scene.children
 				.filter(obj => obj.userData.isTrailSphere)
 				.forEach(obj => game.scene.remove(obj));
-			for (var i = 0; i < 100; i++) {
-				utils.createParticle();
+			for (var i = 0; i < 150; i++) {
+				utils.createParticle(game.collisionX, game.collisionY, 1, 15);
 			}
 			gameData.explosion = false;
+		} 
+		if (gameData.catchBonus === true) {
+			game.scene.children
+				.filter(obj => obj.userData.isTrailSphere)
+				.forEach(obj => game.scene.remove(obj));
+			for (var i = 0; i < 100; i++) {
+				utils.createParticle(game.sphere.position.x,game.sphere.position.y, 0.5, 10);
+			}
+			gameData.catchBonus = false;
 		} 
 		if (gameData.collisionPaddle === true)
 		{
