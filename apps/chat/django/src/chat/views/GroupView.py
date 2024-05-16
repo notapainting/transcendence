@@ -16,7 +16,7 @@ from logging import getLogger
 logger = getLogger('django')
 
 
-
+#  type(error).__name__, "–", error)
 # check if user exist
 # check if private groups exist
 class GroupApiView(View):

@@ -30,6 +30,12 @@ class Event():
         GAME = 'message.game'
         READ = 'message.read'
 
+    class Errors(TextChoices):
+        ENCODE = 'error.encode'
+        DECODE = 'error.decode'
+        TYPE = 'error.type'
+        DATA = 'error.data'
+
     CLIENT = [
                 Message.FIRST,
                 Message.READ,

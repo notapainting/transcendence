@@ -3,7 +3,7 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer, AsyncWebsocketConsumer
 
 from django.core.exceptions import ObjectDoesNotExist
-from channels.exceptions import DenyConnection
+import channels.exceptions as exchan
 from rest_framework.serializers import ValidationError as DrfValidationError
 
 import chat.enums as enu
@@ -24,21 +24,27 @@ CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
         logger.info(f"msg type : {message['type']}")
-        await super().dispatch(message)
+        try :
+            await super().dispatch(message)
+        except ValueError as error:
+            logger.warning(error)
+            await self.send_json({'type':enu.Event.Errors.TYPE})
+        except BaseException:
+            raise
 
     @classmethod
     async def decode_json(cls, text_data):
         try :
             return json.loads(text_data)
         except:
-            return {'type':'error.decode'}
+            return {'type':enu.Event.Errors.DECODE}
 
     @classmethod
     async def encode_json(cls, content):
         try:
             return json.dumps(content)
         except:
-            return json.dumps({'type':'error.encode'})
+            return json.dumps({'type':enu.Event.Errors.ENCODE})
 
     async def send_json(self, content, close=False):
         await super().send(text_data=await self.encode_json(content), close=close)
@@ -72,7 +78,7 @@ class ChatConsumer(BaseConsumer):
     async def connect(self):
         self.user = self.scope['user']
         if self.user is None:
-            raise DenyConnection()
+            raise exchan.DenyConnection()
             # use close with reason/code
 
         #accept connectiont to client
@@ -110,7 +116,7 @@ class ChatConsumer(BaseConsumer):
 
     async def receive_json(self, json_data, **kwargs):
         # logger.info(f'text : {json_data}')
-        if json_data['type'] == 'error.decode':
+        if json_data['type'] == enu.Event.Errors.DECODE:
             await self.send_json(json_data)
             return
         try :
@@ -118,16 +124,15 @@ class ChatConsumer(BaseConsumer):
             serial = await cuti.get_serializer(type)
             ser_data = await cuti.serializer_wrapper(serial, json_data['data'])
             targets, event = await cuti.get_targets(self.user, type, ser_data)
-
+        except DrfValidationError as error:
+                logger.info(error)
+                await self.send_json({"type": enu.Event.Errors.DATA})
+        else:
             if targets == enu.Self.LOCAL:
                 await self.send_json(event)
             else:
                 for target in targets:
                     await self.channel_layer.group_send(target, event)
-
-        except DrfValidationError as e:
-                logger.info(e.args[0])
-                await self.send_json({"data": "fck u"})
 
     async def status_fetch(self, event):
         logger.info(event)
