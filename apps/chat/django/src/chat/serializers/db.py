@@ -75,7 +75,7 @@ class User(BaseSerializer):
     def get_blockeds(self, obj):
         qset = obj.get_outbox(status=mod.Relation.Types.BLOCK)
         return uti.cleaner(Relation(qset, many=True, fields='to_user').data, 'to_user')
-    
+
     def get_invitations(self, obj):
         qset = obj.get_outbox(status=mod.Relation.Types.INVIT)
         return uti.cleaner(Relation(qset, many=True, fields='to_user').data, 'to_user')
