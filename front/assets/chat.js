@@ -44,6 +44,7 @@ document.querySelector('#chat-submit-user').onclick = function(e)
     messageInputDom.value = '';
     chatSocket = new WebSocket('wss://' + host  + '/chat/');
 
+
     chatSocket.onmessage = function(e)
     {
         const data = JSON.parse(e.data);
@@ -63,15 +64,20 @@ document.querySelector('#chat-enter-room').onclick = function(e)
 {
     const messageInputDom = document.querySelector('#chat-input').value;
     const now = getCurrentDateTime();
+    const array = new Float32Array(5);
 
+    for (var i = 0; i < array.length; ++i) {
+        array[i] = i / 2;
+    }
     chatSocket.send(JSON.stringify({
+
         "type":"message.fetch",
         "data":
         {
-            "group":"782e184c-8167-4c93-9f76-e7d15fe8eea3",
-            "date":now,
+            "date":"2024-05-15T12:02:01.005411",
+            "group":"782e184c-8167-4c93-9f76-e7d15fe8eea3"
         }
-    }));
+}));
    messageInputDom.value = '';
 };
 
