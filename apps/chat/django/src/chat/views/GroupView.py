@@ -16,33 +16,26 @@ from logging import getLogger
 logger = getLogger('django')
 
 
-#  type(error).__name__, "–", error)
-# check if user exist
-# check if private groups exist
 class GroupApiView(View):
 
     @csrf_exempt
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
-    # check if user cant create conv (ie for private has un contact)
     def post(self, request, *args, **kwargs):
         try :
             data = uti.parse_json(request.body)
             s = event.GroupCreate(data=data)
-            if s.is_valid() is False:#trhow if user doesnt exit
-                print(s.errors)
-                return HttpResponse(status=400)
-
-            # implementer verification doublon conv ? 
+            s.is_valid(raise_exception=True)
             s.create(s.validated_data)
             return HttpResponse(status=201)
-
-        except (ValidationError, ObjectDoesNotExist) as e:
-            logger.error(f"Internal : {e.args[0]}")
+        except (DrfValidationError, ParseError) as error:
+            logger.error(error)
+            return HttpResponse(status=400)
+        except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
-        except BaseException as e:
-            logger.error(f"Internal : {e.args[0]}")
+        except BaseException as error:
+            logger.critical(f"{type(error).__name__} : {error})")
             return HttpResponse(status=500)
 
     def get(self, request, *args, **kwargs):
@@ -60,46 +53,38 @@ class GroupApiView(View):
             data = ser.Group(qset, many=many, fields=fields).data
             data = uti.render_json(data)
             return HttpResponse(status=200, content=data)
-
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
-        except BaseException as e:
-            logger.error(f"Internal : {e.args[0]}")
+        except BaseException as error:
+            logger.critical(f"{type(error).__name__} : {error})")
             return HttpResponse(status=500)
 
     def patch(self, request, *args, **kwargs):
         try :
             data = uti.parse_json(request.body)
             s = event.GroupUpdate(data=data)
-            if s.is_valid() is False:
-                print(s.errors)
-                return HttpResponse(status=400)
-            print(s.validated_data)
+            s.is_valid(raise_exception=True)
             s.update(s.validated_data)
             return HttpResponse(status=200)
-
+        except (DrfValidationError, ParseError) as error:
+            logger.error(error)
+            return HttpResponse(status=400)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
-        except BaseException as e:
-            logger.error(f"Internal : {e.args[0]}")
+        except BaseException as error:
+            logger.critical(f"{type(error).__name__} : {error})")
             return HttpResponse(status=500)
 
     def delete(self, request, *args, **kwargs):
         try :
-            opt = request.GET.get("opt")
             id = kwargs.get('id')
-            if opt == 'all':
-                Group.objects.all().delete()
-                return HttpResponse(status=200)
-            elif id is None:
-                return HttpResponse(status=400)
             Group.objects.get(id=id).delete()
             logger.info("group %s, deleted", id)
             return HttpResponse(status=200)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
-        except BaseException as e:
-            logger.error(f"Internal : {e.args[0]}")
+        except BaseException as error:
+            logger.critical(f"{type(error).__name__} : {error})")
             return HttpResponse(status=500)
 
 

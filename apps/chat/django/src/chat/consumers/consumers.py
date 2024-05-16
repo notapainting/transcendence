@@ -75,11 +75,11 @@ class ChatConsumer(BaseConsumer):
     group_list = []
     contact_list = []
 
+
     async def connect(self):
         self.user = self.scope['user']
         if self.user is None:
             raise exchan.DenyConnection()
-            # use close with reason/code
 
         #accept connectiont to client
         await self.accept(self.scope.get('subprotocol', None))
@@ -124,6 +124,7 @@ class ChatConsumer(BaseConsumer):
             serial = await cuti.get_serializer(type)
             ser_data = await cuti.serializer_wrapper(serial, json_data['data'])
             targets, event = await cuti.get_targets(self.user, type, ser_data)
+
         except DrfValidationError as error:
                 logger.info(error)
                 await self.send_json({"type": enu.Event.Errors.DATA})

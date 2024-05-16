@@ -11,6 +11,9 @@ from channels.db import database_sync_to_async
 
 from django.http import HttpResponseForbidden
 
+from logging import getLogger
+logger = getLogger('django')
+
 import httpx
 import chat.models as mod
 
@@ -26,14 +29,18 @@ class CustomAuthMiddleware(BaseMiddleware):
     sync_capable = False
 
     async def __call__(self, scope, receive, send):
-        # promise = await httpx.AsyncClient().post(url='http://auth-service:8000/auth/validate_token/', headers=dict(scope['headers']))
 
-        # print(promise.status_code)
-        # print(promise.json())
-        # if httpx.codes.is_error(promise.status_code) is True:
-        #     scope['user'] = None
-        # else:
-        #     scope['user'] = await get_user(name=promise.json()['name'])
+        try :
+            promise = await httpx.AsyncClient().post(url='http://auth-service:8000/auth/validate_token/', headers=dict(scope['headers']))
+            promise.raise_for_status()
+            scope['user'] = await get_user(name=promise.json()['name'])
+
+        except httpx.HTTPStatusError as error:
+            logger.warning(error)
+            scope['user'] = None
+        except (httpx.HTTPError, ObjectDoesNotExist) as error:
+            logger.error(error)
+            scope['user'] = None
+
         scope['user'] = await get_user(name='sam')
         return await self.inner(scope, receive, send)
-

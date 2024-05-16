@@ -2,14 +2,13 @@ TODO:
 	-check for no async ORM in API 
     - better status system if multi session (connect/disconnect)
     - check fo double user valu in group create/update
-    -> better raise auth obj not found
     -> groupe delete ? 
-    -> fix groupview PATCH/DELETE, userview PATCH
-    -> protect json receive
 
 FIXME: 
 	- POST on /users without '/' -> 500
     - POST without body
+    - csrf_exempt
+    - handle IntegrityError
 
 Set-Cookie: access=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1Njc4MzExLCJpYXQiOjE3MTU2NzgyOTEsImp0aSI6IjNhZjVkYTcxNDk3ZjQ0MGI5NGUxYWMwYTAyNGU3NDc1IiwidXNlcl9pZCI6MX0.c1yxgR6BiW1AIJ4Q6zf0usoYX5w6jVsHWcDgmf2SLTk; HttpOnly; Path=/
 

@@ -40,7 +40,6 @@ document.querySelector('#chat-submit-user').onclick = function(e)
     const messageInputDom = document.querySelector('#chat-input');
     userName = messageInputDom.value;
 
-    document.cookie = 'userName=' + userName + ';';
     messageInputDom.value = '';
     chatSocket = new WebSocket('wss://' + host  + '/chat/');
 
@@ -55,7 +54,9 @@ document.querySelector('#chat-submit-user').onclick = function(e)
 
     chatSocket.onclose = function(e)
     {
-        console.error('Chat socket closed unexpectedly');
+        // const data = JSON.parse(e.data);
+        console.log(e.code);
+        console.log(e.reason);
     };
 
 };
