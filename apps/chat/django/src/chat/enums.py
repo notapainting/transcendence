@@ -28,7 +28,27 @@ class Event():
         TEXT = 'message.text'
         FETCH = 'message.fetch'
         GAME = 'message.game'
+        READ = 'message.read'
 
+    class Errors(TextChoices):
+        ENCODE = 'error.encode'
+        DECODE = 'error.decode'
+        TYPE = 'error.type'
+        DATA = 'error.data'
+
+    CLIENT = [
+                Message.FIRST,
+                Message.READ,
+                Message.TEXT,
+                Message.FETCH,
+                Status.UPDATE,
+                Contact.UPDATE,
+                Group.CREATE,
+                Group.UPDATE,
+                Group.QUIT,
+                Group.DELETE
+        ]
+    
     choices = [Group, Contact, Status, Message]
 
 # change to Event.Contact.Operations
@@ -41,3 +61,7 @@ class Operations(TextChoices):
 class SpecialUser(TextChoices):
     ADMIN = 'admin'
     SYSTEM = 'system'
+
+class Self(TextChoices):
+    LOCAL = 'local'
+

@@ -23,10 +23,14 @@ def parse_json(data):
 def render_json(data):
         return (JSONRenderer().render(data))
 
-def cleaner(data, key):
+def cleaner(data, key=None):
     ret = []
-    for element in data:
-        ret.append(element[key])
+    if key is not None:
+        for element in data:
+            ret.append(element[key])
+    else:
+        for element in data:
+            ret.append(element)
     return ret
 
 

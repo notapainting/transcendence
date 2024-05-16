@@ -21,20 +21,21 @@ API HTTP:
             - return: 200/404, payload
             - misc: you can filter users fields by passing fields in querystring,
                     example: ?fields=name+id
-        - PATCH !bokren (only update name is working)
+        - PATCH 
             - do: update ChatUser
-            - <name> : optionnal
+            - <name> : yes
             - expecting payload: yes
             - example payload: {
-                                    "name":"borys",
-                                    "new_name"
+                                    "new_name":"borys",
                                 }
-                                    or 
+                                    or
                                 {
-                                    "data": {
-                                                "name":"borys",
-                                                "operation":"c/b/i/r"
-                                            }
+                                    "contact":
+                                    {
+                                        "author":"arlan",
+                                        "name":"astra",
+                                        "operation":"contact/block/invit/remove"
+                                    }
                                 }
             - return: 200/400
             - misc: user name can be in endpoint or payload
