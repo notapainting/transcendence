@@ -17,9 +17,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from chat.urls import urls
+import logging
+logger = logging.getLogger('elk')
+from django.http import HttpResponse
+
+def my_view(request):
+    logger.debug('Debug message')
+    logger.info('Info message')
+    logger.warning('Warning message')
+    logger.error('Error message')
+    logger.critical('Critical message')
+    return HttpResponse("Logging test")
 
 urlpatterns = [
     path('chat/api/', view=include(urls)),
     path('admin/', admin.site.urls),
+    path('log/', my_view),
 ]
 

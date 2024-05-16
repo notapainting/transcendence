@@ -24,26 +24,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-0#_lx+w5u%tmt2kl*9li+!(3jdtc3re@ihht6#hn2!p8-90j_v'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
 import os
 
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,
+    "disable_existing_loggers": True,
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "level": "DEBUG",  # Ajouté pour s'assurer que les logs apparaissent dans la console
+        },
+        "logstash": {
+            "level": "DEBUG",
+            "class": "logstash.TCPLogstashHandler",
+            "host": "logstash",  # Adresse de Logstash
+            "port": 5959,         # Port de Logstash
+            "version": 1,         # Version du format de message Logstash
         },
     },
-    "root": {
-        "handlers": ["console"],
-        "level": "WARNING",
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "INFO",
+    "loggers": { 
+        "elk": {
+            "handlers": ["console", "logstash"],  # Ajouté console pour débogage
+            "level": "DEBUG",
             "propagate": False,
         },
     },
