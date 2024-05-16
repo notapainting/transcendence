@@ -14,13 +14,11 @@ var height = window.innerHeight
 
 export const scene = new THREE.Scene();
 export const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
-// export const camera = new THREE.PerspectiveCamera(45, 600/900, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
 scene.background = new THREE.Color(0x031d44);
 renderer.setSize(width, height);
-// renderer.setSize(600, 900);
-camera.position.set( 0, -200, 115);
-// camera.position.set( 0, -100, 85 ); // position de la camera pour le jeu
+// camera.position.set( 0, -200, 115);
+camera.position.set( 0, -100, 85 ); // position de la camera pour le jeu
 
 import * as load from './loader.js';
 
@@ -29,7 +27,6 @@ var trailPositions = [];
 const controls = new OrbitControls(camera, renderer.domElement);
 
 // Light
-// const light = new THREE.DirectionalLight(0x0096c7, 1.5);
 const light = new THREE.AmbientLight(0x3a86ff, 4);
 light.position.set(0, 0, 0);
 const lightWall = new THREE.DirectionalLight(0x3a86ff, 0);
@@ -67,14 +64,14 @@ export let initialSpeed = 0.8;
 export let light1;
 export let light2;
 export let light3;
+export let lightBonus;
 
 export var sceneHeight = 70;
 
 // scenes
 export var sceneHandler = 1;
 
-export var randBonus = ['longPaddle'];
-// export var randBonus = ['longPaddle', 'boost'];
+export var randBonus = ['longPaddle', 'boost'];
 export var randMalus = ['slow', 'shortPaddle', 'invertedKey'];
 export var randEffect = ['hurricane', 'earthquake', 'glitch'];
 
@@ -129,7 +126,7 @@ export function gameRenderer(data) {
 
 	// Background plane
 	const geometryPlane = new THREE.PlaneGeometry((data.width + 5) * 2, data.height * 2);
-	const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5 });
+	const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5, transparent: true, opacity: 0.5 });
 	const plane = new THREE.Mesh(geometryPlane, materialPlane);
 	plane.position.z = -2;
 	plane.receiveShadow = true;
@@ -221,6 +218,8 @@ export function gameRenderer(data) {
 	light2.position.set(-data.width + 5, data.leftPaddleY, cylinderLeft.position.z + 5);
 	light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
 	light3.position.set(data.x, data.y, sphere.position.z);
+	lightBonus = new THREE.PointLight(0x90e0ef, 20, 0);
+	lightBonus.position.set(gameData.randomPointB.x, gameData.randomPointB.y, gameData.randomPointB.z);
 
 	// if (animationData.intro === 4){
 		scene.add(light2);

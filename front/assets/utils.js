@@ -271,14 +271,20 @@ export function clearScene() {
     });
 }
 
-export function createParticle(positionX, positionY, particuleSize, distance) {
+export function createParticle(positionX, positionY, particuleSize, distance, color) {
     var geometry = new THREE.BufferGeometry();
     var vertices = new Float32Array([positionX, positionY, 0]);
 
     geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
-    var randomColor = anim.colorBall[Math.floor(Math.random() * anim.colorBall.length)];
-    var material = new THREE.PointsMaterial({ color: randomColor, size: particuleSize });
+	if (color === 0)
+	{
+		var randomColor = anim.colorBall[Math.floor(Math.random() * anim.colorBall.length)];
+		var material = new THREE.PointsMaterial({ color: randomColor, size: particuleSize });
+	}
+	else {
+		var material = new THREE.PointsMaterial({ color: color, size: particuleSize });
+	}
 
     var particle = new THREE.Points(geometry, material);
     scene.add(particle);

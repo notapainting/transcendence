@@ -48,7 +48,7 @@ loader.load('./models/scene.glb', function ( gltf ) {
 } );
 
 
-loader.load('./models/effect.glb', function ( gltf ) {
+loader.load('./models/effectBonus.glb', function ( gltf ) {
 
     effect = gltf.scene;
 

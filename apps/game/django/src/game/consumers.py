@@ -61,7 +61,8 @@ class GameState:
         'paddleWidth' : 1,
         'paddleHeightL' : 10, 
         'paddleHeightR' : 10, 
-        'paddleSpeed' : 1.2,
+        'paddleSpeedR' : 1.2,
+        'paddleSpeedL' : 1.2,
         'leftPlayerScore' : 0,
         'rightPlayerScore' : 0,
         'winner' : 'none',
@@ -74,7 +75,9 @@ class GameState:
         'playerBonus' : -1,
         'bonusStartTime': None,
         'reducingR': False,
-        'reducingL': False
+        'reducingL': False,
+        'maximizeR': False,
+        'maximizeL': False
     }
 
     async def update_player_position(self, message):
@@ -119,12 +122,7 @@ class GameState:
         'winner' : self.status['winner']
     }
 
-    def update(self):
-        global reset, max_speed
-
-        if reset == 1:
-            reset = 2
-
+    def longPaddle(self):
         # bonus increase paddle size
         if self.status['randB'] == 'longPaddle' and self.status['playerBonus'] == 0:
             self.status['randB'] = 'longPaddleR'
@@ -168,23 +166,99 @@ class GameState:
                 self.status['paddleHeightL'] = 10
                 self.status['randB'] = 'none'
                 self.status['reducingL'] = False
+        
+    def shortPaddle(self):
+        # bonus increase paddle size
+        if self.status['randB'] == 'shortPaddle' and self.status['playerBonus'] == 0:
+            self.status['randB'] = 'shortPaddleR'
+            self.status['bonusStartTime'] = time.time()  
+            self.status['maximizeR'] = False  
+        if self.status['randB'] == 'shortPaddle' and self.status['playerBonus'] == 1:
+            self.status['randB'] = 'shortPaddleL'
+            self.status['bonusStartTime'] = time.time()  
+            self.status['maximizeL'] = False  
 
-        # deplacement des paddles
+        # right player long paddle
+        if self.status['randB'] == 'shortPaddleR' and not self.status['maximizeR']:
+            if self.status['paddleHeightR'] > 5:
+                self.status['paddleHeightR'] -= 0.1
+            if self.status['paddleHeightR'] <= 5:
+                elapsed_time = time.time() - self.status['bonusStartTime']
+                if elapsed_time >= 10:
+                    self.status['maximizeR'] = True 
+
+        if self.status['maximizeR']:
+            if self.status['paddleHeightR'] < 10:
+                self.status['paddleHeightR'] += 0.1
+            if self.status['paddleHeightR'] >= 10:
+                self.status['paddleHeightR'] = 10
+                self.status['randB'] = 'none'
+                self.status['maximizeR'] = False
+
+        # left player long paddle
+        if self.status['randB'] == 'shortPaddleL' and not self.status['maximizeL']:
+            if self.status['paddleHeightL'] > 5:
+                self.status['paddleHeightL'] -= 0.1
+            if self.status['paddleHeightL'] <= 5:
+                elapsed_time = time.time() - self.status['bonusStartTime']
+                if elapsed_time >= 10:  
+                    self.status['maximizeL'] = True  
+
+        if self.status['maximizeL']:
+            if self.status['paddleHeightL'] < 10:
+                self.status['paddleHeightL'] += 0.1
+            if self.status['paddleHeightL'] >= 10:
+                self.status['paddleHeightL'] = 10
+                self.status['randB'] = 'none'
+                self.status['maximizeL'] = False
+    
+    def slow(self):
+        if self.status['randB'] == 'slow' and self.status['playerBonus'] == 0:
+            self.status['randB'] = 'slowR'
+            self.status['bonusStartTime'] = time.time()
+        if self.status['randB'] == 'slow' and self.status['playerBonus'] == 1:
+            self.status['randB'] = 'slowL'
+            self.status['bonusStartTime'] = time.time()
+        
+        if self.status['randB'] == 'slowR':
+            self.status['paddleSpeedR'] = 0.5
+            elapsed_time = time.time() - self.status['bonusStartTime']
+            if elapsed_time >= 10:
+                self.status['paddleSpeedR'] = 1.2
+        
+        if self.status['randB'] == 'slowL':
+            self.status['paddleSpeedL'] = 0.5
+            elapsed_time = time.time() - self.status['bonusStartTime']
+            if elapsed_time >= 10:
+                self.status['paddleSpeedL'] = 1.2 
+
+
+    def update(self):
+        global reset, max_speed
+
+        if reset == 1:
+            reset = 2
+
+        self.longPaddle()
+        self.shortPaddle()
+        self.slow()
+
+        # paddle displacement
         if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2 < height:
-            self.status['rightPaddleY'] += self.status['paddleSpeed']
+            self.status['rightPaddleY'] += self.status['paddleSpeedR']
         elif self.status['downPressed'] and self.status['rightPaddleY'] - self.status['paddleHeightR'] / 2 > -height:
-            self.status['rightPaddleY'] -= self.status['paddleSpeed']
+            self.status['rightPaddleY'] -= self.status['paddleSpeedR']
 
         if self.status['wPressed'] and self.status['leftPaddleY'] + self.status['paddleHeightL'] / 2 < height:
-            self.status['leftPaddleY'] += self.status['paddleSpeed']
+            self.status['leftPaddleY'] += self.status['paddleSpeedL']
         elif self.status['sPressed'] and self.status['leftPaddleY'] - self.status['paddleHeightL'] / 2 > -height:
-            self.status['leftPaddleY'] -= self.status['paddleSpeed']
+            self.status['leftPaddleY'] -= self.status['paddleSpeedL']
 
-        # deplacement de la balle
+        # ball displacement
         self.status['ballX'] += self.status['ballSpeedX']
         self.status['ballY'] += self.status['ballSpeedY']
 
-        # collision haut et bas
+        # collision up and down
         if self.status['ballY'] <= -height + self.status['ballRadius'] or self.status['ballY'] >= height - self.status['ballRadius']:
             self.status['ballSpeedY'] *= -1
 
@@ -194,7 +268,7 @@ class GameState:
         left_paddle_top = self.status['leftPaddleY'] + self.status['paddleHeightL'] / 2
         left_paddle_bottom = self.status['leftPaddleY'] - self.status['paddleHeightL'] / 2
 
-        # collisions avec les paddles
+        # collision with paddles
         if (self.status['ballX'] + self.status['ballRadius'] > self.status['rightPaddleX'] - self.status['paddleWidth'] and
                 self.status['ballY'] >= right_paddle_bottom and
                 self.status['ballY'] <= right_paddle_top and 
@@ -239,6 +313,7 @@ class GameState:
 
         self.status['ballX'] = 0
         self.status['ballY'] = 0
+        self.status['playerBonus'] = -1
         if counter % 2 == 0:
             self.status['ballSpeedX'] = -ballSpeedX 
         else:
