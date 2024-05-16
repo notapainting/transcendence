@@ -69,6 +69,7 @@ function sleep(ms) {
 
 export async function animate() {
     requestAnimationFrame(animate);
+	var lightBonus;
 
 	// console.log(gameData.elapsedTime);
 	if (gameData.elapsedTime === bonusTime)
@@ -81,9 +82,11 @@ export async function animate() {
 	{	
 		var i = Math.floor(Math.random() * game.randBonus.length);
 	
-		gameData.bonus = game.randBonus[i];
+		// gameData.bonus = game.randBonus[i];
+		gameData.bonus = 'slow';
 		load.effect.position.set(gameData.randomPointB.x, gameData.randomPointB.y, 0);
 		game.scene.add(load.effect);
+		game.scene.add(game.lightBonus);
 	}
 	
 	if (loadData.mixer2) {
@@ -128,7 +131,7 @@ export async function animate() {
 				.filter(obj => obj.userData.isTrailSphere)
 				.forEach(obj => game.scene.remove(obj));
 			for (var i = 0; i < 150; i++) {
-				utils.createParticle(game.collisionX, game.collisionY, 1, 15);
+				utils.createParticle(game.collisionX, game.collisionY, 1, 15, 0);
 			}
 			gameData.explosion = false;
 		} 
@@ -137,7 +140,7 @@ export async function animate() {
 				.filter(obj => obj.userData.isTrailSphere)
 				.forEach(obj => game.scene.remove(obj));
 			for (var i = 0; i < 100; i++) {
-				utils.createParticle(game.sphere.position.x,game.sphere.position.y, 0.5, 10);
+				utils.createParticle(game.sphere.position.x,game.sphere.position.y, 0.5, 10, game.lightBonus.color);
 			}
 			gameData.catchBonus = false;
 		} 
