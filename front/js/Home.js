@@ -82,7 +82,7 @@ const adjustZoom = (event) => {
     }, 400); // Attendre 2 secondes avant de permettre un autre événement wheel
 };
 
-let logoutRequest = (event) => {
+export let logoutRequest = (event) => {
     fetch('/auth/logout/', {
         method: 'POST',
         headers: {
@@ -95,8 +95,6 @@ let logoutRequest = (event) => {
             window.location.reload();
             // Effectuez ici les actions nécessaires après la déconnexion, par exemple rediriger l'utilisateur vers une autre page
         } else {
-            console.error('Erreur lors de la déconnexion');
-            // Traitez ici les erreurs de déconnexion
         }
     })
     .catch(error => {
@@ -120,6 +118,8 @@ let loggedInStatus = (data) => {
     logoutIconElement.addEventListener("click", logoutRequest);
 }
 
+let messageBox = document.querySelector(".message-box");
+
 let loginRequest = (event) => {
     const loginInputValue = document.querySelector(".home-login").value
     const passwordInputValue = document.querySelector(".home-password").value
@@ -139,6 +139,9 @@ let loginRequest = (event) => {
             return response.json();
         }
         else {
+            messageBox.innerHTML = '<p>Identifiant ou mot de passe incorrect</p>';
+            messageBox.style.color = "red";
+            messageBox.style.transform = "scale(1)";
             throw new Error("Identifiant ou mot de passe incorrect");
         }
     })
@@ -154,7 +157,7 @@ let registerRequest = (event) => {
     const loginInputValue = document.querySelector(".home-login").value
     const passwordInputValue = document.querySelector(".home-password").value
     const emailInputValue = document.querySelector(".home-email").value
-    const data = {
+    const dataSend = {
         email: emailInputValue,
         username: loginInputValue,
         password: passwordInputValue
@@ -164,7 +167,7 @@ let registerRequest = (event) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(dataSend)
     })
     .then(response => {
         if (response.ok)
@@ -174,10 +177,10 @@ let registerRequest = (event) => {
         }
     })
     .then(data => {
-        const homeFormElement = document.querySelector(".home-form");
-        homeFormElement.innerHTML = `
-            <div class="button play-online-button">Play Online</div>
-        `
+        messageBox.style.transform = "scale(0)"
+        messageBox.style.color = "green";
+        messageBox.innerHTML = `<p>Register successiful, we've sent the activation link at ur e-mail address: ${dataSend.email}</p>`
+        messageBox.style.transform = "scale(1)"
     })  
     .catch(error => {
         console.log("Login Error:", error.message);
@@ -223,8 +226,6 @@ let registerOrLoginRequest = (event) => {
         registerRequest(event);
 }
 
-
-
 export const showHome = async () => {
     const homeElement = document.querySelector("#Home");
     let isAuthenticated = await isUserAuthenticated();
@@ -251,6 +252,16 @@ export const showHome = async () => {
     homeElement.style.opacity = 1; 
     document.addEventListener('mousemove', parallaxEffect);
     document.addEventListener('wheel', adjustZoom);
+    const homeFormElement = document.querySelector(".home-form");
     loginOrRegisterButtonElement.addEventListener('click', registerOrLoginRequest);
+    homeFormElement.addEventListener('submit', event => {
+        event.preventDefault(); // Empêche la soumission du formulaire
+        registerOrLoginRequest(event);
+    });
+    loginOrRegisterButtonElement.addEventListener('keyup', event => {
+        if (event.key === 'Enter') {
+            registerOrLoginRequest(event);
+        }
+    });
     registerOrLoginLink.addEventListener('click', registerOrLoginSwitch);
 };

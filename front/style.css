@@ -19,15 +19,19 @@ a {
     text-decoration: none;
 }
 
+input {
+    outline: none;
+}
+
 /* nav */
 
 nav {
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-
     position: absolute;
     z-index: 4;
+    background-color: red;
     height: 50px;
     width: 40%;
     margin-top: 20px;
@@ -128,9 +132,8 @@ nav {
 .home-form {
     position: absolute;
     right: 25%;
-    top: 50%;
+    top: 35%;
     width: 25%;
-    transform: translateY(-40%);
     z-index: 1;
     display: flex;
     flex-direction: column;
@@ -140,7 +143,6 @@ nav {
 
 
 .home-form-input {
-    outline: none;
     border: none;
     width: 300px;
     text-align: center;
@@ -185,7 +187,6 @@ nav {
     cursor: pointer;
     user-select: none;
     font-weight: bold;
-
 }
 
 .login-or-signin {
@@ -208,7 +209,7 @@ nav {
 }
 
 .register-login-link {
-    color: red;
+    color: #29163E;
     cursor: pointer;
 }
 
@@ -231,6 +232,8 @@ nav {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* nav */
+
 .nav-top {
     position: absolute;
     z-index: 1;
@@ -240,170 +243,58 @@ nav {
     right: 0;
     display: flex;
     align-items: center;
+    background-color: wheat;
+    border-radius: 4px;
+    margin-right: 20px;
     justify-content: space-around;
 }
 
 .welcome-text-nav{
-    color: white;
+    color: black;
 }
 
 .profile-picture-nav, .logout-icon-nav{
-    height: 80px;
+    height: 50%;
     border-radius: 50%;
-    width: 80px;
+    width: 50px;
     display: none;
     background-position: center;
     background-size: cover;
+    cursor: pointer;
 }
 
 .logout-icon-nav {
     background-image: url("img/logout-icon.png");
-    cursor: pointer;
 }
 
-/* game page */
+.message-box {
+    margin-top: 10px;
+    transform: scale(0);
+    transition: transform 0.2s ease;
+    text-align: center;
+}
 
-.header-bg {
-    height: 200px;
+/* profile */
+
+#Profile {
+}
+
+.profile-main{
+    height: 100vh;
     width: 100%;
-    position: absolute;
-    top: 0;
-    background-image: url("/img/game-header-bg.png");
-    background-repeat: no-repeat;
-    z-index: -1;
-    transform: translateY(-200px);
-    transition: transform 0.5s ease;
-}
-
-.choose-mode-container{
     display: flex;
-    margin-top: 150px;
     align-items: center;
     justify-content: center;
 }
 
-.choose-mode{
-    height: 400px;
-    width: 50%;
-    display: flex;
-    justify-content: space-between;
+.profile-container {
+    height: 90%;
+    width: 80%;
+    background-color: white;
 }
 
-.item-mode {
-    height: 100%;
-    width: 44%;
-    background-size: cover;
-    background-position: center;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.item-mode:hover {
-    transform: scale(1.05);
-}
-
-.solo {
-    background-image: url("img/solor-mode.webp");
-
-}
-
-.multi {
-    background-image: url("img/multiplayer-mode.webp");
-}
-
-/* signin-page */
-
-#Signin {
-}
-
-.form-signin-container {
-    background-color: #FFFFFF;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 70%;
-    width: 60%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 15px;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-}
-
-.form-signin{
-    width: 90%;
-    height: 80%;
-
-}
-
-.form-signin h1 {
-    display: inline-block;
-    padding-bottom: 10px;
-    font-family: "Arvo", serif;
-    font-weight: 700;
-    font-style: normal;
-}
-
-.form-signin p {
-    margin-bottom: 20px;
-}
-.form-signin p a {
-
-    color: purple;
-}
-
-.login-password-container {
-    display: flex;
-    flex-direction: column;
-    margin-top: 50px;
-}
-
-.input-signin{
-    width: 40%;
-    border: none;
-    border: 1px solid #DDDDDD;
-    border-radius: 10px;
-    height: 50px;
-    outline: none;
-    padding-left: 10px;
-    font-size: 20px;
-}
-
-.input-signin::placeholder {
-    font-size: 20px;
-}
-
-#password-signin {
-    margin-top: 30px;
-}
-
-.remember-container {
-    display: flex;
-    align-items: center;
-    padding: 20px 0;
-}
-
-.remember-container a {
-    color: #2c3e50;
-}
-
-.remember-me {
-    
-}
-
-.forgot-password {
-    
-}
-
-.triangle-form {
-    background-color: rebeccapurple;
-    height: 100%;
-    clip-path: polygon(100% 0, 40% 0, 100% 99%);
-    width: 100%;
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    right: 0;
+.profile-button {
+    color: white;
+    background-color: brown;
+    margin: 30px 20px;
 }

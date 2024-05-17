@@ -35,39 +35,36 @@
                 <div class="button login-register-button">LOGIN</div>
                 <p class="register-login-text">Don't have an account ? <br><span class="register-login-link">Create an account</span></p>
             </div>
+            <div class="message-box"></div>
         </div>
         <div class="nav-top">
             <p class="welcome-text-nav"></p>
-            <div class="profile-picture-nav"></div>
+            <div class="profile-picture-nav" data-link-div data-href="/profile"></div>
             <div class="logout-icon-nav"></div>
         </div>
     </div>
     <div id="Game" class="view"></div>
     <div id="Profile" class="view">
-        <h1>Welcome To Profile</h1>
+        <div class="profile-main">
+            <div class="profile-container">
+                <h3>Username</h3>
+                <input type="text" class="profile-username">
+                <h3>First Name</h3>
+                <input type="text" class="profile-first-name">
+                <h3>Last Name</h3>
+                <input type="text" class="profile-last-name">
+                <h3>Email</h3>
+                <input type="text" class="profile-email">
+                <h3>Gender</h3>
+                <input type="text" class="profile-gender">
+                <h3>Date of Birth</h3>
+                <input type="date" class="profile-date-of-birth" name="date_of_birth">
+                <div class="button profile-button">MODIFY</div>
+            </div>
+        </div>
     </div>
     <div id="Settings" class="view">
         <h1>Welcome To Settings</h1>
-    </div>
-    <div id="Signin" class="view">
-        <div class="form-signin-container">
-            <div class="triangle-form"></div>
-            <div class="form-signin">
-                <h1>LOGIN</h1>
-                <p>Don't have an account ? <a href="">Create an account</a></p>
-                <div class="login-password-container">
-                    <input type="text" id="login-signin" class="input-signin" placeholder="username">
-                    <input type="password" id="password-signup" class="input-signin" placeholder="password">
-                    <div class="remember-container">
-                        <input type="checkbox">
-                        <a href="#" class="remember-me">Remember Me</a>
-                        <a href="#" class="forgot-password">Forgot password ?</a>
-                    </div>
-                </div>
-                <button class="login-button">Se connecter</button>
-               <div id="loginResponse" class="response"></div> 
-            </div>
-        </div>
     </div>
     <script type="module" src="js/Home.js"></script>
     <script type="module" src="js/index.js"></script>
