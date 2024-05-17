@@ -71,6 +71,7 @@ export var sceneHeight = 70;
 // scenes
 export var sceneHandler = 1;
 
+
 export var randBonus = ['longPaddle', 'boost'];
 export var randMalus = ['slow', 'shortPaddle', 'invertedKey'];
 export var randEffect = ['hurricane', 'earthquake', 'glitch'];

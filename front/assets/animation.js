@@ -69,7 +69,6 @@ function sleep(ms) {
 
 export async function animate() {
     requestAnimationFrame(animate);
-	var lightBonus;
 
 	// console.log(gameData.elapsedTime);
 	if (gameData.elapsedTime === bonusTime)
@@ -83,7 +82,7 @@ export async function animate() {
 		var i = Math.floor(Math.random() * game.randBonus.length);
 	
 		// gameData.bonus = game.randBonus[i];
-		gameData.bonus = 'slow';
+		gameData.bonus = 'longPaddle';
 		load.effect.position.set(gameData.randomPointB.x, gameData.randomPointB.y, 0);
 		game.scene.add(load.effect);
 		game.scene.add(game.lightBonus);
