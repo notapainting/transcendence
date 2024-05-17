@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from os import getenv
+from socket import SOCK_STREAM
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,25 +29,55 @@ SECRET_KEY = 'django-insecure-0#_lx+w5u%tmt2kl*9li+!(3jdtc3re@ihht6#hn2!p8-90j_v
 
 import os
 
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": True,
+#     "handlers": {
+#         "console": {
+#             "class": "logging.StreamHandler",
+#             "level": "DEBUG",
+#         },
+#         "logstash": {
+#             "level": "DEBUG",
+#             "class": "logstash.TCPLogstashHandler",
+#             "host": "logstash",
+#             "port": 5959,
+#             "version": 1,
+#         },
+#     },
+#     "loggers": { 
+#         "elk": {
+#             "handlers": ["console", "logstash"],  # Ajouté console pour débogage
+#             "level": "DEBUG",
+#             "propagate": False,
+#         },
+#     },
+# }
+
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": True,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "logstash": {
+            "()": "syslog_rfc5424_formatter.RFC5424Formatter"
+        }
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
-            "level": "DEBUG",  # Ajouté pour s'assurer que les logs apparaissent dans la console
+            "level": "DEBUG",
         },
         "logstash": {
             "level": "DEBUG",
-            "class": "logstash.TCPLogstashHandler",
-            "host": "logstash",  # Adresse de Logstash
-            "port": 5959,         # Port de Logstash
-            "version": 1,         # Version du format de message Logstash
+            "class": "logging.handlers.SysLogHandler",
+            "address": ("logstash", 5141),
+            "socktype": SOCK_STREAM,
+            "formatter" : "logstash",
         },
     },
-    "loggers": { 
-        "elk": {
-            "handlers": ["console", "logstash"],  # Ajouté console pour débogage
+    "loggers": {
+        "": {
+            "handlers": ["logstash", "console"],
             "level": "DEBUG",
             "propagate": False,
         },
