@@ -71,6 +71,7 @@ services:
        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
        echo "Setting kibana_system password";
        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+       sudo sysctl -w vm.max_map_count=262144
        echo "All done!";
      '
    healthcheck:
@@ -191,14 +192,15 @@ services:
      - ELASTIC_HOSTS=https://es01:9200
    restart: on-failure
    healthcheck:
-     test:
-       [
+    test: 
+      [
          "CMD-SHELL",
-         "curl -k -I https://${ELASTIC_USER}:${ELASTIC_PASSWORD}@es01:9200 | grep -q 'HTTP/1.1 200 OK'",
-       ]
-     interval: 10s
-     timeout: 10s
-     retries: 120
+         "timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5140' && timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5141' || exit 1",
+      ]
+    interval: 10s
+    timeout: 10s
+    retries: 120
+    #start_interval / period
    networks:
     - app_network
     - elk_log

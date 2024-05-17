@@ -1,0 +1,61 @@
+Avant de commencer, petit rappel sur ce qu'est la stack ELK :
+    Elasticsearch :
+        Utilisé pour indexer et rechercher des données provenant de diverses sources.
+        Peut etre considere comme le "noyau" de la stack car c'est par elasticsearch qu'on fais le lien entre Logstash et Kibana
+
+    Logstash :
+        Outil de traitement et de transfert de données.
+        Collecte, transforme et envoie les données vers Elasticsearch.
+        Capable de recevoir des données de multiples sources, les filtrer et les formater.
+
+    Kibana :
+        Interface de visualisation et d'exploration des données stockées dans Elasticsearch.
+        Permet de créer des tableaux de bord, des graphiques et des visualisations pour analyser les données.
+        Très utile pour les analyses interactives et les rapports en temps réel.
+
+Maintenant que l'on sais ce qu'est la stack ELK, nous allons nous focus sur le setup, tout ce dont je fait reference peut etre approfondie via
+ce lien : https://www.elastic.co/fr/blog/getting-started-with-the-elastic-stack-and-docker-compose
+
+La stack ELK demande de passer par un conteneur setup qui va "preparer le build" des 3 logiciels. 
+Notez les differences entre mon compose et celui de la documentation officielle:
+    - Les deux configurations créent les certificats, mais la mienne ajoute une instance pour Logstash dans le fichier instances.yml.
+    - La deuxième configuration inclut une commande supplémentaire pour convertir la clé de Logstash au format pkcs8
+    - La deuxième configuration inclut une commande pour modifier le paramètre vm.max_map_count du noyau (Explication dans le lien)
+
+On instancie les conteneur de la stack comme explique dans le lien.
+On peut voir dans le lien que l'on parle de 2 autre logiciels : MetricBeat et Filebeat. Si ca vous interesse je vous laisse faire vos
+recherches, mais notez simplement que MetricBeat est un equivalent a Prometheus et Filebeat collecte les logs dans un fichier avant de 
+les traiter alors que Logstash peut les envoyer "en brut" directement au service souhaite.
+
+Une fois ces explications faites, nous pouvons nous concentrer sur logstash.conf.
+Pour structurer simplement, on peut resumer ce fichier en 3 points, la scope input, la scope filter et la scope output :
+
+    - Input : définit les sources de données à partir desquelles Logstash collecte les logs ou les événements.
+        * file : ingere les logs a aprtir d'un fichier (dans le mien, c'est par un file que je recupere les logs de logstash)
+        * TCP / UDP : permet de recevoir des logs via les protocoles TCP ou UDP. Par exemple, on peut configurer Logstash pour 
+        écouter sur un port spécifique et recevoir des logs envoyés par des applications ou des systèmes externes. 
+        Dans le mien, le port 5140 sert a recuperer les logs nginx et les port 5141, etc servent a recuperer les logs des serveurs django.
+        On peut voir que le port 5140 utilise le type syslog et le 5141 le type syslog5424, la différence entre les deux est que syslog 
+        suit le format traditionnel RFC 3164, tandis que syslog5424 suit le format plus récent et plus structuré RFC 5424.
+
+    - Filter : manipule et transforme les logs collectés en les enrichissant, en les formatant ou en les filtrant selon des critères spécifiques.
+        * Grok : Filtre qui utilise des expressions régulières pour extraire et structurer des champs spécifiques à partir des logs bruts.
+        * mutate (syslog5424) : nous permer de differencier les conteneurs django en les faisant arriver sur le meme syslog5424.
+
+    - Output : spécifie où les logs transformés doivent être envoyés, dans notre cas Elasticsearch.
+        * index : définit l'index Elasticsearch dans lequel les logs seront stockés.
+        * ssl : configure la sécurisation des communications avec Elasticsearch en utilisant SSL/TLS.
+
+Nous avons desormais une meilleur comprehension du setup elk + config de logstash. J'insiste sur le fait que je ne vais qu'en surface, Ce que je fais
+represente meme pas 1% de la puissance de la stack, hesitez pas a aller voir cette suite de video : https://www.youtube.com/watch?v=dxPhnkGAt7Y
+
+Petit point sur les elements a setup dans nginx et les serveur django pour la compatibilite avec ELK :
+
+    - Nginx : Il faut envoie les logs d'accès et d'erreur Nginx au serveur Logstash sur le port 5140, avec des tags respectifs 
+    nginx_access et nginx_error et des niveaux de sévérité info et notice :
+        * access_log syslog:server=logstash:5140,tag=nginx_access,severity=info;
+        * error_log syslog:server=logstash:5140,tag=nginx_error,severity=notice;
+        
+    - Django : Le sujet des logs des serveur django peut etre developpe via ce lien : https://docs.djangoproject.com/en/5.0/topics/logging/
+    Pour faire court, il faut ajouter un handlers logstash dans lequel on specifie le port d'envoie des logs, sous quel format et via quel socket
+ 
