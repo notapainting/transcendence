@@ -74,6 +74,7 @@ class GameState:
         'randB': 'none',
         'playerBonus' : -1,
         'bonusStartTime': None,
+        'malusStartTime': None,
         'reducingR': False,
         'reducingL': False,
         'maximizeR': False,
@@ -171,11 +172,11 @@ class GameState:
         # bonus increase paddle size
         if self.status['randB'] == 'shortPaddle' and self.status['playerBonus'] == 0:
             self.status['randB'] = 'shortPaddleR'
-            self.status['bonusStartTime'] = time.time()  
+            self.status['malusStartTime'] = time.time()  
             self.status['maximizeR'] = False  
         if self.status['randB'] == 'shortPaddle' and self.status['playerBonus'] == 1:
             self.status['randB'] = 'shortPaddleL'
-            self.status['bonusStartTime'] = time.time()  
+            self.status['malusStartTime'] = time.time()  
             self.status['maximizeL'] = False  
 
         # right player long paddle
@@ -183,7 +184,7 @@ class GameState:
             if self.status['paddleHeightR'] > 5:
                 self.status['paddleHeightR'] -= 0.1
             if self.status['paddleHeightR'] <= 5:
-                elapsed_time = time.time() - self.status['bonusStartTime']
+                elapsed_time = time.time() - self.status['malusStartTime']
                 if elapsed_time >= 10:
                     self.status['maximizeR'] = True 
 
@@ -200,7 +201,7 @@ class GameState:
             if self.status['paddleHeightL'] > 5:
                 self.status['paddleHeightL'] -= 0.1
             if self.status['paddleHeightL'] <= 5:
-                elapsed_time = time.time() - self.status['bonusStartTime']
+                elapsed_time = time.time() - self.status['malusStartTime']
                 if elapsed_time >= 10:  
                     self.status['maximizeL'] = True  
 
@@ -215,20 +216,20 @@ class GameState:
     def slow(self):
         if self.status['randB'] == 'slow' and self.status['playerBonus'] == 0:
             self.status['randB'] = 'slowR'
-            self.status['bonusStartTime'] = time.time()
+            self.status['malusStartTime'] = time.time()
         if self.status['randB'] == 'slow' and self.status['playerBonus'] == 1:
             self.status['randB'] = 'slowL'
-            self.status['bonusStartTime'] = time.time()
+            self.status['malusStartTime'] = time.time()
         
         if self.status['randB'] == 'slowR':
             self.status['paddleSpeedR'] = 0.5
-            elapsed_time = time.time() - self.status['bonusStartTime']
+            elapsed_time = time.time() - self.status['malusStartTime']
             if elapsed_time >= 10:
                 self.status['paddleSpeedR'] = 1.2
         
         if self.status['randB'] == 'slowL':
             self.status['paddleSpeedL'] = 0.5
-            elapsed_time = time.time() - self.status['bonusStartTime']
+            elapsed_time = time.time() - self.status['malusStartTime']
             if elapsed_time >= 10:
                 self.status['paddleSpeedL'] = 1.2 
 
