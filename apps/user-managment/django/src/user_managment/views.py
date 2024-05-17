@@ -79,7 +79,8 @@ class UserMatchsInfos(APIView):
 	def post(self, request):
 		try:
 			new_match_raw = parse_json(request.body)
-			new_match = MatchResults(user_one=new_match_raw["user_one"],
+			new_match = MatchResults(
+							user_one=new_match_raw["user_one"],
 							user_one_score=new_match_raw["user_one_score"],
 							user_one_powerups=new_match_raw["user_one_powerups"],
 							user_two=new_match_raw["user_two"],
@@ -91,8 +92,11 @@ class UserMatchsInfos(APIView):
 			return Response("Something went wrong =(", status=500)
 
 	def get(self, request):
-		pass
-
+		try:
+			all_match = MatchResults.objects.all()
+			return Response(all_match, status=200)
+		except :
+			return Response("Something went wrong =(", status=500)
 
 	def patch(self, request):
 		pass
