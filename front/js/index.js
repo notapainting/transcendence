@@ -70,7 +70,7 @@ const router = async () => {
         const isAuthenticated = await isUserAuthenticated();
         if (!isAuthenticated){
             match = {
-                route: routes[4],
+                route: routes[0],
                 isMatch: true
             }
         }
@@ -80,6 +80,16 @@ const router = async () => {
 };
 
 window.addEventListener("popstate", router);
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener('click', e => {
+        if (e.target.matches("[data-link-div]")){
+            e.preventDefault();
+            navigateTo(e.target.dataset.href);
+        }
+    });
+    router();
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener('click', e => {
