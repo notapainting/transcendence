@@ -1,5 +1,6 @@
 # projet/urls.py
 
+from http.client import HTTPResponse
 from django.urls import path, include
 from chat.urls import urls
 import logging
@@ -10,7 +11,7 @@ def my_view(request):
     logging.warning('Warning message')
     logging.error('Error message')
     logging.critical('Critical message')
-    return HttpResponse("Logging test")
+    return HTTPResponse("Logging test")
 
 urlpatterns = [
     path('api/', view=include(urls)),
