@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from os import getenv
+from socket import SOCK_STREAM
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -63,19 +64,28 @@ DATABASES = {
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "logstash": {
+            "()": "syslog_rfc5424_formatter.RFC5424Formatter"
+        }
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "level": "DEBUG",
+        },
+        "logstash": {
+            "level": "DEBUG",
+            "class": "logging.handlers.SysLogHandler",
+            "address": ("logstash", 5141),
+            "socktype": SOCK_STREAM,
+            "formatter" : "logstash",
         },
     },
-    "root": {
-        "handlers": ["console"],
-        "level": "WARNING",
-    },
     "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "INFO",
+        "": {
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
             "propagate": False,
         },
     },
