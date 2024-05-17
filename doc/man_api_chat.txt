@@ -140,6 +140,12 @@ WebSocket :
         all event are formed with a 'type' key and a data 'key'
         data value depend of 'type' key but should always contain 'author' field with username (but automatically set by backend)
         all update/delete/message operation are verified in backend but front shouldn't let pass unauthorized operation
+        ERRORS:
+        'error.encode'
+        'error.decode'
+        'error.type'
+        'error.data'
+        
         SHORT:
             type key possible:
                 message.text
@@ -162,10 +168,10 @@ WebSocket :
                         "type":"message.text",
                         "data":
                         {
+                            "author":"",
                             "to":"755b83ae-0cb9-461c-8639-b55ec589a6a5",
                             "body":"hello",
                             "respond_to": "",
-                            "author":"",
                             "date":""
                         }
                     }
@@ -174,6 +180,7 @@ WebSocket :
                         "type":"message.first",
                         "data":
                         {
+                            "author":"",
                             "target":"",
                             "body":""
                         }
@@ -185,6 +192,7 @@ WebSocket :
                         "type":"message.fetch",
                         "data":
                         {
+                            "author":"",
                             "date":"2024-05-15T12:02:01.005411"
                         }
                     }
@@ -196,6 +204,7 @@ WebSocket :
                         "type":"status.update",
                         "data":
                         {
+                            "author":"",
                             "status":"online/afk/disconnected"
                         }
                     }
@@ -205,6 +214,7 @@ WebSocket :
                         "type":"contact.update",
                         "data":
                         {
+                            "author":"",
                             "name":"target",
                             "operation":"contact/blocked/invitation/remove"
                         }
@@ -217,8 +227,8 @@ WebSocket :
                         {
                             "author":"",
                             "name":"",
-                            "members":[],
                             "admins":[],
+                            "members":[],
                             "restricts":[],
                         }
                     }
@@ -228,6 +238,7 @@ WebSocket :
                         "type":"group.update",
                         "data":
                         {
+                            "author":"",
                             "id":"",
                             "name":"",
                             "members":[],
@@ -242,6 +253,7 @@ WebSocket :
                         "type":"group.quit",
                         "data":
                         {
+                            "author":"",
                             "id":""
                         }
                     }
@@ -251,6 +263,7 @@ WebSocket :
                         "type":"group.delete",
                         "data":
                         {
+                            "author":"",
                             "id":""
                         }
                     }
@@ -268,7 +281,7 @@ WebSocket :
                                     "admins":[],
                                     "restricts":[],
                                     "messages":[],
-                                    "last_read":"" (not implemented)
+                                    "last_read":""
                                 ]
                                 [
                                     ...
