@@ -8,8 +8,6 @@ def validate_futur(value):
 
 	now = timezone.now()
 	if value > now:
-		print(f'value : {value}')
-		print(f'now : {now}')
 		raise ValidationError(
 			"Message from futur",
 			params={"value": value, 'current': now}

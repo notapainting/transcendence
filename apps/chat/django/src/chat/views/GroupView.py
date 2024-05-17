@@ -2,9 +2,12 @@ from django.http import HttpResponse
 from chat.models import Group
 from django.views import View
 
-
+from rest_framework.serializers import ValidationError as DrfValidationError
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from rest_framework.exceptions import ParseError
+
 from django.db.utils import IntegrityError
+
 
 from django.views.decorators.csrf import csrf_exempt
 

@@ -19,10 +19,7 @@ import chat.models as mod
 
 @database_sync_to_async
 def get_user(name):
-    try:
         return mod.User.objects.exclude(name__in=enu.SpecialUser).get(name=name)
-    except ObjectDoesNotExist:
-        return None
 
 class CustomAuthMiddleware(BaseMiddleware):
     async_capable = True
@@ -42,5 +39,4 @@ class CustomAuthMiddleware(BaseMiddleware):
             logger.error(error)
             scope['user'] = None
 
-        scope['user'] = await get_user(name='sam')
         return await self.inner(scope, receive, send)

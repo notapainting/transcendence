@@ -26,8 +26,7 @@ class Relation(models.Model):
     status = models.CharField(choices=Types)
 
     def __str__(self):
-        return f'from {self.from_user.name} to {self.to_user.name}'
-
+        return f"from {self.from_user.name} to {self.to_user.name}"
 
 class User(models.Model):
     class Status(models.TextChoices):
@@ -93,7 +92,7 @@ class GroupShip(models.Model):
     last_read = models.DateTimeField(default=None, null=True)
 
     def __str__(self):
-        return f'from {self.user.name} to {self.group.name}'
+        return f"from {self.user.name} to {self.group.name}"
 
 class Group(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)

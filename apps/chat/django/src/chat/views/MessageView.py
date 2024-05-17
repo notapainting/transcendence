@@ -1,9 +1,11 @@
 from django.http import HttpResponse
 from django.views import View
 
+from rest_framework.serializers import ValidationError as DrfValidationError
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db.utils import IntegrityError
+from rest_framework.exceptions import ParseError
+
 
 
 from django.views.decorators.csrf import csrf_exempt
@@ -26,17 +28,16 @@ class MessageApiView(View):
         try:
             data = uti.parse_json(request.body)
             s = ser.Message(data=data)
-            if s.is_valid() is False:
-                print(s.errors)
-                return HttpResponse(status=400)
-            print(s.validated_data)
+            s.is_valid(raise_exception=True)
             s.create(s.validated_data)
             return HttpResponse(status=201)
-        
+        except (DrfValidationError, ParseError) as error:
+            logger.error(error)
+            return HttpResponse(status=400)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
-        except BaseException as e:
-            logger.error(f"Internal : {e.args[0]}")
+        except BaseException as error:
+            logger.critical(f"{type(error).__name__} : {error})")
             return HttpResponse(status=500)
 
     def get(self, request, *args, **kwargs):
@@ -49,41 +50,43 @@ class MessageApiView(View):
             data = ser.Message(qset, fields=fields).data
             data = uti.render_json(data)
             return HttpResponse(status=200, content=data)
-
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
-        except BaseException as e:
-            logger.error(f"Internal : {e.args[0]}")
+        except BaseException as error:
+            logger.critical(f"{type(error).__name__} : {error})")
             return HttpResponse(status=500)
 
     def patch(self, request, *args, **kwargs):
         try :
-            message = mod.Message.objects.get(id=kwargs.get('id'))
+            id = kwargs.get('id')
+            if id is None:
+                return HttpResponse(status=400)
+            message = mod.Message.objects.get(id=id)
             data = uti.parse_json(request.body)
             s = ser.Message(message, data=data, partial=True)
-            if s.is_valid() is False:
-                print(s.errors)
-                return HttpResponse(status=400)
-            print(s.validated_data)
+            s.is_valid(raise_exception=True)
             s.update(s.instance, s.validated_data)
             return HttpResponse(status=200)
-
+        except (DrfValidationError, ParseError) as error:
+            logger.error(error)
+            return HttpResponse(status=400)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
-        except BaseException as e:
-            logger.error(f"Internal : {e.args[0]}")
+        except BaseException as error:
+            logger.critical(f"{type(error).__name__} : {error})")
             return HttpResponse(status=500)
 
     def delete(self, request, *args, **kwargs):
         try :
-            id = request.GET.get("id")
+            id = kwargs.get('id')
+            if id is None:
+                return HttpResponse(status=400)
             mod.Message.objects.get(id=id).delete()
-            logger.info("message %s, deleted", id)
+            logger.info(f"message {id}, deleted")
             return HttpResponse(status=200)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
-        except BaseException as e:
-            logger.error(f"Internal : {e.args[0]}")
+        except BaseException as error:
+            logger.critical(f"{type(error).__name__} : {error})")
             return HttpResponse(status=500)
-
 
