@@ -1,0 +1,16 @@
+{
+    "user_one":"a", 
+    "user_one_score":"1", 
+    "user_one_powerups":"0", 
+    "user_two":"a",
+    "user_two_score":"1",
+    "user_two_powerups":"0"
+}
+
+// "match_start":"2024-05-15T14:10:00.123456",
+// "match_end":"2024-05-15T14:12:01.0000124",
+// "user_one":  {
+//                 "name":
+//                 "score"
+//                 "powerup"
+//                 }

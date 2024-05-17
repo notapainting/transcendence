@@ -7,6 +7,7 @@ from user_managment.models import CustomUser
 import requests
 from django.core.files.base import ContentFile
 from django.core.files.images import ImageFile
+from user_managment.matchs import MatchResults
 
 
 class UserCreate(APIView):
@@ -68,3 +69,40 @@ class GetUserInfos(APIView):
 		else:
 			return Response("User not in request", status=404)
 
+from rest_framework.parsers import JSONParser
+from io import BytesIO
+
+def parse_json(data):
+    return JSONParser().parse(BytesIO(data))
+
+class UserMatchsInfos(APIView):
+	def post(self, request):
+		try:
+			new_match_raw = parse_json(request.body)
+			new_match = MatchResults(user_one=new_match_raw["user_one"],
+							user_one_score=new_match_raw["user_one_score"],
+							user_one_powerups=new_match_raw["user_one_powerups"],
+							user_two=new_match_raw["user_two"],
+							user_two_score=new_match_raw["user_two_score"],
+							user_two_powerups=new_match_raw["user_two_powerups"])
+			new_match.save()
+			return Response("Match saved", status=200)
+		except :
+			return Response("Something went wrong =(", status=500)
+
+	def get(self, request):
+		pass
+
+
+	def patch(self, request):
+		pass
+
+	def delete(self, request):
+		pass
+
+# , 
+# 							user_one_score=new_match_raw.get(pk=2), 
+# 							user_one_powerups=new_match_raw.get(pk=3), 
+# 							user_two=new_match_raw.get(pk=4),
+# 							user_two_score=new_match_raw.get(pk=5),
+# 							user_two_powerups=new_match_raw.get(pk=6)
