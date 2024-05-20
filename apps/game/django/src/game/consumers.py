@@ -3,6 +3,8 @@ import json, random, asyncio, time
 import sys
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+import game.utils as utils
+import game.power_up as pow
 
 width = 50
 height = 30
@@ -14,8 +16,6 @@ acceleration = 0.05
 reset = 0
 counter = 0
 max_speed = 2
-# randB = None
-# playerBonus = -1 # 0 for right and 1 for left
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -34,15 +34,16 @@ class GameConsumer(AsyncWebsocketConsumer):
         if message == "startButton":
             if self.game_state.status['game_running'] == False :
                 self.game_state.status['game_running'] = True
+                self.game_state.timer.resume()
                 asyncio.create_task(loop(self))
-        elif message == "bonus":
-            self.game_state.status['randB'] = text_data_json["bonus"]
 
         else :
             asyncio.create_task(self.game_state.update_player_position(message))
 
-
 class GameState:
+    timer = utils.Timer(verbose=False)
+    p = pow.PowerUpManager()
+
     def __init__(self):
         self.status = {
         'ballX': 0,
@@ -71,19 +72,15 @@ class GameState:
         'wPressed' : False,
         'sPressed' : False,
         'game_running' : False,
-        'randB': 'none',
         'playerBonus' : -1,
-        'bonusStartTime': None,
-        'malusStartTime': None,
-        'reducingR': False,
-        'reducingL': False,
-        'maximizeR': False,
-        'maximizeL': False
+        'startTime': 0,
+        'totalTime': 0
     }
 
     async def update_player_position(self, message):
         if message == "stopButton":
             self.status['game_running'] = False
+            self.timer.pause()
         elif message == "wPressed":
             self.status['wPressed'] = True
         elif message == "sPressed":
@@ -120,119 +117,12 @@ class GameState:
         'paddleHeightR' : self.status['paddleHeightR'],
         'leftPlayerScore' : self.status['leftPlayerScore'],
         'rightPlayerScore' : self.status['rightPlayerScore'],
-        'winner' : self.status['winner']
+        'winner' : self.status['winner'],
+        'randomPointB': self.p.random_point_b,
+        # 'randomPointM': self.status['random_point_m'],
+        # 'randomPointE': self.status['random_point_e']
+        'hitB': self.p.hitB
     }
-
-    def longPaddle(self):
-        # bonus increase paddle size
-        if self.status['randB'] == 'longPaddle' and self.status['playerBonus'] == 0:
-            self.status['randB'] = 'longPaddleR'
-            self.status['bonusStartTime'] = time.time()  
-            self.status['reducingR'] = False  
-        if self.status['randB'] == 'longPaddle' and self.status['playerBonus'] == 1:
-            self.status['randB'] = 'longPaddleL'
-            self.status['bonusStartTime'] = time.time()  
-            self.status['reducingL'] = False  
-
-        # right player long paddle
-        if self.status['randB'] == 'longPaddleR' and not self.status['reducingR']:
-            if self.status['paddleHeightR'] < 20:
-                self.status['paddleHeightR'] += 0.2
-            if self.status['paddleHeightR'] >= 20:
-                elapsed_time = time.time() - self.status['bonusStartTime']
-                if elapsed_time >= 10:
-                    self.status['reducingR'] = True 
-
-        if self.status['reducingR']:
-            if self.status['paddleHeightR'] > 10:
-                self.status['paddleHeightR'] -= 0.2
-            if self.status['paddleHeightR'] <= 10:
-                self.status['paddleHeightR'] = 10
-                self.status['randB'] = 'none'
-                self.status['reducingR'] = False
-
-        # left player long paddle
-        if self.status['randB'] == 'longPaddleL' and not self.status['reducingL']:
-            if self.status['paddleHeightL'] < 20:
-                self.status['paddleHeightL'] += 0.2
-            if self.status['paddleHeightL'] >= 20:
-                elapsed_time = time.time() - self.status['bonusStartTime']
-                if elapsed_time >= 10:  
-                    self.status['reducingL'] = True  
-
-        if self.status['reducingL']:
-            if self.status['paddleHeightL'] > 10:
-                self.status['paddleHeightL'] -= 0.2
-            if self.status['paddleHeightL'] <= 10:
-                self.status['paddleHeightL'] = 10
-                self.status['randB'] = 'none'
-                self.status['reducingL'] = False
-        
-    def shortPaddle(self):
-        # bonus increase paddle size
-        if self.status['randB'] == 'shortPaddle' and self.status['playerBonus'] == 0:
-            self.status['randB'] = 'shortPaddleR'
-            self.status['malusStartTime'] = time.time()  
-            self.status['maximizeR'] = False  
-        if self.status['randB'] == 'shortPaddle' and self.status['playerBonus'] == 1:
-            self.status['randB'] = 'shortPaddleL'
-            self.status['malusStartTime'] = time.time()  
-            self.status['maximizeL'] = False  
-
-        # right player long paddle
-        if self.status['randB'] == 'shortPaddleR' and not self.status['maximizeR']:
-            if self.status['paddleHeightR'] > 5:
-                self.status['paddleHeightR'] -= 0.1
-            if self.status['paddleHeightR'] <= 5:
-                elapsed_time = time.time() - self.status['malusStartTime']
-                if elapsed_time >= 10:
-                    self.status['maximizeR'] = True 
-
-        if self.status['maximizeR']:
-            if self.status['paddleHeightR'] < 10:
-                self.status['paddleHeightR'] += 0.1
-            if self.status['paddleHeightR'] >= 10:
-                self.status['paddleHeightR'] = 10
-                self.status['randB'] = 'none'
-                self.status['maximizeR'] = False
-
-        # left player long paddle
-        if self.status['randB'] == 'shortPaddleL' and not self.status['maximizeL']:
-            if self.status['paddleHeightL'] > 5:
-                self.status['paddleHeightL'] -= 0.1
-            if self.status['paddleHeightL'] <= 5:
-                elapsed_time = time.time() - self.status['malusStartTime']
-                if elapsed_time >= 10:  
-                    self.status['maximizeL'] = True  
-
-        if self.status['maximizeL']:
-            if self.status['paddleHeightL'] < 10:
-                self.status['paddleHeightL'] += 0.1
-            if self.status['paddleHeightL'] >= 10:
-                self.status['paddleHeightL'] = 10
-                self.status['randB'] = 'none'
-                self.status['maximizeL'] = False
-    
-    def slow(self):
-        if self.status['randB'] == 'slow' and self.status['playerBonus'] == 0:
-            self.status['randB'] = 'slowR'
-            self.status['malusStartTime'] = time.time()
-        if self.status['randB'] == 'slow' and self.status['playerBonus'] == 1:
-            self.status['randB'] = 'slowL'
-            self.status['malusStartTime'] = time.time()
-        
-        if self.status['randB'] == 'slowR':
-            self.status['paddleSpeedR'] = 0.5
-            elapsed_time = time.time() - self.status['malusStartTime']
-            if elapsed_time >= 10:
-                self.status['paddleSpeedR'] = 1.2
-        
-        if self.status['randB'] == 'slowL':
-            self.status['paddleSpeedL'] = 0.5
-            elapsed_time = time.time() - self.status['malusStartTime']
-            if elapsed_time >= 10:
-                self.status['paddleSpeedL'] = 1.2 
-
 
     def update(self):
         global reset, max_speed
@@ -240,9 +130,11 @@ class GameState:
         if reset == 1:
             reset = 2
 
-        self.longPaddle()
-        self.shortPaddle()
-        self.slow()
+        self.p.addBonus(self.timer, self.status)
+        
+        self.p.longPaddle(self.status)
+        # p.shortPaddle()
+        # p.slow(self.status)
 
         # paddle displacement
         if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2 < height:
@@ -308,6 +200,7 @@ class GameState:
             self.reset()
             self.status['winner'] = 'rightWin'
             self.status['game_running'] = False
+
     
     def reset(self):
         global reset, counter
@@ -322,7 +215,6 @@ class GameState:
         counter += 1
         self.status['ballSpeedY'] = random.uniform(-1, 1)
         reset = 1
-
 
 async def loop(self):
     global reset
