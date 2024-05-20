@@ -71,38 +71,38 @@ export async function animate() {
     requestAnimationFrame(animate);
 
 	// console.log(gameData.elapsedTime);
-	if (gameData.elapsedTime === bonusTime)
-		bonusState = true;
+	// if (gameData.elapsedTime === bonusTime)
+	// 	bonusState = true;
 
 	if (load.mixer)
 		load.mixer.update(0.01);
 
-	if (bonusState === true)
-	{	
-		var i = Math.floor(Math.random() * game.randBonus.length);
+	// if (bonusState === true)
+	// {	
+	// 	var i = Math.floor(Math.random() * game.randBonus.length);
 	
-		// gameData.bonus = game.randBonus[i];
-		gameData.bonus = 'longPaddle';
-		load.effect.position.set(gameData.randomPointB.x, gameData.randomPointB.y, 0);
-		game.scene.add(load.effect);
-		game.scene.add(game.lightBonus);
-	}
+	// 	// gameData.bonus = game.randBonus[i];
+	// 	gameData.bonus = 'longPaddle';
+	// 	load.effect.position.set(gameData.randomPointB.x, gameData.randomPointB.y, 0);
+	// 	game.scene.add(load.effect);
+	// 	game.scene.add(game.lightBonus);
+	// }
 	
 	if (loadData.mixer2) {
 		loadData.mixer2.update(0.0167); 
 	}
 
-	if (loadData.mixer2 && loadData.mixer2.time >= load.clips2[0].duration && bonusState === true) {
-		game.scene.remove(load.effect);
-		bonusState = false;
-		gameData.randomPointB = utils.getRandomPointInRectangle(p1, p2, p3, p4);
-		const randomNumber = Math.floor(Math.random() * (10 - 3 + 1)) + 3;
-		bonusTime = gameData.elapsedTime + randomNumber;
-		loadData.mixer2.time = 0;
-		loadData.mixer2 = new THREE.AnimationMixer(load.effect);
-		loadData.mixer2.clipAction(load.clips2[0]).play();
-		gameData.bonus = null;
-	}
+	// if (loadData.mixer2 && loadData.mixer2.time >= load.clips2[0].duration && bonusState === true) {
+	// 	game.scene.remove(load.effect);
+	// 	bonusState = false;
+	// 	gameData.randomPointB = utils.getRandomPointInRectangle(p1, p2, p3, p4);
+	// 	const randomNumber = Math.floor(Math.random() * (10 - 3 + 1)) + 3;
+	// 	bonusTime = gameData.elapsedTime + randomNumber;
+	// 	loadData.mixer2.time = 0;
+	// 	loadData.mixer2 = new THREE.AnimationMixer(load.effect);
+	// 	loadData.mixer2.clipAction(load.clips2[0]).play();
+	// 	gameData.bonus = null;
+	// }
 	
 	startGameButton.style.display = 'none';
 
@@ -141,8 +141,8 @@ export async function animate() {
 			for (var i = 0; i < 100; i++) {
 				utils.createParticle(game.sphere.position.x,game.sphere.position.y, 0.5, 10, game.lightBonus.color);
 			}
-			gameData.catchBonus = false;
-		} 
+			gameData.catchBonus = false;		
+        } 
 		if (gameData.collisionPaddle === true)
 		{
 			var randomIndex;

@@ -71,7 +71,6 @@ export var sceneHeight = 70;
 // scenes
 export var sceneHandler = 1;
 
-
 export var randBonus = ['longPaddle', 'boost'];
 export var randMalus = ['slow', 'shortPaddle', 'invertedKey'];
 export var randEffect = ['hurricane', 'earthquake', 'glitch'];
@@ -256,24 +255,34 @@ export function gameRenderer(data) {
 		initialSpeed = data.speed;
 	}
 
-	if (gameData.randomPointB.x !== 1000 && gameData.bonus !== null){
-		const targetPosition = new THREE.Vector3(gameData.randomPointB.x, gameData.randomPointB.y, gameData.randomPointB.z);
+    if (data.randomPointB && load.effect){
+        load.effect.position.set(data.randomPointB.x, data.randomPointB.y, 0);
+        scene.add(load.effect);
+    } 
 
-		const targetRadius = 5;
-		const spherePosition = sphere.position;
-		const sphereRadius = sphere.geometry.parameters.radius;
-		const distance = spherePosition.distanceTo(targetPosition);
+    // console.log(data.hitB);
 
-		if (distance <= sphereRadius + targetRadius) {
-			gameData.catchBonus = true;
-			gameSocket.send(JSON.stringify({
-				'message': 'bonus',
-				'bonus': gameData.bonus
-			}));
-			gameData.bonus = null;
-			gameData.randomPointB.x = 1000;
-		} 
-	}
+    // if (data.hitB === true)
+    //     gameData.catchBonus = true;
+
+	// if (gameData.randomPointB.x !== 1000 && gameData.bonus !== null){
+	// 	const targetPosition = new THREE.Vector3(gameData.randomPointB.x, gameData.randomPointB.y, gameData.randomPointB.z);
+
+	// 	const targetRadius = 5;
+	// 	const spherePosition = sphere.position;
+	// 	const sphereRadius = sphere.geometry.parameters.radius;
+	// 	const distance = spherePosition.distanceTo(targetPosition);
+
+	// 	if (distance <= sphereRadius + targetRadius) {
+	// 		gameData.catchBonus = true;
+	// 		gameSocket.send(JSON.stringify({
+	// 			'message': 'bonus',
+	// 			'bonus': gameData.bonus
+	// 		}));
+	// 		gameData.bonus = null;
+	// 		gameData.randomPointB.x = 1000;
+	// 	} 
+	// }
     
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     composer.render();
