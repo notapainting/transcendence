@@ -1,17 +1,23 @@
-import { showHome } from "./home.js"
+import { showHome, parallaxEffect } from './Home.js';
+import { showGame } from './Game.js';
+import { showProfile } from './Profile.js';
+import { showSettings } from './Settings.js';
+import { showSignin, sendData } from './Signin.js';
 
-const navigateTo = url => {
+export const navigateTo = url => {
     history.pushState(null, null, url)
     router()
 }
+
 const clearView = () => {
 console.log("Appel ClearView")
     document.querySelectorAll(".view").forEach(div => {
         div.style.display = "none";
     });
+    document.removeEventListener('mousemove', parallaxEffect);
 }
 
-const isUserAuthenticated = () => {
+export const isUserAuthenticated = () => {
     return fetch('auth/validate_token/', {
         method: 'POST',
         credentials: 'same-origin'
@@ -82,10 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
             navigateTo(e.target.dataset.href);
         }
     });
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-    });
     router();
 });
 
@@ -95,9 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             navigateTo(e.target.href)
         }
-    })
-    document.querySelector(".login-signin-form").addEventListener("submit", event => {
-        event.preventDefault();
     })
     router();
 })
