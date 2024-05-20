@@ -1,441 +1,49 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bjill</title>
-    <link rel="stylesheet" href="/style.css">
+    <title>bjill | welcome</title>
+    <link rel="stylesheet" href="./home-page.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica+SC&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- <nav class="nav">
-        <ul>
-            <li><a href="/" class="nav__link" data-link>Home</a></li>
-            <li><a href="/game" class="nav__link" data-link>Game</a></li>
-            <li><a href="/profile" class="nav__link" data-link>Profile</a></li>
-            <li><a href="/settings" class="nav__link" data-link>Settings</a></li>
-        </ul>
-    </nav> -->
-    <div id="Home" class="view">
+    <div id="home" class="view">
         <div class="parallax-container">
-            <div class="banner top-hide"></div>
             <div class="background-threes"></div>
             <div class="back-threes parallax-items"></div>
             <div class="middle-threes parallax-items"></div>
             <div class="front-threes parallax-items"></div>
+            <div class="banner top-hide"></div>
             <div class="banner bot-hide"></div>
         </div>
-        <div class="home-form">
-            <input type="text" class="home-form-input home-email" placeholder="e-mail">
-            <input type="text" class="home-form-input home-login" placeholder="username">
-            <input type="password" class="home-form-input home-password" placeholder="password">
-            <div class="login-or-signin">
-                <div class="button login-register-button">LOGIN</div>
-                <p class="register-login-text">Don't have an account ? <br><span class="register-login-link">Create an account</span></p>
-            </div>
-            <div class="message-box"></div>
-        </div>
-        <div class="nav-top">
-            <p class="welcome-text-nav"></p>
-            <div class="profile-picture-nav" data-link-div data-href="/profile"></div>
-            <div class="logout-icon-nav"></div>
-        </div>
-    </div>
-    <div id="Game" class="view"></div>
-    <div id="Profile" class="view">
-        <div class="profile-main">
-            <div class="profile-container">
-                <h3>Username</h3>
-                <input type="text" class="profile-username">
-                <h3>First Name</h3>
-                <input type="text" class="profile-first-name">
-                <h3>Last Name</h3>
-                <input type="text" class="profile-last-name">
-                <h3>Email</h3>
-                <input type="text" class="profile-email">
-                <h3>Gender</h3>
-                <input type="text" class="profile-gender">
-                <h3>Date of Birth</h3>
-                <input type="date" class="profile-date-of-birth" name="date_of_birth">
-                <div class="button profile-button">MODIFY</div>
+        <div class="play-offline-online">
+            <div class="home-sep"></div>
+            <h2>PLAY OFFLINE OR LOGIN TO PLAY</h2>
+            <div class="form-container">
+                <button class="btn play-offline-btn">PLAY OFFLINE</button>
+                <form action="" class="login-signin-form">
+                    <input type="text" name="home-email" id="home-email" placeholder="e-mail">
+                    <input type="text" name="home-username" id="home-username" placeholder="username / e-mail">
+                    <input type="password" name="home-password" id="home-password" placeholder="password">
+                    <div class="accept">
+                        <div class="checkbox-wrapper-3">
+                            <input type="checkbox" id="cbx-3" />
+                            <label for="cbx-3" class="toggle"><span></span></label>
+                        </div><p>I have read and accepted terms..</p>
+                    </div>
+                    <div class="login-or-create">
+                        <button class="btn home-form-btn">LOGIN</button>
+                        <p class="login-or-register-text">Don't have an account ? <br><span class="switch-form">Create One</span></p>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    <div id="Settings" class="view">
-        <h1>Welcome To Settings</h1>
-    </div>
-    <script type="module" src="js/Home.js"></script>
     <script type="module" src="js/index.js"></script>
-    <script type="module" src="js/Signin.js"></script>
+    <script type="module" src="js/home.js"></script>
 </body>
 </html>
 
-
-<!-- <!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bjill | Welcome</title>
-    <link rel="stylesheet" href="/style.css">    
-</head>
-<body>
-    <main class="main">
-        <nav class="nav">
-            <ul>
-                <li><a href="#home" class="home">Home</a></li>
-                <li><a href="#profile" class="profile">Profile</a></li>
-                <li><a href="#game" class="game">Game</a></li>
-                <li><a href="#chat" class="chat">Chat</a></li>
-                <li><a href="#settings" class="settings">Settings</a></li>
-                <li><a href="#disconnect" class="disconnect">Disconnect</a></li>
-            </ul>
-        </nav>
-        <div id="home" class="parallax-container section">
-            <div class="parallax background-threes"></div>
-            <div class="parallax back-threes">
-            </div>
-            <div class="parallax middle-threes">
-            </div>
-            <div class="parallax front-threes">
-            </div>
-        </div>
-        <div class="section red" id="game"></div>
-    </main>
-    <script src="./index.js"></script>
-</body>
-</html> -->
-
-
-
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test des vues</title>
-    <style>
-        /* Styles CSS pour la mise en forme */
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="file"],
-        button {
-            display: block;
-            width: 100%;
-            margin-bottom: 10px;
-            padding: 8px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .response {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 4px;
-            background-color: #fff;
-        }
-        .error {
-            color: #ff0000;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Test des vues</h2>
-
-        <h3>Connexion avec username et mot de passe</h3>
-        <input type="text" id="loginUsername" placeholder="Nom d'utilisateur">
-        <input type="password" id="loginPassword" placeholder="Mot de passe">
-        <button onclick="login()">Se connecter</button>
-        <div id="loginResponse" class="response"></div>
-        <button onclick="authenticateWith42()">Se connecter avec 42</button>
-        <div id="userInfo" class="user-info" style="display: none;">
-            <img id="profilePicture" src="" alt="Photo de profil">
-            <div id="username"></div>
-            <div id="email"></div>
-            <h3>Modifier la photo de profil</h3>
-            <input type="file" id="profilePictureInput">
-            <button onclick="updateProfilePicture()">Modifier</button>
-            <div id="updateProfilePictureResponse" class="response"></div>
-        </div>
-        <div class="container">
-            <h2>Test des vues</h2>
-    
-            <h3>Activer l'authentification à deux facteurs</h3>
-            <button onclick="activate2FA()">Activer l'authentification à deux facteurs</button>
-            <div id="activate2FAResponse" class="response"></div>
-            <div id="qrCodeContainer"></div>
-            <h3>Confirmer l'activation de l'authentification à deux facteurs</h3>
-            <input type="text" id="code" placeholder="Code à entrer">
-            <button onclick="confirm2FA()">Confirmer l'activation</button>
-            <div id="confirm2FAResponse" class="response"></div>
-        </div>
-    
-        <h3>Créer un utilisateur</h3>
-        <input type="text" id="username-create" placeholder="Nom d'utilisateur">
-        <input type="email" id="email-create" placeholder="Adresse email">
-        <input type="password" id="password-create" placeholder="Mot de passe">
-        <button onclick="createUser()">Créer l'utilisateur</button>
-        <div id="createUserResponse" class="response"></div>
-
-        <h3>Vérifier le token</h3>
-        <input type="text" id="token" placeholder="Token JWT">
-        <button onclick="validateToken()">Valider le token</button>
-        <div id="validateTokenResponse" class="response"></div>
-
-        <h3>Réinitialiser le mot de passe</h3>
-        <input type="email" id="resetEmail" placeholder="Adresse email">
-        <button onclick="resetPassword()">Envoyer le lien de réinitialisation</button>
-        <div id="resetPasswordResponse" class="response"></div>
-
-        <h3>Actualiser le token</h3>
-        <input type="text" id="refreshToken" placeholder="Token JWT">
-        <button onclick="refreshToken()">Actualiser le token</button>
-        <div id="refreshTokenResponse" class="response"></div>
-    </div>
-
-    <script>
-        // Fonction pour créer un utilisateur
-        function createUser() {
-            const username = document.getElementById('username-create').value;
-            const email = document.getElementById('email-create').value;
-            const password = document.getElementById('password-create').value;
-            const data = {
-                username: username,
-                email: email,
-                password: password
-            };
-            fetch('/auth/signup/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('createUserResponse').innerText = JSON.stringify(data);
-            })
-            .catch(error => {
-                document.getElementById('createUserResponse').innerText = 'Erreur : ' + error.message;
-            });
-        }
-
-        // Fonction pour valider le token
-        function validateToken() {
-            // Supprimez la récupération du token de l'input
-
-            // Supprimez l'en-tête Content-Type et le corps de la requête
-            // Remplacez-les par la méthode de transmission des cookies
-
-            fetch('/auth/validate_token/', {
-                method: 'POST',
-                credentials: 'include' // Ajoutez cette option pour inclure les cookies dans la requête
-            })
-            .then(response => {
-                // Vous pouvez supprimer cette partie si vous n'avez pas besoin de la réponse JSON
-                return response.json();
-            })
-            .then(data => {
-                // Vous pouvez supprimer cette partie si vous n'avez pas besoin de la réponse JSON
-                document.getElementById('validateTokenResponse').innerText = JSON.stringify(data);
-            })
-            .catch(error => {
-                document.getElementById('validateTokenResponse').innerText = 'Erreur : ' + error.message;
-            });
-        }
-
-        // Fonction pour réinitialiser le mot de passe
-        function resetPassword() {
-            const email = document.getElementById('resetEmail').value;
-            const data = {
-                email: email
-            };
-            fetch('/auth/reset_password/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('resetPasswordResponse').innerText = JSON.stringify(data);
-            })
-            .catch(error => {
-                document.getElementById('resetPasswordResponse').innerText = 'Erreur : ' + error.message;
-            });
-        }
-
-        // Fonction pour actualiser le token
-        function refreshToken() {
-            fetch('/auth/token/refresh/', {
-                method: 'POST',
-                credentials: 'same-origin' // Pour inclure les cookies dans la demande
-            })
-            .then(response => {
-                if (response.ok) {
-                    document.getElementById('refreshTokenResponse').innerText = "Token actualisé avec succès !";
-                } else {
-                    throw new Error('Erreur lors de la mise à jour du token.');
-                }
-            })
-            .catch(error => {
-                document.getElementById('refreshTokenResponse').innerText = 'Erreur : ' + error.message;
-            });
-        }
-
-        function login() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            const data = {
-                username: username,
-                password: password
-            };
-            fetch('/auth/token/', {
-                method: 'POST',
-                credentials: 'include' // Ajoutez cette option pour inclure les cookies dans la requête
-            })
-            .then(response => {
-                // Log the access_token cookie
-                console.log('Access token cookie:', document.cookie);
-                if (response.ok) {
-                    return response.json(); // Convertir la réponse en JSON
-                } else {
-                    throw new Error('La requête a échoué');
-                }
-            })
-            .then(data => {
-                // Vérifier si la connexion est réussie
-                if (data.username) {
-                    // Afficher les informations de l'utilisateur
-                    document.getElementById('profilePicture').src = `https://localhost:8443${data.profile_picture}`;
-                    document.getElementById('username').innerText = `Nom d'utilisateur: ${data.username}`;
-                    document.getElementById('email').innerText = `Email: ${data.email}`;
-                    // Afficher la section userInfo
-                    document.getElementById('userInfo').style.display = 'block';
-                    // Cacher le formulaire de connexion
-                    document.getElementById('loginResponse').innerText = '';
-                } else {
-                    // Afficher un message d'erreur si la connexion a échoué
-                    document.getElementById('loginResponse').innerText = 'Erreur : Nom d\'utilisateur ou mot de passe incorrect.';
-                }
-            })
-            .catch(error => {
-                document.getElementById('loginResponse').innerText = 'Erreur : ' + error.message;
-            });
-        }
-
-
-        // Fonction pour mettre à jour la photo de profil
-        function updateProfilePicture() {
-            const profilePictureInput = document.getElementById('profilePictureInput');
-            const profilePicture = profilePictureInput.files[0];
-            const formData = new FormData();
-            formData.append('profile_picture', profilePicture);
-            fetch('https://localhost:8443/auth/update_picture/', {
-                method: 'PUT',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('updateProfilePictureResponse').innerText = JSON.stringify(data);
-            })
-            .catch(error => {
-                document.getElementById('updateProfilePictureResponse').innerText = 'Erreur : ' + error.message;
-            });
-        }
-
-        function authenticateWith42() {
-            fetch('auth/authenticate_with_42/', {
-                method: 'GET',
-                redirect: 'follow' // Suivre les redirections
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur lors de la connexion avec l\'école 42');
-                }
-                // Extraire l'URL de redirection depuis la réponse JSON
-                return response.json();
-            })
-            .then(data => {
-                // Récupérer l'URL d'autorisation de l'école 42 depuis les données JSON
-                const authorizationUrl = data.authorization_url;
-                // Rediriger l'utilisateur vers l'URL d'autorisation de l'école 42
-                window.location.href = authorizationUrl;
-            })
-            .catch(error => {
-                document.getElementById('loginResponse').innerText = 'Erreur : ' + error.message;
-            });
-        }
-
-        function activate2FA() {
-            fetch('/auth/activate2FA/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const qrImgBase64 = data.qr_img; // Récupérer l'image du QR code base64 depuis la réponse JSON
-                // Créer un élément <img> pour afficher l'image du QR code
-                const qrImgElement = document.createElement('img');
-                qrImgElement.src = 'data:image/png;base64,' + qrImgBase64; // Définir la source de l'image sur l'image QR base64
-                qrImgElement.alt = 'QR Code'; // Ajouter une description alternative pour l'image
-                // Ajouter l'élément <img> à un conteneur existant dans votre HTML
-                const container = document.getElementById('qrCodeContainer');
-                container.innerHTML = ''; // Effacer le contenu précédent du conteneur
-                container.appendChild(qrImgElement); // Ajouter l'élément <img> au conteneur
-            })
-            .catch(error => {
-                document.getElementById('activate2FAResponse').innerText = 'Erreur : ' + error.message;
-            });
-        }
-        function confirm2FA() {
-            const code = document.getElementById('code').value;
-            const data = {
-                code: code
-            };
-            fetch('/auth/confirm2FA/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('confirm2FAResponse').innerText = JSON.stringify(data);
-            })
-            .catch(error => {
-                document.getElementById('confirm2FAResponse').innerText = 'Erreur : ' + error.message;
-            });
-        }
-    </script>
-</body>
-</html> -->
