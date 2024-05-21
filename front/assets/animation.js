@@ -81,6 +81,8 @@ export async function animate() {
 	if (loadData.mixerBoost) {
 		loadData.mixerBoost.update(0.01); 
 	}
+	// if(load.boost)
+	// 	load.boost.rotation.z += 0.1;
 
 	startGameButton.style.display = 'none';
 	// if (game.sceneHandler === 1)

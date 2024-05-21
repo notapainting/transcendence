@@ -82,7 +82,6 @@ var p3 = { x: 45, y: 25 };
 var p4 = { x: -45, y: 25 };
 
 export const gameData = {
-	boost: false,
 	explosion: false,
 	catchBonus: false,
 	catchMalus: false,
@@ -99,6 +98,37 @@ export const gameData = {
 	malus: null,
 	effect: null
 };
+
+let currentPosition = new THREE.Vector3();
+let previousPosition = new THREE.Vector3();
+let direction = new THREE.Vector3(); 
+
+function updateBallPosition(newPosition) {
+    // Mettre à jour les positions
+    previousPosition.copy(currentPosition);
+    currentPosition.copy(newPosition);
+
+    // Calculer le vecteur de déplacement
+    let displacement = new THREE.Vector3();
+    displacement.subVectors(currentPosition, previousPosition);
+
+    // Normaliser le vecteur de déplacement pour obtenir le vecteur de direction
+    direction.copy(displacement).normalize();
+
+    console.log(`Le vecteur de direction de la balle est :`, direction);
+}
+
+function applyRotationToObject(object, direction) {
+    // Vecteur de référence, généralement l'axe Z (peut varier selon l'orientation de votre objet initial)
+    let referenceVector = new THREE.Vector3(0, -1, 0);
+
+    // Calculer le quaternion de rotation pour aligner le vecteur de référence avec la direction
+    let quaternion = new THREE.Quaternion();
+    quaternion.setFromUnitVectors(referenceVector, direction);
+
+    // Appliquer le quaternion à l'objet
+    object.quaternion.copy(quaternion);
+}
 
 export function gameRenderer(data) {
 	utils.clearScene(); 
@@ -281,11 +311,14 @@ export function gameRenderer(data) {
 		if (load.boost){
 			load.boost.position.set(sphere.position.x, sphere.position.y, sphere.position.z)
 			scene.add(load.boost);
+			updateBallPosition(sphere.position);
+			// load.boost.rotation.x = direction.x;
+			// load.boost.rotation.y = direction.z;
+			// load.boost.rotation.z = direction.x;
+			applyRotationToObject(load.boost, direction) 
 		}
-		// gameData.boost = true;
 	}
 
-	// if (gameData.bonus === true)
 
 
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
