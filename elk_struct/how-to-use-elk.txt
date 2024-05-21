@@ -58,4 +58,44 @@ Petit point sur les elements a setup dans nginx et les serveur django pour la co
 
     - Django : Le sujet des logs des serveur django peut etre developpe via ce lien : https://docs.djangoproject.com/en/5.0/topics/logging/
     Pour faire court, il faut, dans LOGGING, ajouter un handlers logstash dans lequel on specifie le port d'envoie des logs, sous quel format et via quel socket
- 
+
+
+Voici une representation graphiques de la maniere dont les logs sont recupere par l'intermediaire de la stack ELK :
+                            ##########                ##########
+                            # NGINX  #                # DJANGO #      
+                            ##########                ##########
+                                |                          |
+                                |                          | 
+                                |                          |
+                                +--------------------------+
+                                 +------------|-------------+
+                                 |            | TCP         |
+                                 |            | UDP         |
+                       \         |            | SYSLOG      |         /
+                        \--------|--------------------------|--------/
+                        |        | INPUT      |             |        |
+                        |        +--------------------------|        |
+                        |                     |                      |
+                        |                    /|\                     |
+                        |                   / | \                    |
+                        |  +---------------/  |  \----------------+  |
+                        |  | FILTER       /   |   \     Type      |  |
+                        |  |             /    |    \    Grok      |  |
+                        |  |            /     |     \   Mutate    |  |
+                        |  |           /      |      \            |  |
+                        |  +----------/-------|-------\-----------+  |
+                        |            /        |        \             |
+                        |  +--------/---------|---------\--------+   |
+                        |  | ELSAS. |         |          |       |   |
+                        |  | KIBAN. |         |          |       |   |
+                        |  |        |         |          |       |   |
+                        |  |     GRAPH 1    GRAPH 2     GRAPH 3  |   |
+                        |  |                                     |   |
+                        |  |                                     |   |
+                        |  +-------------------------------------+   |
+                        +--------------------------------------------+
+                
+
+
+
+
