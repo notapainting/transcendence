@@ -20,7 +20,7 @@ services:
       - ${CHAT}-db
     stdin_open: true 
     tty: true
-    # entrypoint: ["bash", "/conf/init.sh"]
+    entrypoint: ["bash", "/conf/init.sh"]
 
   chat-db:
     container_name: ${CHAT}-db

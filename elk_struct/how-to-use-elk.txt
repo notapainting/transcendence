@@ -61,13 +61,13 @@ Petit point sur les elements a setup dans nginx et les serveur django pour la co
 
 
 Voici une representation graphiques de la maniere dont les logs sont recupere par l'intermediaire de la stack ELK :
-                            ##########                ##########
-                            # NGINX  #                # DJANGO #      
-                            ##########                ##########
-                                |                          |
-                                |                          | 
-                                |                          |
-                                +--------------------------+
+                             ##########                ##########
+                             # NGINX  #                # DJANGO #      
+                             ##########                ##########
+                                 |                          |
+                                 |                          | 
+                                 |                          |
+                                 +--------------------------+
                                  +------------|-------------+
                                  |            | TCP         |
                                  |            | UDP         |
