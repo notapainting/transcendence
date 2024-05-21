@@ -76,13 +76,18 @@ from .serializers import MatchSerializer
 def parse_json(data):
     return JSONParser().parse(BytesIO(data))
 
-class UserMatchsInfos(APIView):
+class MatchsInfos(APIView):
 	def post(self, request):
 			data = JSONParser().parse(request)
 			new_match = MatchSerializer(data=data)
 			if new_match.is_valid():
 				new_match.save()
 				return Response("Match saved", status=200)
+
+			if not hasattr(new_match, 'user_one'):
+				return Response("user_one unknown", status=500)
+			if not hasattr(new_match, 'user_two'):
+				return Response("user_two unknown", status=500)
 			return Response("POST: Something went wrong =(", status=500)
 
 	def get(self, request):
@@ -90,8 +95,11 @@ class UserMatchsInfos(APIView):
 			all_match = MatchResults.objects.all()
 			serializer = MatchSerializer(all_match, many=True)
 			return Response(serializer.data, status=200)
-		except :
+		except:
 			return Response("GET: Something went wrong =(", status=500)
 
-	def patch(self, request):
-		pass
+class UserMatchsInfos(APIView):
+	def get(self, request, **args):
+		name = args.get('name', None)
+		return Response(name + "'s match history", status=200)
+		
