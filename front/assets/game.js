@@ -65,6 +65,7 @@ export let light1;
 export let light2;
 export let light3;
 export let lightBonus;
+export let lightMalus;
 
 export var sceneHeight = 70;
 
@@ -81,8 +82,10 @@ var p3 = { x: 45, y: 25 };
 var p4 = { x: -45, y: 25 };
 
 export const gameData = {
+	boost: false,
 	explosion: false,
 	catchBonus: false,
+	catchMalus: false,
 	collisionPaddle: false,
 	start: false,
 	elapsedTime: 0,
@@ -218,8 +221,8 @@ export function gameRenderer(data) {
 	light2.position.set(-data.width + 5, data.leftPaddleY, cylinderLeft.position.z + 5);
 	light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
 	light3.position.set(data.x, data.y, sphere.position.z);
-	lightBonus = new THREE.PointLight(0x90e0ef, 20, 0);
-	lightBonus.position.set(gameData.randomPointB.x, gameData.randomPointB.y, gameData.randomPointB.z);
+	lightBonus = new THREE.PointLight(0x90e0ef, 20, 0);	
+	lightMalus = new THREE.PointLight(0xd62828, 20, 0);
 
 	// if (animationData.intro === 4){
 		scene.add(light2);
@@ -255,35 +258,36 @@ export function gameRenderer(data) {
 		initialSpeed = data.speed;
 	}
 
-    if (data.randomPointB && load.effect){
-        load.effect.position.set(data.randomPointB.x, data.randomPointB.y, 0);
-        scene.add(load.effect);
+    if (data.randomPointB && load.bonus){
+        load.bonus.position.set(data.randomPointB.x, data.randomPointB.y, 0);
+		lightBonus.position.set(data.randomPointB.x, data.randomPointB.y, 0);
+        scene.add(load.bonus);
+        scene.add(lightBonus);
     } 
+    if (data.hitB === true)
+        gameData.catchBonus = true;
 
-    // console.log(data.hitB);
+	if (data.randomPointM && load.malus){
+		load.malus.position.set(data.randomPointM.x, data.randomPointM.y, 0);
+		lightMalus.position.set(data.randomPointM.x, data.randomPointM.y, 0);
+		scene.add(load.malus);
+		scene.add(lightMalus);
+	} 
+	if (data.hitM === true)
+		gameData.catchMalus = true;
 
-    // if (data.hitB === true)
-    //     gameData.catchBonus = true;
+	if (data.bonus && (data.bonus === 'boostL' || data.bonus === 'boostR')){
+		console.log(data.bonus);
+		if (load.boost){
+			load.boost.position.set(sphere.position.x, sphere.position.y, sphere.position.z)
+			scene.add(load.boost);
+		}
+		// gameData.boost = true;
+	}
 
-	// if (gameData.randomPointB.x !== 1000 && gameData.bonus !== null){
-	// 	const targetPosition = new THREE.Vector3(gameData.randomPointB.x, gameData.randomPointB.y, gameData.randomPointB.z);
+	// if (gameData.bonus === true)
 
-	// 	const targetRadius = 5;
-	// 	const spherePosition = sphere.position;
-	// 	const sphereRadius = sphere.geometry.parameters.radius;
-	// 	const distance = spherePosition.distanceTo(targetPosition);
 
-	// 	if (distance <= sphereRadius + targetRadius) {
-	// 		gameData.catchBonus = true;
-	// 		gameSocket.send(JSON.stringify({
-	// 			'message': 'bonus',
-	// 			'bonus': gameData.bonus
-	// 		}));
-	// 		gameData.bonus = null;
-	// 		gameData.randomPointB.x = 1000;
-	// 	} 
-	// }
-    
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     composer.render();
 }
