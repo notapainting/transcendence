@@ -36,30 +36,6 @@ async def get_serializer(type):
     }
     return serializers[type]
 
-async def get_targets2(user, type, data):
-    if type == enu.Event.Message.TEXT:
-        targets = [data['group']]
-    elif type == enu.Event.Message.FIRST:
-        targets = data["members"]
-    elif type == enu.Event.Message.FETCH:
-        targets = [enu.Self.LOCAL]
-    elif type == enu.Event.Message.READ:
-        targets = [data["group"]]
-    elif type == enu.Event.Message.GAME:
-        targets = [enu.Self.LOCAL, data['target']]
-    elif type == enu.Event.Status.UPDATE:
-        targets = cuti.get_contact_list(user) + [user.name]
-    elif type == enu.Event.Contact.UPDATE:
-        targets = [user.name, data['name']]
-    elif type in enu.Event.Group.values:
-        type = enu.Event.Group.UPDATE
-        targets = data["owner"] + data["members"] + data["admins"] + data["restricts"]
-
-    event = {}
-    event['type'] = type
-    event['data'] = data
-    return targets, event
-
 async def get_targets(user, type, data):
     match type:
         case enu.Event.Message.TEXT: targets = [data['group']]
@@ -67,7 +43,7 @@ async def get_targets(user, type, data):
         case enu.Event.Message.FETCH: targets = enu.Self.LOCAL
         case enu.Event.Message.READ: targets = [data["group"]]
         case enu.Event.Message.GAME: targets = [user.name, data['target']]
-        case enu.Event.Status.UPDATE: targets = cuti.get_contact_list(user) + [user.name]
+        case enu.Event.Status.UPDATE: targets = get_contact_list(user) + [user.name]
         case enu.Event.Contact.UPDATE: targets = [user.name, data['name']]
         case enu.Event.Group.CREATE | enu.Event.Group.QUIT | enu.Event.Group.DELETE | enu.Event.Group.UPDATE: 
             type = enu.Event.Group.UPDATE
