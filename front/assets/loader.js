@@ -4,14 +4,19 @@ import { scene } from './game.js';
 
 const loader = new GLTFLoader();
 export var intro;
-export var effect;
+export var bonus;
+export var malus;
+export var boost;
 export var mixer;
-export var mixer2;
 export var clips;
-export var clips2;
+export var clipsBonus;
+export var clipsMalus;
+export var clipsBoost;
 
 export const loadData = {
-	mixer2: null
+	mixerBonus: null,
+	mixerMalus: null,
+	mixerBoost: null
   };
 
 loader.load('./models/scene.glb', function ( gltf ) {
@@ -50,25 +55,69 @@ loader.load('./models/scene.glb', function ( gltf ) {
 
 loader.load('./models/effectBonus.glb', function ( gltf ) {
 
-    effect = gltf.scene;
+    bonus = gltf.scene;
 
-    effect.position.set(10,10,0);
+    bonus.position.set(10,10,0);
 
-    effect.scale.set(2, 2, 2); 
+    bonus.scale.set(2, 2, 2); 
 
-    effect.rotation.x += Math.PI / 2;
+    bonus.rotation.x += Math.PI / 2;
 
-    // scene.add(effect);
+    // scene.add(bonus);
 
-	loadData.mixer2 = new THREE.AnimationMixer(effect);
-    clips2 = gltf.animations;
-    if (clips2 && clips2.length) {
-        clips2.forEach(function (clip) {
-            loadData.mixer2.clipAction(clip).play();
+	loadData.mixerBonus = new THREE.AnimationMixer(bonus);
+    clipsBonus = gltf.animations;
+    if (clipsBonus && clipsBonus.length) {
+        clipsBonus.forEach(function (clip) {
+            loadData.mixerBonus.clipAction(clip).play();
         });
     }
-	
 }, undefined, function ( error ) {
 	console.error( error );
 } );
 
+loader.load('./models/effectMalus.glb', function ( gltf ) {
+
+    malus = gltf.scene;
+
+    malus.position.set(10,10,0);
+
+    malus.scale.set(2, 2, 2); 
+
+    malus.rotation.x += Math.PI / 2;
+
+    // scene.add(malus);
+
+	loadData.mixerMalus = new THREE.AnimationMixer(malus);
+    clipsMalus = gltf.animations;
+    if (clipsMalus && clipsMalus.length) {
+        clipsMalus.forEach(function (clip) {
+            loadData.mixerMalus.clipAction(clip).play();
+        });
+    }
+}, undefined, function ( error ) {
+	console.error( error );
+} );
+
+loader.load('./models/boost.glb', function ( gltf ) {
+
+    boost = gltf.scene;
+
+    boost.position.set(10,10,0);
+
+    boost.scale.set(7, 7, 7); 
+
+    // boost.rotation.x += Math.PI / 2;
+
+    // scene.add(boost);
+
+	loadData.mixerBoost = new THREE.AnimationMixer(boost);
+    clipsBoost = gltf.animations;
+    if (clipsBoost && clipsBoost.length) {
+        clipsBoost.forEach(function (clip) {
+            loadData.mixerBoost.clipAction(clip).play();
+        });
+    }
+}, undefined, function ( error ) {
+	console.error( error );
+} );
