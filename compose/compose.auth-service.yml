@@ -16,7 +16,10 @@ services:
       - app_network
     restart: unless-stopped
     depends_on:
-      - ${AUTH}-db
+      logstash01:
+       condition: service_healthy
+      auth-service-db:
+       condition: service_started
     stdin_open: true 
     tty: true
     entrypoint: ["bash", "/conf/init.sh"]

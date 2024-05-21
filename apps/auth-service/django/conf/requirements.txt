@@ -1,3 +1,5 @@
+asgiref==3.8.1
+certifi==2024.2.2
 charset-normalizer==3.3.2
 Django==5.0.2
 django-cors-headers==4.3.1
@@ -8,16 +10,19 @@ django-two-factor-auth==1.16.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
 idna==3.7
-psycopg2==2.9.9
 psycopg2-binary==2.9.9
 PyJWT==2.8.0
 pyotp==2.9.0
 pypng==0.20220715.0
+python-logstash==0.4.8
 pytz==2024.1
 qrcode==7.4.2
 requests==2.31.0
+rfc5424-logging-handler==1.4.3
 setuptools==69.1.0
 sqlparse==0.4.4
+syslog-rfc5424-formatter==1.2.3
 typing_extensions==4.11.0
+tzlocal==5.2
 urllib3==2.2.1
 wheel==0.42.0

@@ -17,7 +17,10 @@ services:
       - "8000:8000"
     restart: unless-stopped
     depends_on:
-      - ${CHAT}-db
+      logstash01:
+       condition: service_healthy
+      chat-db:
+       condition: service_started
     stdin_open: true 
     tty: true
     entrypoint: ["bash", "/conf/init.sh"]
