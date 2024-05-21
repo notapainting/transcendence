@@ -88,6 +88,7 @@ services:
 
 # Elasticsearch
  es01:
+   container_name: elasticsearch
    depends_on:
      setup:
        condition: service_healthy
@@ -135,6 +136,7 @@ services:
 
 # Kibana    
  kibana:
+   container_name: kibana
    depends_on:
      es01:
        condition: service_healthy
