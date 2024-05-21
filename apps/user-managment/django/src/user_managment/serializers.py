@@ -1,6 +1,7 @@
 from user_managment.models import CustomUser
 from django.contrib.auth.hashers import make_password
 import uuid
+from .matchs import MatchResults
 
 	
 from rest_framework import serializers
@@ -20,3 +21,9 @@ class UserSerializer(serializers.ModelSerializer):
 			setattr(instance, attr, value)
 		instance.save()
 		return instance
+
+class MatchSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = MatchResults
+		# fields = ['user_one', 'user_one_score', 'user_one_powerups','user_two', 'user_two_score', 'user_two_powerups']
+		fields = '__all__'

@@ -71,42 +71,27 @@ class GetUserInfos(APIView):
 
 from rest_framework.parsers import JSONParser
 from io import BytesIO
+from .serializers import MatchSerializer
 
 def parse_json(data):
     return JSONParser().parse(BytesIO(data))
 
 class UserMatchsInfos(APIView):
 	def post(self, request):
-		try:
-			new_match_raw = parse_json(request.body)
-			new_match = MatchResults(
-							user_one=new_match_raw["user_one"],
-							user_one_score=new_match_raw["user_one_score"],
-							user_one_powerups=new_match_raw["user_one_powerups"],
-							user_two=new_match_raw["user_two"],
-							user_two_score=new_match_raw["user_two_score"],
-							user_two_powerups=new_match_raw["user_two_powerups"])
-			new_match.save()
-			return Response("Match saved", status=200)
-		except :
-			return Response("Something went wrong =(", status=500)
+			data = JSONParser().parse(request)
+			new_match = MatchSerializer(data=data)
+			if new_match.is_valid():
+				new_match.save()
+				return Response("Match saved", status=200)
+			return Response("POST: Something went wrong =(", status=500)
 
 	def get(self, request):
 		try:
 			all_match = MatchResults.objects.all()
-			return Response(all_match, status=200)
+			serializer = MatchSerializer(all_match, many=True)
+			return Response(serializer.data, status=200)
 		except :
-			return Response("Something went wrong =(", status=500)
+			return Response("GET: Something went wrong =(", status=500)
 
 	def patch(self, request):
 		pass
-
-	def delete(self, request):
-		pass
-
-# , 
-# 							user_one_score=new_match_raw.get(pk=2), 
-# 							user_one_powerups=new_match_raw.get(pk=3), 
-# 							user_two=new_match_raw.get(pk=4),
-# 							user_two_score=new_match_raw.get(pk=5),
-# 							user_two_powerups=new_match_raw.get(pk=6)
