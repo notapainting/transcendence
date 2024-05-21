@@ -14,7 +14,37 @@ import os
 from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+from socket import SOCK_STREAM
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "logstash": {
+            "()": "syslog_rfc5424_formatter.RFC5424Formatter"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+        },
+        "logstash": {
+            "level": "DEBUG",
+            "class": "logging.handlers.SysLogHandler",
+            "address": ("logstash", 5141),
+            "socktype": SOCK_STREAM,
+            "formatter" : "logstash",
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["logstash", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
