@@ -41,10 +41,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             asyncio.create_task(self.game_state.update_player_position(message))
 
 class GameState:
-    timer = utils.Timer(verbose=False)
-    p = pow.PowerUpManager()
-
     def __init__(self):
+        self.timer = utils.Timer(verbose=False)
+        self.p = pow.PowerUpManager()
         self.status = {
         'ballX': 0,
         'ballY': 0,
@@ -67,7 +66,7 @@ class GameState:
         'leftPlayerScore' : 0,
         'rightPlayerScore' : 0,
         'winner' : 'none',
-        'upPressed' : False,
+        'upPressed' : False, # change to host and guest paddles
         'downPressed' : False,
         'wPressed' : False,
         'sPressed' : False,
@@ -119,9 +118,12 @@ class GameState:
         'rightPlayerScore' : self.status['rightPlayerScore'],
         'winner' : self.status['winner'],
         'randomPointB': self.p.random_point_b,
-        # 'randomPointM': self.status['random_point_m'],
-        # 'randomPointE': self.status['random_point_e']
-        'hitB': self.p.hitB
+        'randomPointM': self.p.random_point_m,
+        'randomPointE': self.p.random_point_e,
+        'bonus': 'boostL',
+        # 'bonus': self.p.randB,
+        'hitB': self.p.hitB,
+        'hitM': self.p.hitM
     }
 
     def update(self):
@@ -130,9 +132,13 @@ class GameState:
         if reset == 1:
             reset = 2
 
-        self.p.addBonus(self.timer, self.status)
+        # self.p.addBonus(self.timer, self.status)
+        self.p.addMalus(self.timer, self.status)
         
         self.p.longPaddle(self.status)
+        self.p.shortPaddle(self.status)
+        self.p.slow(self.status)
+        self.p.boost(self.status)
         # p.shortPaddle()
         # p.slow(self.status)
 
