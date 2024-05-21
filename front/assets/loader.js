@@ -99,7 +99,8 @@ loader.load('./models/effectMalus.glb', function ( gltf ) {
 	console.error( error );
 } );
 
-loader.load('./models/boost.glb', function ( gltf ) {
+// loader.load('./models/boost.glb', function ( gltf ) {
+loader.load('./models/booost/scene.gltf', function ( gltf ) {
 
     boost = gltf.scene;
 
