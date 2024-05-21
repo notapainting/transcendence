@@ -1,4 +1,5 @@
 import { showHome } from "./home.js"
+import { showProfile } from "./profile.js"
 
 const navigateTo = url => {
     history.pushState(null, null, url)
@@ -77,7 +78,7 @@ window.addEventListener("popstate", router);
 
 document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener('click', e => {
-        if (e.target.matches("[data-link-div]")){
+        if (e.target.matches("[data-link]")){
             e.preventDefault();
             navigateTo(e.target.dataset.href);
         }
@@ -89,15 +90,15 @@ document.addEventListener("DOMContentLoaded", () => {
     router();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.addEventListener('click', e => {
-        if (e.target.matches("[data-link]")){
-            e.preventDefault();
-            navigateTo(e.target.href)
-        }
-    })
-    document.querySelector(".login-signin-form").addEventListener("submit", event => {
-        event.preventDefault();
-    })
-    router();
-})
+// document.addEventListener("DOMContentLoaded", () => {
+//     document.addEventListener('click', e => {
+//         if (e.target.matches("[data-link]")){
+//             e.preventDefault();
+//             navigateTo(e.target.href)
+//         }
+//     })
+//     document.querySelector(".login-signin-form").addEventListener("submit", event => {
+//         event.preventDefault();
+//     })
+//     router();
+// })
