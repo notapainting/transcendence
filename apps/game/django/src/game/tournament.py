@@ -13,15 +13,13 @@ DEFAULT_CHANNEL_LAYER ='default'
 TOURNAMENT_MAX_PLAYER = 16
 
 class Lobby:
-    name = "_"
-    host = None
-    invitation_list = set()
-    challenger = None
-    full = False
-
     def __init__(self, host, name="Simple Match") -> None:
         self.host = host
         self.name = name
+        self.invitation_list = set()
+        self.challenger = None
+        self.full = False
+        self.n_ready = 0
 
     def invite(self, user):
         self.invitation_list.add(user)

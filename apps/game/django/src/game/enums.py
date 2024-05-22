@@ -1,25 +1,31 @@
 import enum
 
-class Error(enum.StrEnum):
+class Errors(enum.StrEnum):
     DECODE = "error.decode"
     ENCODE = "error.encode"
+    TYPE = "error.type"
+    DATA = "error.data"
 
 
 class Game(enum.StrEnum):
     CREATE = "game.create"
     INVITE = "game.invite"
+    CANCEL = "game.cancel"
     JOIN = "game.join"
+    ACCEPTED = "game.accepted"
+    DENY = "game.deny"
     QUIT = "game.quit"
+    KICK = "game.kick"
     READY = "game.ready"
     START = "game.start"
     PAUSE = "game.pause"
+    UPDATE = "game.update"
 
 class Tournament(enum.StrEnum):
     CREATE = "tournament.create"
     QUIT = "tournament.quit"
 
-class Event(enum.StrEnum):
-    PADDLE = "paddle.update"
+
 
 class CStatus(enum.StrEnum):
     IDLE = "cs.idle"
