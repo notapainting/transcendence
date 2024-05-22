@@ -1,12 +1,36 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 import { scene } from "./game.js";
 import { animationData } from './animation.js';
-import * as anim from './animation.js';
 import { camera } from './game.js';
-import * as game from './game.js';
+import { customData } from './custom.js';
 
 export var colorTransitionTime = 3000;
 export var colorStartTime = Date.now();
+
+export let currentPosition = new THREE.Vector3();
+export let previousPosition = new THREE.Vector3();
+export let direction = new THREE.Vector3(); 
+
+function updateBallPosition(newPosition) {
+    previousPosition.copy(currentPosition);
+    currentPosition.copy(newPosition);
+    let displacement = new THREE.Vector3();
+    displacement.subVectors(currentPosition, previousPosition);
+    direction.copy(displacement).normalize();
+    console.log(`Le vecteur de direction de la balle est :`, direction);
+}
+
+function applyRotationToObject(object, direction) {
+    let referenceVector = new THREE.Vector3(0, -1, 0);
+    let quaternion = new THREE.Quaternion();
+    quaternion.setFromUnitVectors(referenceVector, direction);
+
+    object.quaternion.copy(quaternion);
+}
+
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export function interpolateColor(color) {
     const now = Date.now();
@@ -279,7 +303,7 @@ export function createParticle(positionX, positionY, particuleSize, distance, co
 
 	if (color === 0)
 	{
-		var randomColor = anim.colorBall[Math.floor(Math.random() * anim.colorBall.length)];
+		var randomColor = customData.colorBall[Math.floor(Math.random() * customData.colorBall.length)];
 		var material = new THREE.PointsMaterial({ color: randomColor, size: particuleSize });
 	}
 	else {
@@ -315,33 +339,3 @@ export function createParticle(positionX, positionY, particuleSize, distance, co
     });
 }
 
-export function getRandomPointInRectangle(p1, p2, p3, p4) {
-    const r1 = Math.random();
-    const r2 = Math.random();
-
-    const points = [p1, p2, p3, p4];
-    if (isClockwise(points)) {
-        points.reverse();
-    }
-
-    const [a, b, c, d] = points;
-
-    const x1 = a.x + r1 * (b.x - a.x);
-    const y1 = a.y + r1 * (b.y - a.y);
-    const x2 = d.x + r1 * (c.x - d.x);
-    const y2 = d.y + r1 * (c.y - d.y);
-
-    const x = x1 + r2 * (x2 - x1);
-    const y = y1 + r2 * (y2 - y1);
-
-    return { x, y };
-}
-
-export function isClockwise(points) {
-    const [p1, p2, p3, p4] = points;
-    const sum = (p2.x - p1.x) * (p2.y + p1.y) +
-                (p3.x - p2.x) * (p3.y + p2.y) +
-                (p4.x - p3.x) * (p4.y + p3.y) +
-                (p1.x - p4.x) * (p1.y + p4.y);
-    return sum > 0;
-}
