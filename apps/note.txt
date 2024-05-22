@@ -76,9 +76,10 @@ csguest.sendto(hostname)
 
 
 
-up down
-
+annuler l'invitation de borys
 {
-    "type":"paddle.move"
-    "data":"up"
+    "message":"game.cancel",
+    "data":"borys",
 }
+
+
