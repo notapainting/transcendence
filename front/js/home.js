@@ -134,7 +134,7 @@ const switchForm = (event) => {
 const messageBox = document.querySelector(".message-box");
 
 const loggedInStatus = () => {
-    document.querySelector(".navbar").style.transform = "scale(1)"
+    document.querySelector(".navbar").style.display= "flex"
     document.querySelector(".login-signin-form").style.display = "none"
     document.querySelector(".play-online-btn").style.display = "block"
     setTimeout(()=> {
@@ -208,6 +208,7 @@ const registerRequest = (event) => {
 }
 
 const loginOrRegisterRequest = (event) => {
+    event.preventDefault();
     if (isLoginForm)
         loginRequest();
     else
@@ -296,6 +297,25 @@ const adjustZoom = (event) => {
     }, 400); // Attendre 2 secondes avant de permettre un autre événement wheel
 };
 
+export let logoutRequest = (event) => {
+    fetch('/auth/logout/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.reload();
+            // Effectuez ici les actions nécessaires après la déconnexion, par exemple rediriger l'utilisateur vers une autre page
+        } else {
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+    });
+}
+
 export const showHome = async () => {
     const homeElement = document.querySelector("#home");
     homeElement.style.display = "block";
@@ -320,4 +340,6 @@ export const showHome = async () => {
     })
     document.addEventListener("click", switchForm);
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
+    const logoutButton = document.querySelector(".fa-right-from-bracket");
+    logoutButton.addEventListener("click", logoutRequest);
 }
