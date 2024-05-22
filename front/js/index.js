@@ -1,5 +1,7 @@
 import { showHome } from "./home.js"
 import { showProfile } from "./profile.js"
+import {showSettings} from "./settings.js"
+import {showChat} from "./chat.js"
 
 const navigateTo = url => {
     history.pushState(null, null, url)
@@ -43,10 +45,9 @@ const router = async () => {
     console.log("Appel Router")
     const routes = [
         {path: "/", view:() => showHome() },
-        {path: "/game", view:() => showGame()},
         {path: "/profile", view:() => showProfile()},
+        {path: "/chat", view:() => showChat()},
         {path: "/settings", view:() => showSettings()},
-        {path: "/signin", view:() => showSignin()},
     ];
     const potentialMatches = routes.map(route => {
         return {
