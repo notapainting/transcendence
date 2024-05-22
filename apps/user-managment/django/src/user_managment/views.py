@@ -101,5 +101,9 @@ class MatchsInfos(APIView):
 class UserMatchsInfos(APIView):
 	def get(self, request, **args):
 		name = args.get('name', None)
-		return Response(name + "'s match history", status=200)
+		print(name)
+
+		user_matchs = MatchResults.objects.filter(user_one=name) | MatchResults.objects.filter(user_two=name)
+		serialzer = MatchSerializer(user_matchs, many=True)
+		return Response(serialzer.data, status=200)
 		
