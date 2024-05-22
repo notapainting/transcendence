@@ -71,6 +71,7 @@ class RemoteGameConsumer(BaseConsumer):
         self.tournament_status = enu.CStatus.IDLE
         self.lobby = None
         self.invitations = set()
+        self.host = None
 
     async def connect(self):
         self.username = self.scope.get('user', 'Anon')
@@ -84,6 +85,7 @@ class RemoteGameConsumer(BaseConsumer):
 
     async def send_cs(self, target, data):
         data['type'] = data['message']
+        data['author'] = self.username
         self.channel_layer.send(target, data)
 
     async def receive_json(self, json_data):
@@ -123,9 +125,10 @@ class RemoteGameConsumer(BaseConsumer):
                     await self.send_cs(json_data['target'], json_data)
                 case enu.Game.QUIT: 
                     self.match_status = enu.CStatus.IDLE
-                    await self.send_cs(json_data['target'], json_data)
+                    await self.send_cs(self.host, json_data)
+                    self.host = None
                 case enu.Game.READY :
-                    await self.send_cs(json_data['target'], json_data)
+                    await self.send_cs(self.host, json_data)
 
         else:
             match json_data['message']:
@@ -134,6 +137,8 @@ class RemoteGameConsumer(BaseConsumer):
                     self.lobby = Lobby(self.username)
                 case enu.Game.JOIN: 
                     self.match_status = enu.CStatus.GUEST
+                    self.invitations.discard(data['author'])
+                    await self.send_cs(json_data['target'], json_data)
 
     # BOTH
     async def game_invite(self, data):
@@ -180,6 +185,7 @@ class RemoteGameConsumer(BaseConsumer):
         await self.send_json(data)
 
     async def game_accepted(self, data):
+        self.host = data['author']
         await self.send_json(data)
 
     async def game_kick(self, data):

@@ -1,0 +1,65 @@
+1 : creer une partie
+    game.create
+2 : envoyer des invitations
+    game.invite
+3 : un joueur (guest) accepte l'invitation et rejoind le lobby
+    game.join 
+4 : l'host et le guest disent qu'il sont ready
+    game.ready
+5 : le match commence
+
+
+ENVOI
+creer une partie
+{
+    "message":"game.create"
+}
+
+inviter borys
+{
+    "message":"game.invite",
+    "data":"borys",
+}
+
+
+accepter l'invitation de loulou (rejoindre une partie)
+{
+    "message":"game.join",
+    "data":"loulou",
+}
+
+quitter le lobby (data inutile si c'est l'host qui quitte)
+{
+    "message":"game.quit",
+}
+
+indiquer qu'on est pret a jouer 
+{
+    "message":"game.ready",
+}
+
+
+RECOIT
+une invitation de borys
+{
+    "message":"game.invite",
+    "author":"borys",
+}
+
+loulou a rejoind le match
+{
+    "message":"game.join",
+    "author":"loulou",
+}
+
+loulou est prete a jouer 
+{
+    "message":"game.ready",
+    "author":"loulou",
+}
+
+loulou t'as vire de sa partie
+{
+    "message":"game.kick",
+    "author":"loulou",
+}
