@@ -7,10 +7,13 @@ services:
     image: proxy-waf
     ports:
      - "443:443"
-     - "443:443"
+     - "80:80"
     networks: 
       - app_network
     volumes:
       - ./server/certs/:/certs
       - ./front:/var/www/static
     restart: unless-stopped
+    depends_on:
+     logstash01:
+       condition: service_healthy
