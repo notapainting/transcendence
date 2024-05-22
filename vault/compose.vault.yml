@@ -1,7 +1,0 @@
-version: '3.9'
-
-services:
-  vault:
-    container_name: hsc_vault
-    image: hashicorp/vault:
-    port: "8200:8200"
