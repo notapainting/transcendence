@@ -29,8 +29,6 @@ loader.load('./models/scene.glb', function ( gltf ) {
 
     intro.rotation.x += Math.PI / 2;
 
-    // scene.add(intro);
-
 	mixer = new THREE.AnimationMixer(intro);
     clips = gltf.animations;
     if (clips && clips.length) {
@@ -63,8 +61,6 @@ loader.load('./models/effectBonus.glb', function ( gltf ) {
 
     bonus.rotation.x += Math.PI / 2;
 
-    // scene.add(bonus);
-
 	loadData.mixerBonus = new THREE.AnimationMixer(bonus);
     clipsBonus = gltf.animations;
     if (clipsBonus && clipsBonus.length) {
@@ -86,8 +82,6 @@ loader.load('./models/effectMalus.glb', function ( gltf ) {
 
     malus.rotation.x += Math.PI / 2;
 
-    // scene.add(malus);
-
 	loadData.mixerMalus = new THREE.AnimationMixer(malus);
     clipsMalus = gltf.animations;
     if (clipsMalus && clipsMalus.length) {
@@ -99,18 +93,13 @@ loader.load('./models/effectMalus.glb', function ( gltf ) {
 	console.error( error );
 } );
 
-// loader.load('./models/boost.glb', function ( gltf ) {
-loader.load('./models/booost/scene.gltf', function ( gltf ) {
+loader.load('./models/boost2.glb', function ( gltf ) {
 
     boost = gltf.scene;
 
     boost.position.set(10,10,0);
 
-    boost.scale.set(7, 7, 7); 
-
-    // boost.rotation.x += Math.PI / 2;
-
-    // scene.add(boost);
+    boost.scale.set(7, 7, 7);
 
 	loadData.mixerBoost = new THREE.AnimationMixer(boost);
     clipsBoost = gltf.animations;

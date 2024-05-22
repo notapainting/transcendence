@@ -18,7 +18,7 @@ class PowerUpManager:
     maximizeR = False
     maximizeL = False
     # rand_bonus = ['longPaddle', 'boost']
-    rand_bonus = ['boost']
+    rand_bonus = ['longPaddle']
     # rand_malus = ['slow', 'shortPaddle', 'invertedKey']
     rand_malus = ['slow', 'shortPaddle']
     rand_effect = ['hurricane', 'earthquake', 'glitch']
