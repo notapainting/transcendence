@@ -1,6 +1,12 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
 
+const fastGame = document.getElementById('fastGame');
+const tournament = document.getElementById('tournament');
+const exit = document.getElementById('exit');
+const create = document.getElementById('create');
+const join = document.getElementById('join');
+
 function updateTimer() {
 	gameData.elapsedTime += 1;
 }
@@ -35,17 +41,18 @@ gameSocket.onclose = function(e) {
 };
 
 document.querySelector('#startButton').onclick = function(e) {
-    if (gameData.start)
+	if (gameData.start)
     {
-        gameSocket.send(JSON.stringify({
-            'message': 'startButton'
+		gameSocket.send(JSON.stringify({
+			'message': 'startButton'
         }));
-
-		if (!gameData.timerInterval) {
+		if (!gameData.timerInterval)
 			gameData.timerInterval = setInterval(updateTimer, 1000);
-		}
     }
-
+	else {
+		gameData.sceneHandler = 1;
+		game.gameRenderer(null);
+	}
 };
 
 document.querySelector('#stopButton').onclick = function(e) {
@@ -106,3 +113,20 @@ document.addEventListener('keyup', function(event) {
 	}
 });
 
+fastGame.addEventListener('click', () => {
+	fastGame.style.display = 'none';
+	tournament.style.display = 'none';
+	exit.style.display = 'none';
+
+	create.style.display = 'block';
+	join.style.display = 'block';
+});
+
+tournament.addEventListener('click', () => {
+	fastGame.style.display = 'none';
+	tournament.style.display = 'none';
+	exit.style.display = 'none';
+
+	create.style.display = 'block';
+	join.style.display = 'block';
+});

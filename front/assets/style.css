@@ -119,42 +119,54 @@ body {
     border: solid 2px #0066cc;
 }
 
-
-#startGame {
-    top: 75%;
+#fastGame {
+  /* display: none; */
+    top: 60%;
 }
 
-#localGame {
-    top: 62%;
+#tournament {
+  /* display: none; */
+    top: 70%;
 }
 
 #exit {
-    top: 69%;
+  /* display: none; */
+    top: 80%;
+}
+
+#create {
+    display: none;
+    top: 60%;
+}
+
+#join {
+    display: none;
+    top: 70%;
 }
 
 .buttonStart {
-	display: none;
-	position: absolute;
-	left: 30%;
-	transform: translate(-50%, -50%);
-	padding: .8em 2.2em;
-	width: 300px;
-	cursor: pointer;
-	align-items: center;
-  	justify-content: center;
-	box-shadow: 0 0 0 0 #e76f51;
-	line-height: 1;
-	text-decoration: none;
-	color: #dc5406;
-	font-size: 18px;
-	border-radius: 20px;
-	width: 200px;
-	height: 50px;
-	font-weight: bold;
-	border-bottom: 5px solid #b46436;
-	transition: 0.3s;
-	background-color: #f4a261;
-  	animation: glow 3s linear infinite;
+	/* display: none; */
+    position: absolute;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    padding: .8em 2.2em;
+    width: 300px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 0 #e76f51;
+    line-height: 1;
+    text-decoration: none;
+    color: #dc5406;
+    font-size: 18px;
+    border-radius: 20px;
+    width: 200px;
+    height: 50px;
+    font-weight: bold;
+    border-bottom: 5px solid #b46436;
+    transition: 0.3s;
+    background-color: #f4a261;
+    animation: glow 3s linear infinite;
   }
 
   .buttonStart:hover {
