@@ -35,7 +35,7 @@ const exitButton = document.getElementById('exit');
 export const animationData = {
 	ballFall: false,
 	intro: 0
-  }; // A REMETTRE A FALSE
+  };
 
 localGameButton.addEventListener('click', () => {
 	// startGameButton.style.display = 'none';
@@ -72,17 +72,13 @@ export async function animate() {
 	// models animation
 	if (load.mixer)
 		load.mixer.update(0.01);
-	if (loadData.mixerBonus) {
-		loadData.mixerBonus.update(0.01); 
-	}
-	if (loadData.mixerMalus) {
+	if (loadData.mixerBonus)
+		loadData.mixerBonus.update(0.01);
+	if (loadData.mixerMalus)
 		loadData.mixerMalus.update(0.01); 
-	}
-	if (loadData.mixerBoost) {
+	if (loadData.mixerBoost)
 		loadData.mixerBoost.update(0.01); 
-	}
 
-	startGameButton.style.display = 'none';
 	// if (game.sceneHandler === 1)
 	// {
 		if(animationData.ballFall === true)
