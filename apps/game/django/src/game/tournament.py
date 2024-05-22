@@ -24,23 +24,47 @@ matchManager -> look if lobby with host/guest already exist
             
 store match data 
 
+
+co -> create -> create match in matchmanager 
+            -> return match to host and key to guest 
+
+match = {'loulou':xloby,
+        'host2':xloby2,
+        'host3':xloby3,
+            }
+
+upon end -> remove from list
+if broken guest end -> move to broken list wit hhost key
+
 """
 
+
 class Match:
+    current_match = {} #list all running game
+    lost_guest = {} #list all broken guest
+
     def __init__(self, host):
         self.lobby = Lobby(host=host)
         self.game_state = GameState()
-        
-    def __getitem__(self, key):
-        pass
-    
-    def create(self):
-        pass
+        self._store()
 
+    def __str__(self) -> str:
+        return f"Match hosted by {self.lobby.host}"
 
-class MatchManager:
-    current_game = {}
-    broken_guest= {}
+    def _store(self):
+        Match.current_match[self.lobby.host] = self
+        return Match.current_match[self.lobby.host]
+
+    def end(self, host):
+        del Match.current_match[host]
+
+    def broke(self, host, guest):
+        Match.lost_guest[guest] = host
+
+    def recover(self, guest):
+        host = Match.lost_guest[guest]
+        del Match.lost_guest[guest]
+        return host, Match.current_match[host]
 
 
 TOURNAMENT_MAX_PLAYER = 16
@@ -54,6 +78,9 @@ class Lobby:
         self._challenger = None
         self.n_ready = 0
         self._chlayer = get_channel_layer()
+
+    def __str__(self) -> str:
+        return self.name
 
     async def clear(self):
         await self._chlayer.send(self._challenger, {"message":enu.Game.KICK})

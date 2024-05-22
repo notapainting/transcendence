@@ -11,71 +11,20 @@ import channels.exceptions as exchan
 from logging import getLogger
 logger = getLogger(__name__)
 
+from game.lcons import BaseConsumer
 
-class BaseConsumer(AsyncWebsocketConsumer):
-    async def dispatch(self, message):
-        logger.info(f"msg type : {message['type']}")
-        try :
-            await super().dispatch(message)
-        except ValueError as error:
-            logger.warning(error)
-            await self.send_json({'type':enu.Errors.TYPE})
-        except BaseException:
-            raise
+# chg OK but del not
 
-    @classmethod
-    async def decode_json(cls, text_data):
-        try :
-            return json.loads(text_data)
-        except:
-            return {'type':enu.Errors.DECODE}
-
-    @classmethod
-    async def encode_json(cls, content):
-        try:
-            return json.dumps(content)
-        except:
-            return json.dumps({'type':enu.Errors.ENCODE})
-
-    async def send_json(self, content, close=False):
-        await super().send(text_data=await self.encode_json(content), close=close)
-
-    async def websocket_receive(self, message):
-        if "text" in message:
-            await self.receive_json(json_data=await self.decode_json(message["text"]))
-        else:
-            await self.receive_bytes(bytes_data=message["bytes"])
-
-    async def receive_json(self, json_data, **kwargs):
-        pass
-
-    async def receive_bytes(self, bytes_data, **kwargs):
-        pass
-
-    async def error_decode(self, data):
-        logger.info(data)
-
-    async def error_encode(self, data):
-        logger.info(data)
-
-
-"""
-RemoteGamer  -> Match  -> GameState
-            |        | -> Lobby
-            |
-            | -> Tournament
-"""
-
-class RemoteGameConsumer(BaseConsumer):
+class UltimateGamer(BaseConsumer):
 
     def __init__(self):
         self.username = "Anon"
         self.match_status = enu.CStatus.IDLE
         self.tournament_status = enu.CStatus.IDLE
-        self.lobby = None
         self.invitations = set()
         self.host = None
-        self.game_state = None
+        self.match = None
+
 
     async def connect(self):
         self.username = self.scope.get('user', 'Anon')
@@ -98,16 +47,17 @@ class RemoteGameConsumer(BaseConsumer):
         if self.match_status == enu.CStatus.HOST:
             match json_data['type']:
                 case enu.Game.QUIT: 
-                    self.lobby.clear
+                    self.match.end
+                    # ???
                 case enu.Game.INVITE : 
-                    self.lobby.invite(json_data['target'])
+                    self.match.lobby.invite(json_data['target'])
                 case enu.Game.KICK : 
-                    self.lobby.kick(json_data['target'])
+                    self.match.lobby.kick(json_data['target'])
                 case enu.Game.READY : 
-                    if self.lobby.set_ready(self.username) is True:
+                    if self.match.lobby.set_ready(self.username) is True:
                         await self.gaming({"message":"startButton"})
                     else:
-                        await self.send_cs(self.lobby._challenger, json_data)
+                        await self.send_cs(self.match.lobby._challenger, json_data)
                 case '_': 
                     await self.gaming(json_data)
 
@@ -124,8 +74,7 @@ class RemoteGameConsumer(BaseConsumer):
             match json_data['type']:
                 case enu.Game.CREATE : 
                     self.match_status = enu.CStatus.HOST
-                    self.lobby = Lobby(self.username)
-                    self.game_state = GameState()
+                    self.match = Match(self.username)
                 case enu.Game.JOIN:
                     if json_data['message'] in self.invitations:
                         self.invitations.discard(json_data['message'])
@@ -138,7 +87,7 @@ class RemoteGameConsumer(BaseConsumer):
 
     async def game_ready(self, data):
         if self.match_status == enu.CStatus.HOST:
-            if self.lobby.set_ready(self.username) is True:
+            if self.match.lobby.set_ready(self.username) is True:
                 await self.gaming({"message":"startButton"})
             else:
                 await self.send_json(data)
@@ -153,14 +102,14 @@ class RemoteGameConsumer(BaseConsumer):
 
     # HOST ONLY
     async def game_quit(self, data):
-        self.lobby._challenger = None
-        self.lobby.n_ready -= 1
+        self.match.lobby.set_ready.discard(self.match.lobby._challenger)
+        self.match.lobby._challenger = None
         await self.send_json(data)
 
     async def game_join(self, data):
-        if self.lobby.invited(data['author']) and self.lobby.full() is False:
-            self.lobby._challenger = data['author']
-            await self.send_cs(self.lobby._challenger, {"message":enu.Game.ACCEPTED})
+        if self.match.lobby.invited(data['author']) and self.match.lobby.full() is False:
+            self.match.lobby._challenger = data['author']
+            await self.send_cs(self.match.lobby._challenger, {"message":enu.Game.ACCEPTED})
             await self.send_json(data)
         else:
             await self.send_cs(data['author'], {"message":enu.Game.DENY})
@@ -191,22 +140,22 @@ class RemoteGameConsumer(BaseConsumer):
     async def gaming(self, data):
         message = data["message"]
         if message == "startButton":
-            if self.game_state.status['game_running'] == False :
-                self.game_state.status['game_running'] = True
+            if self.match.game_state.status['game_running'] == False :
+                self.match.game_state.status['game_running'] = True
                 asyncio.create_task(self.loop_remote())
         elif message == "bonus":
-            self.game_state.status['randB'] = data["bonus"]
+            self.match.game_state.status['randB'] = data["bonus"]
         else :
-            asyncio.create_task(self.game_state.update_player_position(message))
+            asyncio.create_task(self.match.game_state.update_player_position(message))
 
     async def loop_remote(self):
         global reset
-        while self.game_state.status['game_running']:
-            message = self.game_state.update()
+        while self.match.game_state.status['game_running']:
+            message = self.match.game_state.update()
             await asyncio.sleep(0.02)
-            asyncio.create_task(self.game_state.update_player_position(message))
-            await self.send_json(self.game_state.to_dict('none'))
-            await self.send_cs(self.game_state.to_dict('none'))
+            asyncio.create_task(self.match.game_state.update_player_position(message))
+            await self.send_json(self.match.game_state.to_dict('none'))
+            await self.send_cs(self.match.game_state.to_dict('none'))
             if reset ==  2:
                 time.sleep(0.5)
                 reset = 0 
