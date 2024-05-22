@@ -24,9 +24,7 @@ loader.load('./models/scene.glb', function ( gltf ) {
     intro = gltf.scene;
 
     intro.position.set(0,0,-20);
-
     intro.scale.set(10, 10, 10); 
-
     intro.rotation.x += Math.PI / 2;
 
 	mixer = new THREE.AnimationMixer(intro);
@@ -56,9 +54,7 @@ loader.load('./models/effectBonus.glb', function ( gltf ) {
     bonus = gltf.scene;
 
     bonus.position.set(10,10,0);
-
     bonus.scale.set(2, 2, 2); 
-
     bonus.rotation.x += Math.PI / 2;
 
 	loadData.mixerBonus = new THREE.AnimationMixer(bonus);
@@ -77,9 +73,7 @@ loader.load('./models/effectMalus.glb', function ( gltf ) {
     malus = gltf.scene;
 
     malus.position.set(10,10,0);
-
     malus.scale.set(2, 2, 2); 
-
     malus.rotation.x += Math.PI / 2;
 
 	loadData.mixerMalus = new THREE.AnimationMixer(malus);
@@ -98,7 +92,6 @@ loader.load('./models/boost2.glb', function ( gltf ) {
     boost = gltf.scene;
 
     boost.position.set(10,10,0);
-
     boost.scale.set(7, 7, 7);
 
 	loadData.mixerBoost = new THREE.AnimationMixer(boost);
