@@ -46,7 +46,7 @@ une invitation de borys
     "author":"borys",
 }
 
-loulou a rejoind le match
+loulou a rejoinsd le match
 {
     "message":"game.join",
     "author":"loulou",
@@ -63,3 +63,9 @@ loulou t'as vire de sa partie
     "message":"game.kick",
     "author":"loulou",
 }
+
+Lobby:
+GameState:
+
+MatchManager:
+TournamentManager:
