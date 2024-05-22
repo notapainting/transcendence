@@ -15,7 +15,6 @@ let lastPingTime = performance.now();
 
 gameSocket.onmessage = function(e) {
     const message = JSON.parse(e.data);
-    // explosion(message);
 	game.gameRenderer(message);
     
     const currentTime = performance.now();
@@ -33,12 +32,6 @@ gameSocket.onmessage = function(e) {
 
 gameSocket.onclose = function(e) {
 	console.error('Game socket closed unexpectedly');
-};
-
-document.querySelector('#backButton').onclick = function(e) {
-	gameSocket.send(JSON.stringify({
-		'message': 'back button click !'
-	}));
 };
 
 document.querySelector('#startButton').onclick = function(e) {

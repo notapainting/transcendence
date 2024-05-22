@@ -36,7 +36,6 @@ class GameConsumer(AsyncWebsocketConsumer):
                 self.game_state.status['game_running'] = True
                 self.game_state.timer.resume()
                 asyncio.create_task(loop(self))
-
         else :
             asyncio.create_task(self.game_state.update_player_position(message))
 
@@ -120,8 +119,7 @@ class GameState:
         'randomPointB': self.p.random_point_b,
         'randomPointM': self.p.random_point_m,
         'randomPointE': self.p.random_point_e,
-        'bonus': 'boostL',
-        # 'bonus': self.p.randB,
+        'bonus': self.p.randB,
         'hitB': self.p.hitB,
         'hitM': self.p.hitM
     }
@@ -132,15 +130,13 @@ class GameState:
         if reset == 1:
             reset = 2
 
-        # self.p.addBonus(self.timer, self.status)
+        self.p.addBonus(self.timer, self.status)
         self.p.addMalus(self.timer, self.status)
         
         self.p.longPaddle(self.status)
         self.p.shortPaddle(self.status)
         self.p.slow(self.status)
         self.p.boost(self.status)
-        # p.shortPaddle()
-        # p.slow(self.status)
 
         # paddle displacement
         if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2 < height:
@@ -188,12 +184,12 @@ class GameState:
             self.status['ballSpeedY'] = hit_pos * max_speed
             self.status['playerBonus'] = 1
     
-        if self.status['ballX'] <= self.status['leftPaddleX']: # a changer pour le bug des paddle
+        if self.status['ballX'] <= self.status['leftPaddleX']:
             self.status['rightPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
             self.reset()
-        elif self.status['ballX'] >= self.status['rightPaddleX']: # a changer pour le bug des paddle
+        elif self.status['ballX'] >= self.status['rightPaddleX']:
             self.status['leftPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
