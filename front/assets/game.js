@@ -1,13 +1,11 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 import { EffectComposer } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/RenderPass.js";
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
 
 import { animationData } from './animation.js';
 import { animate, colorBall } from './animation.js';
-import { gameSocket } from './websocket.js';
 import * as utils from './utils.js';
-
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
 
 var width = window.innerWidth;
 var height = window.innerHeight
@@ -69,9 +67,6 @@ export let lightMalus;
 
 export var sceneHeight = 70;
 
-// scenes
-export var sceneHandler = 1;
-
 export var randBonus = ['longPaddle', 'boost'];
 export var randMalus = ['slow', 'shortPaddle', 'invertedKey'];
 export var randEffect = ['hurricane', 'earthquake', 'glitch'];
@@ -82,7 +77,6 @@ var p3 = { x: 45, y: 25 };
 var p4 = { x: -45, y: 25 };
 
 export const gameData = {
-	boost: false,
 	explosion: false,
 	catchBonus: false,
 	catchMalus: false,
@@ -97,8 +91,30 @@ export const gameData = {
 	randomPointE: utils.getRandomPointInRectangle(p1, p2, p3, p4),
 	bonus: null,
 	malus: null,
-	effect: null
+	effect: null,
+	sceneHandler: 1
 };
+
+let currentPosition = new THREE.Vector3();
+let previousPosition = new THREE.Vector3();
+let direction = new THREE.Vector3(); 
+
+function updateBallPosition(newPosition) {
+    previousPosition.copy(currentPosition);
+    currentPosition.copy(newPosition);
+    let displacement = new THREE.Vector3();
+    displacement.subVectors(currentPosition, previousPosition);
+    direction.copy(displacement).normalize();
+    console.log(`Le vecteur de direction de la balle est :`, direction);
+}
+
+function applyRotationToObject(object, direction) {
+    let referenceVector = new THREE.Vector3(0, -1, 0);
+    let quaternion = new THREE.Quaternion();
+    quaternion.setFromUnitVectors(referenceVector, direction);
+
+    object.quaternion.copy(quaternion);
+}
 
 export function gameRenderer(data) {
 	utils.clearScene(); 
@@ -281,12 +297,10 @@ export function gameRenderer(data) {
 		if (load.boost){
 			load.boost.position.set(sphere.position.x, sphere.position.y, sphere.position.z)
 			scene.add(load.boost);
+			updateBallPosition(sphere.position);
+			applyRotationToObject(load.boost, direction) 
 		}
-		// gameData.boost = true;
 	}
-
-	// if (gameData.bonus === true)
-
 
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     composer.render();
