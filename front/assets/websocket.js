@@ -12,6 +12,8 @@ const invitationBox = document.getElementById('invitationBox');
 
 const invitations = [];
 
+let lastPingTime = performance.now();
+
 function updateTimer() {
 	gameData.elapsedTime += 1;
 }
@@ -21,8 +23,6 @@ export const gameSocket = new WebSocket(
 	+ window.location.host
 	+ '/game/'
 );
-
-let lastPingTime = performance.now();
 
 function updateInvitationList() {
     const invitationList = document.getElementById('invitationList');
@@ -53,17 +53,26 @@ function updateInvitationList() {
 }
 
 gameSocket.onmessage = function(e) {
-    const message = JSON.parse(e.data);
-	var messageType = message.type;
-    console.log("message received: ", message);
+    const content = JSON.parse(e.data);
+	var contentType = content.type;
+    console.log("message received: ", content);
 	updateInvitationList();
-	if (messageType === 'game.invite'){
-		const joinData = message.author;
-        console.log("invitation from: ", joinData);
-		updateInvitationList();
-		invitations.push(joinData);
+	if (contentType === 'game.accepted'){
+		console.log("ACCEPTED");
+		const message = content.message;
+		game.gameRenderer(message);
+		invitationBox.style.display = 'none';
+		userInput.style.display = 'none';
+		inviteButton.style.display = 'none';
 	}
-	else if (messageType === 'game') {
+	if (contentType === 'game.invite'){
+		const joinData = content.author;
+        console.log("invitation from: ", joinData);
+		invitations.push(joinData);
+		updateInvitationList();
+	}
+	else if (contentType === 'game.update') {
+		const message = content.message;
 		game.gameRenderer(message);
 	}
 
@@ -89,6 +98,7 @@ document.querySelector('#startButton').onclick = function(e) {
 	if (gameData.start)
     {
 		gameSocket.send(JSON.stringify({
+			'type': 'game.update',
 			'message': 'startButton'
         }));
 		if (!gameData.timerInterval)
@@ -102,6 +112,7 @@ document.querySelector('#startButton').onclick = function(e) {
 
 document.querySelector('#stopButton').onclick = function(e) {
 	gameSocket.send(JSON.stringify({
+		'type': 'game.update',
 		'message': 'stopButton'
 	}));
 	
@@ -114,21 +125,25 @@ document.querySelector('#stopButton').onclick = function(e) {
 document.addEventListener('keydown', function(event) {
     if (event.key === 'w') {
         gameSocket.send(JSON.stringify({
+			'type': 'game.update',
             'message': 'wPressed'
         }));
     }
 	else if (event.key === 's') {
 		gameSocket.send(JSON.stringify({
+			'type': 'game.update',
 			'message': 'sPressed'
 		}));
 	}
 	else if (event.key === 'ArrowUp') {
 		gameSocket.send(JSON.stringify({
+			'type': 'game.update',
 			'message': 'upPressed'
 		}));
 	}
 	else if (event.key === 'ArrowDown') {
 		gameSocket.send(JSON.stringify({
+			'type': 'game.update',
 			'message': 'downPressed'
 		}));
 	}
@@ -138,21 +153,25 @@ document.addEventListener('keydown', function(event) {
 document.addEventListener('keyup', function(event) {
     if (event.key === 'w') {
         gameSocket.send(JSON.stringify({
+			'type': 'game.update',
             'message': 'wRelease'
         }));
     }
 	else if (event.key === 's') {
 		gameSocket.send(JSON.stringify({
+			'type': 'game.update',
 			'message': 'sRelease'
 		}));
 	}
 	else if (event.key === 'ArrowUp') {
 		gameSocket.send(JSON.stringify({
+			'type': 'game.update',
 			'message': 'upRelease'
 		}));
 	}
 	else if (event.key === 'ArrowDown') {
 		gameSocket.send(JSON.stringify({
+			'type': 'game.update',
 			'message': 'downRelease'
 		}));
 	}
