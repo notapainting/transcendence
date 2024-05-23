@@ -19,7 +19,7 @@ function updateTimer() {
 export const gameSocket = new WebSocket(
 	'wss://'
 	+ window.location.host
-	+ '/ws/ws-game/'
+	+ '/game/'
 );
 
 let lastPingTime = performance.now();

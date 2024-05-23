@@ -25,6 +25,7 @@ RemoteGamer  -> Match  -> GameState
 class RemoteGameConsumer(BaseConsumer):
 
     def __init__(self):
+        super().__init__()
         self.username = "Anon"
         self.match_status = enu.CStatus.IDLE
         self.tournament_status = enu.CStatus.IDLE
@@ -34,11 +35,12 @@ class RemoteGameConsumer(BaseConsumer):
         self.game_state = None
 
     async def connect(self):
-        self.username = self.scope.get('user', 'Anon')
+        self.username = str(self.scope.get('user', 'Anon'))
         if self.username is None:
             raise exchan.DenyConnection()
         await self.accept()
-        await self.channel_layer.group_add(self.channel_name, self.username)
+        print(f"hello {self.username}")
+        await self.channel_layer.group_add(self.username, self.channel_name)
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.channel_name, self.username)
@@ -49,20 +51,23 @@ class RemoteGameConsumer(BaseConsumer):
 
     async def send_cs(self, target, data):
         data['author'] = self.username
+        print(f"send to {target}")
         self.channel_layer.send(target, data)
 
     async def receive_json(self, json_data):
-        if json_data['type'] == enu.Errors.DECODE:
+        
+        if json_data.get('type') == None: # enu.Errors.DECODE
             return await self.send_json({'type':enu.Errors.DECODE})
+        print(f"type is {json_data['type']} ")
         if self.match_status == enu.CStatus.HOST:
             match json_data['type']:
-                case enu.Game.QUIT: 
-                    self.lobby.clear
-                case enu.Game.INVITE : 
-                    self.lobby.invite(json_data['target'])
-                case enu.Game.KICK : 
-                    self.lobby.kick(json_data['target'])
-                case enu.Game.READY : 
+                case enu.Game.QUIT:
+                    await self.lobby.clear
+                case enu.Game.INVITE:
+                    await self.lobby.invite(json_data['message'])
+                case enu.Game.KICK:
+                    await self.lobby.kick(json_data['message'])
+                case enu.Game.READY:
                     if self.lobby.set_ready(self.username) is True:
                         await self.gaming({"message":"startButton"})
                     else:
@@ -93,11 +98,12 @@ class RemoteGameConsumer(BaseConsumer):
     # BOTH
     async def game_invite(self, data):
         self.invitations.add(data['author'])
+        print(f"invited by {data['author']}")
         await self.send_json(data)
 
     async def game_ready(self, data):
         if self.match_status == enu.CStatus.HOST:
-            if self.lobby.set_ready(self.username) is True:
+            if await self.lobby.set_ready(self.username) is True:
                 await self.gaming({"message":"startButton"})
             else:
                 await self.send_json(data)
@@ -106,7 +112,7 @@ class RemoteGameConsumer(BaseConsumer):
 
     async def game_update(self, data):
         if self.match_status == enu.CStatus.HOST:
-            self.gaming(data)
+            await self.gaming(data)
         elif self.match_status == enu.CStatus.GUEST:
             await self.send_json(data)
 
