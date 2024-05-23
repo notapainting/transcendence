@@ -38,7 +38,7 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django": {
+        "": {
             "handlers": ["logstash", "console"],
             "level": "DEBUG",
             "propagate": False,
