@@ -58,10 +58,13 @@ gameSocket.onmessage = function(e) {
     console.log("message received: ", content);
 	updateInvitationList();
 	if (contentType === 'game.accepted'){
-		console.log("ACCEPTED");
 		const message = content.message;
 		game.gameRenderer(message);
 		invitationBox.style.display = 'none';
+	}
+	if (contentType === 'game.join'){
+		const message = content.message;
+		game.gameRenderer(message);
 		userInput.style.display = 'none';
 		inviteButton.style.display = 'none';
 	}

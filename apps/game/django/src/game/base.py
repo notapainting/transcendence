@@ -10,6 +10,7 @@ logger = getLogger(__name__)
 
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
+        print(f"msg : {message}")
         print(f"msg type : {message['type']}")
         try :
             await super().dispatch(message)
