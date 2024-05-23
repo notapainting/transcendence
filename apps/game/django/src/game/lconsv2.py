@@ -30,14 +30,14 @@ class UltimateGamer(BaseConsumer):
 
 
     async def connect(self):
-        self.username = self.scope.get('user', 'Anon')
+        self.username = str(self.scope.get('user', 'Anon'))
         if self.username is None:
             raise exchan.DenyConnection()
         await self.accept()
-        await self.channel_layer.group_add(self.channel_name, self.username)
+        await self.channel_layer.group_add(self.username, self.channel_name)
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.channel_name, self.username)
+        await self.channel_layer.group_discard(self.username, self.channel_name)
         if self.match_status == enu.CStatus.HOST:
             pass
         elif self.match_status == enu.CStatus.GUEST:
@@ -46,7 +46,7 @@ class UltimateGamer(BaseConsumer):
 
     async def send_cs(self, target, data):
         data['author'] = self.username
-        self.channel_layer.send(target, data)
+        self.channel_layer.group_send(target, data)
 
     async def receive_json(self, json_data):
         if json_data['type'] == enu.Errors.DECODE:
@@ -113,7 +113,7 @@ class UltimateGamer(BaseConsumer):
 
     async def game_update(self, data):
         if self.match_status == enu.CStatus.HOST:
-            self.gaming(data)
+            await self.gaming(data)
         elif self.match_status == enu.CStatus.GUEST:
             await self.send_json(data)
 
