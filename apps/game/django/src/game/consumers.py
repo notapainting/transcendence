@@ -46,6 +46,7 @@ class GameState:
         self.timer = utils.Timer(verbose=False)
         self.p = pow.PowerUpManager()
         self.status = {
+        'type' : 'game',
         'ballX': 0,
         'ballY': 0,
         'collisionX': 0,
