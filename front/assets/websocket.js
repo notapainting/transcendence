@@ -55,9 +55,11 @@ function updateInvitationList() {
 gameSocket.onmessage = function(e) {
     const message = JSON.parse(e.data);
 	var messageType = message.type;
+    console.log("message received: ", message);
 	updateInvitationList();
 	if (messageType === 'game.invite'){
-		const joinData = message.message;
+		const joinData = message.author;
+        console.log("invitation from: ", joinData);
 		updateInvitationList();
 		invitations.push(joinData);
 	}
@@ -194,6 +196,7 @@ join.addEventListener('click', () => {
 	create.style.display = 'none';
 	join.style.display = 'none';
 
+    updateInvitationList();
 	invitationBox.style.display = 'block';
 });
 

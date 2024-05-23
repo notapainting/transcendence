@@ -52,7 +52,7 @@ class RemoteGameConsumer(BaseConsumer):
     async def send_cs(self, target, data):
         data['author'] = self.username
         print(f"send to {target}")
-        self.channel_layer.send(target, data)
+        self.channel_layer.group_send(target, data)
 
     async def receive_json(self, json_data):
         
@@ -125,10 +125,11 @@ class RemoteGameConsumer(BaseConsumer):
     async def game_join(self, data):
         if self.lobby.invited(data['author']) and self.lobby.full() is False:
             self.lobby._challenger = data['author']
-            await self.send_cs(self.lobby._challenger, {"message":enu.Game.ACCEPTED})
+            data['message'] = self.game_state.to_dict('none')
             await self.send_json(data)
+            await self.send_cs(self.lobby._challenger, {"type":enu.Game.ACCEPTED, "message":self.game_state.to_dict('none')})
         else:
-            await self.send_cs(data['author'], {"message":enu.Game.DENY})
+            await self.send_cs(data['author'], {"type":enu.Game.DENY})
 
     # GUEST ONLY
     async def game_deny(self, data):
