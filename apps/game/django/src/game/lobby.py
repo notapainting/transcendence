@@ -7,7 +7,7 @@ class Lobby:
     def __init__(self, host, name="Simple Match") -> None:
         self.host = host
         self.name = name
-        
+        self._invited = set()
         self._ready = set()
         self._challenger = None
         self.guest = None
