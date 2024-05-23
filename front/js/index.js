@@ -1,4 +1,7 @@
 import { showHome } from "./home.js"
+import { showProfile } from "./profile.js"
+import {showSettings} from "./settings.js"
+import {showChat} from "./chat.js"
 
 const navigateTo = url => {
     history.pushState(null, null, url)
@@ -42,10 +45,9 @@ const router = async () => {
     console.log("Appel Router")
     const routes = [
         {path: "/", view:() => showHome() },
-        {path: "/game", view:() => showGame()},
         {path: "/profile", view:() => showProfile()},
+        {path: "/chat", view:() => showChat()},
         {path: "/settings", view:() => showSettings()},
-        {path: "/signin", view:() => showSignin()},
     ];
     const potentialMatches = routes.map(route => {
         return {
@@ -77,7 +79,7 @@ window.addEventListener("popstate", router);
 
 document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener('click', e => {
-        if (e.target.matches("[data-link-div]")){
+        if (e.target.matches("[data-link]")){
             e.preventDefault();
             navigateTo(e.target.dataset.href);
         }
@@ -89,15 +91,15 @@ document.addEventListener("DOMContentLoaded", () => {
     router();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.addEventListener('click', e => {
-        if (e.target.matches("[data-link]")){
-            e.preventDefault();
-            navigateTo(e.target.href)
-        }
-    })
-    document.querySelector(".login-signin-form").addEventListener("submit", event => {
-        event.preventDefault();
-    })
-    router();
-})
+// document.addEventListener("DOMContentLoaded", () => {
+//     document.addEventListener('click', e => {
+//         if (e.target.matches("[data-link]")){
+//             e.preventDefault();
+//             navigateTo(e.target.href)
+//         }
+//     })
+//     document.querySelector(".login-signin-form").addEventListener("submit", event => {
+//         event.preventDefault();
+//     })
+//     router();
+// })
