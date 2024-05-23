@@ -2,6 +2,12 @@
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+import game.enums as enu
+import json
+
+from logging import getLogger
+logger = getLogger(__name__)
+
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
         logger.info(f"msg type : {message['type']}")

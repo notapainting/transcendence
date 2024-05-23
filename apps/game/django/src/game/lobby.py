@@ -18,32 +18,33 @@ class Lobby:
         return self.name
 
     async def clear(self):
-        await self._chlayer.send(self._challenger, {"message":enu.Game.KICK})
+        await self._chlayer.group_send(self._challenger, {"message":enu.Game.KICK})
         for user in self._invited:
-            await self._chlayer.send(user, {"message":enu.Game.KICK})
+            await self._chlayer.group_send(user, {"message":enu.Game.KICK})
 
     async def invite(self, user):
         if self.invited(user) is False:
             self._invited.add(user)
-            await self._chlayer.send(user, {"type":enu.Game.INVITE, "author":self.host})
+            print(f"send invite to {user}")
+            await self._chlayer.group_send(user, {"type":enu.Game.INVITE, "author":self.host})
         else:
             raise RuntimeError("Player already invited")
 
     async def kick(self, user):
         if self.invited(user) is True:
             self._invited.discard(user)
-            await self._chlayer.send(user, {"type":enu.Game.KICK, "author":self.host})
+            await self._chlayer.group_send(user, {"type":enu.Game.KICK, "author":self.host})
         elif user == self._challenger:
             self._challenger = None
-            await self._chlayer.send(user, {"type":enu.Game.KICK, "author":self.host})
+            await self._chlayer.group_send(user, {"type":enu.Game.KICK, "author":self.host})
         else:
             raise RuntimeError("Player not found")
 
     async def set_ready(self, user):
         self._ready.add(user)
         if len(self._ready) == 2:
-            await self._chlayer.send(self.host, {"type":enu.Game.START, "author":self.host})
-            await self._chlayer.send(self._challenger, {"type":enu.Game.START, "author":self.host})
+            await self._chlayer.group_send(self.host, {"type":enu.Game.START, "author":self.host})
+            await self._chlayer.group_send(self._challenger, {"type":enu.Game.START, "author":self.host})
             return True
         else:
             return False

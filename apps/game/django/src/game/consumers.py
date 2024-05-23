@@ -17,6 +17,8 @@ reset = 0
 counter = 0
 max_speed = 2
 
+from game.base import BaseConsumer
+
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.game_state = GameState()

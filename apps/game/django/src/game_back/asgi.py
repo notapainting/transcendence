@@ -15,17 +15,17 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
 from game.routing import websocket_urlpatterns
+from game_back.middleware import CustomAuthMiddleware
+from channels.auth import CookieMiddleware
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
-# Initialize Django ASGI application early to ensure the AppRegistry
-# is populated before importing code that may import ORM models.
+
 django_asgi_app = get_asgi_application()
 
 import game.routing
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
-    "websocket": AllowedHostsOriginValidator(
-        AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+    "websocket": CookieMiddleware(CustomAuthMiddleware((URLRouter(websocket_urlpatterns)))
     ),
 })

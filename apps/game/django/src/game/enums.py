@@ -13,7 +13,7 @@ class Game(enum.StrEnum):
     JOIN = "game.join"
     QUIT = "game.quit"
     READY = "game.ready"
-    READY = "game.unready"
+    UNREADY = "game.unready"
     KICK = "game.kick"
     ACCEPTED = "game.accepted"
     DENY = "game.deny"
