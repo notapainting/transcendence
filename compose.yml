@@ -13,8 +13,8 @@ services:
       dockerfile: Dockerfile.dev
     image: proxy-nginx
     ports:
-     - "8443:443"
-     - "8080:80"
+     - "443:443"
+     - "80:80"
     networks: 
       - app_network
     volumes:
