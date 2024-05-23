@@ -7,7 +7,7 @@ class Lobby:
     def __init__(self, host, name="Simple Match") -> None:
         self.host = host
         self.name = name
-        self._invited = set()
+        
         self._ready = set()
         self._challenger = None
         self.guest = None
@@ -18,9 +18,9 @@ class Lobby:
         return self.name
 
     async def clear(self):
-        await self._chlayer.group_send(self._challenger, {"message":enu.Game.KICK})
+        await self._chlayer.group_send(self._challenger, {"message":enu.Game.KICK, "author":self.host})
         for user in self._invited:
-            await self._chlayer.group_send(user, {"message":enu.Game.KICK})
+            await self._chlayer.group_send(user, {"message":enu.Game.KICK, "author":self.host})
 
     async def invite(self, user):
         if self.invited(user) is False:

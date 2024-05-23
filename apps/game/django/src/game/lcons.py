@@ -43,7 +43,7 @@ class RemoteGameConsumer(BaseConsumer):
         await self.channel_layer.group_add(self.username, self.channel_name)
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.channel_name, self.username)
+        await self.channel_layer.group_discard(self.username, self.channel_name)
         if self.match_status == enu.CStatus.HOST:
             pass
         elif self.match_status == enu.CStatus.GUEST:
@@ -72,7 +72,7 @@ class RemoteGameConsumer(BaseConsumer):
                         await self.gaming({"message":"startButton"})
                     else:
                         await self.send_cs(self.lobby._challenger, json_data)
-                case '_': 
+                case enu.Game.UPDATE: 
                     await self.gaming(json_data)
 
         elif self.match_status == enu.CStatus.GUEST:
@@ -172,7 +172,7 @@ class RemoteGameConsumer(BaseConsumer):
             await asyncio.sleep(0.02)
             asyncio.create_task(self.game_state.update_player_position(message))
             await self.send_json(self.game_state.to_dict('none'))
-            await self.send_cs(self.game_state.to_dict('none'))
+            await self.send_cs(self.lobby._challenger, self.game_state.to_dict('none'))
             if reset ==  2:
                 time.sleep(0.5)
                 reset = 0 

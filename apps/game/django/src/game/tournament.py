@@ -18,21 +18,22 @@ TOURNAMENT_MAX_PLAYER = 16
 MATCH_MAX_PLAYER = 2
 
 class BaseLobby:
-    def __init__(self, host, guest):
+    def __init__(self, host, guest=None):
         self.host = host
         self.guest = guest
         self._ready = set()
+        self._invited = set()
         self._chlayer = get_channel_layer()
 
     async def ready(self, user):
         self._ready.add(user)
         if len(self._ready) == MATCH_MAX_PLAYER:
-            await self._chlayer.send(self.host, {"type":enu.Game.START, "author":self.host})
-            await self._chlayer.send(self._challenger, {"type":enu.Game.START, "author":self.host})
+            await self._chlayer.group_send(self.host, {"type":enu.Game.START, "author":self.host})
+            await self._chlayer.group_send(self._challenger, {"type":enu.Game.START, "author":self.host})
             return True
         else:
             return False
-    
+
     async def unready(self, user):
         if len(self._ready) != MATCH_MAX_PLAYER:
             self._ready.discard(user)
