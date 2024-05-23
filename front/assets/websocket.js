@@ -61,19 +61,18 @@ gameSocket.onmessage = function(e) {
 		updateInvitationList();
 		invitations.push(joinData);
 	}
-	else {
+	else if (messageType === 'game') {
 		game.gameRenderer(message);
 	}
 
-    
     const currentTime = performance.now();
     const pingDelay = currentTime - lastPingTime;
     // console.log("Ping delay:", pingDelay, "ms");
 
-	if (message.winner == 'leftWin')
-		playerWin('left')
-	else if (message.winner == 'rightWin')
-		playerWin('right')
+	// if (message.winner == 'leftWin')
+	// 	playerWin('left')
+	// else if (message.winner == 'rightWin')
+	// 	playerWin('right')
 
     lastPingTime = currentTime;
 	// console.log("ping = ", lastPingTime);
