@@ -1,62 +1,18 @@
 import json, asyncio, time
 
-from channels.generic.websocket import AsyncWebsocketConsumer
-
-from game.consumers import GameState
+from game.base import BaseConsumer
 
 import game.enums as enu
-from game.tournament import Lobby, Match, MatchManager
-
 import channels.exceptions as exchan
+
+from game.consumers import GameState
+from game.lobby import Lobby
+from game.match import Match
+
 from logging import getLogger
 logger = getLogger(__name__)
 
 
-class BaseConsumer(AsyncWebsocketConsumer):
-    async def dispatch(self, message):
-        logger.info(f"msg type : {message['type']}")
-        try :
-            await super().dispatch(message)
-        except ValueError as error:
-            logger.warning(error)
-            await self.send_json({'type':enu.Errors.TYPE})
-        except BaseException:
-            raise
-
-    @classmethod
-    async def decode_json(cls, text_data):
-        try :
-            return json.loads(text_data)
-        except:
-            return {'type':enu.Errors.DECODE}
-
-    @classmethod
-    async def encode_json(cls, content):
-        try:
-            return json.dumps(content)
-        except:
-            return json.dumps({'type':enu.Errors.ENCODE})
-
-    async def send_json(self, content, close=False):
-        await super().send(text_data=await self.encode_json(content), close=close)
-
-    async def websocket_receive(self, message):
-        if "text" in message:
-            await self.receive_json(json_data=await self.decode_json(message["text"]))
-        else:
-            await self.receive_bytes(bytes_data=message["bytes"])
-
-    async def receive_json(self, json_data, **kwargs):
-        pass
-
-    async def receive_bytes(self, bytes_data, **kwargs):
-        pass
-
-    async def error_decode(self, data):
-        logger.info(data)
-
-    async def error_encode(self, data):
-        logger.info(data)
 
 
 """
@@ -85,6 +41,7 @@ class RemoteGameConsumer(BaseConsumer):
         await self.channel_layer.group_add(self.channel_name, self.username)
 
     async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.channel_name, self.username)
         if self.match_status == enu.CStatus.HOST:
             pass
         elif self.match_status == enu.CStatus.GUEST:
@@ -95,6 +52,8 @@ class RemoteGameConsumer(BaseConsumer):
         self.channel_layer.send(target, data)
 
     async def receive_json(self, json_data):
+        if json_data['type'] == enu.Errors.DECODE:
+            return await self.send_json({'type':enu.Errors.DECODE})
         if self.match_status == enu.CStatus.HOST:
             match json_data['type']:
                 case enu.Game.QUIT: 
