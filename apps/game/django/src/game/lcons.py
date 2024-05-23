@@ -43,7 +43,7 @@ class RemoteGameConsumer(BaseConsumer):
         await self.channel_layer.group_add(self.username, self.channel_name)
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.channel_name, self.username)
+        await self.channel_layer.group_discard(self.username, self.channel_name)
         if self.match_status == enu.CStatus.HOST:
             pass
         elif self.match_status == enu.CStatus.GUEST:
@@ -51,14 +51,13 @@ class RemoteGameConsumer(BaseConsumer):
 
     async def send_cs(self, target, data):
         data['author'] = self.username
-        print(f"send to {target}")
-        self.channel_layer.group_send(target, data)
+        await self.channel_layer.group_send(target, data)
 
     async def receive_json(self, json_data):
         
         if json_data.get('type') == None: # enu.Errors.DECODE
             return await self.send_json({'type':enu.Errors.DECODE})
-        print(f"type is {json_data['type']} ")
+        print(f"{self.username}: type is {json_data['type']} ")
         if self.match_status == enu.CStatus.HOST:
             match json_data['type']:
                 case enu.Game.QUIT:
@@ -95,11 +94,13 @@ class RemoteGameConsumer(BaseConsumer):
                         self.invitations.discard(json_data['message'])
                         await self.send_cs(json_data['message'], json_data)
 
+
+
     # BOTH
     async def game_invite(self, data):
         self.invitations.add(data['author'])
-        print(f"invited by {data['author']}")
         await self.send_json(data)
+
 
     async def game_ready(self, data):
         if self.match_status == enu.CStatus.HOST:
