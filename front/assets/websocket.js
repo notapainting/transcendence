@@ -6,6 +6,11 @@ const tournament = document.getElementById('tournament');
 const exit = document.getElementById('exit');
 const create = document.getElementById('create');
 const join = document.getElementById('join');
+const userInput = document.getElementById('userInput');
+const inviteButton = document.getElementById('inviteButton');
+const invitationBox = document.getElementById('invitationBox');
+
+const invitations = [];
 
 function updateTimer() {
 	gameData.elapsedTime += 1;
@@ -19,9 +24,47 @@ export const gameSocket = new WebSocket(
 
 let lastPingTime = performance.now();
 
+function updateInvitationList() {
+    const invitationList = document.getElementById('invitationList');
+    invitationList.innerHTML = '';
+
+    invitations.forEach((invitation, index) => {
+        const listItem = document.createElement('li');
+        const invitationText = document.createElement('span');
+        invitationText.textContent = `${index + 1}. ${invitation}`;
+        
+        const acceptButton = document.createElement('button');
+        acceptButton.textContent = 'Accepter';
+        acceptButton.className = 'accept-button';
+
+        acceptButton.addEventListener('click', function() {
+            invitationText.textContent = `${index + 1}. ${invitation} - Ok`;
+            acceptButton.disabled = true;
+			gameSocket.send(JSON.stringify({
+				'type': 'game.join',
+				'message': invitation
+			}));
+        });
+
+        listItem.appendChild(invitationText);
+        listItem.appendChild(acceptButton);
+        invitationList.appendChild(listItem);
+    });
+}
+
 gameSocket.onmessage = function(e) {
     const message = JSON.parse(e.data);
-	game.gameRenderer(message);
+	var messageType = message.type;
+	updateInvitationList();
+	if (messageType === 'game.invite'){
+		const joinData = message.message;
+		updateInvitationList();
+		invitations.push(joinData);
+	}
+	else {
+		game.gameRenderer(message);
+	}
+
     
     const currentTime = performance.now();
     const pingDelay = currentTime - lastPingTime;
@@ -35,6 +78,7 @@ gameSocket.onmessage = function(e) {
     lastPingTime = currentTime;
 	// console.log("ping = ", lastPingTime);
 };
+
 
 gameSocket.onclose = function(e) {
 	console.error('Game socket closed unexpectedly');
@@ -129,4 +173,37 @@ tournament.addEventListener('click', () => {
 
 	create.style.display = 'block';
 	join.style.display = 'block';
+});
+
+create.addEventListener('click', () => {
+	gameSocket.send(JSON.stringify({
+		'type': 'game.create'
+	}));
+
+	create.style.display = 'none';
+	join.style.display = 'none';
+
+	userInput.style.display = 'block';
+	inviteButton.style.display = 'block';
+});
+
+join.addEventListener('click', () => {
+	// gameSocket.send(JSON.stringify({
+	// 	'type': 'game.join'
+	// }));
+
+	create.style.display = 'none';
+	join.style.display = 'none';
+
+	invitationBox.style.display = 'block';
+});
+
+inviteButton.addEventListener('click', function() {
+    var userInput = document.getElementById('userInput').value;
+    console.log('Texte saisi : ' + userInput);
+
+	gameSocket.send(JSON.stringify({
+		'type': 'game.invite',
+		'message': userInput
+	}));
 });
