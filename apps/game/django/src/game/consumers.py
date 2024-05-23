@@ -5,6 +5,7 @@ import sys
 from channels.generic.websocket import AsyncWebsocketConsumer
 import game.utils as utils
 import game.power_up as pow
+import game.enums as enu
 
 width = 50
 height = 30
@@ -46,7 +47,6 @@ class GameState:
         self.timer = utils.Timer(verbose=False)
         self.p = pow.PowerUpManager()
         self.status = {
-        'type' : 'game',
         'ballX': 0,
         'ballY': 0,
         'collisionX': 0,
@@ -101,6 +101,7 @@ class GameState:
 
     def to_dict(self, winner): #mise en forme
         return {
+         # 'type' : enu.Game.UPDATE,
         'x': self.status['ballX'],
         'y': self.status['ballY'],
         'speed': self.status['ballSpeedX'],
