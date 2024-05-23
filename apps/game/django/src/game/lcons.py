@@ -82,6 +82,8 @@ class RemoteGameConsumer(BaseConsumer):
                     self.host = None
                 case enu.Game.READY :
                     await self.send_cs(self.host, json_data)
+                case enu.Game.UPDATE: 
+                    await self.gaming(json_data)
 
         else:
             match json_data['type']:
