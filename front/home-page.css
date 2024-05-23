@@ -64,6 +64,37 @@ input:focus::placeholder {
     padding-top: 50px;
 }
 
+.navbar {
+    width: 100px;
+    height: 400px;
+    position: fixed;
+    top: 50%;
+    right: 0;
+    display: none;
+    transform: translateY(-50%);
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    transition: transfrom 0.4s ease;
+}
+
+.item {
+    font-size: 32px;
+    cursor: pointer;
+    color: black;
+}
+
+.item:hover {
+    color: #99CCFF;
+}
+
+.profile {
+
+}
+
+
 .back-threes,
 .middle-threes,
 .front-threes, .background-threes {
@@ -113,6 +144,14 @@ input:focus::placeholder {
 /* separator */
 
 
+.play-online-btn {
+    transform: scale(0);
+    display: none;
+    margin-right: 5%;
+    background-image: url("img/play-online.png");
+    transition: transform 0.2s ease;
+}
+
 /* forms */
 
 .play-offline-online {
@@ -148,6 +187,7 @@ input:focus::placeholder {
     flex-direction: column;
     
 }
+
 
 .login-signin-form input {
     text-align: center;
@@ -247,6 +287,7 @@ input:focus::placeholder {
     transition: all 0.4s ease;
 }
 
+
 .login-or-create {
     display: flex;
     align-items: center;
@@ -267,3 +308,67 @@ input:focus::placeholder {
     margin-left: 10px;
 }
 
+.message-box {
+    color: white;
+    margin-top: 30px;
+    transform: scale(0);
+    transition: transform 0.2s ease;
+    text-align: center;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+
+  /* profile */
+
+  #profile {
+    display: none;
+    background-color: yellow;
+    color: black;
+    height: 100vh;
+  }
+
+  /* chat */
+
+  #chat {
+    display: none;
+    height: 100vh;
+    background-color: blue;
+    color: wheat;
+  }
+
+  /* settings */
+
+  #settings {
+    display: none;
+    height: 100vh;
+    background-color: #947ADA;
+    color: white;
+  }
+
+  .btn-div {
+    width: 300px;
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.play-offline-btn {
+    background-image: url("img/play-offline.png");
+}

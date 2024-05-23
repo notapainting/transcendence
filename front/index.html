@@ -18,12 +18,23 @@
             <div class="front-threes parallax-items"></div>
             <div class="banner top-hide"></div>
             <div class="banner bot-hide"></div>
+            <nav class="navbar">
+                <i class="item fa-solid fa-user" data-link data-href="/profile"></i>
+                <i class="item fa-solid fa-comment" data-link data-href="/chat"></i>
+                <i class="item fa-solid fa-sliders"data-link data-href="/settings"></i>
+                <i class="item fa-solid fa-right-from-bracket"></i>
+            </nav>
         </div>
         <div class="play-offline-online">
             <div class="home-sep"></div>
             <h2>PLAY OFFLINE OR LOGIN TO PLAY</h2>
             <div class="form-container">
-                <button class="btn play-offline-btn">PLAY OFFLINE</button>
+                <div class="btn-div play-offline-btn">
+
+                </div>
+                <div class="btn-div play-online-btn">
+                    
+                </div>
                 <form action="" class="login-signin-form">
                     <input type="text" name="home-email" id="home-email" placeholder="e-mail">
                     <input type="text" name="home-username" id="home-username" placeholder="username / e-mail">
@@ -38,10 +49,21 @@
                         <button class="btn home-form-btn">LOGIN</button>
                         <p class="login-or-register-text">Don't have an account ? <br><span class="switch-form">Create One</span></p>
                     </div>
+                    <div class="message-box"></div>
                 </form>
             </div>
         </div>
     </div>
+    <div id="profile" class="view">
+        <h1>PROFILE OHH</h1>
+    </div>
+    <div id="chat" class="view">
+        <h1>chat OHH</h1>
+    </div>
+    <div id="settings" class="view">
+        <h1>settings OHH</h1>
+    </div>
+    <script src="https://kit.fontawesome.com/3db1c2f3ab.js" crossorigin="anonymous"></script>
     <script type="module" src="js/index.js"></script>
     <script type="module" src="js/home.js"></script>
 </body>
