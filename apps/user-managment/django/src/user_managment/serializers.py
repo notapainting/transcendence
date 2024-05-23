@@ -25,5 +25,5 @@ class UserSerializer(serializers.ModelSerializer):
 class MatchSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = MatchResults
-		# fields = ['user_one', 'user_one_score', 'user_one_powerups','user_two', 'user_two_score', 'user_two_powerups']
+		# fields = ['user_one', 'user_one_score', 'user_one_powerups','user_two', 'user_two_score', 'user_two_powerups', 'match_start', 'match_end']
 		fields = '__all__'
