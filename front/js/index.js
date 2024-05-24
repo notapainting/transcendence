@@ -3,7 +3,7 @@ import { showProfile } from "./profile.js"
 import {showSettings} from "./settings.js"
 import {showChat} from "./chat.js"
 
-const navigateTo = url => {
+export const navigateTo = url => {
     history.pushState(null, null, url)
     router()
 }

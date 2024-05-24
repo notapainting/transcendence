@@ -1,0 +1,174 @@
+  /* profile */
+
+  #profile {
+    display: none;
+    background-color: #0C3452;
+    color: white;
+    height: 100vh;
+}
+
+.profile-btn {
+    width: 100px;
+    height: 50px;
+    border: none;
+    font-weight: bold;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.profile-container {
+    height: 100vh;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.my-profile-container {
+    width: 80%;
+    height: 80%;
+
+}
+
+.my-profile h2 {
+    font-family: Arial, Helvetica, sans-serif;
+    margin-bottom: 20px;
+    font-weight: 200;
+}
+
+.profile-sep {
+    width: 100%;
+    height: 1px;
+    background-color: #E6E6E7;
+    margin-bottom: 50px;
+}
+
+.info-profile-picture-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-info {
+    width: 65%;
+}
+
+.fill-info-container {
+    padding: 20px;
+    height: 100%;
+}
+
+.fill-info-container h3 {
+    margin-bottom: 20px;
+    font-size: 26px;
+}
+
+.fill-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.column {
+    flex: 1;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.row {
+    margin-bottom: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.row-margin {
+    margin-left: 20px;
+    margin-right: 0;
+}
+
+.row label {
+    margin-bottom: 3px;
+    margin-right: 5px;
+    width: 20%;
+}
+
+.row input {
+    border: 1px solid black;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 22px;
+    height: 100%;
+    width: 70%;
+}
+
+.gender-options input {
+    width: 20px;
+    height: 20px;
+}
+
+
+.gender-options {
+    display: flex;
+}
+
+.mini-gender-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+}
+
+.mini-gender-container label {
+    margin-left: 5px;
+}
+
+
+.profile-picture-info {
+    background-color: #FAFBFB;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 25vw; /* Utilisation de vw pour rendre la hauteur égale à 35% de la largeur de la vue */
+    width: 25vw; /* Utilisation de vw pour rendre la largeur égale à 35% de la largeur de la vue */
+}
+
+.profile-picture-info h3 {
+    color: black;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.profile-picture {
+    width: 70%; /* Utilisation de % pour rendre la largeur de l'image adaptable */
+    max-width: 300px; /* Taille maximale pour éviter un agrandissement excessif sur les grands écrans */
+    aspect-ratio: 1/1; /* Garde le rapport hauteur/largeur pour maintenir la forme carrée */
+    background-color: wheat;
+}
+
+.upload-remove {
+    margin-top: 20px;
+}
+
+.modify-container {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.modify {
+    text-align: center;
+    margin: 0 auto;
+    width: 200px;
+    background-color: orange;
+}
+
+.upload {
+    background-color: green;
+}
+
+.remove {
+    background-color: red;
+}

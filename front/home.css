@@ -4,6 +4,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-size: 10px;
 }
 
 body {
@@ -50,6 +51,15 @@ input:focus::placeholder {
 .btn:hover {
     transform: scale(1.1);
 }
+
+.button {
+    border: none;
+    height: 40px;
+    width: 120px;
+    cursor: pointer;
+    border-radius: 15px;
+}
+
 /* home-page display*/
 
 #home {
@@ -78,6 +88,7 @@ input:focus::placeholder {
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 20px;
     transition: transfrom 0.4s ease;
+    z-index: 2;
 }
 
 .item {
@@ -333,14 +344,20 @@ input:focus::placeholder {
   }
 
 
-  /* profile */
 
-  #profile {
-    display: none;
-    background-color: yellow;
-    color: black;
-    height: 100vh;
-  }
+  .btn-div {
+    width: 300px;
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.play-offline-btn {
+    background-image: url("img/play-offline.png");
+}
+
 
   /* chat */
 
@@ -359,16 +376,3 @@ input:focus::placeholder {
     background-color: #947ADA;
     color: white;
   }
-
-  .btn-div {
-    width: 300px;
-    height: 300px;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    cursor: pointer;
-}
-
-.play-offline-btn {
-    background-image: url("img/play-offline.png");
-}
