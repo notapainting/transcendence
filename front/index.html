@@ -4,12 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bjill | welcome</title>
-    <link rel="stylesheet" href="./home-page.css">
+    <link rel="stylesheet" href="./home.css">
+    <link rel="stylesheet" href="./profile.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica+SC&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <nav class="navbar">
+        <i class="item fa-solid fa-user" data-link data-href="/profile"></i>
+        <i class="item fa-solid fa-comment" data-link data-href="/chat"></i>
+        <i class="item fa-solid fa-sliders"data-link data-href="/settings"></i>
+        <i class="item fa-solid fa-right-from-bracket"></i>
+    </nav>
     <div id="home" class="view">
         <div class="parallax-container">
             <div class="background-threes"></div>
@@ -18,12 +25,6 @@
             <div class="front-threes parallax-items"></div>
             <div class="banner top-hide"></div>
             <div class="banner bot-hide"></div>
-            <nav class="navbar">
-                <i class="item fa-solid fa-user" data-link data-href="/profile"></i>
-                <i class="item fa-solid fa-comment" data-link data-href="/chat"></i>
-                <i class="item fa-solid fa-sliders"data-link data-href="/settings"></i>
-                <i class="item fa-solid fa-right-from-bracket"></i>
-            </nav>
         </div>
         <div class="play-offline-online">
             <div class="home-sep"></div>
@@ -55,7 +56,75 @@
         </div>
     </div>
     <div id="profile" class="view">
-        <h1>PROFILE OHH</h1>
+        <div class="profile-container">
+            <div class="my-profile-container">
+                <div class="my-profile">
+                    <h2>My Profile</h2>
+                    <div class="profile-sep"></div>
+                </div>
+                <div class="info-profile-picture-container">
+                    <div class="user-info">
+                        <div class="fill-info-container">
+                            <div class="h3-contact-details">
+                                <h3>Contact details</h3>
+                            </div>
+                            <div class="fill-info">
+                                <div class="column">
+                                    <div class="row">
+                                        <label for="first-name">First Name</label>
+                                        <input type="text" id="first-name" name="first-name">
+                                    </div>
+                                    <div class="row">
+                                        <label for="last-name">Last Name</label>
+                                        <input type="text" id="last-name" name="last-name">
+                                    </div>
+                                    <div class="row">
+                                        <label for="username">Username</label>
+                                        <input type="text" id="username" name="username">
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <div class="row row-margin">
+                                        <label for="email">E-mail</label>
+                                        <input type="text" id="email" name="email">
+                                    </div>
+                                    <div class="row row-margin">
+                                        <label>Gender</label>
+                                        <div class="gender-options">
+                                            <div class="mini-gender-container">
+                                                <input type="radio" id="male" name="gender" value="male">
+                                                <label for="male">Male</label>
+                                            </div>
+                                            <div class="mini-gender-container">
+                                                <input type="radio" id="female" name="gender" value="female">
+                                                <label for="female">Female</label>
+                                            </div>
+                                            <div class="mini-gender-container">
+                                                <input type="radio" id="other" name="gender" value="other">
+                                                <label for="other">Other</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row row-margin">
+                                        <label for="date-of-birth">Date <br>of Birth</label>
+                                        <input type="date" id="date-of-birth" name="date-of-birth">
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="modify-container"><button class="profile-btn modify">MODIFY</button></div>    
+                        </div>
+                    </div>
+                    <div class="profile-picture-info">
+                        <h3>Upload your profile photo</h3>
+                        <div class="profile-picture"></div>
+                        <div class="upload-remove">
+                            <button class="profile-btn upload">UPLOAD</button>
+                            <button class="profile-btn remove">REMOVE</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div id="chat" class="view">
         <h1>chat OHH</h1>

@@ -1,3 +1,5 @@
+import { navigateTo } from "./index.js";
+
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
     const middleThrees = document.querySelector('.middle-threes');
@@ -306,6 +308,7 @@ export let logoutRequest = (event) => {
     })
     .then(response => {
         if (response.ok) {
+            navigateTo("/");
             window.location.reload();
             // Effectuez ici les actions nécessaires après la déconnexion, par exemple rediriger l'utilisateur vers une autre page
         } else {
@@ -332,9 +335,6 @@ export const showHome = async () => {
             top: 0,
             behavior: "smooth",
         });
-        setTimeout(() => {
-            document.querySelector(".navbar").style.transform = "scale(1)"
-         }, 800);
         document.removeEventListener('wheel', scrollDownEffect);
         document.addEventListener('wheel', adjustZoom);
     })
@@ -342,4 +342,4 @@ export const showHome = async () => {
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
     const logoutButton = document.querySelector(".fa-right-from-bracket");
     logoutButton.addEventListener("click", logoutRequest);
-}
+} 
