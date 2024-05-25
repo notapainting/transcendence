@@ -96,7 +96,7 @@
 
 .row input {
     border: 1px solid black;
-    border-radius: 10px;
+    border-radius: 10px;    font-size: 4rem;
     text-align: center;
     font-size: 22px;
     height: 100%;
@@ -118,6 +118,7 @@
     align-items: center;
     justify-content: center;
     margin: 10px;
+
 }
 
 .mini-gender-container label {
@@ -146,7 +147,9 @@
     width: 70%; /* Utilisation de % pour rendre la largeur de l'image adaptable */
     max-width: 300px; /* Taille maximale pour éviter un agrandissement excessif sur les grands écrans */
     aspect-ratio: 1/1; /* Garde le rapport hauteur/largeur pour maintenir la forme carrée */
-    background-color: wheat;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .upload-remove {
