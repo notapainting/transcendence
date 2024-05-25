@@ -27,6 +27,9 @@ class UserCreate(APIView):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	# def update(self, request):
 
+from django.core.exceptions import ValidationError
+from django.utils.dateparse import parse_date
+
 class UpdateClientInfo(APIView):
 	def put(self, request, *args, **kwargs):
 		try:
@@ -40,6 +43,14 @@ class UpdateClientInfo(APIView):
 				user.profile_picture.delete(save=False)
 				user.profile_picture.save(f"{user.username}.jpg", value, save=True)
 				return Response({"message": "User information updated successfully"}, status=status.HTTP_200_OK)
+			if key == 'date_of_birth':
+                # Vérifie si la date est au format valide
+				if not value:
+					return Response({"error": "Invalid date format. It must be in YYYY-MM-DD format."}, status=status.HTTP_400_BAD_REQUEST)
+				try:
+					parse_date(value)
+				except ValidationError:
+					return Response({"error": "Invalid date format. It must be in YYYY-MM-DD format."}, status=status.HTTP_400_BAD_REQUEST)
 			if hasattr(user, key):
 				setattr(user, key, value)
 			user.save()

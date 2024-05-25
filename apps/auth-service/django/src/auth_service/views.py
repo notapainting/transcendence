@@ -150,6 +150,7 @@ class ValidateTokenView(APIView):
 		user = get_user_from_access_token(access_token_cookie)
 		return Response({'message': 'token valide.', 'username': user.username}, status=status.HTTP_200_OK)
 
+from requests.exceptions import HTTPError
 
 class UpdateProfilePicture(APIView):
 	authentication_classes = [JWTAuthentication]
@@ -162,7 +163,7 @@ class UpdateProfilePicture(APIView):
 				files = {'profile_picture': profile_picture}
 				data = {'unique_id': user.unique_id}
 				update_response = requests.put('http://user-managment:8000/update_client/', files=files, data=data)
-				update_response.raise_for_status()   
+				update_response.raise_for_status()
 			except requests.exceptions.RequestException as e:
 				return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 			return Response({"message": "Profile picture updated successfully"}, status=status.HTTP_200_OK)
