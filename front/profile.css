@@ -7,28 +7,47 @@
     height: 100vh;
 }
 
+
 .profile-btn {
-    width: 100px;
-    height: 50px;
-    border: none;
-    font-weight: bold;
-    color: white;
-    font-size: 20px;
+    --bg: #000;
+    --hover-bg: #ff90e8;
+    --hover-text: #000;
+    color: #fff;
     cursor: pointer;
-}
+    border: none;
+    border-radius: 4px;
+    padding: 0.8em 2em;
+    background: var(--bg);
+    font-weight: bold;
+    font-size: 16px;
+    transition: 0.2s;
+  }
+  
+  .profile-btn:hover {
+    color: var(--hover-text);
+    transform: translate(-0.25rem, -0.25rem);
+    background: var(--hover-bg);
+    box-shadow: 0.25rem 0.25rem var(--bg);
+  }
+  
+  .profile-btn:active {
+    transform: translate(0);
+    box-shadow: none;
+  }
+  
 
 .profile-container {
     height: 100vh;
     font-weight: 400;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
 .my-profile-container {
     width: 80%;
-    height: 80%;
-
+    height: 60%;
 }
 
 .my-profile h2 {
@@ -127,7 +146,6 @@
 
 
 .profile-picture-info {
-    background-color: #FAFBFB;
     border-radius: 15px;
     display: flex;
     align-items: center;
@@ -138,7 +156,6 @@
 }
 
 .profile-picture-info h3 {
-    color: black;
     margin-bottom: 20px;
     font-size: 2rem;
 }
@@ -150,6 +167,7 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    border-radius: 50%;
 }
 
 .upload-remove {
@@ -165,13 +183,45 @@
     text-align: center;
     margin: 0 auto;
     width: 200px;
-    background-color: orange;
+    margin-top: 53px;
 }
 
 .upload {
-    background-color: green;
 }
 
 .remove {
-    background-color: red;
 }
+
+.security-container {
+    width: 80%;
+    height: 30%;
+}
+
+.password-change {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.container-password {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container-password label {
+    margin-bottom: 10px;
+}
+
+.password-change input {
+    border-radius: 10px;    font-size: 4rem;
+    text-align: center;
+    font-size: 22px;
+    height: 40px;
+}
+
+.two-factor {
+    margin-top: 20px;
+}
+

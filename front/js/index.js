@@ -7,7 +7,7 @@ export const navigateTo = url => {
     history.pushState(null, null, url)
     router()
 }
-const clearView = () => {
+export const clearView = () => {
 console.log("Appel ClearView")
     document.querySelectorAll(".view").forEach(div => {
         div.style.display = "none";
@@ -63,7 +63,6 @@ const router = async () => {
             isMatch: true
         }
     }
-    clearView();
     match.route.view()
 };
 

@@ -318,11 +318,15 @@ export let logoutRequest = (event) => {
         console.error('Erreur:', error);
     });
 }
-
+import { clearView } from "./index.js";
 export const showHome = async () => {
+
+
+    let isAuthenticated = await isUserAuthenticated();
+    clearView();
     const homeElement = document.querySelector("#home");
     homeElement.style.display = "block";
-    let isAuthenticated = await isUserAuthenticated();
+
     if (isAuthenticated)
         loggedInStatus();
     const playOfflineBtnElement = document.querySelector(".play-offline-btn");
