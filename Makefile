@@ -1,4 +1,6 @@
 
+MAKEFLAGS += -j
+
 CMP = docker compose --env-file env.dev \
 	--file compose.yml \
 	--file compose/compose.game.yml 

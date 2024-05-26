@@ -4,7 +4,7 @@ import json, asyncio, time
 
 import game.enums as enu
 
-from game.consumers import GameState
+from game.consumers import GameState, loop_remote_ultime
 from game.lobby import Lobby
 from game.match import Match
 
@@ -21,6 +21,7 @@ from game.base import BaseConsumer
 class UltimateGamer(BaseConsumer):
 
     def __init__(self):
+        super().__init__()
         self.username = "Anon"
         self.invitations = set()
         self.match_status = enu.CStatus.IDLE
@@ -35,33 +36,57 @@ class UltimateGamer(BaseConsumer):
             raise exchan.DenyConnection()
         await self.accept()
         await self.channel_layer.group_add(self.username, self.channel_name)
+        lost = Match.is_lost(self.username)
+        if lost is False:
+            pass
+        elif lost is True:
+            self.match_status = enu.CStatus.HOST
+            self.match = Match.current_match[self.username]
+            # implemente reste
+        else:
+            self.match_status = enu.CStatus.GUEST
+            self.host = Match.recover(self.username)
+            await self.send_cs(self.host, {"type":enu.Game.RECOVER})
+        print(f"hello {self.username} ({self.match_status})!")
+
+
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.username, self.channel_name)
+        print(f"bye {self.username} ({self.match_status})...")
         if self.match_status == enu.CStatus.HOST:
-            pass
+            self.match.end
+            if self.match.task is not None:
+                self.match.task.cancel()
+            del self.match
         elif self.match_status == enu.CStatus.GUEST:
-            Match.broke(self.host, self.username)
+            Match.broke(host=self.host, guest=self.username)
             await self.send_cs(self.host, {"type":enu.Game.LOST})
 
     async def send_cs(self, target, data):
         data['author'] = self.username
-        self.channel_layer.group_send(target, data)
+        await self.channel_layer.group_send(target, data)
 
     async def receive_json(self, json_data):
+        
+        if json_data.get('type') == None: # enu.Errors.DECODE
+            return await self.send_json({'type':enu.Errors.TYPE})
+        print(f"{self.username} ({self.match_status}): type is {json_data['type']} ")
+        
         if json_data['type'] == enu.Errors.DECODE:
             return await self.send_json({'type':enu.Errors.DECODE})
+        
         if self.match_status == enu.CStatus.HOST:
             match json_data['type']:
                 case enu.Game.QUIT:
                     self.match.end
                     del self.match
                 case enu.Game.INVITE:
-                    self.match.lobby.invite(json_data['target'])
+                    await self.match.lobby.invite(json_data['message'])
                 case enu.Game.KICK:
-                    self.match.lobby.kick(json_data['target'])
+                    await self.match.lobby.kick(json_data['message'])
                 case enu.Game.READY:
-                    if self.match.lobby.set_ready(self.username) is True:
+                    if await self.match.lobby.set_ready(self.username) is True:
                         await self.gaming({"message":"startButton"})
                     else:
                         await self.send_cs(self.match.lobby._challenger, json_data)
@@ -75,6 +100,8 @@ class UltimateGamer(BaseConsumer):
                     await self.send_cs(self.host, json_data)
                     self.host = None
                 case enu.Game.READY:
+                    await self.send_cs(self.host, json_data)
+                case enu.Game.UPDATE: 
                     await self.send_cs(self.host, json_data)
 
         else:
@@ -118,6 +145,12 @@ class UltimateGamer(BaseConsumer):
             await self.send_json(data)
 
     # HOST ONLY
+    async def game_lost(self, data):
+        pass
+
+    async def game_recover(self, data):
+        pass
+
     async def game_quit(self, data):
         self.match.lobby.set_ready.discard(self.match.lobby._challenger)
         self.match.lobby._challenger = None
@@ -126,10 +159,11 @@ class UltimateGamer(BaseConsumer):
     async def game_join(self, data):
         if self.match.lobby.invited(data['author']) and self.match.lobby.full() is False:
             self.match.lobby._challenger = data['author']
-            await self.send_cs(self.match.lobby._challenger, {"message":enu.Game.ACCEPTED})
+            data['message'] = self.match.game_state.to_dict('none')
             await self.send_json(data)
+            await self.send_cs(self.match.lobby._challenger, {"type":enu.Game.ACCEPTED, "message":self.match.game_state.to_dict('none')})
         else:
-            await self.send_cs(data['author'], {"message":enu.Game.DENY})
+            await self.send_cs(data['author'], {"type":enu.Game.DENY})
 
     # GUEST ONLY
     async def game_deny(self, data):
@@ -157,20 +191,20 @@ class UltimateGamer(BaseConsumer):
         if message == "startButton":
             if self.match.game_state.status['game_running'] == False :
                 self.match.game_state.status['game_running'] = True
-                asyncio.create_task(self.loop_remote())
+                self.match.task = asyncio.create_task(loop_remote_ultime(self))
         elif message == "bonus":
             self.match.game_state.status['randB'] = data["bonus"]
         else :
             asyncio.create_task(self.match.game_state.update_player_position(message))
 
-    async def loop_remote(self):
-        global reset
-        while self.match.game_state.status['game_running']:
-            message = self.match.game_state.update()
-            await asyncio.sleep(0.02)
-            asyncio.create_task(self.match.game_state.update_player_position(message))
-            await self.send_json(self.match.game_state.to_dict('none'))
-            await self.send_cs(self.match.game_state.to_dict('none'))
-            if reset ==  2:
-                time.sleep(0.5)
-                reset = 0 
+    # async def loop_remote(self):
+    #     global reset
+    #     while self.match.game_state.status['game_running']:
+    #         message = self.match.game_state.update()
+    #         await asyncio.sleep(0.02)
+    #         asyncio.create_task(self.match.game_state.update_player_position(message))
+    #         await self.send_json(self.match.game_state.to_dict('none'))
+    #         await self.send_cs(self.match.game_state.to_dict('none'))
+    #         if reset ==  2:
+    #             time.sleep(0.5)
+    #             reset = 0 

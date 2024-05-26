@@ -23,22 +23,18 @@ class Lobby:
             await self._chlayer.group_send(user, {"message":enu.Game.KICK, "author":self.host})
 
     async def invite(self, user):
-        if self.invited(user) is False:
-            self._invited.add(user)
-            print(f"send invite to {user}")
-            await self._chlayer.group_send(user, {"type":enu.Game.INVITE, "author":self.host})
-        else:
-            raise RuntimeError("Player already invited")
+        self._invited.add(user)
+        print(f"send invite to {user}")
+        await self._chlayer.group_send(user, {"type":enu.Game.INVITE, "author":self.host})
+
 
     async def kick(self, user):
-        if self.invited(user) is True:
-            self._invited.discard(user)
-            await self._chlayer.group_send(user, {"type":enu.Game.KICK, "author":self.host})
-        elif user == self._challenger:
+        if user == self._challenger:
             self._challenger = None
-            await self._chlayer.group_send(user, {"type":enu.Game.KICK, "author":self.host})
         else:
-            raise RuntimeError("Player not found")
+            self._invited.discard(user)
+        await self._chlayer.group_send(user, {"type":enu.Game.KICK, "author":self.host})
+
 
     async def set_ready(self, user):
         self._ready.add(user)

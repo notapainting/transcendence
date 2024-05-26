@@ -5,7 +5,7 @@ from game.base import BaseConsumer
 import game.enums as enu
 import channels.exceptions as exchan
 
-from game.consumers import GameState
+from game.consumers import GameState, loop_remote
 from game.lobby import Lobby
 from game.match import Match
 
@@ -57,7 +57,7 @@ class RemoteGameConsumer(BaseConsumer):
         
         if json_data.get('type') == None: # enu.Errors.DECODE
             return await self.send_json({'type':enu.Errors.DECODE})
-        print(f"{self.username}: type is {json_data['type']} ")
+        print(f"{self.username} ({self.match_status}): type is {json_data['type']} ")
         if self.match_status == enu.CStatus.HOST:
             match json_data['type']:
                 case enu.Game.QUIT:
@@ -67,7 +67,7 @@ class RemoteGameConsumer(BaseConsumer):
                 case enu.Game.KICK:
                     await self.lobby.kick(json_data['message'])
                 case enu.Game.READY:
-                    if self.lobby.set_ready(self.username) is True:
+                    if await self.lobby.set_ready(self.username) is True:
                         await self.gaming({"message":"startButton"})
                     else:
                         await self.send_cs(self.lobby._challenger, json_data)
@@ -83,7 +83,7 @@ class RemoteGameConsumer(BaseConsumer):
                 case enu.Game.READY :
                     await self.send_cs(self.host, json_data)
                 case enu.Game.UPDATE: 
-                    await self.gaming(json_data)
+                    await self.send_cs(self.host, json_data)
 
         else:
             match json_data['type']:
@@ -162,20 +162,10 @@ class RemoteGameConsumer(BaseConsumer):
         if message == "startButton":
             if self.game_state.status['game_running'] == False :
                 self.game_state.status['game_running'] = True
-                asyncio.create_task(self.loop_remote())
+                asyncio.create_task(loop_remote(self))
         elif message == "bonus":
             self.game_state.status['randB'] = data["bonus"]
-        else :
+        elif self.game_state.status['game_running'] == True :
             asyncio.create_task(self.game_state.update_player_position(message))
 
-    async def loop_remote(self):
-        global reset
-        while self.game_state.status['game_running']:
-            message = self.game_state.update()
-            await asyncio.sleep(0.02)
-            asyncio.create_task(self.game_state.update_player_position(message))
-            await self.send_json(self.game_state.to_dict('none'))
-            await self.send_cs(self.lobby._challenger, self.game_state.to_dict('none'))
-            if reset ==  2:
-                time.sleep(0.5)
-                reset = 0 
+

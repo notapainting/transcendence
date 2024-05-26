@@ -101,7 +101,6 @@ class GameState:
 
     def to_dict(self, winner): #mise en forme
         return {
-         # 'type' : enu.Game.UPDATE,
         'x': self.status['ballX'],
         'y': self.status['ballY'],
         'speed': self.status['ballSpeedX'],
@@ -232,3 +231,29 @@ async def loop(self):
         if reset ==  2:
             time.sleep(0.5)
             reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+
+async def loop_remote(self):
+    global reset
+    while self.game_state.status['game_running']:
+        message = self.game_state.update()
+        await asyncio.sleep(1)
+        asyncio.create_task(self.game_state.update_player_position(message))
+        await self.send_json({'type':enu.Game.UPDATE, 'message':self.game_state.to_dict('none')})
+        await self.send_cs(self.lobby._challenger, {'type':enu.Game.UPDATE, 'message':self.game_state.to_dict('none')})
+        if reset==  2:
+            time.sleep(0.5)
+            reset= 0 
+
+async def loop_remote_ultime(self):
+    global reset
+    try :
+        while self.match.game_state.status['game_running']:
+            self.match.game_state.update()
+            await self.send_json({'type':enu.Game.UPDATE, 'message':self.match.game_state.to_dict('none')})
+            await self.send_cs(self.match.lobby._challenger, {'type':enu.Game.UPDATE, 'message':self.match.game_state.to_dict('none')})
+            if reset==  2:
+                time.sleep(0.5)
+                reset= 0 
+            await asyncio.sleep(0.5)
+    except asyncio.CancelledError as error:
+        print(error)
