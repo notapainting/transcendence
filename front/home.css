@@ -64,6 +64,7 @@ input:focus::placeholder {
 
 #home {
     background-color: #0C3452;
+    display: none;
 }
 
 /* parallax-threes */

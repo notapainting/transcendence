@@ -1,4 +1,5 @@
 import { isUserAuthenticated } from "./index.js";
+import { clearView } from "./index.js";
 
 let firstnameInput = document.querySelector("#first-name")
 let lastnameInput = document.querySelector("#last-name")
@@ -43,7 +44,7 @@ let displayUserInformations = (data) => {
     determineGender(data.gender);
 };
 
-const modifyProfilePicture = () => {
+const modifyProfilePicture = async () => {
     // Créer un input de type "file"
     const fileInput = document.createElement("input");
     fileInput.type = "file";
@@ -56,7 +57,7 @@ const modifyProfilePicture = () => {
 
     // Ajouter l'input de type "file" au document
     document.body.appendChild(fileInput);
-
+    await isUserAuthenticated();
     // Écouter l'événement de changement sur l'input de type "file"
     fileInput.addEventListener("change", () => {
         // Récupérer le fichier sélectionné par l'utilisateur
@@ -69,6 +70,7 @@ const modifyProfilePicture = () => {
         // Envoyer le fichier à l'API via une requête fetch
         fetch('/auth/update_picture/', {
             method: 'PUT',
+            credentials: 'same-origin',
             body: formData
         })
         .then(response => {
@@ -151,6 +153,7 @@ export const showProfile = async () => {
         }
     })
     .then(data => {
+        clearView();
         displayUserInformations(data);
         const profileElement = document.querySelector("#profile");
         profileElement.style.display = "block";

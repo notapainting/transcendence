@@ -37,25 +37,33 @@ class UpdateClientInfo(APIView):
 		except CustomUser.DoesNotExist:
 			return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 		data = request.data
+		serializer = UserSerializer(instance=user, data=request.data, partial=True)
 		for key, value in data.items():
 			if key == 'profile_picture':
 				# Si la clé est 'profile_picture'
 				user.profile_picture.delete(save=False)
 				user.profile_picture.save(f"{user.username}.jpg", value, save=True)
+				user.save()
 				return Response({"message": "User information updated successfully"}, status=status.HTTP_200_OK)
-			if key == 'date_of_birth':
-                # Vérifie si la date est au format valide
-				if not value:
-					return Response({"error": "Invalid date format. It must be in YYYY-MM-DD format."}, status=status.HTTP_400_BAD_REQUEST)
-				try:
-					parse_date(value)
-				except ValidationError:
-					return Response({"error": "Invalid date format. It must be in YYYY-MM-DD format."}, status=status.HTTP_400_BAD_REQUEST)
-			if hasattr(user, key):
-				setattr(user, key, value)
-			user.save()
+		if serializer.is_valid():
+			serializer.save()
+			return Response({"message": "User information updated successfully"}, status=status.HTTP_200_OK)
+		else:
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 		return Response({"message": "User information updated successfully"}, status=status.HTTP_200_OK)
 
+# class UpdateClientInfo(APIView):
+#     def put(self, request, *args, **kwargs):
+#         try:
+#             user = CustomUser.objects.get(unique_id=request.data['unique_id'])
+#         except CustomUser.DoesNotExist:
+#             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+#         serializer = UserSerializer(instance=user, data=request.data, partial=True)
+#         
+
+
+from django.conf import settings
 class GetUserInfos(APIView):
 	def post(self, request):
 		username = request.data.get('username', None)
@@ -71,7 +79,7 @@ class GetUserInfos(APIView):
                     'last_name': user.last_name,
                     'date_of_birth': user.date_of_birth,
                     'gender': user.gender,
-					'profile_picture': user.profile_picture.url if user.profile_picture else None,
+					'profile_picture': user.profile_picture.url if user.profile_picture else settings.MEDIA_URL + 'default_profile_picture.jpg',
 				}
 				return Response(user_data, status = 200)
 			except CustomUser.DoesNotExist:
