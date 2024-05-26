@@ -1,85 +1,20 @@
-    cs.idle
-invitations = set()
-username 
-match = idle/guest/host
-tournament = i/g/h
-lobby 
+update match
+    lobby + game state -> all in match 
+    match get chlayer 
+    use a group for one match ?
+
+match win -> send_cs game_win/game_end event
+            -> run clean-up and history send
+            -> put cs in idle mode 
+
+match broke -> send match broke / pause game
+            -> if guest -> register guest un lost_guest
+            -> if host -> launch timeout task -> 5s for host to get back
+                        -> transfert hostship to guest ?
+
+update gamestate -> init with settings 
+        cs take up/down paddle and stick host/guest upon it
 
 
-    cs.host
-cs -> host
-in lobby
-    from wbs:
-        - quit -> kick guest and delete match
-        - invite -> send invite to target (type:invite, data:{host:self})
-        - cancel -> cancel invitation send (type:cancel)
-        - kick -> send kick to target (type:kick, data:{host:self})
-        - ready -> start game if everyone say ready, send to all (type:start)
-    from cs :
-        - quit -> kick guest , send (type:kick, data:{host:self}) ?
-        - join -> if chall not set:
-                    guest accept invite, 
-                    remove from invited list,
-                    set guest to challenger, send (type:accepted)
-                    send gamesettings to challenger send (type:settings)
-                if chall set:
-                    responds busy : (type:busy)
-        - ready -> start game if everyone say ready, send to all (type:start)
-
-        - invite : receive invitation for other game
-
-in game: -> loop
-    from wbs and from cs:
-        - paddle 
-        - pause 
-        - resume
-
-    loop send to -> host (self.send_json)
-                 -> guest (self.channel_layer.send(guestname)) 
-
-
-    cs.guest / game.join
-cs -> guest
-in lobby:
-    from wbs:
-        - join -> send join (type:join, guest:self), 
-                    receive (type:accepted), (type:settings)
-                    set cs to guest
-                    or receive (type:busy)
-        - quit -> send quit (type:quit), 
-        - ready -> start game if everyone say ready, send to all (type:start)
-
-    from cs:
-        - game update -> send to cl 
-        - kick -> kicked from game
-        - accepted -> accepted in game
-        - settings -> game data
-        - ready -> host is ready to fight
-        - busy -> match is busy
-        - cancel -> invitation not valid anymore
-
-
-in game: 
-from wbs: -> to cs (send.channel_layer.send(hostname))
-    - paddle
-    - pause
-    - resume
-
-from cs: to cl (self.send_json)
-    - paddle
-    - pause
-    - resume
-
-
-cshost.sendto(guestname)
-csguest.sendto(hostname)
-
-
-
-annuler l'invitation de borys
-{
-    "message":"game.cancel",
-    "data":"borys",
-}
-
-
+tournament : 
+        F
