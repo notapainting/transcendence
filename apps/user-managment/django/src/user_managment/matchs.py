@@ -17,9 +17,13 @@ class MatchResults(models.Model):
     def __str__(self):
         return f"{self.match_end}: {self.host_name} {self.host_score} - {self.client_score} {self.client_name}"
 
-# Json test:
-# curl -k -X POST -H "Content-Type: application/json" -d @match1.json https://localhost:8443/matchsinfos/
-# curl -k -X GET  https://localhost:8443/matchsinfos/
-# curl -k -X POST -H "Content-Type: application/json" -d @match1.json https://localhost:443/matchsinfos/
-# curl -k -X POST -H "Content-Type: application/json" -d @match1.json https://localhost:443/matchsinfos/ && curl -k -X POST -H "Content-Type: application/json" -d @match2.json https://localhost:443/matchsinfos/ && curl -k -X POST -H "Content-Type: application/json" -d @match3.json https://localhost:443/matchsinfos/ && curl -k -X POST -H "Content-Type: application/json" -d @match4.json https://localhost:443/matchsinfos/ && curl -k -X POST -H "Content-Type: application/json" -d @match5.json https://localhost:443/matchsinfos/
-# curl -k -X GET  https://localhost:443/matchsinfos/
+# Json's model send by the game:
+#   {
+#     "host":"host's name", 
+#     "host_score":"host's score", 
+#     "host_powerups":"host's number of powerups", 
+#     "client":"client's name", 
+#     "client_score":"client's score",
+#     "client_powerups":"client's number of powerups",
+#     "match_start":"2024-05-21T11:01:44.496921Z"
+#   }

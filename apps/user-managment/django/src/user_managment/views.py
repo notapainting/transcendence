@@ -73,6 +73,17 @@ from rest_framework.parsers import JSONParser
 from io import BytesIO
 from .serializers import MatchSerializer
 
+# Json's model send by the game:
+#   {
+#     "host":"host's name", 
+#     "host_score":"host's score", 
+#     "host_powerups":"host's number of powerups", 
+#     "client":"client's name", 
+#     "client_score":"client's score",
+#     "client_powerups":"client's number of powerups",
+#     "match_start":"2024-05-21T11:01:44.496921Z"
+#   }
+
 def parse_json(data):
     return JSONParser().parse(BytesIO(data))
 

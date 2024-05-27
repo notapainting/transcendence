@@ -3,7 +3,6 @@ from django.contrib.auth.hashers import make_password
 import uuid
 from .matchs import MatchResults
 
-	
 from rest_framework import serializers
 
 
@@ -21,8 +20,6 @@ class UserSerializer(serializers.ModelSerializer):
 			setattr(instance, attr, value)
 		instance.save()
 		return instance
-
-from  user_managment.models import CustomUser
 
 class MatchSerializer(serializers.ModelSerializer):
 	class Meta:
