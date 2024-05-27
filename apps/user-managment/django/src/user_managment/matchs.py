@@ -3,12 +3,11 @@ from user_managment.models import CustomUser
 
 
 class MatchResults(models.Model):
-    user_one = models.ForeignKey(CustomUser, models.SET_NULL, blank=True, null=True)
+    user_one = models.ForeignKey(CustomUser, models.SET_NULL, blank=True, null=True, related_name="user_1")
     user_one_name = models.CharField(max_length=100, blank=True, null=True)
     user_one_score = models.IntegerField()
     user_one_powerups = models.IntegerField()
-    # user_two = models.ForeignKey(CustomUser, models.SET_NULL, blank=True, null=True)
-    user_two = models.CharField(max_length=100, blank=True, null=True)
+    user_two = models.ForeignKey(CustomUser, models.SET_NULL, blank=True, null=True, related_name="user_2")
     user_two_name = models.CharField(max_length=100, blank=True, null=True)
     user_two_score = models.IntegerField()
     user_two_powerups = models.IntegerField()

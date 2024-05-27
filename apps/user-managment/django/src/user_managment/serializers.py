@@ -22,7 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
 		instance.save()
 		return instance
 
-from django.core.exceptions import ObjectDoesNotExist
 from  user_managment.models import CustomUser
 
 class MatchSerializer(serializers.ModelSerializer):

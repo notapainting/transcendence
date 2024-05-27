@@ -88,9 +88,9 @@ class MatchsInfos(APIView):
                 return Response("User_one not found", status=404)
 
             try:
-            	# u2 = CustomUser.objects.get(username=data["user_two"])
+                u2 = CustomUser.objects.get(username=data["user_two"])
                 data['user_two_name'] = data['user_two']
-                # data['user_two'] = u2.id
+                data['user_two'] = u2.id
             except:
                 return Response("User_two not found", status=404)
 

@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$z&t+&y(==8!@k8nw67ht=u(3e2ineh1(+%a#nm&&xymn_8jtn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # ALLOWED_HOSTS = []
 MEDIA_ROOT = BASE_DIR / 'user_managment/img'
