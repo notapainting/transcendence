@@ -35,10 +35,7 @@
     box-shadow: none;
   }
   
-
 .profile-container {
-    height: 100vh;
-    font-weight: 400;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -47,49 +44,217 @@
 
 .my-profile-container {
     width: 80%;
-    height: 60%;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-between; */
 }
 
-.my-profile h2 {
+.my-profile {
+}
+
+.profile-h3 {
+    font-size: 2rem;
+}
+
+.profile-h2 {
     font-family: Arial, Helvetica, sans-serif;
-    margin-bottom: 20px;
     font-weight: 200;
 }
-
 .profile-sep {
     width: 100%;
     height: 1px;
     background-color: #E6E6E7;
-    margin-bottom: 50px;
+    margin-bottom: 40px;
 }
 
 .info-profile-picture-container {
     display: flex;
+    width: 100%;
     justify-content: space-between;
-    align-items: center;
-}
+    position: relative;
 
+}
 .user-info {
-    width: 65%;
-}
-
-.fill-info-container {
-    padding: 20px;
-    height: 100%;
-}
-
-.fill-info-container h3 {
-    margin-bottom: 20px;
-    font-size: 26px;
+    width: 70%;
 }
 
 .fill-info {
+    display: grid;
+    height: 80%;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.grid-item {
+    display: flex;
+    align-items: center;
+}
+
+.grid-item .text-input {
+    width: 70%;
+    height: 35%;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 22px;
+}
+
+.grid-item label {
+    width: 20%;
+}
+
+.grid-flex {
+    display: flex;
+}
+
+.gender-options {
+    display: flex;
+    width: 70%;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.mini-gender-container {
+    display: flex;
+    align-items: center;
+}
+
+.mini-gender-container label {
+    margin: 0 5px;
+    margin-bottom: 2px;
+}
+
+.mini-gender-container input {
+   width: 20px;
+   height: 20px;
+}
+
+.profile-picture-info {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 30%;
+}
+
+
+.profile-picture {
+    width: 70%; /* Utilisation de % pour rendre la largeur de l'image adaptable */
+    max-width: 300px; /* Taille maximale pour éviter un agrandissement excessif sur les grands écrans */
+    aspect-ratio: 1/1; /* Garde le rapport hauteur/largeur pour maintenir la forme carrée */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 50%;
+    border: 5px solid #ff7675;
+}
+
+.upload-remove {
+    margin-top: 20px;
+}
+
+
+.modify {
+    text-align: center;
+    margin: 0 auto;
+    width: 200px;
+    position: absolute;
+    bottom: 0;
+    left: 30%;
+}
+
+.upload {
+}
+
+.remove {
+}
+
+.security-container {
+    width: 80%;
+    margin-top: 50px;
+}
+
+.password-change {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.container-password {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container-password:not(:first-child) {
+    margin-left: 50px; /* Ajustez la valeur de la marge selon vos besoins */
+}
+
+.container-password label {
+    margin-bottom: 10px;
+}
+
+.password-change input {
+    border-radius: 10px;    font-size: 4rem;
+    text-align: center;
+    font-size: 22px;
+    height: 40px;
+}
+
+.change-password {
+    margin-left: 20px;
+    align-self: flex-end;
+}
+/* 
+two factor */
+
+.two-factor {
+    margin-top: 50px;
+}
+
+.two-factor-display{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Couleur de fond semi-transparente pour obscurcir */
     display: flex;
     align-items: center;
     justify-content: center;
+    display: none;
+    z-index: 2;
 }
 
-.column {
+.two-factor-container {
+    width: 700px;
+    height: 500px;
+    background-color: white;
+    border-radius: 10px;
+    color: black;
+    transform: scale(0);
+    transition: transform 0.2s ease;
+}
+
+.close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    color: black;
+}
+
+.close-btn:hover {
+    color: #ff0000; /* Change la couleur de la croix au survol */
+}
+
+
+
+/* .column {
     flex: 1;
     width: 100%;
     margin-top: 15px;
@@ -142,86 +307,4 @@
 
 .mini-gender-container label {
     margin-left: 5px;
-}
-
-
-.profile-picture-info {
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    height: 25vw; /* Utilisation de vw pour rendre la hauteur égale à 35% de la largeur de la vue */
-    width: 25vw; /* Utilisation de vw pour rendre la largeur égale à 35% de la largeur de la vue */
-}
-
-.profile-picture-info h3 {
-    margin-bottom: 20px;
-    font-size: 2rem;
-}
-
-.profile-picture {
-    width: 70%; /* Utilisation de % pour rendre la largeur de l'image adaptable */
-    max-width: 300px; /* Taille maximale pour éviter un agrandissement excessif sur les grands écrans */
-    aspect-ratio: 1/1; /* Garde le rapport hauteur/largeur pour maintenir la forme carrée */
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    border-radius: 50%;
-}
-
-.upload-remove {
-    margin-top: 20px;
-}
-
-.modify-container {
-    text-align: center;
-    margin-top: 10px;
-}
-
-.modify {
-    text-align: center;
-    margin: 0 auto;
-    width: 200px;
-    margin-top: 53px;
-}
-
-.upload {
-}
-
-.remove {
-}
-
-.security-container {
-    width: 80%;
-    height: 30%;
-}
-
-.password-change {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.container-password {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.container-password label {
-    margin-bottom: 10px;
-}
-
-.password-change input {
-    border-radius: 10px;    font-size: 4rem;
-    text-align: center;
-    font-size: 22px;
-    height: 40px;
-}
-
-.two-factor {
-    margin-top: 20px;
-}
-
+} */

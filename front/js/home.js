@@ -320,13 +320,10 @@ export let logoutRequest = (event) => {
 }
 import { clearView } from "./index.js";
 export const showHome = async () => {
-
-
     let isAuthenticated = await isUserAuthenticated();
     clearView();
     const homeElement = document.querySelector("#home");
     homeElement.style.display = "block";
-
     if (isAuthenticated)
         loggedInStatus();
     const playOfflineBtnElement = document.querySelector(".play-offline-btn");

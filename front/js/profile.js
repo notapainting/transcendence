@@ -136,6 +136,25 @@ let updateUserInfosRequest = async () => {
     });
 }
 
+const twoFactorDisplay = document.querySelector(".two-factor-display");
+const twoFactorContainer = document.querySelector(".two-factor-container");
+
+const displayTwoFactor = (event) => {
+    
+    twoFactorDisplay.style.display = "flex"
+    setTimeout(()=> {
+        twoFactorContainer.style.transform = "scale(1)"
+    }, 200)
+
+}
+
+const closeTwoFactor = (event) => {
+    twoFactorContainer.style.transform = "scale(0)"
+    setTimeout(()=> {
+            twoFactorDisplay.style.display = "none"
+    }, 200)
+} 
+
 
 export const showProfile = async () => {
     await isUserAuthenticated();
@@ -163,4 +182,7 @@ export const showProfile = async () => {
     modifyButton.addEventListener("click", updateUserInfosRequest);
     const uploadButton = document.querySelector(".upload");
     uploadButton.addEventListener("click", modifyProfilePicture)
+    const twoFactorButton = document.querySelector(".two-factor");
+    twoFactorButton.addEventListener("click", displayTwoFactor);
+    document.querySelector(".close-two-factor").addEventListener("click", closeTwoFactor)
 }

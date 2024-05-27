@@ -55,66 +55,59 @@
         </div>
     </div>
     <div id="profile" class="view">
+
         <div class="profile-container">
             <div class="my-profile-container">
                 <div class="my-profile">
-                    <h2>My Profile</h2>
+                    <h2 class="profile-h2">My Profile</h2>
                     <div class="profile-sep"></div>
                 </div>
                 <div class="info-profile-picture-container">
                     <div class="user-info">
-                        <div class="fill-info-container">
-                            <div class="h3-contact-details">
-                                <h3>Contact details</h3>
+                        <h3 class="profile-h3">Contact details</h3>
+                        <div class="fill-info">
+                            <div class="grid-item">
+                                <label for="first-name">First Name</label>
+                                <input class="text-input" type="text" id="first-name" name="first-name">
                             </div>
-                            <div class="fill-info">
-                                <div class="column">
-                                    <div class="row">
-                                        <label for="first-name">First Name</label>
-                                        <input type="text" id="first-name" name="first-name">
+                            <div class="grid-item">
+                                <label for="last-name">Last Name</label>
+                                <input class="text-input" type="text" id="last-name" name="last-name">
+                            </div>
+                            <div class="grid-item">
+                                <label for="username">Username</label>
+                                <input class="text-input" type="text" id="username" name="username">
+                            </div>
+                            <div class="grid-item">
+                                <label for="email">E-mail</label>
+                                <input class="text-input" type="text" id="email" name="email">
+                            </div>
+                            <div class="grid-item grid-flex">
+                                <label>Gender</label>
+                                <div class="gender-options">
+                                    <div class="mini-gender-container">
+                                        <input type="radio" id="male" name="gender" value="male">
+                                        <label for="male">Male</label>
                                     </div>
-                                    <div class="row">
-                                        <label for="last-name">Last Name</label>
-                                        <input type="text" id="last-name" name="last-name">
+                                    <div class="mini-gender-container">
+                                        <input type="radio" id="female" name="gender" value="female">
+                                        <label for="female">Female</label>
                                     </div>
-                                    <div class="row">
-                                        <label for="username">Username</label>
-                                        <input type="text" id="username" name="username">
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <div class="row row-margin">
-                                        <label for="email">E-mail</label>
-                                        <input type="text" id="email" name="email">
-                                    </div>
-                                    <div class="row row-margin">
-                                        <label>Gender</label>
-                                        <div class="gender-options">
-                                            <div class="mini-gender-container">
-                                                <input type="radio" id="male" name="gender" value="male">
-                                                <label for="male">Male</label>
-                                            </div>
-                                            <div class="mini-gender-container">
-                                                <input type="radio" id="female" name="gender" value="female">
-                                                <label for="female">Female</label>
-                                            </div>
-                                            <div class="mini-gender-container">
-                                                <input type="radio" id="other" name="gender" value="other">
-                                                <label for="other">Other</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row row-margin">
-                                        <label for="date-of-birth">Date <br>of Birth</label>
-                                        <input type="date" id="date-of-birth" name="date-of-birth">
+                                    <div class="mini-gender-container">
+                                        <input type="radio" id="other" name="gender" value="other">
+                                        <label for="other">Other</label>
                                     </div>
                                 </div>
-                            </div>  
-                            <div class="modify-container"><button class="profile-btn modify">MODIFY</button></div>    
-                        </div>
+                            </div>
+                            <div class="grid-item">
+                                <label for="date-of-birth">Date <br>of Birth</label>
+                                <input class="text-input" type="date" id="date-of-birth" name="date-of-birth">
+                            </div>
+                        </div>  
+                        <button class="profile-btn modify">MODIFY</button>
                     </div>
                     <div class="profile-picture-info">
-                        <h3>Upload your profile photo</h3>
+                        <h3 class="profile-h3">Upload your profile photo</h3>
                         <div class="profile-picture"></div>
                         <div class="upload-remove">
                             <button class="profile-btn upload">UPLOAD</button>
@@ -123,11 +116,11 @@
                     </div>
                 </div>
             </div>
-            <div class="security-container">
+            <div class="my-profile-container">
                 <div class="security">
-                    <h2>Security</h2>
+                    <h2 class="profile-h2">Security</h2>
                     <div class="profile-sep"></div>
-                    <h3>Change Password</h3>
+                    <h3 class="profile-h3">Change Password</h3>
                     <div class="password-change">
                         <div class="container-password">
                             <label for="">Current Password</label>
@@ -141,9 +134,17 @@
                             <label for="">Retype Password</label>
                             <input type="password">
                         </div>
+                        <button class="profile-btn change-password">CHANGE PASSWORD</button>
                     </div>
                     <button class="profile-btn two-factor">ENABLE 2FA</button>
                 </div>
+            </div>
+
+            </div>
+        </div>
+        <div class="two-factor-display">
+            <div class="two-factor-container">
+                <span class="close-btn close-two-factor">&times;</span>
             </div>
         </div>
     </div>
