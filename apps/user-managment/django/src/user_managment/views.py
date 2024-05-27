@@ -80,6 +80,7 @@ class MatchsInfos(APIView):
     def post(self, request):
             data = JSONParser().parse(request)
 
+            # Find the Users in the DB from the str given in the json
             try:
                 u1 = CustomUser.objects.get(username=data["user_one"])
                 data['user_one_name'] = data['user_one']
@@ -94,6 +95,7 @@ class MatchsInfos(APIView):
             except:
                 return Response("User_two not found", status=404)
 
+            # Serialize the information for the storage of the match's info in the DB
             new_match = MatchSerializer(data=data)
             if new_match.is_valid():
                 new_match.save()
@@ -112,8 +114,8 @@ class MatchsInfos(APIView):
 class UserMatchsInfos(APIView):
     def get(self, request, **args):
         name = args.get('name', None)
-        print(name)
 
+        # Search the username given in the url in the MatchResults' DB
         user_matchs = MatchResults.objects.filter(user_one_name=name) | MatchResults.objects.filter(user_two_name=name)
         serialzer = MatchSerializer(user_matchs, many=True)
         return Response(serialzer.data, status=200)
