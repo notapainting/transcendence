@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
 from django.core.exceptions import ObjectDoesNotExist
 from  user_managment.models import CustomUser
 
-class UserRelatedField(serializers.RelatedField):
+class UserMatchRelatedField(serializers.RelatedField):
     def to_representation(self, value):
         return str(value)
     def to_internal_value(self, data):
@@ -39,5 +39,5 @@ class MatchSerializer(serializers.ModelSerializer):
 		model = MatchResults
 		fields = ['user_one', 'user_one_score', 'user_one_powerups','user_two', 'user_two_score', 'user_two_powerups', 'match_start', 'match_end']
 
-		user_one = UserRelatedField(queryset=CustomUser.objects.all())
+		user_one = UserMatchRelatedField(queryset=CustomUser.objects.all())
 		# user_two = UserRelatedField(queryset=CustomUser.objects.all())

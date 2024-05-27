@@ -79,19 +79,18 @@ def parse_json(data):
 class MatchsInfos(APIView):
 	def post(self, request):
 			data = JSONParser().parse(request)
-			userOne = data["user_one"]
-			u = CustomUser.objects.get(username=userOne)
-			data['user_one'] = u.id
+
+			try:
+				u = CustomUser.objects.get(username=data["user_one"])
+				data['user_one'] = u.id
+			except:
+				return Response("User_one not found", status=404)
 
 			new_match = MatchSerializer(data=data)
 			if new_match.is_valid():
 				new_match.save()
 				return Response("Match saved", status=200)
 
-			if not hasattr(new_match, 'user_one'):
-				return Response("user_one unknown", status=500)
-			if not hasattr(new_match, 'user_two'):
-				return Response("user_two unknown", status=500)
 			return Response("POST: Something went wrong =(", status=500)
 
 	def get(self, request):
