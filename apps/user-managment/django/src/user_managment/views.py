@@ -82,16 +82,16 @@ class MatchsInfos(APIView):
 
             # Find the Users in the DB from the str given in the json
             try:
-                u1 = CustomUser.objects.get(username=data["user_one"])
-                data['user_one_name'] = data['user_one']
-                data['user_one'] = u1.id
+                u1 = CustomUser.objects.get(username=data["host"])
+                data['host_name'] = data['host']
+                data['host'] = u1.id
             except:
                 return Response("User_one not found", status=404)
 
             try:
-                u2 = CustomUser.objects.get(username=data["user_two"])
-                data['user_two_name'] = data['user_two']
-                data['user_two'] = u2.id
+                u2 = CustomUser.objects.get(username=data["client"])
+                data['client_name'] = data['client']
+                data['client'] = u2.id
             except:
                 return Response("User_two not found", status=404)
 
@@ -116,7 +116,7 @@ class UserMatchsInfos(APIView):
         name = args.get('name', None)
 
         # Search the username given in the url in the MatchResults' DB
-        user_matchs = MatchResults.objects.filter(user_one_name=name) | MatchResults.objects.filter(user_two_name=name)
+        user_matchs = MatchResults.objects.filter(host_name=name) | MatchResults.objects.filter(client_name=name)
         serialzer = MatchSerializer(user_matchs, many=True)
         return Response(serialzer.data, status=200)
         

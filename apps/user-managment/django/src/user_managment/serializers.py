@@ -27,4 +27,4 @@ from  user_managment.models import CustomUser
 class MatchSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = MatchResults
-		fields = ['user_one', 'user_one_name', 'user_one_score', 'user_one_powerups','user_two', 'user_two_name', 'user_two_score', 'user_two_powerups', 'match_start', 'match_end']
+		fields = ['host', 'host_name', 'host_score', 'host_powerups','client', 'client_name', 'client_score', 'client_powerups', 'match_start', 'match_end']

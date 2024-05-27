@@ -1,9 +1,9 @@
 {
-    "user_one":"satan", 
-    "user_one_score":"1", 
-    "user_one_powerups":"0", 
-    "user_two":"julien", 
-    "user_two_score":"1",
-    "user_two_powerups":"0",
+    "host":"satan", 
+    "host_score":"1", 
+    "host_powerups":"0", 
+    "client":"julien", 
+    "client_score":"1",
+    "client_powerups":"0",
     "match_start":"2024-05-21T11:01:44.496921Z"
 }
