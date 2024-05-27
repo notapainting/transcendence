@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-1nyh3mrd0y28m&^yw2+0j&p_7e^w9mr5cvf@1rxqa11*jk1gaa'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 #Change current User by CustomUser
 AUTH_USER_MODEL = 'auth_service.CustomUser'

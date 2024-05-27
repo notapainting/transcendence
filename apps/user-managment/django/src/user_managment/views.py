@@ -79,16 +79,14 @@ def parse_json(data):
 class MatchsInfos(APIView):
 	def post(self, request):
 			data = JSONParser().parse(request)
+			userOne = data["user_one"]
+			u = CustomUser.objects.get(username=userOne)
+			data['user_one'] = u.id
+
 			new_match = MatchSerializer(data=data)
-
-			print(new_match)
-
 			if new_match.is_valid():
 				new_match.save()
 				return Response("Match saved", status=200)
-
-			print(new_match.is_valid())
-			print(hasattr(new_match, 'user_one'))
 
 			if not hasattr(new_match, 'user_one'):
 				return Response("user_one unknown", status=500)

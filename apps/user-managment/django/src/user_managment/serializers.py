@@ -22,8 +22,22 @@ class UserSerializer(serializers.ModelSerializer):
 		instance.save()
 		return instance
 
+from django.core.exceptions import ObjectDoesNotExist
+from  user_managment.models import CustomUser
+
+class UserRelatedField(serializers.RelatedField):
+    def to_representation(self, value):
+        return str(value)
+    def to_internal_value(self, data):
+        try :
+            return CustomUser.objects.get(username=data)
+        except ObjectDoesNotExist:
+            raise serializers.ValidationError({'User': 'User not found'})
+
 class MatchSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = MatchResults
-		# fields = ['user_one', 'user_one_score', 'user_one_powerups','user_two', 'user_two_score', 'user_two_powerups', 'match_start', 'match_end']
-		fields = '__all__'
+		fields = ['user_one', 'user_one_score', 'user_one_powerups','user_two', 'user_two_score', 'user_two_powerups', 'match_start', 'match_end']
+
+		user_one = UserRelatedField(queryset=CustomUser.objects.all())
+		# user_two = UserRelatedField(queryset=CustomUser.objects.all())
