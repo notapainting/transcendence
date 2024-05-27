@@ -37,7 +37,7 @@ class UserMatchRelatedField(serializers.RelatedField):
 class MatchSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = MatchResults
-		fields = ['user_one', 'user_one_score', 'user_one_powerups','user_two', 'user_two_score', 'user_two_powerups', 'match_start', 'match_end']
+		fields = ['user_one', 'user_one_name', 'user_one_score', 'user_one_powerups','user_two', 'user_two_name', 'user_two_score', 'user_two_powerups', 'match_start', 'match_end']
 
 		user_one = UserMatchRelatedField(queryset=CustomUser.objects.all())
 		# user_two = UserRelatedField(queryset=CustomUser.objects.all())
