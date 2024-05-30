@@ -140,11 +140,29 @@ const twoFactorDisplay = document.querySelector(".two-factor-display");
 const twoFactorContainer = document.querySelector(".two-factor-container");
 
 const displayTwoFactor = (event) => {
-    
+    isUserAuthenticated()
     twoFactorDisplay.style.display = "flex"
     setTimeout(()=> {
         twoFactorContainer.style.transform = "scale(1)"
     }, 200)
+    fetch('/auth/activate2FA/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const qrImgBase64 = data.qr_img;
+        const qrImgElement = document.querySelector(".qr-code-img");
+        qrImgElement.src = 'data:image/png;base64,' + qrImgBase64; // Définir la source de l'image sur l'image QR base64
+        qrImgElement.alt = 'QR Code'; // Ajouter une description alternative pour l'image
+        const manualCodeElement = document.querySelector(".manual-code");
+        manualCodeElement.innerText = 'Manual code : ' + data.secret_key;
+    })
+    .catch(error => {
+        document.getElementById('activate2FAResponse').innerText = 'Erreur : ' + error.message;
+    });
 
 }
 
@@ -154,6 +172,28 @@ const closeTwoFactor = (event) => {
             twoFactorDisplay.style.display = "none"
     }, 200)
 } 
+
+const confirm2FaRequest = (event) => {
+    isUserAuthenticated()
+    const code = document.querySelector(".input-f2a-activation").value;
+    const data = {
+        code: code
+    };
+    fetch('/auth/confirm2FA/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("gg wp !")
+    })
+    .catch(error => {
+        
+    });
+}
 
 
 export const showProfile = async () => {
@@ -185,4 +225,6 @@ export const showProfile = async () => {
     const twoFactorButton = document.querySelector(".two-factor");
     twoFactorButton.addEventListener("click", displayTwoFactor);
     document.querySelector(".close-two-factor").addEventListener("click", closeTwoFactor)
+    const activate2FaButton = document.querySelector(".activate-2fa");
+    activate2FaButton.addEventListener("click", confirm2FaRequest);
 }
