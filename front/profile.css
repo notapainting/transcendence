@@ -237,7 +237,24 @@ two factor */
     color: black;
     transform: scale(0);
     transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
 }
+
+.two-factor-container input {
+    border-radius: 20px; 
+    border: 1px solid #ccc; 
+    padding: 10px 15px;
+    font-size: 16px;
+    width: 50%;
+    height: 50px;
+    margin: 20px 0 30px 0;
+    font-size: 30px;
+    text-align: center;
+}
+
 
 .close-btn {
     position: absolute;
@@ -250,6 +267,22 @@ two factor */
 
 .close-btn:hover {
     color: #ff0000; /* Change la couleur de la croix au survol */
+}
+
+.manual-code {
+    text-align: center;
+}
+
+.manual-qrcode-container {
+    display: flex;
+    margin: 5px;
+    align-items: center;
+}
+
+.activate-2fa {
+    width: 35%;
+
+    text-align: center;
 }
 
 
