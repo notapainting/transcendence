@@ -29,6 +29,9 @@ let determineGender = (gender) => {
     }
 };
 
+const activate2FaButton = document.querySelector(".activate-2fa");
+const twoFactorButton = document.querySelector(".two-factor");
+
 let displayUserInformations = (data) => {
     usernameInput.value = data.username || "";
     usernameInput.placeholder = !data.username ? "Not Defined" : "";
@@ -42,6 +45,16 @@ let displayUserInformations = (data) => {
     dateOfBirthInput.placeholder = !data.date_of_birth ? "Not Defined" : "";
     profilePictureImage.style.backgroundImage = `url("${data.profile_picture}")`
     determineGender(data.gender);
+    if (data.is_2fa_enabled){ 
+        twoFactorButton.removeEventListener("click", displayTwoFactorActivation);
+        twoFactorButton.innerText = 'DISABLE 2FA';
+    }
+
+    else{
+        twoFactorButton.addEventListener("click", displayTwoFactorActivation);
+        twoFactorButton.innerText = 'ENABLE 2FA';
+    }
+    
 };
 
 const modifyProfilePicture = async () => {
@@ -135,7 +148,6 @@ let updateUserInfosRequest = async () => {
         console.error('Erreur lors de la mise à jour des informations de l\'utilisateur:', error);
     });
 }
-
 const twoFactorDisplay = document.querySelector(".two-factor-display");
 const twoFactorContainer = document.querySelector(".two-factor-container");
 
@@ -172,8 +184,6 @@ const closeTwoFactorActivate = (event) => {
             twoFactorDisplay.style.display = "none"
     }, 200)
 } 
-const activate2FaButton = document.querySelector(".activate-2fa");
-const twoFactorButton = document.querySelector(".two-factor");
 
 const confirm2FaRequest = async (event) => {
     await isUserAuthenticated()
@@ -191,8 +201,7 @@ const confirm2FaRequest = async (event) => {
     .then(response => response.json())
     .then(data => {
         closeTwoFactorActivate();
-        twoFactorButton.innerText = `DISABLE 2FA`;
-        twoFactorButton.style.backgoundColor = 'green';
+        window.location.reload();
     })
     .catch(error => {
         
@@ -226,9 +235,7 @@ export const showProfile = async () => {
     modifyButton.addEventListener("click", updateUserInfosRequest);
     const uploadButton = document.querySelector(".upload");
     uploadButton.addEventListener("click", modifyProfilePicture)
-
     twoFactorButton.addEventListener("click", displayTwoFactorActivation);
     document.querySelector(".close-two-factor").addEventListener("click", closeTwoFactorActivate)
-
     activate2FaButton.addEventListener("click", confirm2FaRequest);
 }

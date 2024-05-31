@@ -1,4 +1,5 @@
 import { navigateTo } from "./index.js";
+import { clearView } from "./index.js";
 
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
@@ -146,21 +147,27 @@ const loggedInStatus = () => {
 
 const twoFactorDisplay = document.querySelector(".two-factor-display");
 const twoFactorContainerLogin = document.querySelector(".two-factor-container-login");
+const login2faButton = document.querySelector(".login-2fa")
 
-const displayTwoFactorLogin = async ()  => {
-    twoFactorDisplay.style.display = "flex"
+
+
+const closeTwoFactorLogin = (event) => {
+    login2faButton.removeEventListener("click", loginRequest);
+    twoFactorContainerLogin.style.transform = "scale(0)"
     setTimeout(()=> {
-        twoFactorContainerLogin.style.transform = "scale(1)"
+            twoFactorDisplay.style.display = "none"
     }, 200)
-}
+} 
 
 const loginRequest = (event) => {
     const dataSend = {
         username: homeEmailUsernameInput.value,
         password: homePasswordInput.value
     };
-    console.log(dataSend.username)
-    console.log(dataSend.password)
+    const input2FaLoginValue = document.querySelector(".input-f2a-login").value;
+    if (input2FaLoginValue) {
+        dataSend.code = input2FaLoginValue;
+    }
     fetch('/auth/token/', {
         method: 'POST',
         headers: {
@@ -171,6 +178,7 @@ const loginRequest = (event) => {
     .then(response => {
         if (response.ok){
             loggedInStatus();
+            closeTwoFactorLogin();
             return response.json();
         } else if (response.status === 403) {
             return response.json().then(data => {
@@ -192,11 +200,17 @@ const loginRequest = (event) => {
         return null;
     })
     .then(data => {
-        // loggedInStatus(data);
     })  
     .catch(error => {
-        console.log("Login Error:", error.message);
     })
+}
+
+const displayTwoFactorLogin = async ()  => {
+    twoFactorDisplay.style.display = "flex"
+    setTimeout(()=> {
+        twoFactorContainerLogin.style.transform = "scale(1)"
+    }, 200)
+    login2faButton.addEventListener("click", loginRequest);
 }
 
 const registerRequest = (event) => {
@@ -339,14 +353,7 @@ export let logoutRequest = (event) => {
         console.error('Erreur:', error);
     });
 }
-import { clearView } from "./index.js";
 
-const closeTwoFactorLogin = (event) => {
-    twoFactorContainerLogin.style.transform = "scale(0)"
-    setTimeout(()=> {
-            twoFactorDisplay.style.display = "none"
-    }, 200)
-} 
 
 export const showHome = async () => {
     let isAuthenticated = await isUserAuthenticated();
