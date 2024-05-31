@@ -43,7 +43,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 		data = super().validate(attrs)
 		user = self.user
 		if not user.isVerified:
-			raise AuthenticationFailed('Email non vérifié.')
+			raise AuthenticationFailed('Email not verified.')
+		if user.is_2fa_enabled:
+		# Authentification à deux facteurs activée, retourner une réponse d'erreur
+			raise AuthenticationFailed('Two Factor Authentification needed.')
 		user_data = {'username':user.username}
 		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data)
 		if response.status_code == 200:
@@ -76,17 +79,21 @@ class GetUserPersonnalInfos(APIView):
 class CustomTokenObtainPairView(TokenObtainPairView):
 	serializer_class = CustomTokenObtainPairSerializer
 	def post(self, request, *args, **kwargs):
-		# Appeler la méthode post de la classe parent pour obtenir la réponse
-		response = super().post(request, *args, **kwargs)
-		# Récupérer les jetons d'accès et de rafraîchissement
-		access_token = response.data.get('access')
-		refresh_token = response.data.get('refresh')
-		response.data.pop('access', None)
-		response.data.pop('refresh', None)
-		# Ajouter les cookies à la réponse
-		response.set_cookie(key='access', value=access_token, httponly=True)
-		response.set_cookie(key='refresh', value=refresh_token, httponly=True)
-		return response
+		try:
+			response = super().post(request, *args, **kwargs)
+			access_token = response.data.get('access')
+			refresh_token = response.data.get('refresh')
+			response.data.pop('access', None)
+			response.data.pop('refresh', None)
+
+			# Ajouter les cookies à la réponse
+			response.set_cookie(key='access', value=access_token, httponly=True)
+			response.set_cookie(key='refresh', value=refresh_token, httponly=True)
+			return response
+		except AuthenticationFailed as e:
+			return Response(e.detail, status=status.HTTP_403_FORBIDDEN)
+		
+
 
 def verify_email(request, uidb64, token):
 	try:
@@ -355,6 +362,21 @@ class Activate2FAView(APIView):
 		user.save()
 
 		return Response({'qr_img': qr_base64, 'secret_key': secret_key}, status=status.HTTP_200_OK)
+
+
+class login2Fa(APIView):
+	authentication_classes = [JWTAuthentication]
+	def post(self, request):
+		access_token_cookie = request.COOKIES.get('access')
+		user = get_user_from_access_token(access_token_cookie)
+		if request.method == 'POST':
+			code = request.data.get('code')
+			secret_key = user.secret_key
+			if pyotp.TOTP(secret_key).verify(code):
+				
+				return Response({'success': True})
+			else:
+				return Response({'success': False, 'error': 'Code incorrect'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Confirm2FAView(APIView):

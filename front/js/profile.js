@@ -139,8 +139,8 @@ let updateUserInfosRequest = async () => {
 const twoFactorDisplay = document.querySelector(".two-factor-display");
 const twoFactorContainer = document.querySelector(".two-factor-container");
 
-const displayTwoFactor = (event) => {
-    isUserAuthenticated()
+const displayTwoFactorActivation = async (event) => {
+    await isUserAuthenticated()
     twoFactorDisplay.style.display = "flex"
     setTimeout(()=> {
         twoFactorContainer.style.transform = "scale(1)"
@@ -166,15 +166,17 @@ const displayTwoFactor = (event) => {
 
 }
 
-const closeTwoFactor = (event) => {
+const closeTwoFactorActivate = (event) => {
     twoFactorContainer.style.transform = "scale(0)"
     setTimeout(()=> {
             twoFactorDisplay.style.display = "none"
     }, 200)
 } 
+const activate2FaButton = document.querySelector(".activate-2fa");
+const twoFactorButton = document.querySelector(".two-factor");
 
-const confirm2FaRequest = (event) => {
-    isUserAuthenticated()
+const confirm2FaRequest = async (event) => {
+    await isUserAuthenticated()
     const code = document.querySelector(".input-f2a-activation").value;
     const data = {
         code: code
@@ -188,7 +190,9 @@ const confirm2FaRequest = (event) => {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("gg wp !")
+        closeTwoFactorActivate();
+        twoFactorButton.innerText = `DISABLE 2FA`;
+        twoFactorButton.style.backgoundColor = 'green';
     })
     .catch(error => {
         
@@ -222,9 +226,9 @@ export const showProfile = async () => {
     modifyButton.addEventListener("click", updateUserInfosRequest);
     const uploadButton = document.querySelector(".upload");
     uploadButton.addEventListener("click", modifyProfilePicture)
-    const twoFactorButton = document.querySelector(".two-factor");
-    twoFactorButton.addEventListener("click", displayTwoFactor);
-    document.querySelector(".close-two-factor").addEventListener("click", closeTwoFactor)
-    const activate2FaButton = document.querySelector(".activate-2fa");
+
+    twoFactorButton.addEventListener("click", displayTwoFactorActivation);
+    document.querySelector(".close-two-factor").addEventListener("click", closeTwoFactorActivate)
+
     activate2FaButton.addEventListener("click", confirm2FaRequest);
 }

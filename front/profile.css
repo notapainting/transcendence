@@ -9,25 +9,22 @@
 
 
 .profile-btn {
-    --bg: #000;
-    --hover-bg: #ff90e8;
-    --hover-text: #000;
     color: #fff;
     cursor: pointer;
     border: none;
     border-radius: 4px;
     padding: 0.8em 2em;
-    background: var(--bg);
+    background-color: black;
     font-weight: bold;
     font-size: 16px;
     transition: 0.2s;
   }
   
   .profile-btn:hover {
-    color: var(--hover-text);
+    color: black;
     transform: translate(-0.25rem, -0.25rem);
-    background: var(--hover-bg);
-    box-shadow: 0.25rem 0.25rem var(--bg);
+    background-color: #ff90e8;
+    box-shadow: 0.25rem 0.25rem black;
   }
   
   .profile-btn:active {
@@ -243,7 +240,8 @@ two factor */
 
 }
 
-.two-factor-container input {
+
+.input-f2a-activation {
     border-radius: 20px; 
     border: 1px solid #ccc; 
     padding: 10px 15px;
