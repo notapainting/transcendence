@@ -29,7 +29,7 @@ class UserCreate(APIView):
 
 from django.core.exceptions import ValidationError
 from django.utils.dateparse import parse_date
-
+from PIL import Image
 class UpdateClientInfo(APIView):
 	def put(self, request, *args, **kwargs):
 		try:
@@ -40,6 +40,13 @@ class UpdateClientInfo(APIView):
 		serializer = UserSerializer(instance=user, data=request.data, partial=True)
 		for key, value in data.items():
 			if key == 'profile_picture':
+				try:
+					img = Image.open(value)
+					if img.format not in ['PNG', 'JPEG', 'JPG']:
+						return Response({"error": "Profile picture must be a PNG or JPEG image"},
+										status=status.HTTP_400_BAD_REQUEST)
+				except Exception as e:
+					return Response({"error": "Invalid image file"}, status=status.HTTP_400_BAD_REQUEST)
 				# Si la clé est 'profile_picture'
 				user.profile_picture.delete(save=False)
 				user.profile_picture.save(f"{user.username}.jpg", value, save=True)
