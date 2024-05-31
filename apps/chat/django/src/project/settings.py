@@ -4,7 +4,6 @@ from pathlib import Path
 from os import getenv
 from socket import SOCK_STREAM
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_URLCONF = 'project.urls'
 
@@ -16,7 +15,7 @@ TIME_ZONE = 'CET'
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-0#_lx+w5u%tmt2kl*9li+!(3jdtc3re@ihht6#hn2!p8-90j_v'
+SECRET_KEY = 'django-insecure-0#_lx+w5u%tmt2kl*9li+!(3jdtc3re@ihht6#hn2!p8-90j_v'
 
 ALLOWED_HOSTS = ['*']
 CSRF_COOKIE_SECURE = False
@@ -60,7 +59,6 @@ DATABASES = {
     }
 }
 
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -81,6 +79,16 @@ LOGGING = {
             "socktype": SOCK_STREAM,
             "formatter" : "logstash",
         },
+        # 'logstash': {
+        #     'level': 'DEBUG',
+        #     'class': 'logstash.TCPLogstashHandler',
+        #     'host': 'logstash',   # IP/name of our Logstash EC2 instance
+        #     'port': 5141,
+        #     'version': 1,
+        #     'message_type': 'logstash',
+        #     'fqdn': True,
+        #     'tags': ['myapp'],
+        # }
     },
     "loggers": {
         "": {

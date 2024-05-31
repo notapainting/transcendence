@@ -1,0 +1,39 @@
+filebeat.config.modules:
+  path: /usr/share/filebeat/modules.d/*.yml
+  reload.enabled: false
+
+filebeat.inputs:
+  - type: filestream
+    id: filebeat
+    paths:
+      - '/var/lib/docker/containers/*/*.log'
+
+processors:
+  - add_docker_metadata:
+      host: "unix:///var/run/docker.sock"
+
+setup.kibana:
+  host: ${KIBANA_HOSTS}
+  username: ${ELASTIC_USER}
+  password: ${ELASTIC_PASSWORD}
+  setup.dashboards.enable: true
+
+output.logstash:
+  hosts: ${LOGSTASH_HOSTS}
+
+logging.json: true
+logging.metrics.enabled: false
+setup.ilm.enabled: true
+json.keys_under_root: true
+json.add_error_key: true
+json.message_key: message
+
+# output.elasticsearch:
+#   hosts: ${ELASTIC_HOSTS}
+#   username: ${ELASTIC_USER}
+#   password: ${ELASTIC_PASSWORD}
+#   ssl.enabled: true
+#   ssl.certificate_authorities: "config/certs/ca/ca.crt"
+#   indices:
+#       - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+
