@@ -360,6 +360,22 @@ input:focus::placeholder {
 }
 
 
+.two-factor-container-login {
+    width: 700px;
+    height: 500px;
+    background-color: white;
+    position: absolute;
+    border-radius: 10px;
+    color: black;
+    transform: scale(0);
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
   /* chat */
 
   #chat {

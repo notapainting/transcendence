@@ -144,6 +144,16 @@ const loggedInStatus = () => {
     }, 100)
 }
 
+const twoFactorDisplay = document.querySelector(".two-factor-display");
+const twoFactorContainerLogin = document.querySelector(".two-factor-container-login");
+
+const displayTwoFactorLogin = async ()  => {
+    twoFactorDisplay.style.display = "flex"
+    setTimeout(()=> {
+        twoFactorContainerLogin.style.transform = "scale(1)"
+    }, 200)
+}
+
 const loginRequest = (event) => {
     const dataSend = {
         username: homeEmailUsernameInput.value,
@@ -160,15 +170,26 @@ const loginRequest = (event) => {
     })
     .then(response => {
         if (response.ok){
-
             loggedInStatus();
             return response.json();
-        }
-        else {
+        } else if (response.status === 403) {
+            return response.json().then(data => {
+                messageBox.style.backgroundColor = "#f44336";
+                if (data.detail === 'Two Factor Authentification needed.') {
+                    displayTwoFactorLogin();
+                }
+                else {
+                    messageBox.innerHTML = `${data.detail} <span" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+                    messageBox.style.transform = "scale(1)";
+                }
+
+            });
+        } else {
             messageBox.style.backgroundColor = "#f44336";
             messageBox.innerHTML = `Username / e-mail or password incorrect.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
             messageBox.style.transform = "scale(1)";
         }
+        return null;
     })
     .then(data => {
         // loggedInStatus(data);
@@ -319,6 +340,14 @@ export let logoutRequest = (event) => {
     });
 }
 import { clearView } from "./index.js";
+
+const closeTwoFactorLogin = (event) => {
+    twoFactorContainerLogin.style.transform = "scale(0)"
+    setTimeout(()=> {
+            twoFactorDisplay.style.display = "none"
+    }, 200)
+} 
+
 export const showHome = async () => {
     let isAuthenticated = await isUserAuthenticated();
     clearView();
@@ -340,6 +369,7 @@ export const showHome = async () => {
         document.addEventListener('wheel', adjustZoom);
     })
     document.addEventListener("click", switchForm);
+    document.querySelector(".close-two-factor-login").addEventListener("click", closeTwoFactorLogin)
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
     const logoutButton = document.querySelector(".fa-right-from-bracket");
     logoutButton.addEventListener("click", logoutRequest);
