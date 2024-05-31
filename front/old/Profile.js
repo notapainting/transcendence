@@ -89,4 +89,5 @@ export const showProfile = () => {
     document.querySelector("#Profile").style.display = "block";
     console.log(document.querySelector(".profile-button"));
     document.querySelector(".profile-button").addEventListener('click', updateClientRequest);
+    
 };

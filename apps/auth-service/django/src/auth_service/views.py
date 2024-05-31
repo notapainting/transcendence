@@ -43,12 +43,26 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 		data = super().validate(attrs)
 		user = self.user
 		if not user.isVerified:
-			raise AuthenticationFailed('Email non vérifié.')
-		user_data = {'username':user.username}
-		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data)
-		if response.status_code == 200:
-			user_info = response.json()
-			data.update(user_info)
+			raise AuthenticationFailed('Email not verified.')
+		if user.is_2fa_enabled:
+			code = self.context['request'].data.get('code')
+			if not code:
+				raise AuthenticationFailed('Two Factor Authentification needed.')
+
+			secret_key = user.secret_key
+			if pyotp.TOTP(secret_key).verify(code):
+
+				user_data = {'username': user.username}
+				response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data)
+				if response.status_code == 200:
+					user_info = response.json()
+					data.update(user_info)
+				return data
+			else:
+
+				raise AuthenticationFailed('Incorrect 2FA code. Please try again.', code='invalid_2fa_code')
+
+
 		return data
 
 class LogoutRequest(APIView):
@@ -68,6 +82,7 @@ class GetUserPersonnalInfos(APIView):
 		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data)
 		if response.status_code == 200:
 			user_info = response.json()
+			user_info['is_2fa_enabled'] = user.is_2fa_enabled
 			return Response(user_info, status=status.HTTP_200_OK)
 		else:
 			return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -76,17 +91,21 @@ class GetUserPersonnalInfos(APIView):
 class CustomTokenObtainPairView(TokenObtainPairView):
 	serializer_class = CustomTokenObtainPairSerializer
 	def post(self, request, *args, **kwargs):
-		# Appeler la méthode post de la classe parent pour obtenir la réponse
-		response = super().post(request, *args, **kwargs)
-		# Récupérer les jetons d'accès et de rafraîchissement
-		access_token = response.data.get('access')
-		refresh_token = response.data.get('refresh')
-		response.data.pop('access', None)
-		response.data.pop('refresh', None)
-		# Ajouter les cookies à la réponse
-		response.set_cookie(key='access', value=access_token, httponly=True)
-		response.set_cookie(key='refresh', value=refresh_token, httponly=True)
-		return response
+		try:
+			response = super().post(request, *args, **kwargs)
+			access_token = response.data.get('access')
+			refresh_token = response.data.get('refresh')
+			response.data.pop('access', None)
+			response.data.pop('refresh', None)
+
+			# Ajouter les cookies à la réponse
+			response.set_cookie(key='access', value=access_token, httponly=True)
+			response.set_cookie(key='refresh', value=refresh_token, httponly=True)
+			return response
+		except AuthenticationFailed as e:
+			return Response(e.detail, status=status.HTTP_403_FORBIDDEN)
+		
+
 
 def verify_email(request, uidb64, token):
 	try:
@@ -150,6 +169,7 @@ class ValidateTokenView(APIView):
 		user = get_user_from_access_token(access_token_cookie)
 		return Response({'message': 'token valide.', 'username': user.username}, status=status.HTTP_200_OK)
 
+from requests.exceptions import HTTPError
 
 class UpdateProfilePicture(APIView):
 	authentication_classes = [JWTAuthentication]
@@ -162,7 +182,7 @@ class UpdateProfilePicture(APIView):
 				files = {'profile_picture': profile_picture}
 				data = {'unique_id': user.unique_id}
 				update_response = requests.put('http://user-managment:8000/update_client/', files=files, data=data)
-				update_response.raise_for_status()   
+				update_response.raise_for_status()
 			except requests.exceptions.RequestException as e:
 				return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 			return Response({"message": "Profile picture updated successfully"}, status=status.HTTP_200_OK)
@@ -337,23 +357,38 @@ class Activate2FAView(APIView):
 		return qr_base64
 
 	def post(self, request):
-		# Génération de la clé secrète pour l'utilisateur
-  
 		access_token_cookie = request.COOKIES.get('access')
 		user = get_user_from_access_token(access_token_cookie)
+		if user.is_2fa_enabled:
+			return Response({"error": "Two Factor Authentication is already enabled for this user."}, status=status.HTTP_400_BAD_REQUEST)
 		secret_key = pyotp.random_base32()
 		
-		# Génération de l'URL pour le QR code
 		otp_url = pyotp.totp.TOTP(secret_key).provisioning_uri(user.email, issuer_name="Nom de votre application")
 
-		# Générer le QR code en base64
 		qr_base64 = self.generate_qr_code(secret_key, otp_url)
 
-		# Activer la 2FA pour l'utilisateur
 		user.secret_key = secret_key
 		user.save()
 
 		return Response({'qr_img': qr_base64, 'secret_key': secret_key}, status=status.HTTP_200_OK)
+	
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+	serializer_class = CustomTokenObtainPairSerializer
+	def post(self, request, *args, **kwargs):
+		try:
+			response = super().post(request, *args, **kwargs)
+			access_token = response.data.get('access')
+			refresh_token = response.data.get('refresh')
+			response.data.pop('access', None)
+			response.data.pop('refresh', None)
+
+			# Ajouter les cookies à la réponse
+			response.set_cookie(key='access', value=access_token, httponly=True)
+			response.set_cookie(key='refresh', value=refresh_token, httponly=True)
+			return response
+		except AuthenticationFailed as e:
+			return Response(e.detail, status=status.HTTP_403_FORBIDDEN)
 
 
 class Confirm2FAView(APIView):

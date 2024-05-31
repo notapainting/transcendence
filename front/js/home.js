@@ -1,3 +1,6 @@
+import { navigateTo } from "./index.js";
+import { clearView } from "./index.js";
+
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
     const middleThrees = document.querySelector('.middle-threes');
@@ -142,13 +145,29 @@ const loggedInStatus = () => {
     }, 100)
 }
 
+const twoFactorDisplay = document.querySelector(".two-factor-display");
+const twoFactorContainerLogin = document.querySelector(".two-factor-container-login");
+const login2faButton = document.querySelector(".login-2fa")
+
+
+
+const closeTwoFactorLogin = (event) => {
+    login2faButton.removeEventListener("click", loginRequest);
+    twoFactorContainerLogin.style.transform = "scale(0)"
+    setTimeout(()=> {
+            twoFactorDisplay.style.display = "none"
+    }, 200)
+} 
+
 const loginRequest = (event) => {
     const dataSend = {
         username: homeEmailUsernameInput.value,
         password: homePasswordInput.value
     };
-    console.log(dataSend.username)
-    console.log(dataSend.password)
+    const input2FaLoginValue = document.querySelector(".input-f2a-login").value;
+    if (input2FaLoginValue) {
+        dataSend.code = input2FaLoginValue;
+    }
     fetch('/auth/token/', {
         method: 'POST',
         headers: {
@@ -158,22 +177,40 @@ const loginRequest = (event) => {
     })
     .then(response => {
         if (response.ok){
-
             loggedInStatus();
+            closeTwoFactorLogin();
             return response.json();
-        }
-        else {
+        } else if (response.status === 403) {
+            return response.json().then(data => {
+                messageBox.style.backgroundColor = "#f44336";
+                if (data.detail === 'Two Factor Authentification needed.') {
+                    displayTwoFactorLogin();
+                }
+                else {
+                    messageBox.innerHTML = `${data.detail} <span" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+                    messageBox.style.transform = "scale(1)";
+                }
+
+            });
+        } else {
             messageBox.style.backgroundColor = "#f44336";
             messageBox.innerHTML = `Username / e-mail or password incorrect.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
             messageBox.style.transform = "scale(1)";
         }
+        return null;
     })
     .then(data => {
-        // loggedInStatus(data);
     })  
     .catch(error => {
-        console.log("Login Error:", error.message);
     })
+}
+
+const displayTwoFactorLogin = async ()  => {
+    twoFactorDisplay.style.display = "flex"
+    setTimeout(()=> {
+        twoFactorContainerLogin.style.transform = "scale(1)"
+    }, 200)
+    login2faButton.addEventListener("click", loginRequest);
 }
 
 const registerRequest = (event) => {
@@ -306,6 +343,7 @@ export let logoutRequest = (event) => {
     })
     .then(response => {
         if (response.ok) {
+            navigateTo("/");
             window.location.reload();
             // Effectuez ici les actions nécessaires après la déconnexion, par exemple rediriger l'utilisateur vers une autre page
         } else {
@@ -316,10 +354,12 @@ export let logoutRequest = (event) => {
     });
 }
 
+
 export const showHome = async () => {
+    let isAuthenticated = await isUserAuthenticated();
+    clearView();
     const homeElement = document.querySelector("#home");
     homeElement.style.display = "block";
-    let isAuthenticated = await isUserAuthenticated();
     if (isAuthenticated)
         loggedInStatus();
     const playOfflineBtnElement = document.querySelector(".play-offline-btn");
@@ -332,14 +372,12 @@ export const showHome = async () => {
             top: 0,
             behavior: "smooth",
         });
-        setTimeout(() => {
-            document.querySelector(".navbar").style.transform = "scale(1)"
-         }, 800);
         document.removeEventListener('wheel', scrollDownEffect);
         document.addEventListener('wheel', adjustZoom);
     })
     document.addEventListener("click", switchForm);
+    document.querySelector(".close-two-factor-login").addEventListener("click", closeTwoFactorLogin)
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
     const logoutButton = document.querySelector(".fa-right-from-bracket");
     logoutButton.addEventListener("click", logoutRequest);
-}
+} 

@@ -1,20 +1,20 @@
-import { showHome } from "./home.js"
+import { logoutRequest, showHome } from "./home.js"
 import { showProfile } from "./profile.js"
 import {showSettings} from "./settings.js"
 import {showChat} from "./chat.js"
 
-const navigateTo = url => {
+export const navigateTo = url => {
     history.pushState(null, null, url)
     router()
 }
-const clearView = () => {
+export const clearView = () => {
 console.log("Appel ClearView")
     document.querySelectorAll(".view").forEach(div => {
         div.style.display = "none";
     });
 }
 
-const isUserAuthenticated = () => {
+export const isUserAuthenticated = () => {
     return fetch('auth/validate_token/', {
         method: 'POST',
         credentials: 'same-origin'
@@ -22,6 +22,7 @@ const isUserAuthenticated = () => {
     .then(response => {
         if (response.ok) {
             console.log("Je return true dans access")
+            document.querySelector(".navbar").style.display = "flex"
             return true;
         } else {
             return fetch('auth/token/refresh/', {
@@ -30,10 +31,10 @@ const isUserAuthenticated = () => {
             })
             .then(refreshResponse => {
                 if (refreshResponse.ok) {
-                    console.log("Je return true dans refresh")
+                    document.querySelector(".navbar").style.display = "flex"
                     return true;
                 } else {
-                    console.log("Je return false dans refresh")
+                    logoutRequest();
                     return false;  
                 }
             });
@@ -62,20 +63,11 @@ const router = async () => {
             isMatch: true
         }
     }
-    if (match.route.path === "/profile"){
-        const isAuthenticated = await isUserAuthenticated();
-        if (!isAuthenticated){
-            match = {
-                route: routes[0],
-                isMatch: true
-            }
-        }
-    }
-    clearView();
     match.route.view()
 };
 
 window.addEventListener("popstate", router);
+
 
 document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener('click', e => {
