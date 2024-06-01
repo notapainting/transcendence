@@ -16,9 +16,9 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
+      # logstash01:
+      #  condition: service_healthy
     depends_on:
-      logstash01:
-       condition: service_healthy
       chat-db:
        condition: service_started
     stdin_open: true 

@@ -390,12 +390,6 @@ input:focus::placeholder {
 
   /* chat */
 
-  #chat {
-    display: none;
-    height: 100vh;
-    background-color: blue;
-    color: wheat;
-  }
 
   /* settings */
 

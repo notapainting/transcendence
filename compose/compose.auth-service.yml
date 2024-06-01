@@ -15,9 +15,9 @@ services:
     networks:
       - app_network
     restart: unless-stopped
+      # logstash01:
+      #  condition: service_healthy
     depends_on:
-      logstash01:
-       condition: service_healthy
       auth-service-db:
        condition: service_started
     stdin_open: true 
