@@ -22,8 +22,14 @@ class UserCreate(APIView):
 					image_content = ContentFile(response.content)
 					user.profile_picture.delete(save=False)
 					user.profile_picture.save(f"{user.username}.jpg", image_content, save=True)
-			user_data = serializer.data
-			return Response(user_data, status=status.HTTP_201_CREATED)
+			chat_user_data = {"name": user.username}
+			chat_response = requests.post('http://chat:8000/api/v1/users/', json=chat_user_data)
+			if chat_response.status_code == 201:
+				user_data = serializer.data
+				return Response(user_data, status=status.HTTP_201_CREATED)
+			else:
+				user.delete()
+				return Response({"error": "Failed to create user in chat service."}, status=status.HTTP_400_BAD_REQUEST)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 	# def update(self, request):
 
