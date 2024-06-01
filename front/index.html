@@ -6,6 +6,7 @@
     <title>bjill | welcome</title>
     <link rel="stylesheet" href="./home.css">
     <link rel="stylesheet" href="./profile.css">
+    <link rel="stylesheet" href="/chat.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica+SC&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -14,7 +15,7 @@
     <nav class="navbar">
         <i class="item fa-solid fa-house"data-link data-href="/"></i>
         <i class="item fa-solid fa-user" data-link data-href="/profile"></i>
-        <i class="item fa-solid fa-comment" data-link data-href="/chat"></i>
+        <i class="item fa-solid fa-comment" data-link data-href="/chatbox"></i>
         <i class="item fa-solid fa-sliders"data-link data-href="/settings"></i>
         <i class="item fa-solid fa-right-from-bracket"></i>
     </nav>
@@ -131,7 +132,7 @@
                             <input type="password">
                         </div>
                         <div class="container-password">                     
-                            <label for="">Retype Password</label>
+                            <label for="">Confirm Password</label>
                             <input type="password">
                         </div>
                         <button class="profile-btn change-password">CHANGE PASSWORD</button>
@@ -161,7 +162,11 @@
         </div>
     </div>
     <div id="chat" class="view">
-        <h1>chat OHH</h1>
+        <div id="chat-container">
+            <div id="chat-box"></div>
+            <input type="text" id="chat-input" placeholder="Type a message...">
+            <button id="send-button">Send</button>
+        </div>
     </div>
     <div id="settings" class="view">
         <h1>settings OHH</h1>

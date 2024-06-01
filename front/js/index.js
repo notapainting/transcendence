@@ -47,7 +47,7 @@ const router = async () => {
     const routes = [
         {path: "/", view:() => showHome() },
         {path: "/profile", view:() => showProfile()},
-        {path: "/chat", view:() => showChat()},
+        {path: "/chatbox", view:() => showChat()},
         {path: "/settings", view:() => showSettings()},
     ];
     const potentialMatches = routes.map(route => {

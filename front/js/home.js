@@ -190,7 +190,6 @@ const loginRequest = (event) => {
                     messageBox.innerHTML = `${data.detail} <span" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
                     messageBox.style.transform = "scale(1)";
                 }
-
             });
         } else {
             messageBox.style.backgroundColor = "#f44336";

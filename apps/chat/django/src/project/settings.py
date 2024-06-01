@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'djangoviz',
 ]
 
+
 MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
 ]
@@ -58,35 +59,4 @@ DATABASES = {
         'HOST': getenv('DB_NAME'),
         'PORT': getenv('DB_PORT'),
     }
-}
-
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "logstash": {
-            "()": "syslog_rfc5424_formatter.RFC5424Formatter"
-        }
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": "DEBUG",
-        },
-        "logstash": {
-            "level": "DEBUG",
-            "class": "logging.handlers.SysLogHandler",
-            "address": ("logstash", 5141),
-            "socktype": SOCK_STREAM,
-            "formatter" : "logstash",
-        },
-    },
-    "loggers": {
-        "": {
-            "handlers": ["logstash", "console"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-    },
 }
