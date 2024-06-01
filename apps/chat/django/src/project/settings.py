@@ -16,7 +16,7 @@ TIME_ZONE = 'CET'
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-0#_lx+w5u%tmt2kl*9li+!(3jdtc3re@ihht6#hn2!p8-90j_v'
+SECRET_KEY = 'django-insecure-0#_lx+w5u%tmt2kl*9li+!(3jdtc3re@ihht6#hn2!p8-90j_v'
 
 ALLOWED_HOSTS = ['*']
 CSRF_COOKIE_SECURE = False

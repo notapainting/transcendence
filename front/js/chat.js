@@ -1,7 +1,9 @@
 import { clearView } from "./index.js";
+import { isUserAuthenticated } from "./index.js";
 
 export const showChat = async () => {
     clearView();
+    await isUserAuthenticated();
     const chatElement = document.querySelector("#chat");
     chatElement.style.display = "flex";
     const host = window.location.host;
@@ -10,4 +12,7 @@ export const showChat = async () => {
     const sendButton = document.getElementById('send-button');
 
     const socket = new WebSocket('wss://' + host  + '/chat/');
+    socket.onopen = () => {
+        console.log('WebSocket is connected');
+    };
 }
