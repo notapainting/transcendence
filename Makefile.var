@@ -1,5 +1,5 @@
 #========#	general	#========#
-MAKE	=	make -sj
+MAKEFLAGS	+=   -sj
 
 #========#	compose	#========#
 APP_DIR		=	compose/
