@@ -22,7 +22,7 @@ services:
        condition: service_started
     stdin_open: true 
     tty: true
-    entrypoint: ["bash", "/conf/init.sh"]
+    # entrypoint: ["bash", "/conf/init.sh"]
 
 
   auth-service-db:

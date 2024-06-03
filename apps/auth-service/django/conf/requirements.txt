@@ -9,6 +9,8 @@ django-phonenumber-field==7.3.0
 django-two-factor-auth==1.16.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
+gunicorn==22.0.0
+packaging==24.0
 idna==3.7
 psycopg2-binary==2.9.9
 PyJWT==2.8.0

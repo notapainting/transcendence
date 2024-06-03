@@ -9,6 +9,8 @@ psycopg2-binary==2.9.9
 python-logstash==0.4.8
 pytz==2024.1
 requests==2.31.0
+gunicorn==22.0.0
+packaging==24.0
 rfc5424-logging-handler==1.4.3
 setuptools==69.1.0
 sqlparse==0.4.4

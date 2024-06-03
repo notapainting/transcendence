@@ -17,13 +17,13 @@ class UserCreate(APIView):
 		if serializer.is_valid():
 			user = serializer.save()
 			if profile_picture_url:
-				response = requests.get(profile_picture_url)
+				response = requests.get(profile_picture_url, verify=False)
 				if response.ok:
 					image_content = ContentFile(response.content)
 					user.profile_picture.delete(save=False)
 					user.profile_picture.save(f"{user.username}.jpg", image_content, save=True)
 			chat_user_data = {"name": user.username}
-			chat_response = requests.post('http://chat:8000/api/v1/users/', json=chat_user_data)
+			chat_response = requests.post('https://chat:8000/api/v1/users/', json=chat_user_data, verify=False)
 			if chat_response.status_code == 201:
 				user_data = serializer.data
 				return Response(user_data, status=status.HTTP_201_CREATED)
