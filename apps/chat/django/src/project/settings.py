@@ -1,7 +1,7 @@
 # projet/settings.py
 
 from pathlib import Path
-from os import getenv
+import os
 from socket import SOCK_STREAM
 
 
@@ -13,7 +13,7 @@ LANGUAGE_CODE = 'en-us'
 
 USE_TZ = False
 TIME_ZONE = 'CET'
-
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-0#_lx+w5u%tmt2kl*9li+!(3jdtc3re@ihht6#hn2!p8-90j_v'
@@ -53,10 +53,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': getenv('DJ_DB_NAME'),
-        'USER': getenv('DB_USER'),
-        'PASSWORD': getenv('DB_PASSWORD'),
-        'HOST': getenv('DB_NAME'),
-        'PORT': getenv('DB_PORT'),
+        'NAME': os.getenv('DJ_DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_NAME'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
