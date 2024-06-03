@@ -25,10 +25,17 @@ SECRET_KEY = 'django-insecure-$z&t+&y(==8!@k8nw67ht=u(3e2ineh1(+%a#nm&&xymn_8jtn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8443']
 # ALLOWED_HOSTS = []
 MEDIA_ROOT = BASE_DIR / 'user_managment/img'
 MEDIA_URL = '/media/'
 ALLOWED_HOSTS = ['*']
+
+
 # Application definition
 
 INSTALLED_APPS = [

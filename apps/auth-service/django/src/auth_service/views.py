@@ -53,7 +53,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 			if pyotp.TOTP(secret_key).verify(code):
 
 				user_data = {'username': user.username}
-				response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data)
+				response = requests.post('https://user-managment:8000/getuserinfo/', json=user_data, verify=False)
 				if response.status_code == 200:
 					user_info = response.json()
 					data.update(user_info)
@@ -79,7 +79,7 @@ class GetUserPersonnalInfos(APIView):
 		access_token_cookie = request.COOKIES.get('access')
 		user = get_user_from_access_token(access_token_cookie)
 		user_data = {'username':user.username}
-		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data)
+		response = requests.post('https://user-managment:8000/getuserinfo/', json=user_data, verify=False)
 		if response.status_code == 200:
 			user_info = response.json()
 			user_info['is_2fa_enabled'] = user.is_2fa_enabled
@@ -125,7 +125,7 @@ def verify_email(request, uidb64, token):
 		# Vérifier si profile_picture n'est pas vide avant de l'ajouter à user_data
 		if user.profile_picture:
 			user_data['profile_picture'] = user.profile_picture
-		response = requests.post('http://user-managment:8000/signup/', json=user_data)
+		response = requests.post('https://user-managment:8000/signup/', json=user_data, verify=False)
 		if (response.status_code == status.HTTP_201_CREATED):
 			return HttpResponse('Lien de vérification valide', status=200)
 		else:
@@ -181,7 +181,7 @@ class UpdateProfilePicture(APIView):
 			try:
 				files = {'profile_picture': profile_picture}
 				data = {'unique_id': user.unique_id}
-				update_response = requests.put('http://user-managment:8000/update_client/', files=files, data=data)
+				update_response = requests.put('https://user-managment:8000/update_client/', files=files, data=data, verify=False)
 				update_response.raise_for_status()
 			except requests.exceptions.RequestException as e:
 				return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -196,7 +196,7 @@ class UpdateClientInfo(APIView):
 		user = get_user_from_access_token(access_token_cookie)
 		try:
 			request.data['unique_id'] = user.unique_id
-			update_response = requests.put('http://user-managment:8000/update_client/', json=request.data)
+			update_response = requests.put('https://user-managment:8000/update_client/', json=request.data, verify=False)
 			update_response.raise_for_status()  
 		except requests.exceptions.RequestException as e:
 			return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

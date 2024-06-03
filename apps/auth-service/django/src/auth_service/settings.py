@@ -28,6 +28,8 @@ DEBUG = True
 #Change current User by CustomUser
 AUTH_USER_MODEL = 'auth_service.CustomUser'
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 #REST FRAMEWORK CONFIG
 REST_FRAMEWORK = {
@@ -90,12 +92,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+
 CORS_ALLOW_ALL_ORIGINS = True
 ALLOWED_HOSTS = ['*']
 
 # Activer les cookies sécurisés (à définir sur True pour une utilisation en production avec HTTPS)
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Activer les cookies HTTPOnly
 SESSION_COOKIE_HTTPONLY = True

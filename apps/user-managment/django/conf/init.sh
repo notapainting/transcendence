@@ -1,3 +1,3 @@
-#!/bin/bash
+# !/bin/bash
 python /app/manage.py migrate
-python /app/manage.py runserver 0.0.0.0:8000
+gunicorn -c /conf/gunicorn.conf.py user_managment.wsgi:application
