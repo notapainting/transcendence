@@ -19,7 +19,7 @@ services:
       #  condition: service_healthy
     depends_on:
       auth-service-db:
-       condition: service_started
+       condition: service_healthy
     stdin_open: true 
     tty: true
     entrypoint: ["bash", "/conf/init.sh"]
@@ -37,7 +37,13 @@ services:
     networks: 
       - app_network
     restart: unless-stopped
-
+    healthcheck:
+      test: "pg_isready -U $$DB_USER -d $$DJ_DB_NAME || exit 1"
+      retries: 3
+      timeout: 5s
+      interval: 600s
+      start_period: 30s
+      start_interval: 10s
 
 volumes:
   auth-service_volume:
