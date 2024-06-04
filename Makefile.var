@@ -3,7 +3,7 @@ MAKEFLAGS	+=   -sj
 
 #========#	compose	#========#
 APP_DIR		=	compose/
-APP_FILE	=	compose.auth-service.yml compose.user-managment.yml compose.chat.yml 
+APP_FILE	=	
 
 PROXY_FILE	=	compose.proxy.yml
 
