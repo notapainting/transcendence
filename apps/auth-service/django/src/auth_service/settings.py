@@ -90,12 +90,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')#for https
+# USE_X_FORWARDED_HOST = True
+
 CORS_ALLOW_ALL_ORIGINS = True
 ALLOWED_HOSTS = ['*']
 
 # Activer les cookies sécurisés (à définir sur True pour une utilisation en production avec HTTPS)
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
+
 
 # Activer les cookies HTTPOnly
 SESSION_COOKIE_HTTPONLY = True
@@ -107,7 +111,6 @@ CSRF_COOKIE_DOMAIN = ''
 
 CSRF_TRUSTED_ORIGINS = ['https://localhost:8443']
 
-# CSRF_COOKIE_SECURE = True #for https
 
 ROOT_URLCONF = 'auth_service.urls'
 
@@ -171,8 +174,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')#for https
-# USE_X_FORWARDED_HOST = True for https
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 

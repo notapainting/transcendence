@@ -21,6 +21,10 @@ WORKDIR /app
 COPY conf/ /conf/
 RUN pip install -r /conf/requirements.txt 
 
+RUN mkdir /certs
+COPY certs/cert.pem /certs
+COPY certs/key.pem /certs
+
 # setup alias 
 RUN echo >> /root/.bashrc \
 	alias init="\"django-admin startproject \${APP_NAME} /app && echo django project created! || echo failed to create django project\"\n"\
