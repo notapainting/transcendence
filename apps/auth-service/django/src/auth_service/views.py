@@ -99,8 +99,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 			response.data.pop('refresh', None)
 
 			# Ajouter les cookies à la réponse
-			response.set_cookie(key='access', value=access_token, httponly=True)
-			response.set_cookie(key='refresh', value=refresh_token, httponly=True)
+			response.set_cookie(key='access', value=access_token, httponly=True, secure=True)
+			response.set_cookie(key='refresh', value=refresh_token, httponly=True, secure=True)
 			return response
 		except AuthenticationFailed as e:
 			return Response(e.detail, status=status.HTTP_403_FORBIDDEN)
@@ -244,7 +244,7 @@ class CustomTokenRefreshView(TokenRefreshView):
 			refresh_token = RefreshToken(refresh_token_cookie)
 			access_token = refresh_token.access_token
 			response = Response(status=status.HTTP_200_OK)
-			response.set_cookie('access', str(access_token), httponly=True)  # Définition du cookie HTTPOnly
+			response.set_cookie('access', str(access_token), httponly=True, secure=True)  # Définition du cookie HTTPOnly
 			return response
 		except Exception as e:
 			return Response({'error': 'Failed to refresh access token'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -371,24 +371,6 @@ class Activate2FAView(APIView):
 		user.save()
 
 		return Response({'qr_img': qr_base64, 'secret_key': secret_key}, status=status.HTTP_200_OK)
-	
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-	serializer_class = CustomTokenObtainPairSerializer
-	def post(self, request, *args, **kwargs):
-		try:
-			response = super().post(request, *args, **kwargs)
-			access_token = response.data.get('access')
-			refresh_token = response.data.get('refresh')
-			response.data.pop('access', None)
-			response.data.pop('refresh', None)
-
-			# Ajouter les cookies à la réponse
-			response.set_cookie(key='access', value=access_token, httponly=True)
-			response.set_cookie(key='refresh', value=refresh_token, httponly=True)
-			return response
-		except AuthenticationFailed as e:
-			return Response(e.detail, status=status.HTTP_403_FORBIDDEN)
 
 
 class Confirm2FAView(APIView):
