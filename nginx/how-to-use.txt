@@ -1,11 +1,11 @@
-This directory is for the NO-WAF nginx reverse-proxy
+This directory is for the WAF nginx reverse-proxy
 
 The goals is to filter all request to our apps api via this proxy 
 =>	it mean that in frontend code, all fetch should be done to the proxy host/port 
 	(8080/8443 in unprivilieged host)
 
 to add a location to your backend api:
-	- copy-paste the following template in `nginx.proxy.conf` inside the main server block
+	- copy-paste the following template in `default.conf` inside the main server block
 	- change the FOO value 
 	- /!\ pay attention to trailling `/` and protocol/port /!\:
 		- there is one after location `/FOO/` so in frontend fetch to `/FOO?` not /FOO 
@@ -16,10 +16,6 @@ to add a location to your backend api:
 	# proxy for FOO api
 	location /FOO/ {
 		proxy_pass http://FOO:8000;
+        include includes/proxy_backend.conf;
 
-		proxy_http_version 1.1;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_set_header Host $host;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection "Upgrade";
 	}
