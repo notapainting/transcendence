@@ -3,11 +3,10 @@ MAKEFLAGS	+=   -sj
 
 #========#	compose	#========#
 APP_DIR		=	compose/
-APP_FILE	=	compose.auth-service.yml compose.user-managment.yml compose.chat.yml 
-
-PROXY_FILE	=	compose.proxy.yml
-
-APP_FILE	+= ${PROXY_FILE}
+APP_FILE	=	compose.proxy.yml \
+                compose.auth-service.yml \
+                compose.user-managment.yml \
+                compose.chat.yml
 
 FILE	=	${addprefix --file , ${addprefix ${APP_DIR}, ${APP_FILE}}}
 
@@ -17,6 +16,7 @@ BASE	=	docker-compose \
 				--file compose.network.yml 
 
 CMP		=	${BASE} ${FILE}
+
 
 #========#	colors	#========#
 BLACK		=	\033[0;30m
