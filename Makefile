@@ -54,11 +54,11 @@ logs:
 	${CMP} logs 
 
 reload:
-	docker exec proxy-waf nginx -s reload
+	docker exec proxy nginx -s reload
 
 
 proxy:
-	docker exec -it proxy-waf sh
+	docker exec -it proxy sh
 
 auth:
 	docker exec -it auth-service bash
