@@ -26,7 +26,7 @@ class CustomAuthMiddleware(BaseMiddleware):
     sync_capable = False
     async def __call__(self, scope, receive, send):
         try :
-            promise = await httpx.AsyncClient().post(url='https://auth-service:8000/auth/validate_token/', headers=dict(scope['headers']))
+            promise = await httpx.AsyncClient().post(url='http://auth-service:8000/auth/validate_token/', headers=dict(scope['headers']))
             promise.raise_for_status()
             scope['user'] = await get_user(name=promise.json()['username'])
 

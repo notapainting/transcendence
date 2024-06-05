@@ -21,11 +21,6 @@ WORKDIR /app
 COPY conf/ /conf/
 RUN pip install -r /conf/requirements.txt 
 
-# Copy SSL certificates
-RUN mkdir /certs
-COPY certs/cert.pem /certs/cert.pem
-COPY certs/key.pem /certs/key.pem
-
 # setup alias 
 RUN echo >> /root/.bashrc \
 	alias init="\"django-admin startproject \${APP_NAME} /app && echo django project created! || echo failed to create django project\"\n"\
@@ -33,7 +28,7 @@ RUN echo >> /root/.bashrc \
 	alias mig="\"python /app/manage.py migrate\"\n" \
 	alias shell="\"python /app/manage.py shell\"\n" \
 	alias viz="\"python /app/manage.py djangoviz\"\n" \
-	alias run="\"gunicorn -c /conf/gunicorn.conf.py user_managment.wsgi:application\"\n" \
+	alias run="\"python /app/manage.py runserver 0.0.0.0:8000\"\n" \
 	alias help="\"echo init: start django project\necho mig: migrate\n echo run: launch django testserver\n echo conf: print app info\necho try to 'type [alias]' for exact command\"\n"
 
 EXPOSE ${PORT}
