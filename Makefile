@@ -54,8 +54,7 @@ logs:
 	${CMP} logs 
 
 reload:
-	docker exec proxy nginx -s reload
-
+	docker container restart proxy
 
 proxy:
 	docker exec -it proxy sh
