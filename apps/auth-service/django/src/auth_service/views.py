@@ -37,32 +37,44 @@ def get_user_from_access_token(access_token_cookie):
 	except Exception as e:
 		raise AuthenticationFailed("Error validating access token: {}".format(str(e)))
 
+from django.contrib.auth import authenticate
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 	def validate(self, attrs):
-		data = super().validate(attrs)
-		user = self.user
+		username_or_email = attrs.get('username')
+		password = attrs.get('password')
+		user = authenticate(username=username_or_email, password=password)
+		if user is None:
+			try:
+				user = User.objects.get(email=username_or_email)
+				if not user.check_password(password):
+					raise AuthenticationFailed('No active account found with the given credentials')
+			except User.DoesNotExist:
+				raise AuthenticationFailed('No active account found with the given credentials')
+
+		if not user.is_active:
+			raise AuthenticationFailed('No active account found with the given credentials')
+
 		if not user.isVerified:
 			raise AuthenticationFailed('Email not verified.')
+
 		if user.is_2fa_enabled:
 			code = self.context['request'].data.get('code')
 			if not code:
 				raise AuthenticationFailed('Two Factor Authentification needed.')
-
 			secret_key = user.secret_key
-			if pyotp.TOTP(secret_key).verify(code):
-
-				user_data = {'username': user.username}
-				response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data, verify=False)
-				if response.status_code == 200:
-					user_info = response.json()
-					data.update(user_info)
-				return data
-			else:
-
+			if not pyotp.TOTP(secret_key).verify(code):
 				raise AuthenticationFailed('Incorrect 2FA code. Please try again.', code='invalid_2fa_code')
-
-
+		refresh = self.get_token(user)
+		data = {
+			'refresh': str(refresh),
+			'access': str(refresh.access_token),
+		}
+		user_data = {'username': user.username}
+		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data, verify=False)
+		if response.status_code == 200:
+			user_info = response.json()
+			data.update(user_info)
 		return data
 
 class LogoutRequest(APIView):
@@ -90,6 +102,7 @@ class GetUserPersonnalInfos(APIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
 	serializer_class = CustomTokenObtainPairSerializer
+
 	def post(self, request, *args, **kwargs):
 		try:
 			response = super().post(request, *args, **kwargs)
