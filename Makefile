@@ -21,32 +21,19 @@ all:	start
 re:	clear start
 
 
--waf-warn:
-ifeq (${PROXY_FILE}, compose.proxy.yml)
-	@printf "${RED_LIGHT}WARNING: WAF disabled !!!${END}\n"
-endif
-
 #========#	build rule	#========#
-build: -waf-warn
+build:
 	${CMP} build
-
-waf:
-	@sed -i'' 's/compose.proxy.yml/compose.proxy.waf.yml/g' Makefile.var
-	@printf "${GREEN}${BOLD}WAF turn on :)\n${YELLOW}${ITALIC}please build image again${END}\n"
-
-no-waf:
-	@sed -i'' 's/compose.proxy.waf.yml/compose.proxy.yml/g' Makefile.var
-	@printf "${RED}${BOLD}Warning WAF disabled!!!\n${YELLOW}${ITALIC}please build image again${END}\n"
 
 
 #========#	start/stop rule	#========#
-start: -waf-warn
+start:
 	${CMP} up -d --build
 
 clear:
 	${CMP} down -v --remove-orphans --rmi all
 
-up:	-waf-warn
+up:
 	${CMP} up -d 
 
 down:
@@ -56,6 +43,7 @@ down:
 #========#	tools rule	#========#
 config:
 	${CMP} config
+
 ps:
 	${CMP} ps
 
@@ -65,5 +53,21 @@ top:
 logs:
 	${CMP} logs 
 
-enter:
+reload:
+	docker exec proxy-waf nginx -s reload
+
+
+proxy:
+	docker exec -it proxy-waf sh
+
+auth:
+	docker exec -it auth-service bash
+
+user:
+	docker exec -it user-managment bash
+
+game:
+	docker exec -it game bash
+
+chat:
 	docker exec -it chat bash
