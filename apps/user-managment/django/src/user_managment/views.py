@@ -23,7 +23,7 @@ class UserCreate(APIView):
 					user.profile_picture.delete(save=False)
 					user.profile_picture.save(f"{user.username}.jpg", image_content, save=True)
 			chat_user_data = {"name": user.username}
-			chat_response = requests.post('https://chat:8000/api/v1/users/', json=chat_user_data, verify=False)
+			chat_response = requests.post('http://chat:8000/api/v1/users/', json=chat_user_data, verify=False)
 			if chat_response.status_code == 201:
 				user_data = serializer.data
 				return Response(user_data, status=status.HTTP_201_CREATED)
