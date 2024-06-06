@@ -20,8 +20,8 @@ services:
     depends_on:
       auth-service-db:
        condition: service_healthy
-    stdin_open: true 
-    tty: true
+    # stdin_open: true 
+    # tty: true
     entrypoint: ["bash", "/conf/init.sh"]
 
 
