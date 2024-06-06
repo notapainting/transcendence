@@ -1,0 +1,7 @@
+version: '3.9'
+
+networks:
+  app_network:
+    name: full_app_test
+    driver: bridge
+

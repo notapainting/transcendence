@@ -1,44 +1,72 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: tlegrand <tlegrand@student.42lyon.fr>      +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/03/10 21:52:05 by tlegrand          #+#    #+#              #
+#    Updated: 2024/05/13 20:14:09 by tlegrand         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-MAKEFLAGS += -j
+-include Makefile.var
 
-CMP = docker compose --env-file env.dev \
-	--file compose.yml \
-	--file compose/compose.game.yml 
 
-all :	up
+#========#	general rule	#========#
+.PHONY: all re build start up down clear top ps config logs enter
 
-build :	
+all:	start
+
+re:	clear start
+
+
+#========#	build rule	#========#
+build:
 	${CMP} build
 
-up :	mdir build
-	${CMP} up -d
 
-down :
-	${CMP} down 
+#========#	start/stop rule	#========#
+start:
+	${CMP} up -d --build
 
 clear:
-	${CMP} down -v --remove-orphans
+	${CMP} down -v --remove-orphans --rmi all
+
+up:
+	${CMP} up -d 
+
+down:
+	${CMP} down 
+
+
+#========#	tools rule	#========#
+config:
+	${CMP} config
 
 ps:
 	${CMP} ps
 
-config:
-	${CMP} config
-
-mdir:
-	mkdir -p \
-		logs \
-		apps/game/django/src 
-
-enter:
-	${CMP} exec django bash
+top:
+	${CMP} top
 
 logs:
 	${CMP} logs 
 
-.PHONY: logs all build up down clear ps config mdir
+reload:
+	docker container restart proxy
 
-# creeate /logs
-# add /logs volume to compose
-#  change docker file 
-# make prod dockerfile
+proxy:
+	docker exec -it proxy sh
+
+auth:
+	docker exec -it auth-service bash
+
+user:
+	docker exec -it user-managment bash
+
+game:
+	docker exec -it game bash
+
+chat:
+	docker exec -it chat bash
