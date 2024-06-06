@@ -1,0 +1,48 @@
+
+services:
+  vault:
+    container_name: vault
+    build: vault/context/
+    image: my_vault
+    environment:
+      VAULT_ADDR: 'http://localhost:8200'
+    ports: 
+      - "8200:8200"
+    volumes:
+      - ./vault/data:/vault/file
+      - ./logs:/vault/logs
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - vault_network
+      - app_network
+    restart: unless-stopped
+    command: vault server -config=/vault/config/conf.hcl
+    healthcheck:
+      test: 'curl --fail -H "X-Vault-Request: true" http://localhost:8200/v1/sys/seal-status'
+      retries: 2
+      timeout: 2s
+      start_period: 1s
+      interval: 1s
+      start_interval: 1s
+
+  vault-init:
+    container_name: vault-init
+    build: vault/init/
+    image: vault-init
+    env_file:
+      - vault/env.vault.env
+    environment:
+      VAULT_ADDR: 'http://vault:8200'
+    networks:
+      - vault_network
+    restart: on-failure:3
+    depends_on:
+      vault:
+        condition: service_healthy
+        restart: true
+
+networks:
+  vault_network:
+    name: vault_private_network
+    driver: bridge
