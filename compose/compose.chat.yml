@@ -21,10 +21,10 @@ services:
     depends_on:
       chat-db:
        condition: service_healthy
-    stdin_open: true 
-    tty: true
+    # stdin_open: true 
+    # tty: true
     # init: true
-    # entrypoint: ["bash", "/conf/init.sh"]
+    entrypoint: ["bash", "/conf/init.sh"]
 
   chat-db:
     container_name: ${CHAT}-db

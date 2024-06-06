@@ -1,5 +1,0 @@
-MODSEC_AUDIT_LOG=/var/log/modsec_audit.log
-ERRORLOG=/var/log/modsec_error.log 
-
-
-check if heaktcheck 
