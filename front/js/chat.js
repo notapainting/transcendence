@@ -58,7 +58,8 @@ function initializeWebSocket() {
 
     socket.onmessage = function(event) {
         const message = JSON.parse(event.data);
-        handleMessage(message);
+        console.log(message);
+        // handleMessage(message);
     };
 
     socket.onerror = function(error) {

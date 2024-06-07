@@ -23,6 +23,8 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 APPEND_SLASH = False
 
+DEBUG = True
+
 ASGI_APPLICATION = "project.asgi.application"
 
 INSTALLED_APPS = [
