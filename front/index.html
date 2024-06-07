@@ -162,15 +162,42 @@
         </div>
     </div>
     <div id="chat" class="view" style="display: none;">
-        <div id="chat-container">
-            <div id="chat-box"></div>
-            <input type="text" id="chat-input" placeholder="Type a message...">
-            <button id="send-button">Send</button>
+        <div class="chatbox">
+            <div class="menu-container">
+                <div class="menu">
+                    <i class="fa-solid fa-bars"></i>
+                    <h3 class="menu-title">TEST</h3>
+                    <input type="text" class="searchbar">
+                    
+                </div>
+                <div class="display-menu">
+                    <div class="search-results"></div>
+                </div>
+            </div>
+            <div class="chat-container">
+                <div class="person-chat">
+                    <div class="picture-chat"></div>
+                    <div class="description-chat">
+                        <h4 class="username-title">John</h4>
+                        <p class="data">Today a 16:00PM</p>
+                    </div>
+                </div>
+                <div class="messages">
+                </div>
+                <div class="send-container">
+                    <input type="text" class="message-input">
+                    <div class="emoji-send">
+                        <i class="fa-regular fa-face-smile emoji"></i>
+                        <i class="fa-solid fa-arrow-right chat-send"></i>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="settings" class="view">
+    <!-- <div id="settings" class="view">
         <h1>settings OHH</h1>
-    </div>
+
+    </div> -->
     <script src="https://kit.fontawesome.com/3db1c2f3ab.js" crossorigin="anonymous"></script>
     <script type="module" src="js/index.js"></script>
     <script type="module" src="js/home.js"></script>
