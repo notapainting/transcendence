@@ -47,8 +47,10 @@ function handleMessage(message) {
     }
 }
 
+let host = window.location.host;
+
 function initializeWebSocket() {
-    socket = new WebSocket('wss://localhost/chat/');
+    socket = new WebSocket('wss://' + host + '/chat/');
 
     socket.onopen = function() {
         console.log('WebSocket connection established');
