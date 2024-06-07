@@ -10,11 +10,11 @@
 #                                                                              #
 # **************************************************************************** #
 
--include Makefile.var
+-include conf/Makefile.var
 
 
 #========#	general rule	#========#
-.PHONY: all re build start up down clear top ps config logs enter
+.PHONY: all re build start up down clear top ps config logs reload proxy vault chat game auth user
 
 all:	start
 
@@ -54,17 +54,20 @@ logs:
 	${CMP} logs 
 
 reload:
-	docker exec proxy-waf nginx -s reload
-
+	docker container restart proxy
 
 proxy:
-	docker exec -it proxy-waf sh
+	docker exec -it proxy sh
+
+vault:
+	docker exec -it vault sh
+
 
 auth:
-	docker exec -it auth-service bash
+	docker exec -it auth bash
 
 user:
-	docker exec -it user-managment bash
+	docker exec -it user bash
 
 game:
 	docker exec -it game bash

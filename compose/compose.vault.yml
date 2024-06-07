@@ -2,7 +2,7 @@
 services:
   vault:
     container_name: vault
-    build: vault/context/
+    build: vault/
     image: my_vault
     environment:
       VAULT_ADDR: 'http://localhost:8200'
@@ -10,7 +10,6 @@ services:
       - "8200:8200"
     volumes:
       - ./vault/data:/vault/file
-      - ./logs:/vault/logs
     cap_add:
       - IPC_LOCK
     networks:
@@ -28,10 +27,10 @@ services:
 
   vault-init:
     container_name: vault-init
-    build: vault/init/
-    image: vault-init
+    build: vault-auto-unseal/
+    image: vault-unseal
     env_file:
-      - vault/env.vault.env
+      - conf/vault.env.example
     environment:
       VAULT_ADDR: 'http://vault:8200'
     networks:

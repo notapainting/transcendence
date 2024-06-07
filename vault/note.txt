@@ -1,0 +1,69 @@
+dev : 
+docker run --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID=myroot'  vault
+VAULT_LOCAL_CONFIG={"storage": {"file": {"path": "/vault/file"}}, "listener": [{"tcp": { "address": "0.0.0.0:8200", "tls_disable": true}}], "default_lease_ttl": "168h", "max_lease_ttl": "720h", "ui": true}
+
+docker exec vault vault status 
+
+First: 
+
+- init vault -> get - root token
+                    - ukey
+            -> create db engine (postgres/ elasticsearch) 
+            -> conf db engine 
+            -> create db role
+            -> load secret  in kv engine 
+
+-> dev -> auto-unseal
+-> prod -> unseal manuel
+
+
+
+vault server (-tls) -config='path/to/config.hcl'
+vault operator init
+
+vault read -non-interactive
+vault kv put kv-v1/eng/apikey/Google @apikey.json
+
+vault secrets enable -path=kv kv
+
+#same
+vault kv put -mount=kv hello foo=world
+vault kv put kv/hello target=world
+
+vault kv get -mount=kv hello
+vault kv get kv/hello
+
+1 path = 1 engine puis 1 path == 1 secet (kv, etc0)
+
+
+
+
+
+
+
+
+
+
+Unseal Key 1: /Ss0WYeCDwnmpOicwsgXfPIWe4pNF83lUB6ikcG0sMrI
+Unseal Key 2: w6AGgldfMUkduOB9pw2xkd90k551NsYQy2JxmPXx3sQr
+Unseal Key 3: 4Uu96v/TCh+zN5pbfB0LDLxGpJJ0+Ua+eUz44/QJaowB
+Unseal Key 4: wCyL9uQmAGYyfCdG9ALRYFcVnHTuWoHSk7DveMkoD7lC
+Unseal Key 5: jdMqt60dyOnx01aABRkACmhNOGx01NZtmZAGoIS2Az9V
+
+Initial Root Token: hvs.G371irCwmOU6dfgRjrXRGxIT
+
+
+
+storage "raft" {
+  path    = "./vault/data"
+  node_id = "node1"
+}
+
+listener "tcp" {
+  address     = "127.0.0.1:8200"
+  tls_disable = "true"
+}
+
+api_addr = "http://127.0.0.1:8200"
+cluster_addr = "https://127.0.0.1:8201"
+ui = true
