@@ -38,7 +38,7 @@ services:
       test: "pg_isready -U $$DB_USER -d $$DJ_DB_NAME || exit 1"
       retries: 3
       timeout: 5s
-      interval: 600s
+      interval: 6s
       start_period: 30s
       start_interval: 10s
 

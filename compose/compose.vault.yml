@@ -9,7 +9,7 @@ services:
     ports: 
       - "8200:8200"
     volumes:
-      - ./vault/data:/vault/file
+      - vault-data:/vault/file
     cap_add:
       - IPC_LOCK
     networks:
@@ -40,6 +40,12 @@ services:
       vault:
         condition: service_healthy
         restart: true
+
+volumes:
+  vault-data:
+    name: vault-data
+    driver: local
+
 
 networks:
   vault_network:
