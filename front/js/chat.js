@@ -1,10 +1,14 @@
 import { clearView } from "./index.js";
 import { isUserAuthenticated } from "./index.js";
+import { whoIam } from "./index.js";
 
 const searchbar = document.querySelector('.searchbar');
 const searchResults = document.querySelector('.search-results');
 const displayMenu = document.querySelector('.display-menu');
-const messageInput = document.querySelector(".message-input")
+const messageInput = document.querySelector(".message-input");
+let host = window.location.host;
+let groupSummary;
+let contactSummary;
 
 let socket;
 
@@ -25,20 +29,90 @@ function displayMessages(username, messages) {
     messageContainer.style.display = "block";
 }
 
+let usernamePrivateGroupList = {}
+
+
+function addUserToMenu(user) {
+    const personDiv = document.createElement('div');
+    personDiv.classList.add('person');
+    personDiv.setAttribute('data-username', user.username);
+    const picturePersonDiv = document.createElement('div');
+    picturePersonDiv.classList.add('picture-person');
+    picturePersonDiv.style.backgroundImage = `url(${user.profile_picture})`;
+
+    const descriptionPersonDiv = document.createElement('div');
+    descriptionPersonDiv.classList.add('description-person');
+    descriptionPersonDiv.innerHTML = `
+        <h4 class="username-person">${user.username}</h4>
+        <div class="last-message">Last message</div>
+    `;
+
+    personDiv.appendChild(picturePersonDiv);
+    personDiv.appendChild(descriptionPersonDiv);
+
+    displayMenu.appendChild(personDiv);
+
+    personDiv.addEventListener("click", async function() {
+        document.querySelectorAll('.person').forEach(elem => {
+            elem.classList.remove('focus');
+        });
+        personDiv.classList.add('focus');
+        const username = personDiv.getAttribute('data-username');
+        const pictureChat = document.querySelector(".picture-chat");
+        const usernameTitle = document.querySelector(".username-title");
+        usernameTitle.innerHTML = `${user.username}`
+        pictureChat.style.backgroundImage = `url(${user.profile_picture})`;
+        console.log(username);
+        // fetchMessages(username);
+        document.querySelectorAll('.message-person').forEach(messageElem => {
+            if (messageElem.classList.contains(`username-${username}`)) {
+                messageElem.style.display = 'flex';
+            } else {
+                messageElem.style.display = 'none';
+            }
+        });
+    });
+}
+
 function handleMessage(message) {
-    if (message.type === 'message.text') {
-        const { author, body } = message.data;
-        const messageContainer = document.querySelector(`.message-person.username-${author}`);
-        if (!messageContainer){
-            messageContainer = document.createElement('div');
-            messageContainer.classList.add('message-person', `username-${username}`);
-            document.querySelector('.messages').appendChild(messageContainer);
-        }
-        const newMessageDiv = document.createElement('div');
-        newMessageDiv.classList.add('message', 'right-message');
-        newMessageDiv.innerHTML = `<p>${body}</p>`;
-        messageContainer.appendChild(newMessageDiv);
-        messageContainer.style.display = "block";
+    if (message.type === 'group.summary'){
+        groupSummary = message;
+        groupSummary.data.forEach(group => {
+            if (group.name === '@'){
+                group.members.forEach(member=> {
+                    // if (member !== whoIam)
+                        // addUserToMenu();
+                })
+            }
+        })
+        // usernamePrivateGroupList.forEach(user=> {
+        //     // addUserToMenu(user)
+        // })
+    }
+    else if (message.type === 'contact.summary'){
+        contactSummary = message;
+        console.log(contactSummary)
+    }
+    else if (message.type === 'message.first'){
+        console.log("MESSAGE FIRST")
+    }
+        // handleMessage(message);
+    else if (message.type === 'group.update'){
+        console.log("GROUP CREEE" + message);
+    }
+    else if (message.type === 'message.text') {
+        // let messageData = message.data;
+        // const messageContainer = document.querySelector(`.message-person.username-${data.author}`);
+        // if (!messageContainer){
+        //     messageContainer = document.createElement('div');
+        //     messageContainer.classList.add('message-person', `username-${data.author}`);
+        //     document.querySelector('.messages').appendChild(messageContainer);
+        // }
+        // const newMessageDiv = document.createElement('div');
+        // newMessageDiv.classList.add('message', 'right-message');
+        // newMessageDiv.innerHTML = `<p>${body}</p>`;
+        // messageContainer.appendChild(newMessageDiv);
+        // messageContainer.style.display = "block";
     }
     else if (message.type === 'message.fetch') {
         const { author, messages } = message.data;
@@ -47,7 +121,7 @@ function handleMessage(message) {
     }
 }
 
-let host = window.location.host;
+
 
 function initializeWebSocket() {
     socket = new WebSocket('wss://' + host + '/chat/');
@@ -58,9 +132,8 @@ function initializeWebSocket() {
 
     socket.onmessage = function(event) {
         const message = JSON.parse(event.data);
-        console.log(message);
-        // handleMessage(message);
-    };
+        handleMessage(message);
+    }
 
     socket.onerror = function(error) {
         console.error('WebSocket error:', error);
@@ -95,7 +168,7 @@ function displaySearchResults(users) {
 
 async function fetchUsers(query) {
     try {
-        const response = await fetch(`/user_managment/users_info/`);
+        const response = await fetch(`/user/users_info/`);
         if (response.ok) {
             const users = await response.json();
             // Filtrer les utilisateurs en fonction du query
@@ -122,100 +195,74 @@ function fetchMessages(username) {
     socket.send(JSON.stringify(payload));
 }
 
-function addUserToMenu(user) {
-    const personDiv = document.createElement('div');
-    personDiv.classList.add('person');
-    personDiv.setAttribute('data-username', user.username);
-    const picturePersonDiv = document.createElement('div');
-    picturePersonDiv.classList.add('picture-person');
-    picturePersonDiv.style.backgroundImage = `url(${user.profile_picture})`;
-
-    const descriptionPersonDiv = document.createElement('div');
-    descriptionPersonDiv.classList.add('description-person');
-    descriptionPersonDiv.innerHTML = `
-        <h4 class="username-person">${user.username}</h4>
-        <div class="last-message">Last message</div>
-    `;
-
-    personDiv.appendChild(picturePersonDiv);
-    personDiv.appendChild(descriptionPersonDiv);
-
-    displayMenu.appendChild(personDiv);
-
-    personDiv.addEventListener("click", async function() {
-        document.querySelectorAll('.person').forEach(elem => {
-            elem.classList.remove('focus');
-        });
-        personDiv.classList.add('focus');
-        const username = personDiv.getAttribute('data-username');
-        const pictureChat = document.querySelector(".picture-chat");
-        const usernameTitle = document.querySelector(".username-title");
-        usernameTitle.innerHTML = `${user.username}`
-        pictureChat.style.backgroundImage = `url(${user.profile_picture})`;
-        console.log(username);
-        fetchMessages(username);
-        document.querySelectorAll('.message-person').forEach(messageElem => {
-            if (messageElem.classList.contains(`username-${username}`)) {
-                messageElem.style.display = 'flex';
-            } else {
-                messageElem.style.display = 'none';
-            }
-        });
-    });
-}
-
 const sendToWebSocket = (username, message) => {
     try {
-        const payload = {
-            type: "message.text",
-            data: {
-                author: "islem",
-                to: username,
-                body: message,
-                date: new Date().toISOString()
+        let isGroupAlreadyExist;
+        let saveGroup = false;
+        groupSummary.data.forEach(group => {
+            if (group.name == '@' && group.members.includes(username)){
+                isGroupAlreadyExist = true;
+                saveGroup = group;
             }
-        };
-        console.log("Sending message:", payload);
-        socket.send(JSON.stringify(payload));
-        console.log("Message sent successfully");
+        })
+        if (!isGroupAlreadyExist){
+            const createGroupPrivateData = {
+                type: "message.first",
+                data: {
+                    target: username,
+                    body: message,
+                }
+            };
+            socket.send(JSON.stringify(createGroupPrivateData));
+        }
+        else {
+            console.log(saveGroup.id)
+            const privateMessage = {
+                type:"message.text",
+                data:
+                {
+                    group: saveGroup.id,
+                    body: message,
+                    respond_to: "",
+                    date: new Date().toISOString()
+                }
+            };
+            socket.send(JSON.stringify(privateMessage));
+        }
+
     } catch (error) {
         console.error('Error sending message:', error);
     }
 }
 
+
 function sendMessage() {
     const message = messageInput.value.trim();
     if (!message) return;
-
-    // Find the focused person
     const focusedPerson = document.querySelector('.person.focus');
     if (!focusedPerson) {
         alert('Please select a person to send the message to.');
         return;
     }
-
     const username = focusedPerson.getAttribute('data-username');
+    console.log("username focus :" + username);
+    sendToWebSocket(username, message);
     let messageContainer = document.querySelector(`.message-person.username-${username}`);
 
     if (!messageContainer) {
         messageContainer = document.createElement('div');
         messageContainer.classList.add('message-person', `username-${username}`);
 
-        // Ajoute le nouveau conteneur de message à la div .messages
         document.querySelector('.messages').appendChild(messageContainer);
     }
 
-    // Create the new message element
     const newMessageDiv = document.createElement('div');
     newMessageDiv.classList.add('message', 'left-message');
     newMessageDiv.innerHTML = `<p>${message}</p>`;
 
-    // Append the new message to the message container
     messageContainer.appendChild(newMessageDiv);
     messageContainer.style.display = "block";
-    // Clear the message input field
     messageInput.value = '';
-    sendToWebSocket(username, message);
 }
 
 const searchUsers = () => {
@@ -229,7 +276,9 @@ const searchUsers = () => {
 
 export const showChat = async () => {
     clearView();
-    await isUserAuthenticated();
+    let test;
+    test = await isUserAuthenticated();
+    console.log(test);
     const chatElement = document.querySelector("#chat");
     
     chatElement.style.display = "flex";

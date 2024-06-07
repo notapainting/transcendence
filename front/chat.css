@@ -1,4 +1,3 @@
-
 #chat {
     display: none;
     height: 100vh;
@@ -8,7 +7,6 @@
     color: black;
     display: flex; 
 }
-
 
 .chatbox {
     width: 600px;
@@ -24,7 +22,6 @@
     border-radius: 15px;
     background-color: #FAFAFA;
 }
-
 
 .menu-container {
     height: 90%;

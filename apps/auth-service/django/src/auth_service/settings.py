@@ -48,7 +48,7 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=20),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
@@ -118,6 +118,9 @@ ROOT_URLCONF = 'auth_service.urls'
 
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
+ADMIN_USERNAME = 'admin'
+ADMIN_EMAIL = 'admin@admin.com'
+ADMIN_PASSWORD = 'adminpassword'
 
 TEMPLATES = [
     {

@@ -3,6 +3,8 @@ import { showProfile } from "./profile.js"
 import {showSettings} from "./settings.js"
 import {showChat} from "./chat.js"
 
+export let whoIam;
+
 export const navigateTo = url => {
     history.pushState(null, null, url)
     router()
@@ -14,33 +16,39 @@ console.log("Appel ClearView")
     });
 }
 
+
 export const isUserAuthenticated = () => {
     return fetch('auth/validate_token/', {
         method: 'POST',
         credentials: 'same-origin'
     })
-    .then(response => {
+    .then(response => response.json().then(data => {
         if (response.ok) {
-            console.log("Je return true dans access")
-            document.querySelector(".navbar").style.display = "flex"
+            whoIam = data.username; 
+            console.log("Je return true dans access");
             return true;
         } else {
             return fetch('auth/token/refresh/', {
                 method: 'POST',
                 credentials: 'same-origin'
             })
-            .then(refreshResponse => {
+            .then(refreshResponse => refreshResponse.json().then(refreshData => {
                 if (refreshResponse.ok) {
-                    document.querySelector(".navbar").style.display = "flex"
+                    whoIam = refreshData.username;  // Stocker le username
+                    console.log("Je return true dans refresh");
                     return true;
                 } else {
-                    logoutRequest();
+                    console.log("Je return false dans refresh");
                     return false;  
                 }
-            });
+            }));
         }
+    }))
+    .catch(error => {
+        console.error("Error during authentication process:", error);
+        return false;
     });
-}
+};
 
 const router = async () => {
     console.log("Appel Router")

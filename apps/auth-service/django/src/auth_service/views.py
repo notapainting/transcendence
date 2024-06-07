@@ -51,13 +51,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 					raise AuthenticationFailed('No active account found with the given credentials')
 			except User.DoesNotExist:
 				raise AuthenticationFailed('No active account found with the given credentials')
-
 		if not user.is_active:
 			raise AuthenticationFailed('No active account found with the given credentials')
 
 		if not user.isVerified:
 			raise AuthenticationFailed('Email not verified.')
-
 		if user.is_2fa_enabled:
 			code = self.context['request'].data.get('code')
 			if not code:
@@ -274,7 +272,13 @@ class CustomTokenRefreshView(TokenRefreshView):
 		try:
 			refresh_token = RefreshToken(refresh_token_cookie)
 			access_token = refresh_token.access_token
-			response = Response(status=status.HTTP_200_OK)
+
+			# Extract the user id from the access token
+			user_id = access_token['user_id']
+			user = User.objects.get(id=user_id)
+			username = user.username
+
+			response = Response({'username': username}, status=status.HTTP_200_OK)
 			response.set_cookie('access', str(access_token), httponly=True, secure=True)  # Définition du cookie HTTPOnly
 			return response
 		except Exception as e:

@@ -21,6 +21,8 @@ const parallaxEffect = (event) => {
 }
 let isScrolling = false;
 
+let whoIam;
+
 const scrollUpEffect = (event) => {
     document.removeEventListener('wheel', scrollDownEffect);
     event.preventDefault();
@@ -251,32 +253,9 @@ const loginOrRegisterRequest = (event) => {
         registerRequest();
 }
 
-const isUserAuthenticated = () => {
-    return fetch('auth/validate_token/', {
-        method: 'POST',
-        credentials: 'same-origin'
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log("Je return true dans access")
-            return true;
-        } else {
-            return fetch('auth/token/refresh/', {
-                method: 'POST',
-                credentials: 'same-origin'
-            })
-            .then(refreshResponse => {
-                if (refreshResponse.ok) {
-                    console.log("Je return true dans refresh")
-                    return true;
-                } else {
-                    console.log("Je return false dans refresh")
-                    return false;  
-                }
-            });
-        }
-    });
-}
+
+
+
 let isZooming = false;
 let indexZoom = 0;
 let zoomFactor = 1;
