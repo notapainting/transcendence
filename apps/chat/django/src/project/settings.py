@@ -17,8 +17,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-0#_lx+w5u%tmt2kl*9li+!(3jdtc3re@ihht6#hn2!p8-90j_v'
-
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8443']
+SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 APPEND_SLASH = False
 

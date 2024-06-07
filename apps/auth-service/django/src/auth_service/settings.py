@@ -28,6 +28,8 @@ DEBUG = True
 #Change current User by CustomUser
 AUTH_USER_MODEL = 'auth_service.CustomUser'
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 #REST FRAMEWORK CONFIG
 REST_FRAMEWORK = {
@@ -90,12 +92,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')#for https
+# USE_X_FORWARDED_HOST = True
+
 CORS_ALLOW_ALL_ORIGINS = True
 ALLOWED_HOSTS = ['*']
 
 # Activer les cookies sécurisés (à définir sur True pour une utilisation en production avec HTTPS)
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
+
 
 # Activer les cookies HTTPOnly
 SESSION_COOKIE_HTTPONLY = True
@@ -107,7 +113,6 @@ CSRF_COOKIE_DOMAIN = ''
 
 CSRF_TRUSTED_ORIGINS = ['https://localhost:8443']
 
-# CSRF_COOKIE_SECURE = True #for https
 
 ROOT_URLCONF = 'auth_service.urls'
 
@@ -149,30 +154,11 @@ DATABASES = {
     }
 }
 # JWT_AUTH = {
-#     'JWT_AUTH_COOKIE': 'access_token',  # Nom du cookie pour le token d'accès
-#     'JWT_REFRESH_TOKEN_COOKIE': 'refresh_token',  # Nom du cookie pour le token de rafraîchissement
-#     # Autres configurations JWT...
-# }
-# Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
+        # 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+#     },
+# ]
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
 
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')#for https
-# USE_X_FORWARDED_HOST = True for https
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 

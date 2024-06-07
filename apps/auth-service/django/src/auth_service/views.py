@@ -37,32 +37,44 @@ def get_user_from_access_token(access_token_cookie):
 	except Exception as e:
 		raise AuthenticationFailed("Error validating access token: {}".format(str(e)))
 
+from django.contrib.auth import authenticate
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 	def validate(self, attrs):
-		data = super().validate(attrs)
-		user = self.user
+		username_or_email = attrs.get('username')
+		password = attrs.get('password')
+		user = authenticate(username=username_or_email, password=password)
+		if user is None:
+			try:
+				user = User.objects.get(email=username_or_email)
+				if not user.check_password(password):
+					raise AuthenticationFailed('No active account found with the given credentials')
+			except User.DoesNotExist:
+				raise AuthenticationFailed('No active account found with the given credentials')
+
+		if not user.is_active:
+			raise AuthenticationFailed('No active account found with the given credentials')
+
 		if not user.isVerified:
 			raise AuthenticationFailed('Email not verified.')
+
 		if user.is_2fa_enabled:
 			code = self.context['request'].data.get('code')
 			if not code:
 				raise AuthenticationFailed('Two Factor Authentification needed.')
-
 			secret_key = user.secret_key
-			if pyotp.TOTP(secret_key).verify(code):
-
-				user_data = {'username': user.username}
-				response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data)
-				if response.status_code == 200:
-					user_info = response.json()
-					data.update(user_info)
-				return data
-			else:
-
+			if not pyotp.TOTP(secret_key).verify(code):
 				raise AuthenticationFailed('Incorrect 2FA code. Please try again.', code='invalid_2fa_code')
-
-
+		refresh = self.get_token(user)
+		data = {
+			'refresh': str(refresh),
+			'access': str(refresh.access_token),
+		}
+		user_data = {'username': user.username}
+		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data, verify=False)
+		if response.status_code == 200:
+			user_info = response.json()
+			data.update(user_info)
 		return data
 
 class LogoutRequest(APIView):
@@ -79,7 +91,7 @@ class GetUserPersonnalInfos(APIView):
 		access_token_cookie = request.COOKIES.get('access')
 		user = get_user_from_access_token(access_token_cookie)
 		user_data = {'username':user.username}
-		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data)
+		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data, verify=False)
 		if response.status_code == 200:
 			user_info = response.json()
 			user_info['is_2fa_enabled'] = user.is_2fa_enabled
@@ -90,6 +102,7 @@ class GetUserPersonnalInfos(APIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
 	serializer_class = CustomTokenObtainPairSerializer
+
 	def post(self, request, *args, **kwargs):
 		try:
 			response = super().post(request, *args, **kwargs)
@@ -99,8 +112,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 			response.data.pop('refresh', None)
 
 			# Ajouter les cookies à la réponse
-			response.set_cookie(key='access', value=access_token, httponly=True)
-			response.set_cookie(key='refresh', value=refresh_token, httponly=True)
+			response.set_cookie(key='access', value=access_token, httponly=True, secure=True)
+			response.set_cookie(key='refresh', value=refresh_token, httponly=True, secure=True)
 			return response
 		except AuthenticationFailed as e:
 			return Response(e.detail, status=status.HTTP_403_FORBIDDEN)
@@ -125,7 +138,7 @@ def verify_email(request, uidb64, token):
 		# Vérifier si profile_picture n'est pas vide avant de l'ajouter à user_data
 		if user.profile_picture:
 			user_data['profile_picture'] = user.profile_picture
-		response = requests.post('http://user-managment:8000/signup/', json=user_data)
+		response = requests.post('http://user-managment:8000/signup/', json=user_data, verify=False)
 		if (response.status_code == status.HTTP_201_CREATED):
 			return HttpResponse('Lien de vérification valide', status=200)
 		else:
@@ -140,11 +153,35 @@ def GenerateVerificationUrl(request, user, viewname):
 	verification_url = request.build_absolute_uri(path)
      
 	#pour le port 8443 TEMPORAIRE
-	if '8080' not in verification_url:
+	if '8443' not in verification_url:
 		parts = list(urlparse(verification_url))
-		parts[1] = parts[1].replace('localhost', 'localhost:8080')  # Replace the domain part
+		parts[1] = parts[1].replace('localhost', 'localhost:8443')  # Replace the domain part
 		verification_url = urlunparse(parts)
 	return verification_url
+
+def send_verification_email(email, verification_url):
+	subject = 'Confirm Your Transcendence Account'
+	message = f"""
+	Hello,
+
+	Thank you for registering on Transcendence! We're excited to have you join our community. Before you can start using your account, we need to verify your email address. Please click the link below to confirm your account:
+
+	{verification_url}
+
+	If you are unable to click the link, you can copy and paste it into your browser's address bar.
+
+	If you did not register for an account on Transcendence, please ignore this email.
+
+	Best regards,
+	The Transcendence Team
+	"""
+	send_mail(
+		subject,
+		message,
+		'jill.transcendance@gmail.com',
+		[email],
+		fail_silently=False,
+	)
 
 class UserCreate(APIView):
 	def post(self, request):
@@ -152,13 +189,7 @@ class UserCreate(APIView):
 		if serializer.is_valid():
 			user = serializer.save()
 			full_verification_url = GenerateVerificationUrl(request, user, 'verify_email')
-			send_mail(
-				'Vérifiez votre adresse email',
-				f'olalaaaaa sa marche : {full_verification_url}',
-				'jill.transcendance@gmail.com',
-				[user.email],
-				fail_silently=False,
-			)
+			send_verification_email(user.email, full_verification_url)
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -181,7 +212,7 @@ class UpdateProfilePicture(APIView):
 			try:
 				files = {'profile_picture': profile_picture}
 				data = {'unique_id': user.unique_id}
-				update_response = requests.put('http://user-managment:8000/update_client/', files=files, data=data)
+				update_response = requests.put('http://user-managment:8000/update_client/', files=files, data=data, verify=False)
 				update_response.raise_for_status()
 			except requests.exceptions.RequestException as e:
 				return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -196,7 +227,7 @@ class UpdateClientInfo(APIView):
 		user = get_user_from_access_token(access_token_cookie)
 		try:
 			request.data['unique_id'] = user.unique_id
-			update_response = requests.put('http://user-managment:8000/update_client/', json=request.data)
+			update_response = requests.put('http://user-managment:8000/update_client/', json=request.data, verify=False)
 			update_response.raise_for_status()  
 		except requests.exceptions.RequestException as e:
 			return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -244,7 +275,7 @@ class CustomTokenRefreshView(TokenRefreshView):
 			refresh_token = RefreshToken(refresh_token_cookie)
 			access_token = refresh_token.access_token
 			response = Response(status=status.HTTP_200_OK)
-			response.set_cookie('access', str(access_token), httponly=True)  # Définition du cookie HTTPOnly
+			response.set_cookie('access', str(access_token), httponly=True, secure=True)  # Définition du cookie HTTPOnly
 			return response
 		except Exception as e:
 			return Response({'error': 'Failed to refresh access token'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -371,24 +402,6 @@ class Activate2FAView(APIView):
 		user.save()
 
 		return Response({'qr_img': qr_base64, 'secret_key': secret_key}, status=status.HTTP_200_OK)
-	
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-	serializer_class = CustomTokenObtainPairSerializer
-	def post(self, request, *args, **kwargs):
-		try:
-			response = super().post(request, *args, **kwargs)
-			access_token = response.data.get('access')
-			refresh_token = response.data.get('refresh')
-			response.data.pop('access', None)
-			response.data.pop('refresh', None)
-
-			# Ajouter les cookies à la réponse
-			response.set_cookie(key='access', value=access_token, httponly=True)
-			response.set_cookie(key='refresh', value=refresh_token, httponly=True)
-			return response
-		except AuthenticationFailed as e:
-			return Response(e.detail, status=status.HTTP_403_FORBIDDEN)
 
 
 class Confirm2FAView(APIView):
