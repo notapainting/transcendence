@@ -10,11 +10,11 @@
 #                                                                              #
 # **************************************************************************** #
 
--include Makefile.var
+-include conf/Makefile.var
 
 
 #========#	general rule	#========#
-.PHONY: all re build start up down clear top ps config logs enter
+.PHONY: all re build start up down clear top ps config logs reload proxy chat game auth user
 
 all:	start
 
@@ -60,10 +60,10 @@ proxy:
 	docker exec -it proxy sh
 
 auth:
-	docker exec -it auth-service bash
+	docker exec -it auth bash
 
 user:
-	docker exec -it user-managment bash
+	docker exec -it user bash
 
 game:
 	docker exec -it game bash
