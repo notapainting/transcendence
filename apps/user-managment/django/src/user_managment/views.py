@@ -100,3 +100,14 @@ class GetUserInfos(APIView):
 		else:
 			return Response("User not in request", status=404)
 
+class GetAllUserInfos(APIView):
+	def get(self, request):
+		users = CustomUser.objects.all()
+		user_data = [
+			{
+				"username": user.username,
+				"profile_picture": user.profile_picture.url if user.profile_picture else settings.MEDIA_URL + 'default_profile_picture.jpg'
+			}
+			for user in users
+		]
+		return Response(user_data, status=status.HTTP_200_OK)
