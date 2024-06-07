@@ -19,7 +19,8 @@ WORKDIR /app
 
 # install django requirements
 COPY conf/ /conf/
-RUN pip install -r /conf/requirements.txt 
+RUN pip install -r /conf/requirements.txt
+
 
 # setup alias 
 RUN echo >> /root/.bashrc \
