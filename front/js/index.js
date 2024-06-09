@@ -1,7 +1,6 @@
 import { logoutRequest, showHome } from "./home.js"
 import { showProfile } from "./profile.js"
 import {showSettings} from "./settings.js"
-import {showChat} from "./chat.js"
 
 export let whoIam;
 
@@ -9,13 +8,13 @@ export const navigateTo = url => {
     history.pushState(null, null, url)
     router()
 }
+
 export const clearView = () => {
 console.log("Appel ClearView")
     document.querySelectorAll(".view").forEach(div => {
         div.style.display = "none";
     });
 }
-
 
 export const isUserAuthenticated = () => {
     return fetch('auth/validate_token/', {
@@ -55,7 +54,6 @@ const router = async () => {
     const routes = [
         {path: "/", view:() => showHome() },
         {path: "/profile", view:() => showProfile()},
-        {path: "/chatbox", view:() => showChat()},
         {path: "/settings", view:() => showSettings()},
     ];
     const potentialMatches = routes.map(route => {
