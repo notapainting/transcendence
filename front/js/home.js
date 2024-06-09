@@ -1,5 +1,6 @@
 import { navigateTo } from "./index.js";
-import { clearView } from "./index.js";
+import { clearView, isUserAuthenticated } from "./index.js";
+import { showChat } from "./chat.js";
 
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
@@ -139,9 +140,13 @@ const switchForm = (event) => {
 const messageBox = document.querySelector(".message-box");
 
 const loggedInStatus = () => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
     document.querySelector(".navbar").style.display= "flex"
     document.querySelector(".login-signin-form").style.display = "none"
     document.querySelector(".play-online-btn").style.display = "block"
+    showChat();
     setTimeout(()=> {
         document.querySelector(".play-online-btn").style.transform = "scale(1)"
     }, 100)

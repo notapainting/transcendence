@@ -12,24 +12,58 @@ let contactSummary;
 
 let socket;
 
-function displayMessages(username, messages) {
-    let messageContainer = document.querySelector(`.message-person.username-${username}`);
+let usernamePrivateGroupList = {}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const currentDate = new Date();
+    
+    if (date.toDateString() === currentDate.toDateString()) {
+        return `${date.getHours().toString().padStart(2, '0')}h${date.getMinutes().toString().padStart(2, '0')}`;
+    } else if (date.getFullYear() === currentDate.getFullYear()) {
+        return `${date.getDate()}/${date.getMonth() + 1} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    } else {
+        return `${date.getFullYear()}/${date.getDate()}/${date.getMonth() + 1} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    }
+}
+
+let receiveMessage = async (message) => {
+    let messageContainer = document.getElementById(message.data.group);
     if (!messageContainer) {
         messageContainer = document.createElement('div');
         messageContainer.classList.add('message-person', `username-${username}`);
+        messageContainer.setAttribute('id', message.data.group)
         document.querySelector('.messages').appendChild(messageContainer);
     }
-    messageContainer.innerHTML = '';
-    messages.forEach(message => {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', message.author === username ? 'left-message' : 'right-message');
-        messageDiv.innerHTML = `<p>${message.body}</p>`;
-        messageContainer.appendChild(messageDiv);
-    });
-    messageContainer.style.display = "block";
-}
 
-let usernamePrivateGroupList = {}
+    const newMessageDiv = document.createElement('div');
+    newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
+    newMessageDiv.innerHTML = `<p>${message.data.body}</p><span>${formatDate(message.data.date)}</span>`;   
+
+    messageContainer.appendChild(newMessageDiv);
+    messageInput.value = ``;
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+    const audio = document.getElementById("newMessageSound");
+
+    if (audio && typeof audio.play === "function") {
+        audio.play().catch(error => {
+            console.error("Impossible de jouer le son du nouveau message:", error);
+        });
+    } else {
+        console.error("L'élément audio n'est pas valide ou ne peut pas être lu.");
+    }
+    if ("Notification" in window && Notification.permission === "granted") {
+        let i = 0;
+        while (i < 10){
+            new Notification("NEW MESSAAAGGGEEEEEEEEEEEE", {
+                body: message.data.body,
+                icon: "../img/notification.png"
+            });
+            i++
+            await new Promise(resolve => setTimeout(resolve, 800));
+        }
+    }
+}
 
 
 function addUserToMenu(user) {
@@ -62,8 +96,6 @@ function addUserToMenu(user) {
         const usernameTitle = document.querySelector(".username-title");
         usernameTitle.innerHTML = `${user.username}`
         pictureChat.style.backgroundImage = `url(${user.profile_picture})`;
-        console.log(username);
-        // fetchMessages(username);
         document.querySelectorAll('.message-person').forEach(messageElem => {
             if (messageElem.classList.contains(`username-${username}`)) {
                 messageElem.style.display = 'flex';
@@ -74,24 +106,91 @@ function addUserToMenu(user) {
     });
 }
 
-function handleMessage(message) {
+async function fetchUsers() {
+    try {
+        const response = await fetch(`/user/users_info/`);
+        if (response.ok) {
+            return await response.json(); 
+        } else {
+            console.error('Error fetching users:', response.statusText);
+            return []; 
+        }
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return [];
+    }
+}
+
+const displayHistoryConversations = async (id, person, message, personList) => {
+    const personDiv = document.createElement('div');
+    personDiv.classList.add('person');
+    personDiv.setAttribute('data-username', person);
+    const picturePersonDiv = document.createElement('div');
+    picturePersonDiv.classList.add('picture-person');
+    const foundUser = personList.find(elem => elem.username === person);
+    const backgroundImageURL = foundUser ? foundUser.profile_picture : "/media/default_profile_picture.jpg/";
+    picturePersonDiv.style.backgroundImage = `url(${backgroundImageURL})`;
+    const descriptionPersonDiv = document.createElement('div');
+    descriptionPersonDiv.classList.add('description-person');
+    descriptionPersonDiv.innerHTML = `
+        <h4 class="username-person">${person}</h4>
+        <div class="last-message">Last message</div>
+    `;
+    personDiv.appendChild(picturePersonDiv);
+    personDiv.appendChild(descriptionPersonDiv);
+    displayMenu.appendChild(personDiv);
+
+
+    let messageContainer = document.createElement('div');
+    messageContainer.classList.add('message-person', `username-${person}`);
+    messageContainer.setAttribute('id', id);
+    document.querySelector('.messages').appendChild(messageContainer);
+    message.forEach(bullet => {
+        const newMessageDiv = document.createElement('div');
+        newMessageDiv.classList.add('message', `${bullet.author === whoIam ? 'left-message' : 'right-message'}`);
+        newMessageDiv.setAttribute('id', bullet.id);
+        newMessageDiv.innerHTML = `<p>${bullet.body}</p><span>${formatDate(bullet.date)}</span>`;
+        messageContainer.insertBefore(newMessageDiv, messageContainer.firstChild);
+    })
+    
+    personDiv.addEventListener("click", async function() {
+        document.querySelectorAll('.person').forEach(elem => {
+            elem.classList.remove('focus');
+        });
+        personDiv.classList.add('focus');
+        const username = personDiv.getAttribute('data-username');
+        const pictureChat = document.querySelector(".picture-chat");
+        const usernameTitle = document.querySelector(".username-title");
+        usernameTitle.innerHTML = `${person}`
+        pictureChat.style.backgroundImage = `url(${backgroundImageURL})`;
+        document.querySelectorAll('.message-person').forEach(messageElem => {
+            if (messageElem.classList.contains(`username-${username}`)) {
+                messageElem.style.display = 'flex';
+            } else {
+                messageElem.style.display = 'none';
+            }
+        });
+    });
+}
+
+
+async function handleMessage(message) {
     if (message.type === 'group.summary'){
         groupSummary = message;
-        groupSummary.data.forEach(group => {
-            if (group.name === '@'){
-                group.members.forEach(member=> {
-                    // if (member !== whoIam)
-                        // addUserToMenu();
-                })
-            }
+        while (displayMenu.children.length > 1) {
+            displayMenu.removeChild(displayMenu.children[1]);
+        }
+        let personList = await fetchUsers();
+        message.data.forEach(group => {
+            let id = group.id;
+            let person = group.members.find(value => value !== whoIam);
+            let messages = group.messages;
+            displayHistoryConversations(id, person, messages, personList);
         })
-        // usernamePrivateGroupList.forEach(user=> {
-        //     // addUserToMenu(user)
-        // })
     }
     else if (message.type === 'contact.summary'){
         contactSummary = message;
-        console.log(contactSummary)
+        // console.log(contactSummary)
     }
     else if (message.type === 'message.first'){
         console.log("MESSAGE FIRST")
@@ -101,24 +200,14 @@ function handleMessage(message) {
         console.log("GROUP CREEE" + message);
     }
     else if (message.type === 'message.text') {
-        // let messageData = message.data;
-        // const messageContainer = document.querySelector(`.message-person.username-${data.author}`);
-        // if (!messageContainer){
-        //     messageContainer = document.createElement('div');
-        //     messageContainer.classList.add('message-person', `username-${data.author}`);
-        //     document.querySelector('.messages').appendChild(messageContainer);
-        // }
-        // const newMessageDiv = document.createElement('div');
-        // newMessageDiv.classList.add('message', 'right-message');
-        // newMessageDiv.innerHTML = `<p>${body}</p>`;
-        // messageContainer.appendChild(newMessageDiv);
-        // messageContainer.style.display = "block";
+        console.log(message);
+        receiveMessage(message);
     }
-    else if (message.type === 'message.fetch') {
-        const { author, messages } = message.data;
-        console.log('Fetched messages:', messages);
-        displayMessages(author, messages);
-    }
+    // else if (message.type === 'message.fetch') {
+    //     const { author, messages } = message.data;
+    //     console.log('Fetched messages:', messages);
+    //     displayMessages(author, messages);
+    // }
 }
 
 
@@ -141,7 +230,6 @@ function initializeWebSocket() {
 
     socket.onclose = function() {
         console.log('WebSocket connection closed');
-        // Try to reconnect every 5 seconds
         setTimeout(initializeWebSocket, 5000);
     };
 }
@@ -166,23 +254,6 @@ function displaySearchResults(users) {
     }
 }
 
-async function fetchUsers(query) {
-    try {
-        const response = await fetch(`/user/users_info/`);
-        if (response.ok) {
-            const users = await response.json();
-            // Filtrer les utilisateurs en fonction du query
-            const filteredUsers = users.filter(user => user.username.toLowerCase().startsWith(query.toLowerCase()));
-            displaySearchResults(filteredUsers);
-        } else {
-            console.error('Error fetching users:', response.statusText);
-        }
-    } catch (error) {
-        console.error('Error fetching users:', error);
-    }
-}
-
-
 
 function fetchMessages(username) {
     const payload = {
@@ -191,7 +262,6 @@ function fetchMessages(username) {
             author: username,
         }
     };
-    console.log("je suis rentre dans fetch message")
     socket.send(JSON.stringify(payload));
 }
 
@@ -245,46 +315,26 @@ function sendMessage() {
         return;
     }
     const username = focusedPerson.getAttribute('data-username');
-    console.log("username focus :" + username);
     sendToWebSocket(username, message);
-    let messageContainer = document.querySelector(`.message-person.username-${username}`);
-
-    if (!messageContainer) {
-        messageContainer = document.createElement('div');
-        messageContainer.classList.add('message-person', `username-${username}`);
-
-        document.querySelector('.messages').appendChild(messageContainer);
-    }
-
-    const newMessageDiv = document.createElement('div');
-    newMessageDiv.classList.add('message', 'left-message');
-    newMessageDiv.innerHTML = `<p>${message}</p>`;
-
-    messageContainer.appendChild(newMessageDiv);
-    messageContainer.style.display = "block";
-    messageInput.value = '';
 }
 
-const searchUsers = () => {
+const searchUsers = async () => {
     const query = searchbar.value.trim();
     if (query.length > 0) {
-        fetchUsers(query);
+        const users = await fetchUsers(); 
+        const filteredUsers = users.filter(user => user.username.toLowerCase().startsWith(query.toLowerCase())); 
+        displaySearchResults(filteredUsers); 
     } else {
         searchResults.style.display = 'none';
     }
-}
+};
 
 export const showChat = async () => {
-    clearView();
-    let test;
-    test = await isUserAuthenticated();
-    console.log(test);
-    const chatElement = document.querySelector("#chat");
-    
+    // await isUserAuthenticated();
+    const chatElement = document.querySelector(".chatbox");
     chatElement.style.display = "flex";
     initializeWebSocket();
     searchbar.addEventListener('input', searchUsers);
-
     const sendButton = document.querySelector(".chat-send");
     sendButton.addEventListener("click", sendMessage);
     messageInput.addEventListener("keydown", function(event) {
