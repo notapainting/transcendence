@@ -27,57 +27,47 @@ function formatDate(dateString) {
     }
 }
 
-let receiveMessage = async (message) => {
+let receiveMessage = async (message, type) => {
+    console.log("RECEIVEEEE")
     let messageContainer = document.getElementById(message.data.group);
+    console.log(message);
     if (!messageContainer) {
         messageContainer = document.createElement('div');
-        messageContainer.classList.add('message-person', `username-${username}`);
-        messageContainer.setAttribute('id', message.data.group)
+        messageContainer.classList.add('message-person', `username-${message.data.members.find(person => person != whoIam)}`);
+        if (type === 'group.update')
+            messageContainer.setAttribute('id', message.data.id);
+        else
+            messageContainer.setAttribute('id', message.data.group);
         document.querySelector('.messages').appendChild(messageContainer);
     }
-
     const newMessageDiv = document.createElement('div');
-    newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
-    newMessageDiv.innerHTML = `<p>${message.data.body}</p><span>${formatDate(message.data.date)}</span>`;   
-
+    if (message.type === 'group.update') {
+        newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
+        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
+    }
+    else {
+        newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
+        newMessageDiv.innerHTML = `<p>${message.data.body}</p><span>${formatDate(message.data.date)}</span>`;   
+    }
     messageContainer.appendChild(newMessageDiv);
     messageInput.value = ``;
     messageContainer.scrollTop = messageContainer.scrollHeight;
-    const audio = document.getElementById("newMessageSound");
-
-    if (audio && typeof audio.play === "function") {
-        audio.play().catch(error => {
-            console.error("Impossible de jouer le son du nouveau message:", error);
-        });
-    } else {
-        console.error("L'élément audio n'est pas valide ou ne peut pas être lu.");
-    }
-    if ("Notification" in window && Notification.permission === "granted") {
-        let i = 0;
-        while (i < 10){
-            new Notification("NEW MESSAAAGGGEEEEEEEEEEEE", {
-                body: message.data.body,
-                icon: "../img/notification.png"
-            });
-            i++
-            await new Promise(resolve => setTimeout(resolve, 800));
-        }
-    }
 }
 
 
-function addUserToMenu(user) {
+
+function addUserToMenu(target, profile_picture) {
     const personDiv = document.createElement('div');
     personDiv.classList.add('person');
-    personDiv.setAttribute('data-username', user.username);
+    personDiv.setAttribute('data-username', target);
     const picturePersonDiv = document.createElement('div');
     picturePersonDiv.classList.add('picture-person');
-    picturePersonDiv.style.backgroundImage = `url(${user.profile_picture})`;
+    picturePersonDiv.style.backgroundImage = `url(${profile_picture})`;
 
     const descriptionPersonDiv = document.createElement('div');
     descriptionPersonDiv.classList.add('description-person');
     descriptionPersonDiv.innerHTML = `
-        <h4 class="username-person">${user.username}</h4>
+        <h4 class="username-person">${target}</h4>
         <div class="last-message">Last message</div>
     `;
 
@@ -94,8 +84,8 @@ function addUserToMenu(user) {
         const username = personDiv.getAttribute('data-username');
         const pictureChat = document.querySelector(".picture-chat");
         const usernameTitle = document.querySelector(".username-title");
-        usernameTitle.innerHTML = `${user.username}`
-        pictureChat.style.backgroundImage = `url(${user.profile_picture})`;
+        usernameTitle.innerHTML = `${target}`
+        pictureChat.style.backgroundImage = `url(${profile_picture})`;
         document.querySelectorAll('.message-person').forEach(messageElem => {
             if (messageElem.classList.contains(`username-${username}`)) {
                 messageElem.style.display = 'flex';
@@ -197,11 +187,12 @@ async function handleMessage(message) {
     }
         // handleMessage(message);
     else if (message.type === 'group.update'){
-        console.log("GROUP CREEE" + message);
+        console.log("GROUP UPDATE");
+        receiveMessage(message, message.type);
     }
     else if (message.type === 'message.text') {
-        console.log(message);
-        receiveMessage(message);
+        console.log("MESSAGE");
+        receiveMessage(message, message.type);
     }
     // else if (message.type === 'message.fetch') {
     //     const { author, messages } = message.data;
@@ -242,7 +233,7 @@ function displaySearchResults(users) {
             userDiv.classList.add('result-item');
             userDiv.textContent = user.username;
             userDiv.addEventListener('click', function () {
-                addUserToMenu(user);
+                addUserToMenu(user.username, user.profile_picture);
                 searchResults.style.display = 'none';
                 searchbar.value = '';
             });
@@ -276,14 +267,14 @@ const sendToWebSocket = (username, message) => {
             }
         })
         if (!isGroupAlreadyExist){
-            const createGroupPrivateData = {
+            const createGroup = {
                 type: "message.first",
                 data: {
                     target: username,
                     body: message,
                 }
             };
-            socket.send(JSON.stringify(createGroupPrivateData));
+            socket.send(JSON.stringify(createGroup));
         }
         else {
             console.log(saveGroup.id)
