@@ -22,8 +22,6 @@ const parallaxEffect = (event) => {
 }
 let isScrolling = false;
 
-let whoIam;
-
 const scrollUpEffect = (event) => {
     document.removeEventListener('wheel', scrollDownEffect);
     event.preventDefault();
@@ -257,9 +255,6 @@ const loginOrRegisterRequest = (event) => {
     else
         registerRequest();
 }
-
-
-
 
 let isZooming = false;
 let indexZoom = 0;

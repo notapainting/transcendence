@@ -18,9 +18,9 @@ def create_admin_user(sender, **kwargs):
             email='islem@islem.com',
         )
         print("islem user created")
-    if not CustomUser.objects.filter(username='laël').exists():
+    if not CustomUser.objects.filter(username='lael').exists():
         user = CustomUser.objects.create(
-            username='laël',
+            username='lael',
             email='lael@lael.com',
         )
-        print("Laël user created")
+        print("lael user created")

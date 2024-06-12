@@ -16,9 +16,9 @@ def create_admin_user(sender, **kwargs):
             name='islem',
         )
         print("islem user created")
-    if not User.objects.filter(name='laël').exists():
+    if not User.objects.filter(name='lael').exists():
         user = User.objects.create(
-            name='laël',
+            name='lael',
         )
         print("Laël user created")
 
