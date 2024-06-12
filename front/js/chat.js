@@ -7,7 +7,6 @@ const searchResults = document.querySelector('.search-results');
 const displayMenu = document.querySelector('.display-menu');
 const messageInput = document.querySelector(".message-input");
 let host = window.location.host;
-let groupSummary;
 let contactSummary;
 
 let socket;
@@ -27,110 +26,122 @@ function formatDate(dateString) {
     }
 }
 
-let receiveMessage = async (message, type) => {
-    console.log("RECEIVEEEE")
-    let messageContainer = document.getElementById(message.data.group);
-    console.log(message);
-    if (!messageContainer) {
-        messageContainer = document.createElement('div');
-        messageContainer.classList.add('message-person', `username-${message.data.members.find(person => person != whoIam)}`);
-        if (type === 'group.update')
-            messageContainer.setAttribute('id', message.data.id);
-        else
-            messageContainer.setAttribute('id', message.data.group);
-        document.querySelector('.messages').appendChild(messageContainer);
-    }
-    const newMessageDiv = document.createElement('div');
-    if (message.type === 'group.update') {
-        newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
-        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
-    }
-    else {
-        newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
-        newMessageDiv.innerHTML = `<p>${message.data.body}</p><span>${formatDate(message.data.date)}</span>`;   
-    }
-    messageContainer.appendChild(newMessageDiv);
-    messageInput.value = ``;
-    messageContainer.scrollTop = messageContainer.scrollHeight;
-}
-
-
-
 function addUserToMenu(target, profile_picture) {
-    const personDiv = document.createElement('div');
-    personDiv.classList.add('person');
-    personDiv.setAttribute('data-username', target);
-    const picturePersonDiv = document.createElement('div');
-    picturePersonDiv.classList.add('picture-person');
-    picturePersonDiv.style.backgroundImage = `url(${profile_picture})`;
+    const displayMenu = document.querySelector('.display-menu');
+    const existingPersonDiv = displayMenu.querySelector(`[data-username="${target}"]`);
+    if (existingPersonDiv) {
+        console.log("je vais remonter le user: " + target + "avec la photo de profil : " + profile_picture);
+        displayMenu.insertBefore(existingPersonDiv, displayMenu.children[1]);
+    } else {
+        console.log("je vais add le user: " + target + "avec la photo de profil : " + profile_picture);
+        const personDiv = document.createElement('div');
+        personDiv.classList.add('person');
+        personDiv.setAttribute('data-username', target);
 
-    const descriptionPersonDiv = document.createElement('div');
-    descriptionPersonDiv.classList.add('description-person');
-    descriptionPersonDiv.innerHTML = `
-        <h4 class="username-person">${target}</h4>
-        <div class="last-message">Last message</div>
-    `;
+        const picturePersonDiv = document.createElement('div');
+        picturePersonDiv.classList.add('picture-person');
+        picturePersonDiv.style.backgroundImage = `url(${profile_picture})`;
 
-    personDiv.appendChild(picturePersonDiv);
-    personDiv.appendChild(descriptionPersonDiv);
-
-    displayMenu.appendChild(personDiv);
-
-    personDiv.addEventListener("click", async function() {
-        document.querySelectorAll('.person').forEach(elem => {
-            elem.classList.remove('focus');
+        const descriptionPersonDiv = document.createElement('div');
+        descriptionPersonDiv.classList.add('description-person');
+        descriptionPersonDiv.innerHTML = `
+            <h4 class="username-person">${target}</h4>
+            <div class="last-message">Last message</div>
+        `;
+        personDiv.appendChild(picturePersonDiv);
+        personDiv.appendChild(descriptionPersonDiv);
+        displayMenu.insertBefore(personDiv, displayMenu.children[1]);
+        personDiv.addEventListener("click", async function() {
+            document.querySelectorAll('.person').forEach(elem => {
+                elem.classList.remove('focus');
+            });
+            personDiv.classList.add('focus');
+            const username = personDiv.getAttribute('data-username');
+            const pictureChat = document.querySelector(".picture-chat");
+            const usernameTitle = document.querySelector(".username-title");
+            usernameTitle.innerHTML = `${target}`
+            pictureChat.style.backgroundImage = `url(${profile_picture})`;
+            document.querySelectorAll('.message-person').forEach(messageElem => {
+                if (messageElem.classList.contains(`username-${username}`)) {
+                    messageElem.style.display = 'flex';
+                } else {
+                    messageElem.style.display = 'none';
+                }
+            });
         });
-        personDiv.classList.add('focus');
-        const username = personDiv.getAttribute('data-username');
-        const pictureChat = document.querySelector(".picture-chat");
-        const usernameTitle = document.querySelector(".username-title");
-        usernameTitle.innerHTML = `${target}`
-        pictureChat.style.backgroundImage = `url(${profile_picture})`;
-        document.querySelectorAll('.message-person').forEach(messageElem => {
-            if (messageElem.classList.contains(`username-${username}`)) {
-                messageElem.style.display = 'flex';
-            } else {
-                messageElem.style.display = 'none';
-            }
-        });
-    });
+    }
 }
 
-async function fetchUsers() {
+async function fetchUsers(username = null) {
     try {
-        const response = await fetch(`/user/users_info/`);
+        let url = '/user/users_info/';
+        if (username) {
+            url += `?username=${encodeURIComponent(username)}`;
+        }
+        
+        const response = await fetch(url);
         if (response.ok) {
-            return await response.json(); 
+            return await response.json();
         } else {
             console.error('Error fetching users:', response.statusText);
-            return []; 
+            return username ? null : []; // Retourne null si une seule recherche d'utilisateur échoue, sinon retourne un tableau vide pour la recherche de tous les utilisateurs
         }
     } catch (error) {
         console.error('Error fetching users:', error);
-        return [];
+        return username ? null : [];
     }
 }
 
+let createGroup = async (message) => {
+    console.log("je cree le groupe au front: ");
+    console.log(message);
+    const target = message.data.members.find(person => person != whoIam);
+    console.log("LE GROUPE SE CREE sur la target :" + target);
+    const personData = await fetchUsers(target);
+    const profile_picture = personData.profile_picture;
+    addUserToMenu(target, profile_picture);
+    let messageContainer = document.getElementById(message.data.group);
+    if (!messageContainer) {
+        messageContainer = document.createElement('div');
+        messageContainer.classList.add('message-person', `username-${target}`);
+        messageContainer.setAttribute('id', message.data.id);
+        document.querySelector('.messages').appendChild(messageContainer);
+    }
+    const newMessageDiv = document.createElement('div');
+    newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
+    newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
+    messageContainer.appendChild(newMessageDiv);
+    const focusedPerson = document.querySelector('.person.focus');
+    console.log("AHHHHH");
+    console.log(focusedPerson)
+    console.log("AHHHHH");
+    console.log(target);
+    console.log("AHHHHH");
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+    if (focusedPerson.getAttribute('data-username') === target){
+        messageContainer.style.display = 'flex';
+        console.log("je display le message");
+    }
+    messageInput.value = ``;
+}
+let receiveMessage = async (message) => {
+    let messageContainer = document.getElementById(message.data.group);
+    console.log(messageContainer);
+    const newMessageDiv = document.createElement('div');
+    newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
+    newMessageDiv.innerHTML = `<p>${message.data.body}</p><span>${formatDate(message.data.date)}</span>`;   
+    messageContainer.appendChild(newMessageDiv);
+    messageInput.value = ``;
+    const focusedPerson = document.querySelector('.person.focus');
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+    // if (focusedPerson === message.data.author)
+    //         messageContainer.style.display = 'flex';
+}
+
+
 const displayHistoryConversations = async (id, person, message, personList) => {
-    const personDiv = document.createElement('div');
-    personDiv.classList.add('person');
-    personDiv.setAttribute('data-username', person);
-    const picturePersonDiv = document.createElement('div');
-    picturePersonDiv.classList.add('picture-person');
-    const foundUser = personList.find(elem => elem.username === person);
-    const backgroundImageURL = foundUser ? foundUser.profile_picture : "/media/default_profile_picture.jpg/";
-    picturePersonDiv.style.backgroundImage = `url(${backgroundImageURL})`;
-    const descriptionPersonDiv = document.createElement('div');
-    descriptionPersonDiv.classList.add('description-person');
-    descriptionPersonDiv.innerHTML = `
-        <h4 class="username-person">${person}</h4>
-        <div class="last-message">Last message</div>
-    `;
-    personDiv.appendChild(picturePersonDiv);
-    personDiv.appendChild(descriptionPersonDiv);
-    displayMenu.appendChild(personDiv);
-
-
+    addUserToMenu(person, personList.find(elem => elem.username===person).profile_picture);
+    const personDiv = displayMenu.querySelector(`[data-username="${person}"]`);
     let messageContainer = document.createElement('div');
     messageContainer.classList.add('message-person', `username-${person}`);
     messageContainer.setAttribute('id', id);
@@ -142,7 +153,7 @@ const displayHistoryConversations = async (id, person, message, personList) => {
         newMessageDiv.innerHTML = `<p>${bullet.body}</p><span>${formatDate(bullet.date)}</span>`;
         messageContainer.insertBefore(newMessageDiv, messageContainer.firstChild);
     })
-    
+
     personDiv.addEventListener("click", async function() {
         document.querySelectorAll('.person').forEach(elem => {
             elem.classList.remove('focus');
@@ -152,7 +163,7 @@ const displayHistoryConversations = async (id, person, message, personList) => {
         const pictureChat = document.querySelector(".picture-chat");
         const usernameTitle = document.querySelector(".username-title");
         usernameTitle.innerHTML = `${person}`
-        pictureChat.style.backgroundImage = `url(${backgroundImageURL})`;
+        pictureChat.style.backgroundImage = `url(${personList.find(elem => elem.username===person).profile_picture})`;
         document.querySelectorAll('.message-person').forEach(messageElem => {
             if (messageElem.classList.contains(`username-${username}`)) {
                 messageElem.style.display = 'flex';
@@ -166,7 +177,7 @@ const displayHistoryConversations = async (id, person, message, personList) => {
 
 async function handleMessage(message) {
     if (message.type === 'group.summary'){
-        groupSummary = message;
+        console.log("EVENT GROUP SUMMARY");
         while (displayMenu.children.length > 1) {
             displayMenu.removeChild(displayMenu.children[1]);
         }
@@ -180,19 +191,14 @@ async function handleMessage(message) {
     }
     else if (message.type === 'contact.summary'){
         contactSummary = message;
-        // console.log(contactSummary)
     }
-    else if (message.type === 'message.first'){
-        console.log("MESSAGE FIRST")
-    }
-        // handleMessage(message);
     else if (message.type === 'group.update'){
-        console.log("GROUP UPDATE");
-        receiveMessage(message, message.type);
+        console.log("EVENT GROUP UPDATE");
+        createGroup(message);
     }
     else if (message.type === 'message.text') {
-        console.log("MESSAGE");
-        receiveMessage(message, message.type);
+    console.log("EVENT MESSAGE TEXT");
+        receiveMessage(message);
     }
     // else if (message.type === 'message.fetch') {
     //     const { author, messages } = message.data;
@@ -258,15 +264,9 @@ function fetchMessages(username) {
 
 const sendToWebSocket = (username, message) => {
     try {
-        let isGroupAlreadyExist;
-        let saveGroup = false;
-        groupSummary.data.forEach(group => {
-            if (group.name == '@' && group.members.includes(username)){
-                isGroupAlreadyExist = true;
-                saveGroup = group;
-            }
-        })
+        const isGroupAlreadyExist = document.querySelector(`.username-${username}`)
         if (!isGroupAlreadyExist){
+            console.log("le groupe n'existe pas");
             const createGroup = {
                 type: "message.first",
                 data: {
@@ -277,12 +277,11 @@ const sendToWebSocket = (username, message) => {
             socket.send(JSON.stringify(createGroup));
         }
         else {
-            console.log(saveGroup.id)
             const privateMessage = {
                 type:"message.text",
                 data:
                 {
-                    group: saveGroup.id,
+                    group: isGroupAlreadyExist.id,
                     body: message,
                     respond_to: "",
                     date: new Date().toISOString()
@@ -290,7 +289,6 @@ const sendToWebSocket = (username, message) => {
             };
             socket.send(JSON.stringify(privateMessage));
         }
-
     } catch (error) {
         console.error('Error sending message:', error);
     }
@@ -306,6 +304,7 @@ function sendMessage() {
         return;
     }
     const username = focusedPerson.getAttribute('data-username');
+    console.log("sendToWebsocket " + username + " " + message);
     sendToWebSocket(username, message);
 }
 
@@ -321,7 +320,7 @@ const searchUsers = async () => {
 };
 
 export const showChat = async () => {
-    // await isUserAuthenticated();
+    await isUserAuthenticated();
     const chatElement = document.querySelector(".chatbox");
     chatElement.style.display = "flex";
     initializeWebSocket();

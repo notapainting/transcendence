@@ -18,15 +18,15 @@ def create_admin_user(sender, **kwargs):
         user = CustomUser.objects.create_superuser(
             username='islem',
             email='islem@islem.com',
-            password='lucjesuistonpere',
+            password='123',
             isVerified=True
         )
         print("islem user created")
-    if not CustomUser.objects.filter(username='laël').exists():
+    if not CustomUser.objects.filter(username='lael').exists():
         user = CustomUser.objects.create_superuser(
-            username='laël',
+            username='lael',
             email='lael@lael.com',
-            password='motdepassesecurise',
+            password='123',
             isVerified=True
         )
         print("Laël user created")

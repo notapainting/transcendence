@@ -81,10 +81,7 @@
     cursor: pointer;
 }
 
-.person:nth-child(1) {
-    background-color: pink;
-    color: black;
-}
+
 
 .picture-person{
     height: 50px;
