@@ -1,0 +1,172 @@
+{"consumer":"consumer"}
+{
+    "type":"status.fetch"
+    "data":
+    {
+        "author":"target"
+    }
+}
+
+{
+    "type":"websocket.receive",
+    "text":"",
+}
+
+{"consumer":"client"}
+{
+    "type":"group.summary",
+    "data":
+        {
+            [
+                "id":"",
+                "name":"",
+                "members":[],
+                "admins":[],
+                "restricts":[],
+                "messages":[],
+                "last_read":""
+            ]
+            [
+                ...
+            ]
+        }
+}
+{
+    "type":"websocket.receive"
+    "text":{
+        "type":"group.update",
+        "data":
+            {
+                "id":"",
+                "name":"",
+                "members":[],
+                "admins":[],
+                "restricts":[],
+                "last_read":""
+            }
+    }
+}
+{
+    "type":"contact.summary",
+    "data":
+    {
+        [
+            "name":"",
+            "relation":"c/b/i"
+        ]
+        [
+            ...
+        ]
+    }
+}
+
+{
+    "type":"contact.update",
+    "data":
+    {
+        "name":"",
+        "operation":"c/b/i/r",
+    }
+}
+
+{
+    "type":"status.update",
+    "data":
+    {
+        "status":"online"
+    }
+}
+
+{
+    "type":"message.text",
+    "data":
+    {
+        "to":"755b83ae-0cb9-461c-8639-b55ec589a6a5",
+        "body":"hello",
+        "respond_to": "",
+        "author":"",
+        "date":""
+    }
+}
+
+
+
+{"client":"consumer"}
+
+{
+    "type":"message.text",
+    "data":
+    {
+        "to":"755b83ae-0cb9-461c-8639-b55ec589a6a5",
+        "body":"hello",
+        "respond_to": "",
+        "author":"",
+        "date":""
+    }
+}
+
+{
+    "type":"message.fetch",
+    "data":
+    {
+        "date":"2024-05-15T12:02:01.005411"
+    }
+}
+
+{
+    "type":"status.update",
+    "data":
+    {
+        "status":"online/afk"
+    }
+}
+
+{
+    "type":"contact.update",
+    "data":
+    {
+        "name":"target",
+        "operation":"contact/blocked/invitation/remove"
+    }
+}
+
+{
+    "type":"group.update",
+    "data":
+    {
+        "id":"",
+        "name":"",
+        "members":[],
+        "admins":[],
+        "restricts":[],
+        "remove":[],
+    }
+}
+
+{
+    "type":"group.create",
+    "data":
+    {
+        "author":"",
+        "name":"",
+        "members":[],
+        "admins":[],
+        "restricts":[],
+    }
+}
+
+{
+    "type":"group.quit",
+    "data":
+    {
+        "id":""
+    }
+}
+
+{
+    "type":"group.delete",
+    "data":
+    {
+        "id":""
+    }
+}

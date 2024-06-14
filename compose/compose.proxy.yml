@@ -3,7 +3,7 @@ services:
     container_name: proxy
     image: owasp/modsecurity-crs:4.2-nginx-alpine-202405220605
     env_file:
-      - env.example/waf.env.example
+      - conf/waf.env.example
     ports:
      - "443:8443"
      - "80:8080"

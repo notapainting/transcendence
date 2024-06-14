@@ -23,6 +23,10 @@ body {
     display: block;
 }
 
+.green {
+	color: green;
+}
+
 #content {
     display: flex;
     align-items: center;
