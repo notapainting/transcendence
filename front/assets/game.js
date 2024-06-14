@@ -1,279 +1,224 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
-import { EffectComposer } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/RenderPass.js";
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
 
-import { animationData } from './animation.js';
-import { animate } from './animation.js';
-import { customData } from './custom.js';
-import * as utils from './utils.js';
+var start = document.getElementById("startButton");
+var stop = document.getElementById("stopButton");
+var back = document.getElementById("backButton");
 
-var width = window.innerWidth;
-var height = window.innerHeight
+var gameRunning = false;
 
-export const scene = new THREE.Scene();
-export const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
-scene.background = new THREE.Color(0x031d44);
-renderer.setSize(width, height);
-camera.position.set( 0, -100, 85 );
+// ball properties
+var ballRadius = 10;
+var ballX = canvas.width / 2;
+var ballY = canvas.height / 2;
+var ballSpeedX = 7;
+var ballSpeedY = 7;
 
-import * as load from './loader.js';
+// paddle properties
+var paddleHeight = 80;
+var paddleWidth = 10;
+var leftPaddleY = canvas.height / 2 - paddleHeight / 2;
+var rightPaddleY = canvas.height / 2 - paddleHeight / 2;
+var paddleSpeed = 10;
 
-var trailPositions = [];
+// score properties
+var leftPlayerScore = 0;
+var rightPlayerScore = 0;
+var maxScore = 5;
 
-const controls = new OrbitControls(camera, renderer.domElement);
+// Listen for keyboard events
+document.addEventListener("keydown", keyDownHandler);
+document.addEventListener("keyup", keyUpHandler);
 
-const geometryBall1 = new THREE.SphereGeometry(0, 10, 10);
-const materialBall1 = new THREE.MeshToonMaterial({ color: 0xfcca46});
-let spotLight = new THREE.Mesh(geometryBall1, materialBall1);
-spotLight.position.set(-90, 60, 1);
+// Listen for button events
+start.addEventListener('click', startGame);
+stop.addEventListener('click', stopGame);
+back.addEventListener('click', backTest);
 
-// Light
-const light = new THREE.AmbientLight(0x3a86ff, 4);
-light.position.set(0, 0, 0);
-const lightWall = new THREE.DirectionalLight(0x3a86ff, 0);
-lightWall.position.set(0, -400, 50);
-const spotLight1 = new THREE.DirectionalLight(0x0e7b7f, 7);
-spotLight1.position.set(90, 60, 5);
-const spotLight2 = new THREE.DirectionalLight(0x0e7b7f, 7);
-spotLight2.position.set(-90, 60, 1);
+// Handle key press
+var upPressed = false;
+var downPressed = false;
+let wPressed = false;
+let sPressed = false;
 
-// Activate shadows in the renderer
-renderer.shadowMap.enabled = true;
-
-// Composer pour la scène principale
-export const composer = new EffectComposer(renderer);
-const renderScene = new RenderPass(scene, camera);
-composer.addPass(renderScene);
-
-export var sphere;
-export var cylinderRight;
-export var cylinderLeft;
-export var plane;
-export var line;
-
-export let scoreRight = 0
-export let scoreLeft = 0
-export let collisionX = 0;
-export let collisionY = 0;
-export let initialSpeed = 0.8;
-
-export let light1;
-export let light2;
-export let light3;
-export let lightBonus;
-export let lightMalus;
-
-export const gameData = {
-	explosion: false,
-	catchBonus: false,
-	catchMalus: false,
-	collisionPaddle: false,
-	start: false,
-	elapsedTime: 0,
-	timerInterval: null,
-	width: 0,
-	height: 0,
-	bonus: null,
-	malus: null,
-	effect: null,
-	sceneHandler: 0
-};
-
-export function gameRenderer(data) {
-	if (data)
-	{
-		utils.clearScene(); 
-		animationData.ballFall = true;
-		// scene.add(load.intro);
-		// scene.add(spotLight);
-		// scene.add(light);
-		// scene.add(lightWall);
-		// scene.add(spotLight1);
-		// scene.add(spotLight2);
-	
-		gameData.width = data.width;
-		gameData.height = data.height;
-	
-		// Game limits
-		const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
-		const points = [];
-		points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
-		points.push(new THREE.Vector3(data.width + 5, data.height, 0));
-		points.push(new THREE.Vector3(-data.width - 5, data.height, 0));
-		points.push(new THREE.Vector3(-data.width - 5, -data.height, 0));
-		points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
-		points.push(new THREE.Vector3(0, -data.height, 0));
-		points.push(new THREE.Vector3(data.heigt, 0, 0));
-		points.push(new THREE.Vector3(0, data.height, 0));
-		const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
-		line = new THREE.Line(geometryLine, materialLine);
-	
-		// Background plane
-		const geometryPlane = new THREE.PlaneGeometry((data.width + 5) * 2, data.height * 2);
-		const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5, transparent: true, opacity: 0.5 });
-		plane = new THREE.Mesh(geometryPlane, materialPlane);
-		plane.position.z = -2;
-		plane.receiveShadow = true;
-		
-		// Paddles
-		const geometryR = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightR - 1, 20);
-		const geometryL = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightL - 1, 20);
-		const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
-		cylinderRight = new THREE.Mesh(geometryR, material);
-		cylinderLeft = new THREE.Mesh(geometryL, material);
-		cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY, 0);
-		cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY, 0);
-		cylinderRight.castShadow = true; 
-		cylinderLeft.castShadow = true; 
-		
-		// Ball
-		const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 10);
-		const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
-		sphere = new THREE.Mesh(geometryBall, materialBall);
-		sphere.position.set(data.x, data.y, 0);
-		
-		const materialTrail = new THREE.MeshToonMaterial({ color: 0xffffff, transparent:true});
-		if (gameData.start)
-		{
-			trailPositions.push(sphere.position.clone());
-			if (trailPositions.length > 15 || gameData.explosion === true) {
-				trailPositions.shift();
-			}
-		}
-	
-		scene.children
-			.filter(obj => obj.userData.isTrailSphere)
-			.forEach(obj => scene.remove(obj));
-	
-		var size = 0.1;
-		trailPositions.forEach(position => {
-			const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
-			trailSphere.position.copy(position);
-			trailSphere.scale.multiplyScalar(size);
-			if (size < 1)
-				size += 0.08;
-			trailSphere.userData.isTrailSphere = true;
-			materialTrail.opacity = 0.5;
-			scene.add(trailSphere);
-		});
-	
-		if (gameData.explosion) {
-			scene.children
-				.filter(obj => obj.userData.isTrailSphere)
-				.forEach(obj => scene.remove(obj));
-		} else {
-			trailPositions.push(sphere.position.clone());
-			if (trailPositions.length > 15) {
-				trailPositions.shift();
-			}
-		
-			scene.children
-				.filter(obj => obj.userData.isTrailSphere)
-				.forEach(obj => scene.remove(obj));
-		
-			var size = 0.1;
-			trailPositions.forEach(position => {
-				const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
-				trailSphere.position.copy(position);
-				trailSphere.scale.multiplyScalar(size);
-				if (size < 1)
-					size += 0.08;
-				trailSphere.userData.isTrailSphere = true;
-				materialTrail.opacity = 0.5;
-				scene.add(trailSphere);
-			});
-		}
-	
-		// Lights
-		const lightColor = utils.interpolateColor(customData.colorBall); 
-		const lightIntensity = 100;
-		const lightDistance = 80;
-		light1 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
-		light1.position.set(data.width - 5, data.rightPaddleY, cylinderRight.position.z + 5);
-		light2 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
-		light2.position.set(-data.width + 5, data.leftPaddleY, cylinderLeft.position.z + 5);
-		light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
-		light3.position.set(data.x, data.y, sphere.position.z);
-		lightBonus = new THREE.PointLight(0x90e0ef, 20, 0);	
-		lightMalus = new THREE.PointLight(0xd62828, 20, 0);
-
-		// Explosion collision
-		if (data.leftPlayerScore > scoreLeft) {
-			collisionX = data.collisionX;
-			collisionY = data.collisionY;
-			scoreLeft++;
-			trailPositions = [];
-			gameData.explosion = true;
-			trailPositions = [];
-		}
-		if (data.rightPlayerScore > scoreRight) {
-			collisionX = data.collisionX;
-			collisionY = data.collisionY;
-			scoreRight++;
-			trailPositions = [];
-			gameData.explosion = true;
-			trailPositions = [];
-		}
-		if (data.speed != initialSpeed)
-		{
-			gameData.collisionPaddle = true;
-			initialSpeed = data.speed;
-		}
-
-		if (data.randomPointB && load.bonus){
-			load.bonus.position.set(data.randomPointB.x, data.randomPointB.y, 0);
-			lightBonus.position.set(data.randomPointB.x, data.randomPointB.y, 0);
-			scene.add(load.bonus);
-			scene.add(lightBonus);
-		} 
-		if (data.hitB === true)
-			gameData.catchBonus = true;
-
-		if (data.randomPointM && load.malus){
-			load.malus.position.set(data.randomPointM.x, data.randomPointM.y, 0);
-			lightMalus.position.set(data.randomPointM.x, data.randomPointM.y, 0);
-			scene.add(load.malus);
-			scene.add(lightMalus);
-		} 
-		if (data.hitM === true)
-			gameData.catchMalus = true;
-
-		// if (data.bonus && (data.bonus === 'boostL' || data.bonus === 'boostR')){
-		// 	console.log(data.bonus);
-		// 	if (load.boost){
-		// 		load.boost.position.set(sphere.position.x, sphere.position.y, sphere.position.z)
-		// 		scene.add(load.boost);
-		// 		updateBallPosition(sphere.position);
-		// 		applyRotationToObject(load.boost, direction) 
-		// 	}
-		// }
+//test backend connexion
+function backTest() {
+	console.log("click");
+    fetch('https://127.0.0.1:8443/game/')
+        .then(response => response.json())
+        .then(data => console.log(data.message))
+        .catch(error => {
+            console.error('Error response:', error);
+        });
 	}
+	
+// Start game
+function startGame() {
+    fetch('https://127.0.0.1:8443/start-game/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"gameRunning": true})
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 
-	if (gameData.sceneHandler === 1){
-		if (data) {
-			if (gameData.start) {
-				sphere.position.set(data.x, data.y, 0);
-				scene.add(sphere);
-			} else {
-				sphere.position.set(data.x, data.y, 40);
-			}
-		}
-
-		scene.add(light2);
-		scene.add(light1);
-		scene.add(light3);
-
-		scene.add(line);
-		scene.add(cylinderRight);
-		scene.add(cylinderLeft);
-		scene.add(sphere);
-		scene.add(plane);
-	}
-
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    composer.render();
+	gameRunning = true; // a enlever
 }
 
-animate();
+// Stop game
+function stopGame()
+{
+    fetch('https://127.0.0.1:8443/start-game/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"gameRunning": false})
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+	gameRunning = false; // a enlever
+}
+
+// Pong Functions
+function keyDownHandler(e) {
+	if (e.key === "ArrowUp") {
+		upPressed = true;
+	} else if (e.key === "ArrowDown") {
+		downPressed = true;
+	} else if (e.key === "w") {
+		wPressed = true;
+	} else if (e.key === "s") {
+		sPressed = true;
+	}
+}
+
+function keyUpHandler(e) {
+	if (e.key === "ArrowUp") {
+		upPressed = false;
+	} else if (e.key === "ArrowDown") {
+		downPressed = false;
+	} else if (e.key === "w") {
+		wPressed = false;
+	} else if (e.key === "s") {
+		sPressed = false;
+	}
+}
+
+function update() {
+	if (upPressed && rightPaddleY > 0) {
+	  rightPaddleY -= paddleSpeed;
+	} else if (downPressed && rightPaddleY + paddleHeight < canvas.height) {
+	  rightPaddleY += paddleSpeed;
+	}
+
+	if (wPressed && leftPaddleY > 0) {
+	  leftPaddleY -= paddleSpeed;
+	} else if (sPressed && leftPaddleY + paddleHeight < canvas.height) {
+	  leftPaddleY += paddleSpeed;
+	}
+
+	ballX += ballSpeedX;
+	ballY += ballSpeedY;
+
+	if (ballY - ballRadius < 0 || ballY + ballRadius > canvas.height) {
+	  ballSpeedY = -ballSpeedY;
+	}
+  
+	if (
+	  ballX - ballRadius < paddleWidth &&
+	  ballY > leftPaddleY &&
+	  ballY < leftPaddleY + paddleHeight
+	) {
+	  ballSpeedX = -ballSpeedX;
+	}
+  
+	if (
+	  ballX + ballRadius > canvas.width - paddleWidth &&
+	  ballY > rightPaddleY &&
+	  ballY < rightPaddleY + paddleHeight
+	) {
+	  ballSpeedX = -ballSpeedX;
+	}
+  
+	if (ballX < 0) {
+	  rightPlayerScore++;
+	  reset();
+	} else if (ballX > canvas.width) {
+	  leftPlayerScore++;
+	  reset();
+	}
+  
+	if (leftPlayerScore === maxScore) {
+	  playerWin("Left player");
+	} else if (rightPlayerScore === maxScore) {
+	  playerWin("Right player");
+	}
+  }
+
+function playerWin(player) {
+	var message = "Congratulations! " + player + " win!";
+	var myParagraph = document.getElementById("scoreMessage");
+	myParagraph.innerText = message; 
+	reset();
+}
+  
+function reset() {
+	ballX = canvas.width / 2;
+	ballY = canvas.height / 2;
+	ballSpeedX = -ballSpeedX;
+	ballSpeedY = Math.random() * 10 - 5;
+}
+
+function draw() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+	ctx.fillStyle = "#FFF";
+	ctx.font = "15px Arial";
+  
+	ctx.beginPath();
+	ctx.moveTo(canvas.width / 2, 0);
+	ctx.lineTo(canvas.width / 2, canvas.height);
+	ctx.strokeStyle = "#FFF";
+	ctx.stroke();
+	ctx.closePath();
+  
+	ctx.beginPath();
+	ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.closePath();
+  
+	ctx.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
+  
+	ctx.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
+  
+	ctx.fillText("Score: " + leftPlayerScore, 10, 20);
+	ctx.fillText("Score: " + rightPlayerScore, canvas.width - 70, 20);
+  }
+  
+
+function loop() {
+	if (gameRunning == true)
+		update();
+	draw();
+	animationId = requestAnimationFrame(loop);
+}
+
+loop();

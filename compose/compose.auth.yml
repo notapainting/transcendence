@@ -1,0 +1,57 @@
+services:
+  auth:
+    container_name: auth
+    build:
+      context: apps/auth/
+      dockerfile: Dockerfile.dev
+    image: auth_image
+    environment:
+      - TZ=${TZ}
+    env_file:
+      - conf/auth.env.example
+      - conf/auth-common.env.example
+    volumes:
+      - auth_volume:/app
+    networks:
+      - app_network
+    restart: unless-stopped
+    depends_on:
+      auth-db:
+       condition: service_healthy
+    entrypoint: ["bash", "/conf/init.sh"]
+
+
+  auth-db:
+    container_name: auth-db
+    build: postgres/
+    image: postgres_image
+    environment:
+      - TZ=${TZ}
+    env_file:
+      - conf/auth-db.env.example
+      - conf/auth-common.env.example
+    volumes:
+      - auth-db_volume:${PGDATA}
+    networks: 
+      - app_network
+    restart: unless-stopped
+    healthcheck:
+      test: "pg_isready -U $$DB_USER -d $$DJ_DB_NAME || exit 1"
+      retries: 3
+      timeout: 5s
+      interval: 600s
+      start_period: 30s
+      start_interval: 10s
+
+volumes:
+  auth_volume:
+    name: auth_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: apps/auth/src
+      o: bind
+
+  auth-db_volume:
+    name: auth-db_volume
+    driver: local
