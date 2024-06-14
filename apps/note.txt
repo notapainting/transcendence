@@ -17,4 +17,40 @@ update gamestate -> init with settings
 
 
 tournament : 
-        F
+        host -> orchestrator : process charge   d'organiser les matchs, 
+                                                d'enregistrer les scores
+                                                de transferer els informations
+        invited -> clients invites au tournoi
+        players -> tout les clients participants au tournoi (host compris)
+        watchers -> players elimines
+
+
+    phase 1 : wait for client ot join, cahnge settings etc, when max_player reached ->
+    phase 2: a) matchmaking -> create firts x match with players and send order to match to players
+             b) wait for all match to end (players stay in players, looser go to watchers)
+             c) repeat until end
+    phase 3: clear tournament and send data to game history?
+
+
+
+    client : 
+        at start: load function depend on type :
+                        - all -> quit current (game/tournament, if host delete it) 
+                        - idle      -> create game -> GOTO -game/host
+                                    -> join game -> GOTO -game/guest
+                                    -> create tournament -> GOTO -tournament/host
+                                    -> join tournament -> GOTO -tournament/guest
+
+                        - tournament    /host -> invit player
+                                            -> kick player
+                                            -> start tounament 
+                                            -> cancel tournament -> GOTO -idle
+                                        /player -> receive match to do -> GOTO -game/(host/guest)
+
+                        - game  /host -> invit player
+                                        -> kick player
+                                        -> start game 
+                                        -> cancel game -> GOTO -game/host
+                                /guest -> ready game
+                            when game end, -> GOTO -last state(idle or -tournament/(host/guest))
+                            when load game, register last state as loopback function
