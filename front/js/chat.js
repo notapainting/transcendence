@@ -112,11 +112,6 @@ let createGroup = async (message) => {
     newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
     messageContainer.appendChild(newMessageDiv);
     const focusedPerson = document.querySelector('.person.focus');
-    console.log("AHHHHH");
-    console.log(focusedPerson)
-    console.log("AHHHHH");
-    console.log(target);
-    console.log("AHHHHH");
     messageContainer.scrollTop = messageContainer.scrollHeight;
     if (focusedPerson.getAttribute('data-username') === target){
         messageContainer.style.display = 'flex';
@@ -124,6 +119,7 @@ let createGroup = async (message) => {
     }
     messageInput.value = ``;
 }
+
 let receiveMessage = async (message) => {
     let messageContainer = document.getElementById(message.data.group);
     console.log(messageContainer);
@@ -197,7 +193,7 @@ async function handleMessage(message) {
         createGroup(message);
     }
     else if (message.type === 'message.text') {
-    console.log("EVENT MESSAGE TEXT");
+        console.log("EVENT MESSAGE TEXT");
         receiveMessage(message);
     }
     // else if (message.type === 'message.fetch') {
@@ -264,7 +260,9 @@ function fetchMessages(username) {
 
 const sendToWebSocket = (username, message) => {
     try {
-        const isGroupAlreadyExist = document.querySelector(`.username-${username}`)
+        console.log(username, message);
+        const isGroupAlreadyExist = document.querySelector(`.username-${username}`);
+        console.log(isGroupAlreadyExist);
         if (!isGroupAlreadyExist){
             console.log("le groupe n'existe pas");
             const createGroup = {
@@ -277,6 +275,7 @@ const sendToWebSocket = (username, message) => {
             socket.send(JSON.stringify(createGroup));
         }
         else {
+            console.log("j'envoie message message.text " + isGroupAlreadyExist.id + " " + message);
             const privateMessage = {
                 type:"message.text",
                 data:

@@ -53,7 +53,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 				raise AuthenticationFailed('No active account found with the given credentials')
 		if not user.is_active:
 			raise AuthenticationFailed('No active account found with the given credentials')
-
 		if not user.isVerified:
 			raise AuthenticationFailed('Email not verified.')
 		if user.is_2fa_enabled:
@@ -100,7 +99,6 @@ class GetUserPersonnalInfos(APIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
 	serializer_class = CustomTokenObtainPairSerializer
-
 	def post(self, request, *args, **kwargs):
 		try:
 			response = super().post(request, *args, **kwargs)
@@ -109,13 +107,11 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 			response.data.pop('access', None)
 			response.data.pop('refresh', None)
 
-			# Ajouter les cookies à la réponse
 			response.set_cookie(key='access', value=access_token, httponly=True, secure=True)
 			response.set_cookie(key='refresh', value=refresh_token, httponly=True, secure=True)
 			return response
 		except AuthenticationFailed as e:
 			return Response(e.detail, status=status.HTTP_403_FORBIDDEN)
-		
 
 
 def verify_email(request, uidb64, token):
@@ -132,8 +128,6 @@ def verify_email(request, uidb64, token):
 			'email': user.email,
 			'unique_id': user.unique_id
 		}
-		
-		# Vérifier si profile_picture n'est pas vide avant de l'ajouter à user_data
 		if user.profile_picture:
 			user_data['profile_picture'] = user.profile_picture
 		response = requests.post('http://user-managment:8000/signup/', json=user_data, verify=False)
@@ -153,7 +147,7 @@ def GenerateVerificationUrl(request, user, viewname):
 	#pour le port 8443 TEMPORAIRE
 	if '8443' not in verification_url:
 		parts = list(urlparse(verification_url))
-		parts[1] = parts[1].replace('localhost', 'localhost:8443')  # Replace the domain part
+		parts[1] = parts[1].replace('localhost', 'localhost:8443') 
 		verification_url = urlunparse(parts)
 	return verification_url
 
@@ -291,24 +285,23 @@ def authenticate_with_42(request):
 	uid = os.getenv('UID')
 	if uid is None:
 		pass #implementer uen redirection
-	authorization_url = f"https://api.intra.42.fr/oauth/authorize?client_id={uid}&redirect_uri=https://10.14.3.2:8443/auth/Oauth/&response_type=code"
+	authorization_url = f"https://api.intra.42.fr/oauth/authorize?client_id={uid}&redirect_uri=https://localhost:8443/auth/Oauth/&response_type=code"
 	response = JsonResponse({'authorization_url': authorization_url})
 	response["Access-Control-Allow-Origin"] = "*"
 	response["Access-Control-Allow-Methods"] = "GET"
 	response["Access-Control-Allow-Headers"] = "Content-Type"
 	return response
 
-
 import random
 import string
 from django.http import HttpResponseRedirect
 def oauth_callback(request):
-	code = request.GET['code']
+	code = request.GET.get('code')
 	if code:
 		token_url = "https://api.intra.42.fr/oauth/token"
 		client_id = os.getenv('UID')
 		client_secret = os.getenv('SECRET_KEY')
-		redirect_url = "https://10.14.3.2:8443/auth/Oauth/"
+		redirect_url = "https://localhost:8443/auth/Oauth/"
 		payload = {
 			"grant_type": "authorization_code",
 			"client_id": client_id,
@@ -318,49 +311,42 @@ def oauth_callback(request):
 		}
 		response = requests.post(token_url, data=payload)
 		if response.ok:
-			# Extraire le jeton d'accès de la réponse
 			access_token = response.json().get('access_token')
 			user_info_url = "https://api.intra.42.fr/v2/me"
-			headers = {
-				"Authorization": f"Bearer {access_token}"
-			}
+			headers = {"Authorization": f"Bearer {access_token}"}
 			user_info_response = requests.get(user_info_url, headers=headers)
-			if user_info_response.ok :
-				user_data = user_info_response.json()	
-				password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+			if user_info_response.ok:
+				user_data = user_info_response.json()
 				username = user_data.get('login')
-				profile_picture = user_data.get('image', {}).get('versions', {}).get('small')
-				print(profile_picture)
 				email = user_data.get('email')
-				if CustomUser.objects.filter(username=username).exists() and CustomUser.objects.filter(is_42=False).exists():
-					pass #implementer une feature de username set si deja pris par un compte non 42.
-				elif not CustomUser.objects.filter(username=username).exists():
-					serializer = UserSerializer(data={
-					'username': username,
-					'password': password,
+				profile_picture = user_data.get('image', {}).get('versions', {}).get('small')
+				User = get_user_model()
+				user, created = User.objects.get_or_create(username=username, defaults={
 					'email': email,
+					'profile_picture': profile_picture,
+					'password': ''.join(random.choices(string.ascii_letters + string.digits, k=12)),
 					'is_42': True,
-					'profile_picture': profile_picture
-					})
-					if serializer.is_valid():
-						user = serializer.save()
-						full_verification_url = GenerateVerificationUrl(request, user, 'verify_email')
-						send_mail(
-							'Vérifiez votre adresse email',
-							f'olalaaaaa sa marche : {full_verification_url}',
-							'jill.transcendance@gmail.com',
-							[user.email],
-							fail_silently=False,
-					)
-				return redirect('https://localhost:8443/?username={}&profile_picture={}&email={}'.format(username, profile_picture, email))
-				return JsonResponse({'username': username, 'profile_picture': profile_picture, 'email': email, 'password': password})
-			else:	
-				return JsonResponse({'error': 'Échec de la récuperation des informatiosn utilisateur'}, status=400)
+				})
+				if created:
+					account = {
+						'username': username,
+						'email': user.email,
+						'profile_picture': profile_picture,
+						'unique_id': user.pk
+					}
+					requests.post('http://user-managment:8000/signup/', json=account, verify=False)
+				refresh = RefreshToken.for_user(user)
+				access_token_jwt = str(refresh.access_token)
+				response = HttpResponseRedirect('https://localhost:8443/')
+				response.set_cookie('access', access_token_jwt, httponly=True, secure=True, samesite='Lax')
+				response.set_cookie('refresh', str(refresh), httponly=True, secure=True, samesite='Lax')
+				return response
+			else:
+				return JsonResponse({'error': 'Échec de la récupération des informations utilisateur'}, status=400)
 		else:
 			return JsonResponse({'error': 'Échec de la récupération du jeton d\'accès'}, status=400)
 	else:
 		return JsonResponse({'error': 'Code d\'autorisation manquant dans la requête'}, status=400)
-
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -375,7 +361,6 @@ from io import BytesIO
 
 class Activate2FAView(APIView):
 	authentication_classes = [JWTAuthentication]
-
 	def generate_qr_code(self, secret_key, otp_url):
 		qr = qrcode.QRCode(
 			version=1,
