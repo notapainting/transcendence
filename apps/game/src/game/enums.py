@@ -27,7 +27,11 @@ class Game(enum.StrEnum):
 
 class Tournament(enum.StrEnum):
     CREATE = "tournament.create"
+    INVITE = "tournament.invite"
+    JOIN = "tournament.join"
     QUIT = "tournament.quit"
+    ACCEPTED = "tournament.accepted"
+    
 
 
 class CStatus(enum.StrEnum):
