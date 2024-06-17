@@ -1,5 +1,4 @@
-FROM    docker.elastic.co/beats/filebeat:8.12.2
+FROM    docker.elastic.co/beats/filebeat:8.14.1
 
 COPY    --chown=root:filebeat conf/filebeat.yml /usr/share/filebeat/filebeat.yml
-
-COPY    modules/*.yml /usr/share/filebeat/modules.d/
+COPY    --chown=root:filebeat modules/nginx.yml /usr/share/filebeat/modules.d/

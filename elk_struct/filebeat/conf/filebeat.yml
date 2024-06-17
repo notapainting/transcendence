@@ -7,6 +7,16 @@ filebeat.inputs:
     id: filebeat
     paths:
       - '/var/lib/docker/containers/*/*.log'
+    fields_under_root: true
+    ignore_inactive: since_last_start
+    ignore_older: 24h
+    parsers:
+      - multiline:
+          match: after
+          negate: true
+          pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}
+          type: pattern
+    take_over: true
 
 processors:
   - add_docker_metadata:
@@ -18,15 +28,22 @@ setup.kibana:
   password: ${ELASTIC_PASSWORD}
   setup.dashboards.enable: true
 
-output.logstash:
-  hosts: ${LOGSTASH_HOSTS}
-
 logging.json: true
 logging.metrics.enabled: false
-setup.ilm.enabled: true
 json.keys_under_root: true
 json.add_error_key: true
 json.message_key: message
+
+setup.ilm.enabled: true
+setup.ilm.rollover_alias: "filebeat"
+setup.ilm.pattern: "{now/d}-000001"
+setup.ilm.overwrite: true
+
+# logging:
+#   level: debug
+
+output.logstash:
+  hosts: ${LOGSTASH_HOSTS}
 
 # output.elasticsearch:
 #   hosts: ${ELASTIC_HOSTS}
@@ -34,6 +51,6 @@ json.message_key: message
 #   password: ${ELASTIC_PASSWORD}
 #   ssl.enabled: true
 #   ssl.certificate_authorities: "config/certs/ca/ca.crt"
-#   indices:
-#       - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
+# output.console:
+#   enabled: true

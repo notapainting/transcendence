@@ -41,7 +41,7 @@ no-waf:
 
 #========#	start/stop rule	#========#
 start: -waf-warn
-	${CMP} up -d --build
+	${CMP} up --build
 
 clear:
 	${CMP} down -v --remove-orphans --rmi all
