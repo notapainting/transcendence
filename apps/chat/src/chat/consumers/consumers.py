@@ -71,11 +71,6 @@ class BaseConsumer(AsyncWebsocketConsumer):
 
 
 class ChatConsumer(BaseConsumer):
-
-    group_list = []
-    contact_list = []
-
-
     async def connect(self):
         self.user = self.scope['user']
         if self.user is None:
@@ -90,7 +85,7 @@ class ChatConsumer(BaseConsumer):
 
         await self.channel_layer.group_add(self.user.name, self.channel_name)#attention au name
 
-        # add user to channel groups,
+        # add user to channel groups
         self.group_list = await cuti.get_group_list(self.user)
         for id in self.group_list:
             await self.channel_layer.group_add(id, self.channel_name)
@@ -123,8 +118,12 @@ class ChatConsumer(BaseConsumer):
             type = await cuti.validate_data(username=self.user.name, data=json_data)
             serial = await cuti.get_serializer(type)
             ser_data = await cuti.serializer_wrapper(serial, json_data['data'])
-            targets, event = await cuti.get_targets(self.user, type, ser_data)
-
+            if type == enu.Message.FIRST:
+                targets, event = await cuti.get_targets(self.user, type, ser_data)
+                self.group_list = await cuti.get_group_list(self.user)
+                await self.channel_layer.group_add(ser_data['target'], self.channel_name)
+            else:
+                targets, event = await cuti.get_targets(self.user, type, ser_data)
         except DrfValidationError as error:
                 logger.info(error)
                 await self.send_json({"type": enu.Event.Errors.DATA})
