@@ -39,11 +39,13 @@ async def get_serializer(type):
 async def get_targets(user, type, data):
     match type:
         case enu.Event.Message.TEXT: targets = [data['group']]
-        case enu.Event.Message.FIRST: targets = data["members"]
+        case enu.Event.Message.FIRST: 
+            type = enu.Event.Group.UPDATE
+            targets = data["members"]
         case enu.Event.Message.FETCH: targets = enu.Self.LOCAL
         case enu.Event.Message.READ: targets = [data["group"]]
         case enu.Event.Message.GAME: targets = [user.name, data['target']]
-        case enu.Event.Status.UPDATE: targets = get_contact_list(user) + [user.name]
+        case enu.Event.Status.UPDATE: targets = user.contact_list + [user.name]
         case enu.Event.Contact.UPDATE: targets = [user.name, data['name']]
         case enu.Event.Group.CREATE | enu.Event.Group.QUIT | enu.Event.Group.DELETE | enu.Event.Group.UPDATE: 
             type = enu.Event.Group.UPDATE
