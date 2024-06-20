@@ -176,15 +176,15 @@ WebSocket :
                         }
                     }
                 message.first
-                 {
-                        "type":"message.first",
-                        "data":
-                        {
-                            "author":"",
-                            "target":"",
-                            "body":""
-                        }
+                {
+                    "type":"message.first",
+                    "data":
+                    {
+                        "author":"",
+                        "target":"",
+                        "body":""
                     }
+                }
 
 
                 message.fetch

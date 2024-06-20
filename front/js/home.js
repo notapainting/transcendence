@@ -1,5 +1,6 @@
 import { navigateTo } from "./index.js";
-import { clearView } from "./index.js";
+import { clearView, isUserAuthenticated } from "./index.js";
+import { showChat } from "./chat.js";
 
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
@@ -19,6 +20,25 @@ const parallaxEffect = (event) => {
     middleThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.4}px) calc(50% + ${yAxis * 0.4}px)`;
     frontThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.9}px) calc(50% + ${yAxis * 0.9}px)`;
 }
+
+function authenticateWith42() {
+    fetch('auth/authenticate_with_42/', {
+        method: 'GET',
+        redirect: 'follow'
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        // Récupérer l'URL d'autorisation de l'école 42 depuis les données JSON
+        const authorizationUrl = data.authorization_url;
+        // Rediriger l'utilisateur vers l'URL d'autorisation de l'école 42
+        window.location.href = authorizationUrl;
+    })
+    .catch(error => {
+    });
+}
+
 let isScrolling = false;
 
 const scrollUpEffect = (event) => {
@@ -137,9 +157,13 @@ const switchForm = (event) => {
 const messageBox = document.querySelector(".message-box");
 
 const loggedInStatus = () => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
     document.querySelector(".navbar").style.display= "flex"
     document.querySelector(".login-signin-form").style.display = "none"
     document.querySelector(".play-online-btn").style.display = "block"
+    showChat();
     setTimeout(()=> {
         document.querySelector(".play-online-btn").style.transform = "scale(1)"
     }, 100)
@@ -187,16 +211,15 @@ const loginRequest = (event) => {
                     displayTwoFactorLogin();
                 }
                 else {
-                    messageBox.innerHTML = `${data.detail} <span" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+                    messageBox.innerHTML = `Username / e-mail or password incorrect.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
                     messageBox.style.transform = "scale(1)";
                 }
             });
         } else {
             messageBox.style.backgroundColor = "#f44336";
-            messageBox.innerHTML = `Username / e-mail or password incorrect.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+            messageBox.innerHTML = `Server error, please retry later.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
             messageBox.style.transform = "scale(1)";
         }
-        return null;
     })
     .then(data => {
     })  
@@ -227,14 +250,19 @@ const registerRequest = (event) => {
     })
     .then(response => {
         if (response.ok){
+            console.log('OKKK');
             messageBox.style.backgroundColor = "#36B985";
             messageBox.innerHTML = `An link have been send to your e-mail address<br> please check you mailbox.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
             messageBox.style.transform = "scale(1)";
             return response.json();
         }
         else {
-            console.log("IL Y A UNE ERREUR");
-            throw new Error("Identifiant ou mot de passe incorrect");
+            messageBox.style.backgroundColor = "#f44336";
+            return response.json().then(data => {
+                console.log(data);
+                messageBox.innerHTML = `${data.email || data.username}<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+                messageBox.style.transform = "scale(1)";
+            });
         }
     })
     .then(data => {
@@ -251,32 +279,6 @@ const loginOrRegisterRequest = (event) => {
         registerRequest();
 }
 
-const isUserAuthenticated = () => {
-    return fetch('auth/validate_token/', {
-        method: 'POST',
-        credentials: 'same-origin'
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log("Je return true dans access")
-            return true;
-        } else {
-            return fetch('auth/token/refresh/', {
-                method: 'POST',
-                credentials: 'same-origin'
-            })
-            .then(refreshResponse => {
-                if (refreshResponse.ok) {
-                    console.log("Je return true dans refresh")
-                    return true;
-                } else {
-                    console.log("Je return false dans refresh")
-                    return false;  
-                }
-            });
-        }
-    });
-}
 let isZooming = false;
 let indexZoom = 0;
 let zoomFactor = 1;
@@ -379,4 +381,5 @@ export const showHome = async () => {
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
     const logoutButton = document.querySelector(".fa-right-from-bracket");
     logoutButton.addEventListener("click", logoutRequest);
+    document.querySelector(".login-42").addEventListener('click', authenticateWith42);
 } 
