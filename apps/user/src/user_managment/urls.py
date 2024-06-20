@@ -25,5 +25,5 @@ urlpatterns = [
 	path('signup/', UserCreate.as_view(), name='signup'),
 	path('getuserinfo/', GetUserInfos.as_view(), name='get-user-info'),
     path('update_client/', UpdateClientInfo.as_view(), name='get-client'),
-    path('user_managment/users_info/', GetAllUserInfos.as_view(), name='users-imfo'),
+    path('user/users_info/', GetAllUserInfos.as_view(), name='users-info'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

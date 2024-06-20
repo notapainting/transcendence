@@ -23,7 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
 		if 'username' in data:
 			username = data['username']
 			if not username:
-				print("ERROR USERNAME")
 				errors['username'] = "Username cannot be empty."
 			elif not username.isalnum():
 				print("ERROR USERNAME")
