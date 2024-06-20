@@ -69,7 +69,7 @@ def oauth_callback(request):
 						'profile_picture': profile_picture,
 						'unique_id': user.unique_id
 					}
-					requests.post('http://user-managment:8000/signup/', json=account, verify=False)
+					requests.post('http://user:8000/signup/', json=account, verify=False)
 				refresh = RefreshToken.for_user(user)
 				access_token_jwt = str(refresh.access_token)
 				response = HttpResponseRedirect('https://localhost:8443/')

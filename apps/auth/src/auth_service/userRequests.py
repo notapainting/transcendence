@@ -16,7 +16,7 @@ class UpdateProfilePicture(APIView):
 			try:
 				files = {'profile_picture': profile_picture}
 				data = {'unique_id': user.unique_id}
-				update_response = requests.put('http://user-managment:8000/update_client/', files=files, data=data, verify=False)
+				update_response = requests.put('http://user:8000/update_client/', files=files, data=data, verify=False)
 				update_response.raise_for_status()
 			except requests.exceptions.RequestException as e:
 				return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -32,7 +32,7 @@ class UpdateClientInfo(APIView):
 		print(user.unique_id)
 		try:
 			request.data['unique_id'] = user.unique_id
-			update_response = requests.put('http://user-managment:8000/update_client/', json=request.data, verify=False)
+			update_response = requests.put('http://user:8000/update_client/', json=request.data, verify=False)
 			update_response.raise_for_status()  
 		except requests.exceptions.RequestException as e:
 			return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -50,7 +50,7 @@ class GetUserPersonnalInfos(APIView):
 		access_token_cookie = request.COOKIES.get('access')
 		user = get_user_from_access_token(access_token_cookie)
 		user_data = {'username':user.username}
-		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data, verify=False)
+		response = requests.post('http://user:8000/getuserinfo/', json=user_data, verify=False)
 		if response.status_code == 200:
 			user_info = response.json()
 			user_info['is_2fa_enabled'] = user.is_2fa_enabled
