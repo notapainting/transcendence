@@ -67,7 +67,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 			'access': str(refresh.access_token),
 		}
 		user_data = {'username': user.username}
-		response = requests.post('http://user-managment:8000/getuserinfo/', json=user_data, verify=False)
+		response = requests.post('http://user:8000/getuserinfo/', json=user_data, verify=False)
 		if response.status_code == 200:
 			user_info = response.json()
 			data.update(user_info)

@@ -64,7 +64,7 @@ def verify_email(request, uidb64, token):
 		}
 		if user.profile_picture:
 			user_data['profile_picture'] = user.profile_picture
-		response = requests.post('http://user-managment:8000/signup/', json=user_data, verify=False)
+		response = requests.post('http://user:8000/signup/', json=user_data, verify=False)
 		if (response.status_code == status.HTTP_201_CREATED):
 			return HttpResponse('Lien de vérification valide', status=200)
 		else:
