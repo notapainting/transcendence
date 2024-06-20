@@ -29,6 +29,7 @@ class UpdateClientInfo(APIView):
 	def put(self, request, *args, **kwargs):
 		access_token_cookie = request.COOKIES.get('access')
 		user = get_user_from_access_token(access_token_cookie)
+		print(user.unique_id)
 		try:
 			request.data['unique_id'] = user.unique_id
 			update_response = requests.put('http://user-managment:8000/update_client/', json=request.data, verify=False)

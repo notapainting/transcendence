@@ -4,7 +4,9 @@ import requests
 import random
 import string
 from rest_framework_simplejwt.tokens import RefreshToken
+from auth_service.models import CustomUser
 import os
+import uuid
 
 def authenticate_with_42(request):
 	uid = os.getenv('UID')
@@ -44,13 +46,12 @@ def oauth_callback(request):
 				email = user_data.get('email')
 				profile_picture = user_data.get('image', {}).get('versions', {}).get('small')
 
-				User = get_user_model()
 				original_username = username
 				counter = 1
-				while User.objects.filter(username=username).exists():
+				while CustomUser.objects.filter(username=username).exists():
 					username = f"{original_username}{counter}"
 					counter += 1
-				user, created = User.objects.get_or_create(
+				user, created = CustomUser.objects.get_or_create(
 					oauth_id=oauth_id,
 					defaults={
 						'username': username,
@@ -58,6 +59,7 @@ def oauth_callback(request):
 						'profile_picture': profile_picture,
 						'password': ''.join(random.choices(string.ascii_letters + string.digits, k=12)),
 						'is_42': True,
+						'unique_id': str(uuid.uuid4()),
 					}
 				)
 				if created:
@@ -65,7 +67,7 @@ def oauth_callback(request):
 						'username': username,
 						'email': user.email,
 						'profile_picture': profile_picture,
-						'unique_id': user.pk
+						'unique_id': user.unique_id
 					}
 					requests.post('http://user-managment:8000/signup/', json=account, verify=False)
 				refresh = RefreshToken.for_user(user)
