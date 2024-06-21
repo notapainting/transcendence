@@ -42,8 +42,6 @@ let displayUserInformations = (data) => {
     lastnameInput.placeholder = !data.last_name ? "Not Defined" : "";
     emailInput.value = data.email || "";
     emailInput.placeholder = !data.email ? "Not Defined" : "";
-    dateOfBirthInput.value = data.date_of_birth || "";
-    dateOfBirthInput.placeholder = !data.date_of_birth ? "Not Defined" : "";
     profilePictureImage.style.backgroundImage = `url("${data.profile_picture}")`
     determineGender(data.gender);
     if (data.is_2fa_enabled){ 
@@ -125,7 +123,6 @@ let updateUserInfosRequest = async () => {
         last_name: lastnameInput.value,
         email: emailInput.value,
         gender: genderValue,
-        date_of_birth: dateOfBirthInput.value
     };
     fetch('/auth/update_client/', {
             method: 'PUT',
