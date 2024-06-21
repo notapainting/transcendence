@@ -7,9 +7,11 @@ import game.utils as utils
 import game.power_up as pow
 import game.enums as enu
 
+
+MAX_SCORE = 50
 width = 50
 height = 30
-maxScore = 50
+maxScore = MAX_SCORE
 paddleHeight = 80
 paddleWidth = 10
 ballSpeedX = 0.8
@@ -201,10 +203,14 @@ class GameState:
             self.reset()
             self.status['winner'] = 'leftWin'
             self.status['game_running'] = False
+            return True
         elif self.status['rightPlayerScore'] == maxScore:
             self.reset()
             self.status['winner'] = 'rightWin'
             self.status['game_running'] = False
+            return False
+
+        return None
 
     
     def reset(self):
@@ -232,23 +238,17 @@ async def loop(self):
             time.sleep(0.5)
             reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 
-async def loop_remote(self):
-    global reset
-    while self.game_state.status['game_running']:
-        message = self.game_state.update()
-        await asyncio.sleep(1)
-        asyncio.create_task(self.game_state.update_player_position(message))
-        await self.send_json({'type':enu.Game.UPDATE, 'message':self.game_state.to_dict('none')})
-        await self.send_cs(self.lobby._challenger, {'type':enu.Game.UPDATE, 'message':self.game_state.to_dict('none')})
-        if reset==  2:
-            time.sleep(0.5)
-            reset= 0 
+
 
 async def loop_remote_ultime(self):
     global reset
     try :
         while self.match.game_state.status['game_running']:
-            self.match.game_state.update()
+            end = self.match.game_state.update()
+            if end is not None:
+                message = {"type":enu.Game.END, "message":self.match.compute()}
+                await self.match.broadcast()
+                return 
             await self.send_json({'type':enu.Game.UPDATE, 'message':self.match.game_state.to_dict('none')})
             await self.send_cs(self.match.lobby._challenger, {'type':enu.Game.UPDATE, 'message':self.match.game_state.to_dict('none')})
             if reset==  2:
