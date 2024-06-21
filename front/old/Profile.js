@@ -7,7 +7,6 @@ const firstNameElem = document.querySelector(".profile-first-name");
 const lastNameElem = document.querySelector(".profile-last-name");
 const emailElem = document.querySelector(".profile-email");
 const genderElem = document.querySelector(".profile-gender");
-const dateOfBirthElem = document.querySelector(".profile-date-of-birth");
 
 
 let displayUserInformations = (data) => {
@@ -24,9 +23,6 @@ let displayUserInformations = (data) => {
     genderElem.value = data.gender;
     if (!data.gender)
         genderElem.placeholder = "Not Defined"
-    dateOfBirthElem.value = data.date_of_birth;
-    if (!data.date_of_bith)
-        dateOfBirthElem.placeholder = "Not Defined"
 }
 
 let updateClientRequest = async () => {
@@ -38,7 +34,6 @@ let updateClientRequest = async () => {
             last_name: lastNameElem.value,
             email: emailElem.value,
             gender: genderElem.value,
-            date_of_birth: dateOfBirthElem.value
         };
         fetch('/auth/update_client/', {
              method: 'PUT',
