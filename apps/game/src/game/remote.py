@@ -17,7 +17,6 @@ logger = getLogger(__name__)
 
 from game.base import BaseConsumer
 
-# chg OK but del not
 
 class RemoteGamer(BaseConsumer):
 
@@ -219,11 +218,26 @@ class RemoteGamer2(BaseConsumer):
         await self.channel_layer.group_discard(self.username, self.channel_name)
         print(f"bye {self.username} ({self.match_status})...")
 
+        if self.status == enu.CStatus.GHOST:
+            await self.match.end(True)
+            await self.match.broadcast({"type":enu.Event.Game.BROKE, "author":self.username})
+            self.set_mode()
+        if self.status == enu.CStatus.GGUEST:
+            await self.match.broadcast({"type":enu.Event.Game.BROKE, "author":self.username})
+            self.set_mode()
+
+        if self.status == enu.CStatus.THOST:
+            self.tounament.end(True)
+            await self.match.broadcast({"type":enu.Event.Tournament.BROKE, "author":self.username})
+        if self.status == enu.CStatus.TGUEST:
+            await self.match.broadcast({"type":enu.Event.Tournament.BROKE, "author":self.username})
+
+
     async def send_cs(self, target, data):
         data['author'] = self.username
         await self.channel_layer.group_send(target, data)
 
-    async def set_mode(self, status=None):
+    def set_mode(self, status=None):
         if status == None:
             self.status = self.loopback
         else:
@@ -267,7 +281,7 @@ class RemoteGamer2(BaseConsumer):
     async def game_host(self, data):
         match data['type']:
             case enu.Game.QUIT:
-                self.match.end(True)
+                await self.match.end(True)
                 self.set_mode(enu.CStatus.IDLE)
             case enu.Game.INVITE:
                 await self.match.invite(data['message'])
@@ -338,11 +352,18 @@ class RemoteGamer2(BaseConsumer):
     async def game_start(self, data):
         await self.send_json(data)
 
+    async def game_broke(self, data):
+        if self.status == enu.CStatus.GHOST:
+            await self.match.end(cancelled=True)
+        self.set_mode()
+        await self.send_json(data)
+
     async def game_end(self, data):
         if self.status == enu.CStatus.GHOST:
-            self.match.end()
+            await self.match.end()
         self.set_mode()
-        
+        await self.send_json(data)
+
 
     async def game_update(self, data):
         if self.status == enu.CStatus.GHOST:
@@ -397,6 +418,7 @@ class RemoteGamer2(BaseConsumer):
     async def tournament_result(self, data):
         if hasattr(self, "tournament") is False:
             return
+        await self.tournament.update_result(data)
 
 
     async def tournament_match(self, data):
@@ -408,3 +430,8 @@ class RemoteGamer2(BaseConsumer):
             self.set_mode(enu.CStatus.GGUEST)
         
 
+    async def tournament_broke(self, data):
+        if self.status == enu.CStatus.THOST:
+            await self.tournament.end(cancelled=True)
+        self.set_mode()
+        await self.send_json(data)

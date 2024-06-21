@@ -36,6 +36,7 @@ class Tournament(enum.StrEnum):
     PHASE = "tournament.phase"
     MATCH = "tournament.match"
     RESULT = "tournament.result"
+    BROKE = "tournament.broke"
 
 
 class CStatus(enum.StrEnum):
