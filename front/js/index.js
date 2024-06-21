@@ -1,6 +1,7 @@
 import { logoutRequest, showHome } from "./home.js"
 import { showProfile } from "./profile.js"
 import {showSettings} from "./settings.js"
+import { loggedInStatus } from "./home.js";
 
 export let whoIam;
 

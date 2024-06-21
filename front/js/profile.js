@@ -1,3 +1,4 @@
+import { loggedInStatus } from "./home.js";
 import { isUserAuthenticated } from "./index.js";
 import { clearView } from "./index.js";
 
@@ -208,7 +209,6 @@ const confirm2FaRequest = async (event) => {
     });
 }
 
-
 export const showProfile = async () => {
     await isUserAuthenticated();
     fetch('/auth/get_pers_infos/', {
@@ -226,6 +226,7 @@ export const showProfile = async () => {
     })
     .then(data => {
         clearView();
+        loggedInStatus();
         displayUserInformations(data);
         const profileElement = document.querySelector("#profile");
         profileElement.style.display = "block";

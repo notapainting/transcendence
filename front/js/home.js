@@ -156,14 +156,11 @@ const switchForm = (event) => {
 
 const messageBox = document.querySelector(".message-box");
 
-const loggedInStatus = () => {
-    if ("Notification" in window && Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
-    document.querySelector(".navbar").style.display= "flex"
+export const loggedInStatus = () => {
     document.querySelector(".login-signin-form").style.display = "none"
     document.querySelector(".play-online-btn").style.display = "block"
     showChat();
+    document.querySelector(".navbar").style.display= "flex"
     setTimeout(()=> {
         document.querySelector(".play-online-btn").style.transform = "scale(1)"
     }, 100)
@@ -172,8 +169,6 @@ const loggedInStatus = () => {
 const twoFactorDisplay = document.querySelector(".two-factor-display");
 const twoFactorContainerLogin = document.querySelector(".two-factor-container-login");
 const login2faButton = document.querySelector(".login-2fa")
-
-
 
 const closeTwoFactorLogin = (event) => {
     login2faButton.removeEventListener("click", loginRequest);
@@ -357,8 +352,8 @@ export let logoutRequest = (event) => {
 
 
 export const showHome = async () => {
-    let isAuthenticated = await isUserAuthenticated();
     clearView();
+    let isAuthenticated = await isUserAuthenticated();
     const homeElement = document.querySelector("#home");
     homeElement.style.display = "block";
     if (isAuthenticated)
