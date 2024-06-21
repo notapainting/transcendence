@@ -23,6 +23,7 @@ class Tournament(Lobby2):
         super().__init__(host=host, n_player=n_player, types=enu.Tournament)
         self.host = host
         self.losers = set()
+        self.match_count = 0
 
 
     async def end(self, cancelled=False):
@@ -36,7 +37,8 @@ class Tournament(Lobby2):
         tmp = list(self._players)
         random.shuffle(tmp)
         self.current = [(tmp[i],tmp[i + 1]) for i in range(0, len(tmp), 2)]
-        self.broadcast({"type":types.PHASE, "message":self.current})
+        self.match_count = len(self.current)
+        self.broadcast({"type":types.PHASE, "message":self.current, "author":self.host})
 
     async def order_match(self):
         for match in self.current:
@@ -48,5 +50,10 @@ class Tournament(Lobby2):
         loser = data['message']['loser']
         self._players.discard(loser)
         self.losers.add(loser)
-        # send result to all
-        # when all pahse 1 match done -> go phase 2
+        self.broadcast(data)
+        self.match_count -= 1
+        if self.match_count == 0:
+            await self.make_phase()
+
+
+# tournament end 

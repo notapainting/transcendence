@@ -79,8 +79,13 @@ class Match2(Lobby2):
         return self.result
 
     async def end(self, cancelled=False):
-        # send match history data to usermgt
-        if hasattr(self, "result") is False:
-            self.result = self.compute()
-        if self.tournament is True:
-            await self._chlayer.send_group(self.tournament, {"type":enu.Tournament.RESULT, "message":self.result})
+        if cancelled == False:
+            if hasattr(self, "result") is False:
+                self.result = self.compute()
+            # send match history data to usermgt
+            # import httpx
+            # await httpx.AsyncClient().post(url='http://auth-service:8000/user/match/', data=self.result)
+            if self.tournament is True:
+                await self._chlayer.send_group(self.tournament, {"type":enu.Tournament.RESULT, "message":self.result})
+        if self.task is not None:
+            self.task.cancel()
