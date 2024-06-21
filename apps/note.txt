@@ -54,3 +54,10 @@ tournament :
                                 /guest -> ready game
                             when game end, -> GOTO -last state(idle or -tournament/(host/guest))
                             when load game, register last state as loopback function
+
+
+idle
+tr/host
+tr/guest
+game/host
+game/idle

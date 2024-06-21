@@ -24,18 +24,28 @@ class Game(enum.StrEnum):
 
     START = "game.start"
     PAUSE = "game.pause"
+    END = "game.end"
 
 class Tournament(enum.StrEnum):
     CREATE = "tournament.create"
     INVITE = "tournament.invite"
     JOIN = "tournament.join"
     QUIT = "tournament.quit"
+    KICK = "tournament.kick"
     ACCEPTED = "tournament.accepted"
-    
+    PHASE = "tournament.phase"
+    MATCH = "tournament.match"
+    RESULT = "tournament.result"
 
 
 class CStatus(enum.StrEnum):
-    IDLE = "cs.idle"
-    HOST = "cs.host"
-    GUEST = "cs.guest"
+    IDLE = "status.idle"
+    LOCAL = "status.local"
+    HOST = "status.host"
+    GUEST = "status.guest"
+
+    GHOST = "status.game.host"
+    GGUEST = "status.game.guest"
+    THOST = "status.game.host"
+    TGUEST = "status.game.guest"
 
