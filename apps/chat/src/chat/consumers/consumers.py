@@ -118,7 +118,7 @@ class ChatConsumer(BaseConsumer):
             type = await cuti.validate_data(username=self.user.name, data=json_data)
             serial = await cuti.get_serializer(type)
             ser_data = await cuti.serializer_wrapper(serial, json_data['data'])
-            if type == enu.Message.FIRST:
+            if type == enu.Event.Message.FIRST:
                 targets, event = await cuti.get_targets(self.user, type, ser_data)
                 self.group_list = await cuti.get_group_list(self.user)
                 await self.channel_layer.group_add(ser_data['target'], self.channel_name)
