@@ -16,10 +16,6 @@ logger = getLogger('django')
 
 CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
 
-        # if data['type'] in enu.Event.CLIENT:
-        #     super().dispatch(data)
-        # else:
-        #     super().dispatch("{'type':'error.badtype'}")
 
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
@@ -121,12 +117,12 @@ class ChatConsumer(BaseConsumer):
             if type == enu.Event.Message.FIRST:
                 targets, event = await cuti.get_targets(self.user, type, ser_data)
                 self.group_list = await cuti.get_group_list(self.user)
-                await self.channel_layer.group_add(json_data['data']['target'], self.channel_name)
+                await self.channel_layer.group_add(ser_data['id'], self.channel_name)
             else:
                 targets, event = await cuti.get_targets(self.user, type, ser_data)
         except DrfValidationError as error:
-                logger.info(error)
-                await self.send_json({"type": enu.Event.Errors.DATA})
+            logger.info(error)
+            await self.send_json({"type": enu.Event.Errors.DATA})
         else:
             if targets == enu.Self.LOCAL:
                 await self.send_json(event)
