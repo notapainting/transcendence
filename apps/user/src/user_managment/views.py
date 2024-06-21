@@ -1,4 +1,4 @@
-from django.http import JsonResv1/ponse
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from user_managment.serializers import UserSerializer
 from rest_framework.response import Response
