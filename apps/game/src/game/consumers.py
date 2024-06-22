@@ -3,9 +3,12 @@ import json, random, asyncio, time
 import sys
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.exceptions import StopConsumer
 import game.utils as utils
 import game.power_up as pow
 import game.enums as enu
+
+TOURNAMENT_MAX_PLAYER = 16
 
 
 MAX_SCORE = 50
@@ -43,6 +46,81 @@ class GameConsumer(AsyncWebsocketConsumer):
                 asyncio.create_task(loop(self))
         else :
             asyncio.create_task(self.game_state.update_player_position(message))
+
+
+import random
+import enum
+
+class Local(enum.StrEnum):
+    PLAYERS = "local.tournament.players"
+    PHASE = "local.tournament.phase"
+    MATCH = "local.tournament.match"
+    UPDATE = "local.game.update"
+    NEXT = "local.game.next"
+
+class TournamentConsumer(BaseConsumer):
+    async def connect(self):
+        await self.accept()
+        self.players = []
+        self.losers = []
+        self.task = None
+
+    async def disconnect(self, close_code):
+        if self.task is not None:
+            self.task.cancel()
+
+    async def receive_json(self, json_data):
+        match json_data['type']:
+            case Local.PLAYERS: 
+                self.players = list(json_data['message'])
+                await self.matchmake()
+                await self.announce_next()
+            case Local.UPDATE:
+                await self.gaming(json_data)
+            case Local.NEXT:
+                await self.announce_next()
+            case _:
+                print(f"error in local trn: wrong type")
+
+    async def matchmake(self):
+        random.suffle(self.players)
+        self.current = [(self.players[i],self.players[i + 1]) for i in range(0, len(self.players), 2)]
+        self.matchIdx = -1
+        await self.send_json({"type":Local.PHASE, "message":self.current})
+
+    async def announce_next(self):
+        self.matchIdx += 1
+        if self.matchIdx == len(self.current):
+            await self.machmake()
+            await self.announce_next()
+            return
+        match = self.current[self.matchIdx]
+        await self.send_json({"type":Local.MATCH, "message":match})
+        self.game_state = GameState()
+
+    async def game_end(self, data):
+        await self.send(json.dumps(self.game_state.to_dict('none')))
+        winner = self.game_state.status['winner']
+        if winner == 'leftWin':
+            loser = self.current[self.matchIdx][1]
+        else:
+            loser = self.current[self.matchIdx][0]
+        self.losers.append(loser)
+        self.players.remove(loser)
+        if len(self.current) == 1:
+            raise StopConsumer
+
+    async def gaming(self, data):
+        message = data["message"]
+        if message == "startButton":
+            if self.game_state.status['game_running'] == False :
+                self.game_state.status['game_running'] = True
+                self.task = asyncio.create_task(loop(self))
+        elif message == "bonus":
+            self.game_state.status['randB'] = data["bonus"]
+        else :
+            asyncio.create_task(self.game_state.update_player_position(message))
+
 
 class GameState:
     def __init__(self):
@@ -229,15 +307,19 @@ class GameState:
 
 async def loop(self):
     global reset
-    while self.game_state.status['game_running']:
-        message = self.game_state.update()
-        await asyncio.sleep(0.02)
-        asyncio.create_task(self.game_state.update_player_position(message))
-        await self.send(json.dumps(self.game_state.to_dict('none')))
-        if reset ==  2:
-            time.sleep(0.5)
-            reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-
+    try :
+        while self.game_state.status['game_running']:
+            end = self.game_state.update()
+            if end is not None:
+                await self.channel_layer.send(self.channel_name, {"type":enu.Game.END})
+                return
+            await asyncio.sleep(0.02)
+            await self.send(json.dumps(self.game_state.to_dict('none')))
+            if reset ==  2:
+                time.sleep(0.5)
+                reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+    except asyncio.CancelledError as error:
+        print(error)
 
 
 async def loop_remote_ultime(self):
@@ -257,3 +339,16 @@ async def loop_remote_ultime(self):
             await asyncio.sleep(0.5)
     except asyncio.CancelledError as error:
         print(error)
+
+"""
+    global reset
+    while self.game_state.status['game_running']:
+        message = self.game_state.update()
+        await asyncio.sleep(0.02)
+        asyncio.create_task(self.game_state.update_player_position(message))
+        await self.send(json.dumps(self.game_state.to_dict('none')))
+        if reset ==  2:
+            time.sleep(0.5)
+            reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+"""
+

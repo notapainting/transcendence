@@ -34,6 +34,8 @@ class CustomAuthMiddleware(BaseMiddleware):
             logger.error(error)
             scope['user'] = None
 
-        scope['user'] = scope['cookies']['user']
-
+        try:
+            scope['user'] = scope['cookies']['user']
+        except BaseException:
+            scope['user'] = 'Local'
         return await self.inner(scope, receive, send)

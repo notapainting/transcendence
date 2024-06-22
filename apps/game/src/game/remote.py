@@ -17,6 +17,24 @@ logger = getLogger(__name__)
 
 from game.base import BaseConsumer
 
+async def authenticate(headers):
+    try :
+        promise = await httpx.AsyncClient().post(url='http://auth-service:8000/auth/validate_token/', headers=headers)
+        promise.raise_for_status()
+        user = str(promise.json()['name'])
+    except httpx.HTTPStatusError as error:
+        logger.warning(error)
+        user = None
+    except (httpx.HTTPError) as error:
+        logger.error(error)
+        user = None
+
+    try:
+        user = headers['cookies']['user']
+    except BaseException:
+        user = 'Local'
+
+        return user
 
 class RemoteGamer(BaseConsumer):
 
@@ -31,7 +49,7 @@ class RemoteGamer(BaseConsumer):
 
 
     async def connect(self):
-        self.username = str(self.scope.get('user', 'Anon'))
+        self.username = scope['user'] #authenticate(dict(scope['headers']))
         if self.username is None:
             raise exchan.DenyConnection()
         await self.accept()
