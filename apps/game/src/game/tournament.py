@@ -12,6 +12,7 @@ import game.enums as enu
 from game.consumers import GameState
 
 from game.lobby import Lobby, Lobby2
+import random
 
 
 
@@ -33,7 +34,6 @@ class Tournament(Lobby2):
         super().start()
 
     async def make_phase(self):
-        import random
         tmp = list(self._players)
         random.shuffle(tmp)
         self.current = [(tmp[i],tmp[i + 1]) for i in range(0, len(tmp), 2)]
