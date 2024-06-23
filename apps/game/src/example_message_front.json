@@ -12,60 +12,131 @@
 ENVOI
 creer une partie
 {
-    "message":"game.create"
+    "type":"game.create"
 }
 
-inviter borys
+inviter borys dans uen partie
 {
-    "message":"game.invite",
-    "data":"borys",
+    "type":"game.invite",
+    "message":"borys",
 }
 
 
 accepter l'invitation de loulou (rejoindre une partie)
 {
-    "message":"game.join",
-    "data":"loulou",
+    "type":"game.join",
+    "message":"loulou",
 }
 
-quitter le lobby (data inutile si c'est l'host qui quitte)
+quitter le lobby 
 {
-    "message":"game.quit",
+    "type":"game.quit",
+}
+
+kick qqun du lobby 
+{
+    "type":"game.kick",
+    "message":"borys",
 }
 
 indiquer qu'on est pret a jouer 
 {
-    "message":"game.ready",
+    "type":"game.ready",
+}
+
+envoie une update de la game
+{
+    "type":"game.update"
+}
+
+creer une tournoie
+{
+    "type":"tournament.create"
+}
+
+inviter borys a uen tournoi
+{
+    "type":"tournament.invite",
+    "message":"borys",
+}
+
+rejoindre une tournoie (necessaire d'avoir une invitation prealable)
+{
+    "type":"tournament.join",
+    "message":"borys",
+}
+
+kick qqun du tounoie 
+{
+    "type":"tournament.kick",
+    "message":"borys",
+}
+
+indiquer qu'on est pret a jouer le tounoie
+{
+    "type":"tournament.ready",
 }
 
 
 RECOIT
+!GAME
 une invitation de borys
 {
-    "message":"game.invite",
+    "type":"game.invite",
     "author":"borys",
 }
 
 loulou a rejoinsd le match
 {
-    "message":"game.join",
+    "type":"game.join",
     "author":"loulou",
 }
 
 loulou est prete a jouer 
 {
-    "message":"game.ready",
+    "type":"game.ready",
+    "author":"loulou",
+}
+
+la partie de loulou commence
+{
+    "type":"game.start",
     "author":"loulou",
 }
 
 loulou t'as vire de sa partie
 {
-    "message":"game.kick",
+    "type":"game.kick",
     "author":"loulou",
 }
 
-Lobby:
-GameState:
+!TOUNOI
+une invitation de borys a un tournoi
+{
+    "type":"tournament.invite",
+    "author":"borys",
+}
 
-MatchManager:
-TournamentManager:
+loulou a rejoinsd le tournoi
+{
+    "type":"tournament.join",
+    "author":"loulou",
+}
+
+loulou est prete a jouer le tournoi
+{
+    "type":"tournament.ready",
+    "author":"loulou",
+}
+
+la tounoi de loulou commence
+{
+    "type":"tournament.start",
+    "author":"loulou",
+}
+
+loulou t'as vire de sa tournoi
+{
+    "type":"tournament.kick",
+    "author":"loulou",
+}

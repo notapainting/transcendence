@@ -1,3 +1,33 @@
+API local : 
+    # send to API
+    tounament :
+        local.tournament.players    ->  send with all players for tounament 
+            ex: {
+                    "type":"local.tournament.players", 
+                    "message":
+                    [
+                        "player1", "player2", "..."
+                    ]
+                }
+        local.game.update   ->  game update
+        local.game.next     ->  request next match (should be send after a match end)
+
+    # client receive 
+        local.tournament.phase  ->  send current phase (ie list of match to play this phase)
+            ex : {
+                    "type":"local.tournament.phase",
+                    "message":
+                    [
+                        [p1, p2], [p3, p4], [...]
+                    ]
+                }
+        local.tournament.match  ->  send current match to play
+            ex : {
+                    "type":"local.tournament.match",
+                    "message": [p1, p2],
+                }
+
+
 update match
     lobby + game state -> all in match 
     match get chlayer 

@@ -453,3 +453,12 @@ class RemoteGamer2(BaseConsumer):
             await self.tournament.end(cancelled=True)
         self.set_mode()
         await self.send_json(data)
+
+    async def tournament_quit(self, data):
+        await self.tournament.kick(data['message'])
+
+    async def tournament_kick(self, data):
+        await self.send_json(data)
+
+    async def tournament_start(self, data):
+        await self.send_json(data)
