@@ -28,7 +28,7 @@ if [[ "$response" == *"filebeat-index-*"* ]] && \
   [[ "$response" == *"logstash-index-*"* ]] && \
   [[ "$response" == *"nginx-index-*"* ]]; then
   echo -e "${COLOR_GREEN}All Data Views creation completed.${COLOR_RESET}"
-  sleep 10
+  sleep 5
   exit 0
 else
   echo -e "${COLOR_GREEN}Creating Data Views...${COLOR_RESET}"
@@ -139,4 +139,4 @@ else
   exit 1;
 fi
 
-sleep 10
+sleep 5
