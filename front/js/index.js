@@ -1,51 +1,61 @@
-import { showHome } from "./home.js"
+import { logoutRequest, showHome } from "./home.js"
+import { showProfile } from "./profile.js"
+import {showSettings} from "./settings.js"
+import { loggedInStatus } from "./home.js";
 
-const navigateTo = url => {
+export let whoIam;
+
+export const navigateTo = url => {
     history.pushState(null, null, url)
     router()
 }
-const clearView = () => {
+
+export const clearView = () => {
 console.log("Appel ClearView")
     document.querySelectorAll(".view").forEach(div => {
         div.style.display = "none";
     });
 }
 
-const isUserAuthenticated = () => {
+export const isUserAuthenticated = () => {
     return fetch('auth/validate_token/', {
         method: 'POST',
         credentials: 'same-origin'
     })
-    .then(response => {
+    .then(response => response.json().then(data => {
         if (response.ok) {
-            console.log("Je return true dans access")
+            whoIam = data.username; 
+            console.log("Je return true dans access");
             return true;
         } else {
             return fetch('auth/token/refresh/', {
                 method: 'POST',
                 credentials: 'same-origin'
             })
-            .then(refreshResponse => {
+            .then(refreshResponse => refreshResponse.json().then(refreshData => {
                 if (refreshResponse.ok) {
-                    console.log("Je return true dans refresh")
+                    whoIam = refreshData.username;  // Stocker le username
+                    console.log("Je return true dans refresh");
                     return true;
                 } else {
-                    console.log("Je return false dans refresh")
+                    console.log("Je return false dans refresh");
                     return false;  
                 }
-            });
+            }));
         }
+    }))
+    .catch(error => {
+        console.error("Error during authentication process:", error);
+        return false;
     });
-}
+};
 
 const router = async () => {
     console.log("Appel Router")
     const routes = [
         {path: "/", view:() => showHome() },
-        {path: "/game", view:() => showGame()},
         {path: "/profile", view:() => showProfile()},
         {path: "/settings", view:() => showSettings()},
-        {path: "/signin", view:() => showSignin()},
     ];
     const potentialMatches = routes.map(route => {
         return {
@@ -60,24 +70,15 @@ const router = async () => {
             isMatch: true
         }
     }
-    if (match.route.path === "/profile"){
-        const isAuthenticated = await isUserAuthenticated();
-        if (!isAuthenticated){
-            match = {
-                route: routes[0],
-                isMatch: true
-            }
-        }
-    }
-    clearView();
     match.route.view()
 };
 
 window.addEventListener("popstate", router);
 
+
 document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener('click', e => {
-        if (e.target.matches("[data-link-div]")){
+        if (e.target.matches("[data-link]")){
             e.preventDefault();
             navigateTo(e.target.dataset.href);
         }
@@ -89,15 +90,15 @@ document.addEventListener("DOMContentLoaded", () => {
     router();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.addEventListener('click', e => {
-        if (e.target.matches("[data-link]")){
-            e.preventDefault();
-            navigateTo(e.target.href)
-        }
-    })
-    document.querySelector(".login-signin-form").addEventListener("submit", event => {
-        event.preventDefault();
-    })
-    router();
-})
+// document.addEventListener("DOMContentLoaded", () => {
+//     document.addEventListener('click', e => {
+//         if (e.target.matches("[data-link]")){
+//             e.preventDefault();
+//             navigateTo(e.target.href)
+//         }
+//     })
+//     document.querySelector(".login-signin-form").addEventListener("submit", event => {
+//         event.preventDefault();
+//     })
+//     router();
+// })

@@ -1,36 +1,35 @@
 services:
-  chat:
-    container_name: chat
+  user:
+    container_name: user
     build:
-      context: apps/chat
+      context: apps/user/
       dockerfile: Dockerfile.dev
-    image: chat_image
+    image: user_image
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/chat-common.env.example
+      - conf/user-common.env.example
     volumes:
-      - chat_volume:/app
+      - user_volume:/app
     networks:
       - app_network
     restart: unless-stopped
     depends_on:
-      chat-db:
+      user-db:
        condition: service_healthy
-    init: true
     entrypoint: ["bash", "/conf/init.sh"]
 
-  chat-db:
-    container_name: chat-db
+  user-db:
+    container_name: user-db
     build: postgres/
     image: postgres_image
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/chat-common.env.example
-      - conf/chat-db.env.example
+      - conf/user-db.env.example
+      - conf/user-common.env.example
     volumes:
-      - chat-db_volume:${PGDATA}
+      - user-db_volume:${PGDATA}
     networks: 
       - app_network
     restart: unless-stopped
@@ -42,22 +41,15 @@ services:
       start_period: 30s
       start_interval: 10s
 
-  chat-redis:
-    container_name: chat-redis
-    image: redis:7.2.4-alpine
-    networks: 
-      - app_network
-    restart: unless-stopped
-
 volumes:
-  chat_volume:
-    name: chat
+  user_volume:
+    name: user_volume
     driver: local
     driver_opts:
       type: none
-      device: apps/chat/src
+      device: apps/user/src
       o: bind
 
-  chat-db_volume:
-    name: chat-db
+  user-db_volume:
+    name: user-db_volume
     driver: local
