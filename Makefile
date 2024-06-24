@@ -41,6 +41,7 @@ no-waf:
 
 #========#	start/stop rule	#========#
 start: -waf-warn
+	sudo sysctl -w vm.max_map_count=262144
 	${CMP} up --build
 
 clear:

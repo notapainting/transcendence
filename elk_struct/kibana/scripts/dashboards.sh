@@ -28,7 +28,7 @@ response=$(curl -X GET "http://$KIBANA_URL/api/kibana/dashboards/export?dashboar
 
 if [[ "$response" == *"Nginx-Dashboard"* ]]; then
   echo -e "${COLOR_GREEN}All Dashboards creation completed.${COLOR_RESET}"
-  sleep 10
+  sleep 5
   exit 0
 else
   echo -e "${COLOR_GREEN}Creating Dashboards...${COLOR_RESET}"
@@ -142,4 +142,4 @@ else
   exit 1;
 fi
 
-sleep 10
+sleep 5
