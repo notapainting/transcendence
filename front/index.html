@@ -4,12 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bjill | welcome</title>
-    <link rel="stylesheet" href="./home-page.css">
+    <link rel="stylesheet" href="./home.css">
+    <link rel="stylesheet" href="./profile.css">
+    <link rel="stylesheet" href="/chat.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica+SC&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <audio id="newMessageSound">
+        <source src="img/goofy.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <nav class="navbar">
+        <i class="item fa-solid fa-house"data-link data-href="/"></i>
+        <i class="item fa-solid fa-user" data-link data-href="/profile"></i>
+        <i class="item fa-solid fa-sliders"data-link data-href="/settings"></i>
+        <i class="item fa-solid fa-right-from-bracket"></i>
+    </nav>
     <div id="home" class="view">
         <div class="parallax-container">
             <div class="background-threes"></div>
@@ -23,7 +35,10 @@
             <div class="home-sep"></div>
             <h2>PLAY OFFLINE OR LOGIN TO PLAY</h2>
             <div class="form-container">
-                <button class="btn play-offline-btn">PLAY OFFLINE</button>
+                <div class="btn-div play-offline-btn">
+                </div>
+                <div class="btn-div play-online-btn">
+                </div>
                 <form action="" class="login-signin-form">
                     <input type="text" name="home-email" id="home-email" placeholder="e-mail">
                     <input type="text" name="home-username" id="home-username" placeholder="username / e-mail">
@@ -35,13 +50,156 @@
                         </div><p>I have read and accepted terms..</p>
                     </div>
                     <div class="login-or-create">
-                        <button class="btn home-form-btn">LOGIN</button>
+                        <div class="login-or-42">
+                            <button class="btn home-form-btn">LOGIN</button>
+                            <div class="login-42"></div>
+                        </div>
                         <p class="login-or-register-text">Don't have an account ? <br><span class="switch-form">Create One</span></p>
                     </div>
+                    <div class="message-box"></div>
                 </form>
             </div>
         </div>
     </div>
+    <div id="profile" class="view">
+
+        <div class="profile-container">
+            <div class="my-profile-container">
+                <div class="my-profile">
+                    <h2 class="profile-h2">My Profile</h2>
+                    <div class="profile-sep"></div>
+                </div>
+                <div class="info-profile-picture-container">
+                    <div class="user-info">
+                        <h3 class="profile-h3">Contact details</h3>
+                        <div class="fill-info">
+                            <div class="grid-item">
+                                <label for="first-name">First Name</label>
+                                <input class="text-input" type="text" id="first-name" name="first-name">
+                            </div>
+                            <div class="grid-item">
+                                <label for="last-name">Last Name</label>
+                                <input class="text-input" type="text" id="last-name" name="last-name">
+                            </div>
+                            <div class="grid-item">
+                                <label for="username">Username</label>
+                                <input class="text-input" type="text" id="username" name="username">
+                            </div>
+                            <div class="grid-item">
+                                <label for="email">E-mail</label>
+                                <input class="text-input" type="text" id="email" name="email">
+                            </div>
+                            <div class="grid-item grid-flex">
+                                <label>Gender</label>
+                                <div class="gender-options">
+                                    <div class="mini-gender-container">
+                                        <input type="radio" id="male" name="gender" value="male">
+                                        <label for="male">Male</label>
+                                    </div>
+                                    <div class="mini-gender-container">
+                                        <input type="radio" id="female" name="gender" value="female">
+                                        <label for="female">Female</label>
+                                    </div>
+                                    <div class="mini-gender-container">
+                                        <input type="radio" id="other" name="gender" value="other">
+                                        <label for="other">Other</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>  
+                        <button class="profile-btn modify">MODIFY</button>
+                    </div>
+                    <div class="profile-picture-info">
+                        <h3 class="profile-h3">Upload your profile photo</h3>
+                        <div class="profile-picture"></div>
+                        <div class="upload-remove">
+                            <button class="profile-btn upload">UPLOAD</button>
+                            <button class="profile-btn remove">REMOVE</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="my-profile-container">
+                <div class="security">
+                    <h2 class="profile-h2">Security</h2>
+                    <div class="profile-sep"></div>
+                    <h3 class="profile-h3">Change Password</h3>
+                    <div class="password-change">
+                        <div class="container-password">
+                            <label for="">Current Password</label>
+                            <input type="password">
+                        </div>
+                        <div class="container-password">  
+                            <label for="">New Password</label>
+                            <input type="password">
+                        </div>
+                        <div class="container-password">                     
+                            <label for="">Confirm Password</label>
+                            <input type="password">
+                        </div>
+                        <button class="profile-btn change-password">CHANGE PASSWORD</button>
+                    </div>
+                    <button class="profile-btn two-factor">ENABLE 2FA</button>
+                </div>
+            </div>
+
+            </div>
+        </div>
+        <div class="two-factor-display">
+            <div class="two-factor-container">
+                <span class="close-btn close-two-factor">&times;</span>
+                <div class="manual-qrcode-container">
+                    <img src="" alt="" width="300px" height="300px" class="qr-code-img">
+                    <p class="manual-code"></p>
+                </div>
+                <input type="text" class="input-f2a-activation">
+                <button class="profile-btn activate-2fa">ACTIVATE 2FA</button>
+            </div>
+            <div class="two-factor-container-login">
+                <p>Please enter the code of your authentificator app</p>
+                <span class="close-btn close-two-factor-login">&times;</span>
+                <input type="text" class="input-f2a-login">
+                <button class="profile-btn login-2fa">LOGIN</button>
+            </div>
+        </div>
+    </div>
+    <div class="chatbox">
+        <div class="menu-container">
+            <div class="menu">
+                <i class="fa-solid fa-bars"></i>
+                <h3 class="menu-title">TEST</h3>
+                <input type="text" class="searchbar">
+                
+            </div>
+            <div class="display-menu">
+                <div class="search-results"></div>
+            </div>
+        </div>
+        <div class="chat-container">
+            <div class="person-chat">
+                <div class="picture-chat"></div>
+                <div class="description-chat">
+                    <h4 class="username-title"></h4>
+                    <p class="data">Today a 16:00PM</p>
+                </div>
+            </div>
+            <div class="messages">
+            </div>
+            <div class="send-container">
+                <input type="text" class="message-input">
+                <div class="emoji-send">
+                    <i class="fa-regular fa-face-smile emoji"></i>
+                    <i class="fa-solid fa-arrow-right chat-send"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div id="settings" class="view">
+        <h1>settings OHH</h1>
+
+    </div> -->
+    <script src="https://kit.fontawesome.com/3db1c2f3ab.js" crossorigin="anonymous"></script>
     <script type="module" src="js/index.js"></script>
     <script type="module" src="js/home.js"></script>
 </body>
