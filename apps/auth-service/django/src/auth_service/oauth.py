@@ -44,7 +44,7 @@ def oauth_callback(request):
 				oauth_id = user_data['id']
 				username = user_data.get('login')
 				email = user_data.get('email')
-				profile_picture = user_data.get('image', {}).get('versions', {}).get('small')
+				profile_picture = user_data.get('image', {}).get('versions', {}).get('medium')
 
 				original_username = username
 				counter = 1
