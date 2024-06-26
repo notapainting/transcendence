@@ -180,3 +180,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+ADMIN_USERNAME = 'admin'
+ADMIN_EMAIL = 'admin@admin.com'
+ADMIN_PASSWORD = 'adminpassword'

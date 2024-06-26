@@ -1,0 +1,182 @@
+.containerGame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #0066CC;
+  }
+
+
+  #scoreMessage {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#gameMenu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-element {
+    
+}
+
+.button-game{
+    font-family: Roboto, sans-serif;
+    font-weight: 0;
+    font-size: 14px;
+    color: #fff;
+    background-color: #0066CC;
+    padding: 10px 30px;
+    border: 2px solid #0066cc;
+    box-shadow: none;
+    border-radius: 50px;
+    transition : 1000ms;
+    transform: translateY(0);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    padding-left: 5%;
+    padding-right: 5%;
+    margin-top: 2%;
+	z-index: 999;
+}
+
+.button-game:hover{
+    transition : 500ms;
+    transform : translateY(-0px);
+    transform: scale(1.08);
+    background-color: #fff;
+    color: #0066cc;
+    border: solid 2px #0066cc;
+}
+
+#invitationBox {
+  position: absolute;
+  display: flex;
+  left:70%;
+  top: 60%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fafafa;
+}
+
+#invitationBox h3 {
+  top: 0;
+  color: black;
+}
+
+#invitationList {
+  list-style-type: none;
+  color: black;
+  padding: 0;
+}
+
+#invitationList li {
+  padding: 8px;
+  color: black;
+  border-bottom: 1px solid #ddd;
+}
+
+#invitationList li:last-child {
+  border-bottom: none;
+}
+
+.accept-button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.accept-button:hover {
+  background-color: #0056b3;
+}
+
+#inviteInput {
+  position: absolute;
+  display: none;
+  top: 60%;
+}
+
+#inviteButton {
+    display: none;
+    top: 70%;
+}
+
+#fastGame {
+  /* display: none; */
+    top: 60%;
+}
+
+#tournament {
+  /* display: none; */
+    top: 70%;
+}
+
+#exit {
+  /* display: none; */
+    top: 80%;
+}
+
+#create {
+    display: none;
+    top: 60%;
+}
+
+#join {
+    display: none;
+    top: 70%;
+}
+
+#back {
+    /* display: none; */
+      top: 80%;
+  }
+
+.button-menu {
+	display: none;
+    position: absolute;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    padding: .8em 2.2em;
+    width: 300px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 0 #e76f51;
+    line-height: 1;
+    text-decoration: none;
+    color: #dc5406;
+    font-size: 18px;
+    border-radius: 20px;
+    width: 200px;
+    height: 50px;
+    font-weight: bold;
+    border-bottom: 5px solid #b46436;
+    transition: 0.3s;
+    background-color: #f4a261;
+    animation: glow 3s linear infinite;
+  }
+
+.button-menu:hover {
+	border-bottom-width: 0;
+  }
+
+@keyframes glow {
+  0% {
+      box-shadow: 0 0 0 0 #e76f51;
+  }
+  
+  50% {
+      box-shadow: 0 0 30px 0 #e76f51;
+  }
+  }
+  

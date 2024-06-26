@@ -6,7 +6,7 @@ import game.enums as enu
 
 from game.consumers import GameState, loop_remote_ultime
 from game.lobby import Lobby
-from game.match import Match
+from game.match import Match, Match2
 from game.tournament import Tournament
 
 import channels.exceptions as exchan
@@ -14,27 +14,24 @@ import channels.exceptions as exchan
 from logging import getLogger
 logger = getLogger(__name__)
 
+import httpx
 
 from game.base import BaseConsumer
 
 async def authenticate(headers):
     try :
-        promise = await httpx.AsyncClient().post(url='http://auth-service:8000/auth/validate_token/', headers=headers)
+        promise = await httpx.AsyncClient().post(url='http://auth:8000/auth/validate_token/', headers=headers)
         promise.raise_for_status()
-        user = str(promise.json()['name'])
+        user = str(promise.json()['username'])
     except httpx.HTTPStatusError as error:
         logger.warning(error)
         user = None
     except (httpx.HTTPError) as error:
         logger.error(error)
         user = None
-
-    try:
-        user = headers['cookies']['user']
-    except BaseException:
-        user = 'Local'
-
-        return user
+    except BaseException as error:
+        logger.error(error)
+    return user
 
 class RemoteGamer(BaseConsumer):
 
@@ -49,7 +46,7 @@ class RemoteGamer(BaseConsumer):
 
 
     async def connect(self):
-        self.username = scope['user'] #authenticate(dict(scope['headers']))
+        self.username = await authenticate(dict(self.scope['headers']))
         if self.username is None:
             raise exchan.DenyConnection()
         await self.accept()
@@ -215,7 +212,6 @@ class RemoteGamer(BaseConsumer):
             asyncio.create_task(self.match.game_state.update_player_position(message))
 
 
-
 class RemoteGamer2(BaseConsumer):
     def __init__(self):
         super().__init__()
@@ -225,30 +221,31 @@ class RemoteGamer2(BaseConsumer):
         self.mode = self.idle
 
     async def connect(self):
-        self.username = str(self.scope.get('user', 'Anon'))
+        self.username = await authenticate(dict(self.scope['headers'])) #str(self.scope.get('user', 'Anon'))
         if self.username is None:
             raise exchan.DenyConnection()
         await self.accept()
         await self.channel_layer.group_add(self.username, self.channel_name)
-        print(f"hello {self.username} ({self.match_status})!")
+        print(f"hello {self.username} ({self.status})!")
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.username, self.channel_name)
-        print(f"bye {self.username} ({self.match_status})...")
+        if self.username is not None:
+            await self.channel_layer.group_discard(self.username, self.channel_name)
+        print(f"bye {self.username} ({self.status})...")
 
         if self.status == enu.CStatus.GHOST:
             await self.match.end(True)
-            await self.match.broadcast({"type":enu.Event.Game.BROKE, "author":self.username})
+            await self.match.broadcast({"type":enu.Game.BROKE, "author":self.username})
             self.set_mode()
         if self.status == enu.CStatus.GGUEST:
-            await self.match.broadcast({"type":enu.Event.Game.BROKE, "author":self.username})
+            await self.send_cs(self.host, {"type":enu.Game.BROKE, "author":self.username})
             self.set_mode()
 
         if self.status == enu.CStatus.THOST:
             self.tounament.end(True)
-            await self.match.broadcast({"type":enu.Event.Tournament.BROKE, "author":self.username})
+            await self.match.broadcast({"type":enu.Tournament.BROKE, "author":self.username})
         if self.status == enu.CStatus.TGUEST:
-            await self.match.broadcast({"type":enu.Event.Tournament.BROKE, "author":self.username})
+            await self.send_cs(self.thost, {"type":enu.Tournament.BROKE, "author":self.username})
 
 
     async def send_cs(self, target, data):
@@ -256,6 +253,7 @@ class RemoteGamer2(BaseConsumer):
         await self.channel_layer.group_send(target, data)
 
     def set_mode(self, status=None):
+        print(f"ouin")
         if status == None:
             self.status = self.loopback
         else:
@@ -275,7 +273,7 @@ class RemoteGamer2(BaseConsumer):
             return await self.send_json({'type':enu.Errors.DECODE})
 
         print(f"{self.username} ({self.status}): type is {json_data['type']} ")
-        self.mode(json_data)
+        await self.mode(json_data)
 
 
     async def idle(self, data):
@@ -291,6 +289,7 @@ class RemoteGamer2(BaseConsumer):
                 self.tournament = Tournament(self.username)
                 self.set_mode(enu.CStatus.THOST)
             case enu.Tournament.JOIN:
+                self.thost = data['message']
                 self.set_mode(enu.CStatus.TGUEST)
             case _: 
                 await self.send_json({'type':enu.Errors.TYPE})
@@ -346,10 +345,10 @@ class RemoteGamer2(BaseConsumer):
     async def tournament_guest(self, data):
         match data['type']:
             case enu.Tournament.QUIT:
-                await self.send_cs(self.host, data)
+                await self.send_cs(self.thost, data)
                 self.set_mode(enu.CStatus.IDLE)
             case enu.Tournament.READY:
-                await self.send_cs(self.host, data)
+                await self.send_cs(self.thost, data)
             case _: 
                 await self.send_json({'type':enu.Errors.TYPE})
 
@@ -397,10 +396,10 @@ class RemoteGamer2(BaseConsumer):
 
     async def game_join(self, data):
         if self.match.invited(data['author']) and self.match.full() is False:
-            self.match._challenger = data['author']
+            self.match._players.add(data['author'])
             data['message'] = self.match.game_state.to_dict('none')
-            await self.send_json(data)
-            await self.send_cs(self.match._challenger, {"type":enu.Game.ACCEPTED, "message":self.match.game_state.to_dict('none')})
+            # await self.send_json(data)
+            await self.match.broadcast({"type":enu.Game.ACCEPTED, "author":self.username, "message":self.match.game_state.to_dict('none')})
         else:
             await self.send_cs(data['author'], {"type":enu.Game.DENY})
 
@@ -409,8 +408,9 @@ class RemoteGamer2(BaseConsumer):
         await self.send_json(data)
 
     async def game_accepted(self, data):
-        self.host = data['author']
-        self.set_mode(enu.CStatus.GGUEST)
+        if self.status != enu.CStatus.GHOST:
+            self.host = data['author']
+            self.set_mode(enu.CStatus.GGUEST)
         await self.send_json(data)
 
     async def game_kick(self, data):

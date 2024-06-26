@@ -1,5 +1,6 @@
 import { navigateTo } from "./index.js";
 import { clearView } from "./index.js";
+import { initGame } from "./game/websocket.js";
 
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
@@ -353,6 +354,21 @@ export let logoutRequest = (event) => {
     });
 }
 
+const playOfflineBtnElement = document.querySelector(".play-offline-btn");
+const playOnlineBtnElement = document.querySelector(".play-online-btn");
+playOfflineBtnElement.addEventListener("click", event => {
+    // scrollUpEffect()
+    initGame("/game/local/")
+})
+playOnlineBtnElement.addEventListener("click", event => {
+    // window.scrollTo({
+    //     top: 0,
+    //     behavior: "smooth",
+    // });
+    // document.removeEventListener('wheel', scrollDownEffect);
+    // document.addEventListener('wheel', adjustZoom);
+    initGame("/game/")
+})
 
 export const showHome = async () => {
     let isAuthenticated = await isUserAuthenticated();
@@ -361,22 +377,12 @@ export const showHome = async () => {
     homeElement.style.display = "block";
     if (isAuthenticated)
         loggedInStatus();
-    const playOfflineBtnElement = document.querySelector(".play-offline-btn");
-    const playOnlineBtnElement = document.querySelector(".play-online-btn");
     document.addEventListener('mousemove', parallaxEffect);
     document.addEventListener('wheel', scrollDownEffect);
-    playOfflineBtnElement.addEventListener("click", scrollUpEffect)
-    playOnlineBtnElement.addEventListener("click", event => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-        document.removeEventListener('wheel', scrollDownEffect);
-        document.addEventListener('wheel', adjustZoom);
-    })
     document.addEventListener("click", switchForm);
     document.querySelector(".close-two-factor-login").addEventListener("click", closeTwoFactorLogin)
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
     const logoutButton = document.querySelector(".fa-right-from-bracket");
     logoutButton.addEventListener("click", logoutRequest);
 } 
+
