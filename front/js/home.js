@@ -378,7 +378,6 @@ export const showHome = async () => {
     document.addEventListener("click", switchForm);
     document.querySelector(".close-two-factor-login").addEventListener("click", closeTwoFactorLogin)
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
-    const logoutButton = document.querySelector(".fa-right-from-bracket");
-    logoutButton.addEventListener("click", logoutRequest);
+
     document.querySelector(".login-42").addEventListener('click', authenticateWith42);
 } 

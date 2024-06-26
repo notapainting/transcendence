@@ -83,6 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
             navigateTo(e.target.dataset.href);
         }
     });
+    const logoutButton = document.querySelector(".fa-right-from-bracket");
+    logoutButton.addEventListener("click", logoutRequest);
     window.scrollTo({
         top: 0,
         behavior: "smooth",
