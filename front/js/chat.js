@@ -321,7 +321,21 @@ const searchUsers = async () => {
 export const showChat = async () => {
     await isUserAuthenticated();
     const chatElement = document.querySelector(".chatbox");
-    chatElement.style.display = "flex";
+    const bubbleElement = document.querySelector(".bubble");
+    bubbleElement.style.display = "flex"
+    bubbleElement.addEventListener("click", () => {
+        chatElement.style.display = "flex";
+        bubbleElement.style.display = "none"
+    })
+    document.querySelector(".close-chat").addEventListener("click", ()=> {
+        chatElement.style.display = "none";
+        bubbleElement.style.display = "flex"
+    })
+
+    document.querySelector(".left-display").addEventListener("click", () => {
+        document.querySelector(".menu-container").style.opacity = "1";
+        document.querySelector(".left-display").style.display = "none";
+    })
     initializeWebSocket();
     searchbar.addEventListener('input', searchUsers);
     const sendButton = document.querySelector(".chat-send");
