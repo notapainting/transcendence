@@ -1,6 +1,6 @@
-import { navigateTo } from "./index.js";
+import { navigateTo, whoIam } from "./index.js";
 import { clearView, isUserAuthenticated } from "./index.js";
-import { showChat } from "./chat.js";
+import { fetchUsers, showChat } from "./chat.js";
 
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
@@ -30,9 +30,7 @@ function authenticateWith42() {
         return response.json();
     })
     .then(data => {
-        // Récupérer l'URL d'autorisation de l'école 42 depuis les données JSON
         const authorizationUrl = data.authorization_url;
-        // Rediriger l'utilisateur vers l'URL d'autorisation de l'école 42
         window.location.href = authorizationUrl;
     })
     .catch(error => {
@@ -156,10 +154,12 @@ const switchForm = (event) => {
 
 const messageBox = document.querySelector(".message-box");
 
-export const loggedInStatus = () => {
+export const loggedInStatus = (profile_picture, username) => {
     document.querySelector(".login-signin-form").style.display = "none"
     document.querySelector(".play-online-btn").style.display = "block"
     showChat();
+    document.querySelector(".welcome-msg").innerHTML = `Welcome<br>${username}`;
+    document.querySelector(".profile-picture-home").style.backgroundImage = `url('${profile_picture}')`
     document.querySelector(".navbar").style.display= "flex"
     setTimeout(()=> {
         document.querySelector(".play-online-btn").style.transform = "scale(1)"
@@ -196,7 +196,6 @@ const loginRequest = (event) => {
     })
     .then(response => {
         if (response.ok){
-            loggedInStatus();
             closeTwoFactorLogin();
             return response.json();
         } else if (response.status === 403) {
@@ -217,6 +216,9 @@ const loginRequest = (event) => {
         }
     })
     .then(data => {
+        console.log("YOOO")
+        console.log(data)
+        loggedInStatus(data.profile_picture, data.username);
     })  
     .catch(error => {
     })
@@ -331,6 +333,7 @@ const adjustZoom = (event) => {
 };
 
 export let logoutRequest = (event) => {
+    event.preventDefault();
     fetch('/auth/logout/', {
         method: 'POST',
         headers: {
@@ -356,8 +359,9 @@ export const showHome = async () => {
     let isAuthenticated = await isUserAuthenticated();
     const homeElement = document.querySelector("#home");
     homeElement.style.display = "block";
+    const personData = await fetchUsers(whoIam);
     if (isAuthenticated)
-        loggedInStatus();
+        loggedInStatus(personData.profile_picture, personData.username);
     const playOfflineBtnElement = document.querySelector(".play-offline-btn");
     const playOnlineBtnElement = document.querySelector(".play-online-btn");
     document.addEventListener('mousemove', parallaxEffect);

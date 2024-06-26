@@ -223,7 +223,7 @@ export const showProfile = async () => {
     })
     .then(data => {
         clearView();
-        loggedInStatus();
+        loggedInStatus(data.profile_picture, data.username);
         displayUserInformations(data);
         const profileElement = document.querySelector("#profile");
         profileElement.style.display = "block";
