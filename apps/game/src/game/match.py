@@ -60,11 +60,11 @@ class Match2(Lobby2):
 
     async def invite(self, user):
         if self.tournament is None:
-            super().invite(user)
+            await super().invite(user)
 
     async def kick(self, user):
         if self.tournament is None:
-            super().kick(user)
+            await super().kick(user)
 
     def compute(self):
         guest = [x for x in list(self._players) if x != self.host][0]

@@ -18,7 +18,7 @@ from game.routing import websocket_urlpatterns
 from game_back.middleware import CustomAuthMiddleware
 from channels.auth import CookieMiddleware
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'game_back.settings')
 
 django_asgi_app = get_asgi_application()
 
@@ -26,6 +26,5 @@ import game.routing
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
-    "websocket": CookieMiddleware(CustomAuthMiddleware((URLRouter(websocket_urlpatterns)))
-    ),
+    "websocket": CookieMiddleware((URLRouter(websocket_urlpatterns))),
 })

@@ -67,6 +67,10 @@ input:focus::placeholder {
     display: none;
 }
 
+#game {
+    display: none;
+}
+
 /* parallax-threes */
 
 .parallax-container {

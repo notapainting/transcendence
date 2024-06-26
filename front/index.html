@@ -7,10 +7,19 @@
     <link rel="stylesheet" href="./home.css">
     <link rel="stylesheet" href="./profile.css">
     <link rel="stylesheet" href="/chat.css">
+    <link rel="stylesheet" href="./game.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica+SC&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-</head>
+	<script type="importmap">
+		{
+		  "imports": {
+			"three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+			"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+		  }
+		}
+	  </script>
+</head> 
 <body>
     <nav class="navbar">
         <i class="item fa-solid fa-house"data-link data-href="/"></i>
@@ -21,7 +30,7 @@
     </nav>
     <div id="home" class="view">
         <div class="parallax-container">
-            <div class="background-threes"></div>
+            <!-- <div class="background-threes"></div> -->
             <div class="back-threes parallax-items"></div>
             <div class="middle-threes parallax-items"></div>
             <div class="front-threes parallax-items"></div>
@@ -193,6 +202,33 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div id ="game" class="view" style="display: none;">
+        <div class="containerGame">
+            <canvas id="canvas" width="1920" height="1080"></canvas>
+
+        </div>
+        <div id="gameMenu">
+            <button id="fastGame" class="menu-element button-menu" type="button">Partie rapide</button> 
+            <button id="tournament" class="menu-element button-menu" type="button">Tournoi</button>
+            <button id="exit" class="menu-element button-menu" type="button">Exit</button>
+            
+            <button id="create" class="menu-element button-menu" type="button">Create</button>
+            <button id="join" class="menu-element button-menu" type="button">Join</button>
+            <button id="back" class="menu-element button-menu" type="button">Back</button>
+
+            <input type="text" id="inviteInput" class="menu-element" placeholder="Nom d'un joueur...">
+            <button id="inviteButton" class="menu-element button-menu">Invite</button>
+
+            <div id="invitationBox">
+                <h3>Invitations Reçues: </h3>
+                <ul id="invitationList"></ul>
+            </div>
+
+            <button id="startButton" class="button-game" type="button">Start</button> 
+            <button id="stopButton" class="button-game" type="button">Stop</button>
+        </div>
+
     </div>
     <!-- <div id="settings" class="view">
         <h1>settings OHH</h1>
