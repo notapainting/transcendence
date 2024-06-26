@@ -76,29 +76,34 @@ input:focus::placeholder {
 }
 
 .navbar {
-    width: 400px;
+    width: 250px;
     height: 80px;
     position: fixed;
-    left: 50%;
+    right: 10px;
     top: 10px;
     display: none;
-    transform: translatex(-50%);
     align-items: center;
     justify-content: space-around;
-    background-color: rgba(255, 255, 255, 0.8);
     border-radius: 20px;
     transition: transfrom 0.4s ease;
     z-index: 2;
+    text-align: center;
+}
+
+.profile-picture-home {
+    height: 55px;
+    width: 55px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .item {
     font-size: 32px;
     cursor: pointer;
-    color: black;
-}
-
-.item:hover {
-    color: #99CCFF;
+    color: white;
 }
 
 .profile {

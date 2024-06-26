@@ -72,7 +72,7 @@ function addUserToMenu(target, profile_picture) {
     }
 }
 
-async function fetchUsers(username = null) {
+export async function fetchUsers(username = null) {
     try {
         let url = '/user/users_info/';
         if (username) {
@@ -84,7 +84,7 @@ async function fetchUsers(username = null) {
             return await response.json();
         } else {
             console.error('Error fetching users:', response.statusText);
-            return username ? null : []; // Retourne null si une seule recherche d'utilisateur échoue, sinon retourne un tableau vide pour la recherche de tous les utilisateurs
+            return username ? null : [];
         }
     } catch (error) {
         console.error('Error fetching users:', error);
@@ -173,7 +173,7 @@ const displayHistoryConversations = async (id, person, message, personList) => {
 
 async function handleMessage(message) {
     if (message.type === 'group.summary'){
-        console.log("EVENT GROUP SUMMARY");
+        console.log(message);
         while (displayMenu.children.length > 1) {
             displayMenu.removeChild(displayMenu.children[1]);
         }
@@ -193,6 +193,7 @@ async function handleMessage(message) {
         createGroup(message);
     }
     else if (message.type === 'message.text') {
+        console.log(message)
         console.log("EVENT MESSAGE TEXT");
         receiveMessage(message);
     }
@@ -322,20 +323,31 @@ export const showChat = async () => {
     await isUserAuthenticated();
     const chatElement = document.querySelector(".chatbox");
     const bubbleElement = document.querySelector(".bubble");
-    bubbleElement.style.display = "flex"
+    if (window.getComputedStyle(chatElement).display === 'none')
+        bubbleElement.style.display = "flex"
     bubbleElement.addEventListener("click", () => {
         chatElement.style.display = "flex";
         bubbleElement.style.display = "none"
     })
+    const leftHideElement = document.querySelector(".left-hide");
+    const leftDisplayElement = document.querySelector(".left-display");
+    const menuContainerElement = document.querySelector(".menu-container");
     document.querySelector(".close-chat").addEventListener("click", ()=> {
         chatElement.style.display = "none";
         bubbleElement.style.display = "flex"
     })
-
-    document.querySelector(".left-display").addEventListener("click", () => {
-        document.querySelector(".menu-container").style.opacity = "1";
-        document.querySelector(".left-display").style.display = "none";
+    leftHideElement.addEventListener("click", () => {
+        menuContainerElement.style.transform = "scale(0)";
+        leftHideElement.style.transform = "scale(0)";
+        leftDisplayElement.style.display = "flex";
     })
+    document.querySelector(".left-display").addEventListener("click", () => {
+        menuContainerElement.style.transform = "scale(1)";
+        leftHideElement.style.transform = "scale(1)";
+        leftDisplayElement.style.display = "none";
+    })
+
+
     initializeWebSocket();
     searchbar.addEventListener('input', searchUsers);
     const sendButton = document.querySelector(".chat-send");
