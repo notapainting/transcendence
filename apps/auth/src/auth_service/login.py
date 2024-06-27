@@ -11,6 +11,7 @@ import requests
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from auth_service.utils import get_user_from_access_token
+from auth_service.models import CustomUser
 
 
 class ValidateTokenView(APIView):
@@ -45,10 +46,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 		user = authenticate(username=username_or_email, password=password)
 		if user is None:
 			try:
-				user = User.objects.get(email=username_or_email)
+				user = CustomUser.objects.get(email=username_or_email)
 				if not user.check_password(password):
 					raise AuthenticationFailed('No active account found with the given credentials')
-			except User.DoesNotExist:
+			except CustomUser.DoesNotExist:
 				raise AuthenticationFailed('No active account found with the given credentials')
 		if not user.is_active:
 			raise AuthenticationFailed('No active account found with the given credentials')
