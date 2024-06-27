@@ -26,6 +26,25 @@ function formatDate(dateString) {
     }
 }
 
+const displayFocusedPerson = (personDiv, target, profile_picture) => {
+    document.querySelectorAll('.person').forEach(elem => {
+        elem.classList.remove('focus');
+    });
+    personDiv.classList.add('focus');
+    const username = personDiv.getAttribute('data-username');
+    const pictureChat = document.querySelector(".picture-chat");
+    const usernameTitle = document.querySelector(".username-title");
+    usernameTitle.innerHTML = `${target}`
+    pictureChat.style.backgroundImage = `url(${profile_picture})`;
+    document.querySelectorAll('.message-person').forEach(messageElem => {
+        if (messageElem.classList.contains(`username-${username}`)) {
+            messageElem.style.display = 'flex';
+        } else {
+            messageElem.style.display = 'none';
+        }
+    });
+}
+
 function addUserToMenu(target, profile_picture) {
     const displayMenu = document.querySelector('.display-menu');
     const existingPersonDiv = displayMenu.querySelector(`[data-username="${target}"]`);
@@ -51,26 +70,13 @@ function addUserToMenu(target, profile_picture) {
         personDiv.appendChild(picturePersonDiv);
         personDiv.appendChild(descriptionPersonDiv);
         displayMenu.insertBefore(personDiv, displayMenu.children[1]);
-        personDiv.addEventListener("click", async function() {
-            document.querySelectorAll('.person').forEach(elem => {
-                elem.classList.remove('focus');
-            });
-            personDiv.classList.add('focus');
-            const username = personDiv.getAttribute('data-username');
-            const pictureChat = document.querySelector(".picture-chat");
-            const usernameTitle = document.querySelector(".username-title");
-            usernameTitle.innerHTML = `${target}`
-            pictureChat.style.backgroundImage = `url(${profile_picture})`;
-            document.querySelectorAll('.message-person').forEach(messageElem => {
-                if (messageElem.classList.contains(`username-${username}`)) {
-                    messageElem.style.display = 'flex';
-                } else {
-                    messageElem.style.display = 'none';
-                }
-            });
-        });
+        personDiv.removeEventListener("click", (event) => displayFocusedPerson(personDiv, targe, profile_picture));
+        personDiv.addEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
     }
 }
+
+
+
 
 export async function fetchUsers(username = null) {
     try {
@@ -228,6 +234,12 @@ function initializeWebSocket() {
     };
 }
 
+const selectSearchResult = (user) => {
+    addUserToMenu(user.username, user.profile_picture);
+    searchResults.style.display = 'none';
+    searchbar.value = '';
+} 
+
 function displaySearchResults(users) {
     searchResults.innerHTML = '';
     if (users.length > 0) {
@@ -235,11 +247,8 @@ function displaySearchResults(users) {
             const userDiv = document.createElement('div');
             userDiv.classList.add('result-item');
             userDiv.textContent = user.username;
-            userDiv.addEventListener('click', function () {
-                addUserToMenu(user.username, user.profile_picture);
-                searchResults.style.display = 'none';
-                searchbar.value = '';
-            });
+            userDiv.removeEventListener('click', (event) => selectSearchResult(user));
+            userDiv.addEventListener('click', (event) => selectSearchResult(user));
             searchResults.appendChild(userDiv);
         });
         searchResults.style.display = 'block';
@@ -319,42 +328,56 @@ const searchUsers = async () => {
     }
 };
 
+const leftHideElement = document.querySelector(".left-hide");
+const leftDisplayElement = document.querySelector(".left-display");
+const menuContainerElement = document.querySelector(".menu-container");
+const chatElement = document.querySelector(".chatbox");
+const bubbleElement = document.querySelector(".bubble");
+
+const displayChat = () => {
+    chatElement.style.display = "flex";
+    bubbleElement.style.display = "none"
+}
+
+const closeChat = () => {
+    chatElement.style.display = "none";
+    bubbleElement.style.display = "flex"
+}
+
+const hideChatLeft = () => {
+    menuContainerElement.style.transform = "scale(0)";
+    leftHideElement.style.transform = "scale(0)";
+    leftDisplayElement.style.display = "flex";
+}
+
+const showChatLeft = () => { 
+    menuContainerElement.style.transform = "scale(1)";
+    leftHideElement.style.transform = "scale(1)";
+    leftDisplayElement.style.display = "none";
+}
+
+const sendMessageEnter = (event) => {
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+}
+
 export const showChat = async () => {
     await isUserAuthenticated();
-    const chatElement = document.querySelector(".chatbox");
-    const bubbleElement = document.querySelector(".bubble");
     if (window.getComputedStyle(chatElement).display === 'none')
         bubbleElement.style.display = "flex"
-    bubbleElement.addEventListener("click", () => {
-        chatElement.style.display = "flex";
-        bubbleElement.style.display = "none"
-    })
-    const leftHideElement = document.querySelector(".left-hide");
-    const leftDisplayElement = document.querySelector(".left-display");
-    const menuContainerElement = document.querySelector(".menu-container");
-    document.querySelector(".close-chat").addEventListener("click", ()=> {
-        chatElement.style.display = "none";
-        bubbleElement.style.display = "flex"
-    })
-    leftHideElement.addEventListener("click", () => {
-        menuContainerElement.style.transform = "scale(0)";
-        leftHideElement.style.transform = "scale(0)";
-        leftDisplayElement.style.display = "flex";
-    })
-    document.querySelector(".left-display").addEventListener("click", () => {
-        menuContainerElement.style.transform = "scale(1)";
-        leftHideElement.style.transform = "scale(1)";
-        leftDisplayElement.style.display = "none";
-    })
-
-
+    bubbleElement.removeEventListener("click", displayChat);
+    bubbleElement.addEventListener("click", displayChat);
+    document.querySelector(".close-chat").removeEventListener("click", closeChat)
+    document.querySelector(".close-chat").addEventListener("click", closeChat)
+    leftHideElement.removeEventListener("click", hideChatLeft);
+    leftHideElement.addEventListener("click", hideChatLeft);
+    document.querySelector(".left-display").removeEventListener("click", showChatLeft)
+    document.querySelector(".left-display").addEventListener("click", showChatLeft)
     initializeWebSocket();
     searchbar.addEventListener('input', searchUsers);
     const sendButton = document.querySelector(".chat-send");
     sendButton.addEventListener("click", sendMessage);
-    messageInput.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-            sendMessage();
-        }
-    });
+    messageInput.removeEventListener("keydown", sendMessageEnter);
+    messageInput.addEventListener("keydown", sendMessageEnter);
 }
