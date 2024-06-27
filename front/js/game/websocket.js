@@ -25,6 +25,8 @@ export const initGame = (path) => {
 
     document.querySelector("#home").style.display = "none"
     document.querySelector("#game").style.display = "block"
+    invitationBox.style.display = 'block';
+
     console.log(path)
     gameSocket = new WebSocket(
         'wss://'
@@ -41,8 +43,7 @@ export const initGame = (path) => {
             const message = content.message;
             game.gameRenderer(message);
             invitationBox.style.display = 'none';
-            // #startbutton/stopbutton
-            clearMenu()
+            moveTo(3);
 
         }
         if (contentType === 'game.join'){
@@ -62,7 +63,19 @@ export const initGame = (path) => {
             console.log('update')
             game.gameRenderer(message);
         }
-    
+        else if (contentType === 'game.ready') {
+            const message = content.message;
+            console.log('ready')
+            circle.style.background = '#0eee28';
+        }
+        else if (contentType === 'game.broke') {
+            console.log('broke')
+            moveTo(0);
+        }
+        else if (contentType === 'game.start') {
+            console.log('start')
+            clearMenu();
+        }
         // const currentTime = performance.now();
         // const pingDelay = currentTime - lastPingTime;
         // console.log("Ping delay:", pingDelay, "ms");
@@ -116,6 +129,7 @@ function updateInvitationList() {
 
 
 // bouton game
+/*
 
 document.querySelector('#startButton').onclick = function(e) {
 	if (gameData.start)
@@ -144,6 +158,7 @@ document.querySelector('#stopButton').onclick = function(e) {
 		gameData.timerInterval = null;
 	}
 };
+*/
 
 document.addEventListener('keydown', function(event) {
     if (event.key === 'w') {
@@ -202,12 +217,6 @@ document.addEventListener('keyup', function(event) {
 
 // navigation bouton
 
-// export const clearView = () => {
-//     console.log("Appel ClearView")
-//         document.querySelectorAll(".view").forEach(div => {
-//             div.style.display = "none";
-//         });
-//     }
 
 import { showHome } from "../home.js"
 
@@ -220,6 +229,8 @@ const   join = document.getElementById('join');
 const   userInput = document.getElementById('inviteInput');
 const   inviteButton = document.getElementById('inviteButton');
 const   invitationBox = document.getElementById('invitationBox');
+const   ready = document.getElementById('ready');
+const   circle = document.getElementById('ready-circle');
 
 
 const gameMode = Object.freeze({
@@ -230,7 +241,9 @@ const gameMode = Object.freeze({
 const   sceneGamode = [fastGame, tournament, exit];
 const   sceneType = [create, join, back];
 const   sceneCreate = [userInput, inviteButton, back];
-const   scene = [sceneGamode, sceneType, sceneCreate];
+const   sceneReady = [ready, circle, exit];
+const   sceneEnd = [];
+const   scene = [sceneGamode, sceneType, sceneCreate, sceneReady, sceneEnd];
 let     idx = -1;
 let     status = gameMode.MATCH;
 
@@ -239,6 +252,7 @@ const clearMenu = () => {
     document.querySelectorAll(".menu-element").forEach(div => {
         div.style.display = "none";
     });
+    circle.style.background = '#ee0e0e';
 }
 
 exit.addEventListener('click', () => {
@@ -259,6 +273,19 @@ const move = (pas) => {
         div.style.display = "block";
     })
 }
+
+
+const moveTo = (i) => {
+    if (i === scene.length || i < 0) 
+        return ;
+    idx = i;
+    console.log('move to: ' + idx)
+    clearMenu()
+    scene[idx].forEach( div => {
+        div.style.display = "block";
+    })
+}
+
 
 fastGame.addEventListener('click', () => {
 	move(1);
@@ -292,6 +319,12 @@ inviteButton.addEventListener('click', function() {
 	gameSocket.send(JSON.stringify({
 		'type': 'game.invite',
 		'message': userInput
+	}));
+});
+
+ready.addEventListener('click', () => {
+    gameSocket.send(JSON.stringify({
+		'type': 'game.ready'
 	}));
 });
 

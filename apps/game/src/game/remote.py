@@ -305,9 +305,9 @@ class RemoteGamer2(BaseConsumer):
             case enu.Game.KICK:
                 await self.match.kick(data['message'])
             case enu.Game.READY:
-                await self.match.set_ready(self.username)
+                await self.match.add_ready(self.username)
                 if self.match.ready() is True:
-                    self.match.start()
+                    await self.match.start()
                     await self.gaming({"message":"startButton"})
             case enu.Game.UPDATE: 
                 await self.gaming(data)
@@ -358,13 +358,12 @@ class RemoteGamer2(BaseConsumer):
         await self.send_json(data)
 
     async def game_ready(self, data):
-        if self.match_status == enu.CStatus.HOST:
-            if self.match.set_ready(data['message']) is True:
+        if self.status == enu.CStatus.GHOST and 'r' not in data:
+            await self.match.add_ready(data['author'])
+            if self.match.ready() is True:
+                await self.match.start()
                 await self.gaming({"message":"startButton"})
-            else:
-                await self.send_json(data)
-        elif self.match_status == enu.CStatus.GUEST:
-            await self.send_json(data)
+        await self.send_json(data)
 
     async def game_start(self, data):
         await self.send_json(data)
@@ -390,8 +389,7 @@ class RemoteGamer2(BaseConsumer):
 
     # HOST ONLY
     async def game_quit(self, data):
-        self.match.set_ready.discard(self.match._challenger)
-        self.match._challenger = None
+        self.match._ready.discard(data['author'])
         await self.send_json(data)
 
     async def game_join(self, data):
@@ -426,6 +424,7 @@ class RemoteGamer2(BaseConsumer):
         if message == "startButton":
             if self.match.game_state.status['game_running'] == False :
                 self.match.game_state.status['game_running'] = True
+                print(f"{self.username} ({self.status}): here")
                 self.match.task = asyncio.create_task(loop_remote_ultime(self))
         elif message == "bonus":
             self.match.game_state.status['randB'] = data["bonus"]

@@ -26,6 +26,8 @@
 }
 
 .button-game{
+    position:absolute;
+    left:2%;
     font-family: Roboto, sans-serif;
     font-weight: 0;
     font-size: 14px;
@@ -37,7 +39,7 @@
     border-radius: 50px;
     transition : 1000ms;
     transform: translateY(0);
-    display: flex;
+    display: none;
     flex-direction: row;
     align-items: center;
     cursor: pointer;
@@ -54,6 +56,14 @@
     background-color: #fff;
     color: #0066cc;
     border: solid 2px #0066cc;
+}
+
+#startButton {
+    top: 80%;
+}
+
+#stopButton {
+    top: 90%;
 }
 
 #invitationBox {
@@ -137,9 +147,14 @@
 }
 
 #back {
-    /* display: none; */
-      top: 80%;
-  }
+    display: none;
+    top: 80%;
+}
+
+#ready {
+    display: none;
+    top: 40%;
+}
 
 .button-menu {
 	display: none;
@@ -179,4 +194,19 @@
       box-shadow: 0 0 30px 0 #e76f51;
   }
   }
+
+  #ready-circle{
+    position:absolute;
+    left:40%;
+    top:40%;
+    background:#ee0e0e;
+    border-radius:50%;
+    width:16px;
+    height:16px;
+    border:2px solid #d826cf; 
+  }
+
+  /* #0eee28 vert
+  #ee0e0e red
   
+  */
