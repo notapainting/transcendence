@@ -27,7 +27,7 @@ build:
 
 
 #========#	start/stop rule	#========#
-start: -waf-warn
+start:
 	sudo sysctl -w vm.max_map_count=262144
 	${CMP} up --build
 
