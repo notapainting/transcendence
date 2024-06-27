@@ -229,6 +229,7 @@ const displayTwoFactorLogin = async ()  => {
     setTimeout(()=> {
         twoFactorContainerLogin.style.transform = "scale(1)"
     }, 200)
+    login2faButton.removeEventListener("click", loginRequest);
     login2faButton.addEventListener("click", loginRequest);
 }
 
@@ -353,6 +354,14 @@ export let logoutRequest = (event) => {
     });
 }
 
+const smoothSroll = (event) => {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    });
+    document.removeEventListener('wheel', scrollDownEffect);
+    document.addEventListener('wheel', adjustZoom);
+}
 
 export const showHome = async () => {
     clearView();
@@ -364,20 +373,20 @@ export const showHome = async () => {
         loggedInStatus(personData.profile_picture, personData.username);
     const playOfflineBtnElement = document.querySelector(".play-offline-btn");
     const playOnlineBtnElement = document.querySelector(".play-online-btn");
+    document.removeEventListener('mousemove', parallaxEffect);
+    document.removeEventListener('wheel', scrollDownEffect);
     document.addEventListener('mousemove', parallaxEffect);
     document.addEventListener('wheel', scrollDownEffect);
+    playOfflineBtnElement.removeEventListener("click", scrollUpEffect)
+    playOnlineBtnElement.removeEventListener("click", smoothSroll)
     playOfflineBtnElement.addEventListener("click", scrollUpEffect)
-    playOnlineBtnElement.addEventListener("click", event => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-        document.removeEventListener('wheel', scrollDownEffect);
-        document.addEventListener('wheel', adjustZoom);
-    })
+    playOnlineBtnElement.addEventListener("click", smoothSroll)
+    document.removeEventListener("click", switchForm);
     document.addEventListener("click", switchForm);
+    document.querySelector(".close-two-factor-login").removeEventListener("click", closeTwoFactorLogin)
+    homeFormButton.removeEventListener("click", loginOrRegisterRequest)
+    document.querySelector(".login-42").removeEventListener('click', authenticateWith42);
     document.querySelector(".close-two-factor-login").addEventListener("click", closeTwoFactorLogin)
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
-
     document.querySelector(".login-42").addEventListener('click', authenticateWith42);
 } 
