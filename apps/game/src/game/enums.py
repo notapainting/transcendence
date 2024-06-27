@@ -17,7 +17,7 @@ class Game(enum.StrEnum):
     KICK = "game.kick"
     ACCEPTED = "game.accepted"
     DENY = "game.deny"
-    LOST = "game.lost"
+    BROKE = "game.broke"
     RECOVER = "game.recover"
     UPDATE = "game.update"
 

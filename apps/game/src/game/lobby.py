@@ -76,17 +76,23 @@ class Lobby2:
 
 
     async def invite(self, user):
+        if user == "":
+            return ;
         self._invited.add(user)
         await self._chlayer.group_send(user, {"type":self.types.INVITE, "author":self.host})
 
     async def kick(self, user):
+        if user == "":
+            return ;
         self._players.discard(user)
         self._invited.discard(user)
         await self._chlayer.group_send(user, {"type":self.types.KICK, "author":self.host})
 
     async def add_ready(self, user):
+        if user == "":
+            return ;
         self._ready.add(user)
-        self.broadcast({"type":self.types.READY, "author":user})
+        await self.broadcast({"type":self.types.READY, "author":user, "r":True})
 
 
     def ready(self):
@@ -100,7 +106,7 @@ class Lobby2:
         return False
 
     async def start(self):
-        self.broadcast({"type":self.types.START, "author":self.host})
+        await self.broadcast({"type":self.types.START, "author":self.host})
 
     def invited(self, user):
         return user in self._invited

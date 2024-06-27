@@ -326,6 +326,8 @@ async def loop_remote_ultime(self):
     global reset
     try :
         while self.match.game_state.status['game_running']:
+            print(f"{self.username} ({self.status}):  loop")
+
             end = self.match.game_state.update()
             if end is not None:
                 message = {"type":enu.Game.END, "message":self.match.compute()}
