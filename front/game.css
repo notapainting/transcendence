@@ -25,9 +25,9 @@
     
 }
 
-.button-game{
+.game-button{
     position:absolute;
-    left:2%;
+    left:50%;
     font-family: Roboto, sans-serif;
     font-weight: 0;
     font-size: 14px;
@@ -49,7 +49,7 @@
 	z-index: 999;
 }
 
-.button-game:hover{
+.game-button:hover{
     transition : 500ms;
     transform : translateY(-0px);
     transform: scale(1.08);
@@ -58,13 +58,12 @@
     border: solid 2px #0066cc;
 }
 
-#startButton {
+#game-pause {
     top: 80%;
+    display: none;
 }
 
-#stopButton {
-    top: 90%;
-}
+
 
 #invitationBox {
   position: absolute;
