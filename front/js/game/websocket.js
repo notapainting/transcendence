@@ -1,22 +1,108 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
+import { moveTo, clearMenu, invitations } from './menu.js';
 import { clearView } from "../index.js";
 
+export const EventGame = Object.freeze({
+    CREATE: "game.create",
+    INVITE: "game.invite",
+    JOIN: "game.join",
+    QUIT: "game.quit",
+    READY: "game.ready",
+    UNREADY: "game.unready",
+    KICK: "game.kick",
+    ACCEPTED: "game.accepted",
+    DENY: "game.deny",
+    UPDATE: "game.update",
+    START: "game.start",
+    PAUSE: "game.pause",
+    END: "game.end",
+    BROKE: "game.broke",
+})
 
+export const EventTournament = Object.freeze({
+    CREATE: "tournament.create",
+    INVITE: "tournament.invite",
+    JOIN: "tournament.join",
+    QUIT: "tournament.quit",
+    KICK: "tournament.kick",
+    ACCEPTED: "tournament.accepted",
+    PHASE: "tournament.phase",
+    MATCH: "tournament.match",
+    RESULT: "tournament.result",
+    BROKE: "tournament.broke",
+})
 
-const invitations = [];
-
-
-
-let lastPingTime = performance.now();
 
 function updateTimer() {
 	gameData.elapsedTime += 1;
 }
 
-let gameSocket;
+export let gameSocket;
 
-// socket event
+const messageHandler = (e) => {
+    const content = JSON.parse(e.data);
+    console.log("message: ", content.type);
+    updateInvitationList();
+
+    switch(content.type){
+        case EventGame.INVITE:
+            console.log("invitation from: ", content.author);
+            invitations.push(content.author);
+            updateInvitationList();
+            break;
+        case EventGame.JOIN:
+            game.gameRenderer(content.message);
+            break;
+        case EventGame.ACCEPTED:
+            game.gameRenderer(content.message);
+            moveTo(3);
+            break;
+        case EventGame.READY:
+            document.getElementById('ready-circle').style.background = '#0eee28';
+            break;
+        case EventGame.START:
+            moveTo(4);
+            if (gameData.start)
+                {
+                    if (!gameData.timerInterval)
+                        gameData.timerInterval = setInterval(updateTimer, 1000);
+                }
+                else {
+                    gameData.sceneHandler = 1;
+                    game.gameRenderer(null);
+                }
+            break;
+        case EventGame.UPDATE:
+            game.gameRenderer(content.message);
+            break;
+        case EventGame.PAUSE:
+            if (gameData.timerInterval) {
+                clearInterval(gameData.timerInterval);
+                gameData.timerInterval = null;
+            }
+            break;
+        case EventGame.BROKE:
+            moveTo(0);
+            break;
+        default:
+            console.log("unknow type : ", content.type)
+    }
+
+    // const currentTime = performance.now();
+    // const pingDelay = currentTime - lastPingTime;
+    // console.log("Ping delay:", pingDelay, "ms");
+
+    // if (message.winner == 'leftWin')
+    // 	playerWin('left')
+    // else if (message.winner == 'rightWin')
+    // 	playerWin('right')
+
+    // lastPingTime = currentTime;
+    // console.log("ping = ", lastPingTime);
+};
+
+// refaire en supprimant la partei transition (utilsier funciton islem + naviguate To)
 export const initGame = (path) => {
     window.scrollTo({
         top: 0,
@@ -25,79 +111,19 @@ export const initGame = (path) => {
 
     document.querySelector("#home").style.display = "none"
     document.querySelector("#game").style.display = "block"
-    invitationBox.style.display = 'block';
-
     console.log(path)
     gameSocket = new WebSocket(
         'wss://'
         + window.location.host
         + path
     );
-
-    gameSocket.onmessage = function(e) {
-        const content = JSON.parse(e.data);
-        var contentType = content.type;
-        console.log("message received: ", content);
-        updateInvitationList();
-        if (contentType === 'game.accepted'){
-            const message = content.message;
-            game.gameRenderer(message);
-            invitationBox.style.display = 'none';
-            moveTo(3);
-
-        }
-        if (contentType === 'game.join'){
-            const message = content.message;
-            game.gameRenderer(message);
-            userInput.style.display = 'none';
-            inviteButton.style.display = 'none';
-        }
-        if (contentType === 'game.invite'){
-            const joinData = content.author;
-            console.log("invitation from: ", joinData);
-            invitations.push(joinData);
-            updateInvitationList();
-        }
-        else if (contentType === 'game.update') {
-            const message = content.message;
-            console.log('update')
-            game.gameRenderer(message);
-        }
-        else if (contentType === 'game.ready') {
-            const message = content.message;
-            console.log('ready')
-            circle.style.background = '#0eee28';
-        }
-        else if (contentType === 'game.broke') {
-            console.log('broke')
-            moveTo(0);
-        }
-        else if (contentType === 'game.start') {
-            console.log('start')
-            clearMenu();
-        }
-        // const currentTime = performance.now();
-        // const pingDelay = currentTime - lastPingTime;
-        // console.log("Ping delay:", pingDelay, "ms");
-    
-        // if (message.winner == 'leftWin')
-        // 	playerWin('left')
-        // else if (message.winner == 'rightWin')
-        // 	playerWin('right')
-    
-        // lastPingTime = currentTime;
-        // console.log("ping = ", lastPingTime);
-    };
-    
-    
+    gameSocket.onmessage = messageHandler;
     gameSocket.onclose = function(e) {
-        // console.error('Game socket closed unexpectedly');
         console.log('Game socket closed');
     };
-    console.log(idx)
-
-    move(1);
+    moveTo(0);
 }
+
 
 function updateInvitationList() {
     const invitationList = document.getElementById('invitationList');
@@ -127,38 +153,6 @@ function updateInvitationList() {
     });
 }
 
-
-// bouton game
-/*
-
-document.querySelector('#startButton').onclick = function(e) {
-	if (gameData.start)
-    {
-		gameSocket.send(JSON.stringify({
-			'type': 'game.update',
-			'message': 'startButton'
-        }));
-		if (!gameData.timerInterval)
-			gameData.timerInterval = setInterval(updateTimer, 1000);
-    }
-	else {
-		gameData.sceneHandler = 1;
-		game.gameRenderer(null);
-	}
-};
-
-document.querySelector('#stopButton').onclick = function(e) {
-	gameSocket.send(JSON.stringify({
-		'type': 'game.update',
-		'message': 'stopButton'
-	}));
-	
-	if (gameData.timerInterval) {
-		clearInterval(gameData.timerInterval);
-		gameData.timerInterval = null;
-	}
-};
-*/
 
 document.addEventListener('keydown', function(event) {
     if (event.key === 'w') {
@@ -215,132 +209,41 @@ document.addEventListener('keyup', function(event) {
 	}
 });
 
-// navigation bouton
 
 
-import { showHome } from "../home.js"
+// let lastPingTime = performance.now();
 
-const   fastGame = document.getElementById('fastGame');
-const   tournament = document.getElementById('tournament');
-const   exit = document.getElementById('exit');
-const   back = document.getElementById('back');
-const   create = document.getElementById('create');
-const   join = document.getElementById('join');
-const   userInput = document.getElementById('inviteInput');
-const   inviteButton = document.getElementById('inviteButton');
-const   invitationBox = document.getElementById('invitationBox');
-const   ready = document.getElementById('ready');
-const   circle = document.getElementById('ready-circle');
+// bouton game
+/*
 
+// document.querySelector('#startButton').onclick = function(e) {
+	if (gameData.start)
+    {
+		gameSocket.send(JSON.stringify({
+			'type': 'game.update',
+			'message': 'startButton'
+        }));
+		if (!gameData.timerInterval)
+			gameData.timerInterval = setInterval(updateTimer, 1000);
+    }
+	else {
+		gameData.sceneHandler = 1;
+		game.gameRenderer(null);
+	}
+// };
 
-const gameMode = Object.freeze({
-    MATCH: 0,
-    TOURNAMENT: 1
-})
-
-const   sceneGamode = [fastGame, tournament, exit];
-const   sceneType = [create, join, back];
-const   sceneCreate = [userInput, inviteButton, back];
-const   sceneReady = [ready, circle, exit];
-const   sceneEnd = [];
-const   scene = [sceneGamode, sceneType, sceneCreate, sceneReady, sceneEnd];
-let     idx = -1;
-let     status = gameMode.MATCH;
-
-
-const clearMenu = () => {
-    document.querySelectorAll(".menu-element").forEach(div => {
-        div.style.display = "none";
-    });
-    circle.style.background = '#ee0e0e';
-}
-
-exit.addEventListener('click', () => {
-	gameSocket.close();
-    idx = -1;
-    console.log(idx)
-    clearMenu()
-    showHome()
-});
-
-const move = (pas) => {
-    if (idx + pas === scene.length || idx + pas < 0) 
-        return ;
-    idx += pas;
-    console.log('move at: ' + idx)
-    clearMenu()
-    scene[idx].forEach( div => {
-        div.style.display = "block";
-    })
-}
-
-
-const moveTo = (i) => {
-    if (i === scene.length || i < 0) 
-        return ;
-    idx = i;
-    console.log('move to: ' + idx)
-    clearMenu()
-    scene[idx].forEach( div => {
-        div.style.display = "block";
-    })
-}
-
-
-fastGame.addEventListener('click', () => {
-	move(1);
-});
-
-tournament.addEventListener('click', () => {
-    status = gameMode.TOURNAMENT;
-    move(1);
-});
-
-back.addEventListener('click', () => {
-	move(-1);
-});
-
-create.addEventListener('click', () => {
-	if (status === gameMode.MATCH)
-        var key = 'game.create'
-    else
-        var key = 'tournament.create'
-    gameSocket.send(JSON.stringify({
-		'type': key
-	}));
-    move(1);
-
-});
-
-inviteButton.addEventListener('click', function() {
-    var userInput = document.getElementById('inviteInput').value;
-    console.log('Texte saisi : ' + userInput);
-
+document.querySelector('#stopButton').onclick = function(e) {
 	gameSocket.send(JSON.stringify({
-		'type': 'game.invite',
-		'message': userInput
+		'type': 'game.update',
+		'message': 'stopButton'
 	}));
-});
-
-ready.addEventListener('click', () => {
-    gameSocket.send(JSON.stringify({
-		'type': 'game.ready'
-	}));
-});
-
-join.addEventListener('click', () => {
-	gameSocket.send(JSON.stringify({
-		'type': 'game.join'
-	}));
-
-	// create.style.display = 'none';
-	// join.style.display = 'none';
-
-    updateInvitationList();
-	invitationBox.style.display = 'block';
-});
-
-
+	
+	if (gameData.timerInterval) {
+		clearInterval(gameData.timerInterval);
+		gameData.timerInterval = null;
+	}
+};
+*/
 
 
 /*

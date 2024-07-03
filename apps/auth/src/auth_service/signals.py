@@ -37,4 +37,4 @@ def create_admin_user(sender, **kwargs):
             password='123',
             isVerified=True
         )
-        print("Laël user created")
+        print("Loulou user created")

@@ -8,6 +8,9 @@ class Errors(enum.StrEnum):
 
 
 class Game(enum.StrEnum):
+    HOST = "game.host"
+    GUEST = "game.guest"
+
     CREATE = "game.create"
     INVITE = "game.invite"
     JOIN = "game.join"
@@ -18,7 +21,6 @@ class Game(enum.StrEnum):
     ACCEPTED = "game.accepted"
     DENY = "game.deny"
     BROKE = "game.broke"
-    RECOVER = "game.recover"
     UPDATE = "game.update"
 
 
@@ -27,6 +29,9 @@ class Game(enum.StrEnum):
     END = "game.end"
 
 class Tournament(enum.StrEnum):
+    HOST = "tournament.host"
+    GUEST = "tournament.guest"
+
     CREATE = "tournament.create"
     INVITE = "tournament.invite"
     JOIN = "tournament.join"
