@@ -1,7 +1,8 @@
 import { logoutRequest, showHome } from "./home.js"
 import { showProfile } from "./profile.js"
-import {showSettings} from "./settings.js"
-import {showChat} from "./chat.js"
+import { showSettings } from "./settings.js"
+import { showChat } from "./chat.js"
+import { showGame, showGameLocal } from "./game/index.js"
 
 export const navigateTo = url => {
     history.pushState(null, null, url)
@@ -49,6 +50,8 @@ const router = async () => {
         {path: "/profile", view:() => showProfile()},
         {path: "/chatbox", view:() => showChat()},
         {path: "/settings", view:() => showSettings()},
+        {path: "/game", view:() => showGame()},
+        {path: "/game/local", view:() => showGameLocal()},
     ];
     const potentialMatches = routes.map(route => {
         return {

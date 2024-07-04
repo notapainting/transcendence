@@ -1,37 +1,9 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { moveTo, clearMenu, invitations } from './menu.js';
-import { clearView } from "../index.js";
+import { moveTo, invitations } from './menu.js';
+import { clearScene } from './utils.js';
+import * as enu from './enums.js'
 
-export const EventGame = Object.freeze({
-    CREATE: "game.create",
-    INVITE: "game.invite",
-    JOIN: "game.join",
-    QUIT: "game.quit",
-    READY: "game.ready",
-    UNREADY: "game.unready",
-    KICK: "game.kick",
-    ACCEPTED: "game.accepted",
-    DENY: "game.deny",
-    UPDATE: "game.update",
-    START: "game.start",
-    PAUSE: "game.pause",
-    END: "game.end",
-    BROKE: "game.broke",
-})
-
-export const EventTournament = Object.freeze({
-    CREATE: "tournament.create",
-    INVITE: "tournament.invite",
-    JOIN: "tournament.join",
-    QUIT: "tournament.quit",
-    KICK: "tournament.kick",
-    ACCEPTED: "tournament.accepted",
-    PHASE: "tournament.phase",
-    MATCH: "tournament.match",
-    RESULT: "tournament.result",
-    BROKE: "tournament.broke",
-})
 
 
 function updateTimer() {
@@ -44,25 +16,26 @@ const messageHandler = (e) => {
     const content = JSON.parse(e.data);
     console.log("message: ", content.type);
     updateInvitationList();
-
     switch(content.type){
-        case EventGame.INVITE:
+        case enu.EventGame.INVITE:
             console.log("invitation from: ", content.author);
             invitations.push(content.author);
             updateInvitationList();
             break;
-        case EventGame.JOIN:
+        case enu.EventGame.JOIN:
             game.gameRenderer(content.message);
             break;
-        case EventGame.ACCEPTED:
+        case enu.EventGame.ACCEPTED:
+            document.addEventListener('keydown', bindKeyPress)
+            document.addEventListener('keyup', bindKeyRelease)
             game.gameRenderer(content.message);
-            moveTo(3);
+            moveTo(enu.sceneIdx.READY);
             break;
-        case EventGame.READY:
-            document.getElementById('ready-circle').style.background = '#0eee28';
+        case enu.EventGame.READY:
+            document.getElementById('game-menu-ready-circle').style.background = '#0eee28';
             break;
-        case EventGame.START:
-            moveTo(4);
+        case enu.EventGame.START:
+            moveTo(enu.sceneIdx.MATCH);
             if (gameData.start)
                 {
                     if (!gameData.timerInterval)
@@ -73,45 +46,32 @@ const messageHandler = (e) => {
                     game.gameRenderer(null);
                 }
             break;
-        case EventGame.UPDATE:
+        case enu.EventGame.UPDATE:
             game.gameRenderer(content.message);
             break;
-        case EventGame.PAUSE:
+        case enu.EventGame.PAUSE:
             if (gameData.timerInterval) {
                 clearInterval(gameData.timerInterval);
                 gameData.timerInterval = null;
             }
             break;
-        case EventGame.BROKE:
-            moveTo(0);
+        case enu.EventGame.BROKE:
+            moveTo(enu.sceneIdx.END);
+            break;
+        case enu.EventGame.END:
+            moveTo(enu.sceneIdx.END);
+            break;
+        case enu.EventGame.QUIT:
+            moveTo(enu.sceneIdx.END);
             break;
         default:
             console.log("unknow type : ", content.type)
     }
 
-    // const currentTime = performance.now();
-    // const pingDelay = currentTime - lastPingTime;
-    // console.log("Ping delay:", pingDelay, "ms");
 
-    // if (message.winner == 'leftWin')
-    // 	playerWin('left')
-    // else if (message.winner == 'rightWin')
-    // 	playerWin('right')
-
-    // lastPingTime = currentTime;
-    // console.log("ping = ", lastPingTime);
 };
 
-// refaire en supprimant la partei transition (utilsier funciton islem + naviguate To)
-export const initGame = (path) => {
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-    });
-
-    document.querySelector("#home").style.display = "none"
-    document.querySelector("#game").style.display = "block"
-    console.log(path)
+export const initWebSocket = (path) => {
     gameSocket = new WebSocket(
         'wss://'
         + window.location.host
@@ -119,14 +79,14 @@ export const initGame = (path) => {
     );
     gameSocket.onmessage = messageHandler;
     gameSocket.onclose = function(e) {
+        clearGame()
         console.log('Game socket closed');
     };
-    moveTo(0);
 }
 
 
 function updateInvitationList() {
-    const invitationList = document.getElementById('invitationList');
+    const invitationList = document.getElementById('game-menu-invitationList');
     invitationList.innerHTML = '';
 
     invitations.forEach((invitation, index) => {
@@ -145,6 +105,7 @@ function updateInvitationList() {
 				'type': 'game.join',
 				'message': invitation
 			}));
+
         });
 
         listItem.appendChild(invitationText);
@@ -153,6 +114,73 @@ function updateInvitationList() {
     });
 }
 
+const bindKeyPress = (event) => {
+    let data = {'type': 'game.update','message': ''};
+    switch (event.key) {
+        case 'w':
+            data.message = 'wPressed'
+            break;
+        case 's':
+            data.message = 'sPressed'
+            break;
+        case 'ArrowUp':
+            data.message = 'upPressed'
+            break;
+        case 'ArrowDown':
+            data.message = 'downPressed'
+            break;
+        default:
+            return ;
+    }
+    gameSocket.send(JSON.stringify(data));
+}
+
+const bindKeyRelease = (event) => {
+    let data = {'type': 'game.update','message': ''};
+    switch (event.key) {
+        case 'w':
+            data.message = 'wRelease'
+            break;
+        case 's':
+            data.message = 'sRelease'
+            break;
+        case 'ArrowUp':
+            data.message = 'upRelease'
+            break;
+        case 'ArrowDown':
+            data.message = 'downRelease'
+            break;
+        default:
+            return ;
+    }
+    gameSocket.send(JSON.stringify(data));
+}
+
+export const clearGame = () => {
+    document.removeEventListener('keydown', bindKeyPress)
+    document.removeEventListener('keyup', bindKeyRelease)
+    document.querySelectorAll(".game-element").forEach(div => {div.style.display = "none";});
+    clearScene()
+}
+
+
+    // const currentTime = performance.now();
+    // const pingDelay = currentTime - lastPingTime;
+    // console.log("Ping delay:", pingDelay, "ms");
+
+    // if (message.winner == 'leftWin')
+    // 	playerWin('left')
+    // else if (message.winner == 'rightWin')
+    // 	playerWin('right')
+
+    // lastPingTime = currentTime;
+    // console.log("ping = ", lastPingTime);
+
+
+// const context = canvas.getContext('2d');
+// context.clearRect(0, 0, canvas.width, canvas.height);
+
+/*
 
 document.addEventListener('keydown', function(event) {
     if (event.key === 'w') {

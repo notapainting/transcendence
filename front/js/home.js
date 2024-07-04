@@ -1,6 +1,5 @@
 import { navigateTo } from "./index.js";
 import { clearView } from "./index.js";
-import { initGame } from "./game/websocket.js";
 
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
@@ -332,6 +331,7 @@ const adjustZoom = (event) => {
     setTimeout(() => {
         isZooming = false; // Réinitialiser l'indicateur après 2 secondes
     }, 400); // Attendre 2 secondes avant de permettre un autre événement wheel
+    
 };
 
 export let logoutRequest = (event) => {
@@ -358,16 +358,20 @@ const playOfflineBtnElement = document.querySelector(".play-offline-btn");
 const playOnlineBtnElement = document.querySelector(".play-online-btn");
 playOfflineBtnElement.addEventListener("click", event => {
     // scrollUpEffect()
-    initGame("/game/local/")
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    });
+    navigateTo("/game/local");
 })
 playOnlineBtnElement.addEventListener("click", event => {
-    // window.scrollTo({
-    //     top: 0,
-    //     behavior: "smooth",
-    // });
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    });
     // document.removeEventListener('wheel', scrollDownEffect);
     // document.addEventListener('wheel', adjustZoom);
-    initGame("/game/")
+    navigateTo("/game");
 })
 
 export const showHome = async () => {

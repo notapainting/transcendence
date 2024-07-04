@@ -120,6 +120,7 @@ class RemoteGamer(BaseConsumer):
             case enu.Game.QUIT:
                 await self.match.end(True)
                 self.set_mode(enu.CStatus.IDLE)
+                await self.match.broadcast(data)
             case enu.Game.INVITE:
                 await self.match.invite(data['message'])
             case enu.Game.KICK:
@@ -130,6 +131,7 @@ class RemoteGamer(BaseConsumer):
                     await self.match.start()
                     await self.gaming({"message":"startButton"})
             case enu.Game.UPDATE: 
+                data['message'] = format_paddle_key(self.status, data['message'])
                 await self.gaming(data)
             case enu.Game.PAUSE: 
                 data['author'] = self.username
@@ -151,6 +153,7 @@ class RemoteGamer(BaseConsumer):
             case enu.Game.READY:
                 await self.send_cs(self.host, data)
             case enu.Game.UPDATE: 
+                data['message'] = format_paddle_key(self.status, data['message'])
                 await self.send_cs(self.host, data)
             case enu.Game.PAUSE: 
                 await self.send_cs(self.host, data)
@@ -208,7 +211,7 @@ class RemoteGamer(BaseConsumer):
         await self.send_json(data)
 
     async def game_end(self, data):
-        if self.status == enu.Game.HOST:
+        if self.status == enu.Game.HOST and data['author'] != self.username:
             await self.match.end()
         self.set_mode()
         await self.send_json(data)
@@ -234,8 +237,11 @@ class RemoteGamer(BaseConsumer):
 
     # HOST ONLY
     async def game_quit(self, data):
-        self.match._ready.discard(data['author'])
+        if self.status == enu.Game.HOST and data['author'] != self.username:
+            await self.match.end(True)
         await self.send_json(data)
+        # await self.send_json({'type':enu.Game.END})
+        self.set_mode()
 
     async def game_join(self, data):
         if self.match.invited(data['author']) and self.match.full() is False:
@@ -306,3 +312,30 @@ class RemoteGamer(BaseConsumer):
 
     async def tournament_start(self, data):
         await self.send_json(data)
+
+
+def format_paddle_key(status, key):
+    if status == enu.Game.HOST:
+        match key:
+            case 'downPressed' | 'sPressed':
+                return 'sPressed'
+            case 'downRelease' | 'sRelease':
+                return 'sRelease'
+            case 'upPressed' | 'wPressed':
+                return 'wPressed'
+            case 'upRelease' | 'wRelease':
+                return 'wRelease'
+            case '_':
+                return key
+    else:
+        match key:
+            case 'downPressed' | 'sPressed':
+                return 'downPressed'
+            case 'downRelease' | 'sRelease':
+                return 'downRelease'
+            case 'upPressed' | 'wPressed':
+                return 'upPressed'
+            case 'upRelease' | 'wRelease':
+                return 'upRelease'
+            case '_':
+                return key

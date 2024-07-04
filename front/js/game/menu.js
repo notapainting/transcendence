@@ -1,127 +1,111 @@
-import { showHome } from "../home.js"
-import { gameSocket, EventGame, EventTournament } from "./websocket.js"
+import { navigateTo } from "../index.js"
+import { gameSocket, clearGame } from "./websocket.js"
+import * as enu from './enums.js'
 export let invitations = [];
 
-const gameMode = Object.freeze({
-    MATCH: 0,
-    TOURNAMENT: 1
-})
 
-const   fastGame = document.getElementById('fastGame');
-const   tournament = document.getElementById('tournament');
-const   exit = document.getElementById('exit');
-const   back = document.getElementById('back');
-const   create = document.getElementById('create');
-const   join = document.getElementById('join');
-const   userInput = document.getElementById('inviteInput');
-const   inviteButton = document.getElementById('inviteButton');
-const   invitationBox = document.getElementById('invitationBox');
-const   ready = document.getElementById('ready');
+const   fastGame = document.getElementById('game-menu-fastGame');
+const   tournament = document.getElementById('game-menu-tournament');
+const   exit = document.getElementById('game-menu-exit');
+const   back = document.getElementById('game-menu-back');
+const   create = document.getElementById('game-menu-create');
+const   userInput = document.getElementById('game-menu-inviteInput');
+const   inviteButton = document.getElementById('game-menu-inviteButton');
+const   invitationBox = document.getElementById('game-menu-invitationBox');
+const   ready = document.getElementById('game-menu-ready');
+const   circle = document.getElementById('game-menu-ready-circle');
+const   home = document.getElementById('game-menu-home');
 const   pause = document.getElementById('game-pause');
-const   circle = document.getElementById('ready-circle');
+const   abandon = document.getElementById('game-abandon');
 
+/*** scene list ****/
 const   sceneGamode = [fastGame, tournament, invitationBox, exit];
 const   sceneType = [create, invitationBox, back];
 const   sceneCreate = [userInput, inviteButton, back];
 const   sceneReady = [ready, circle, exit];
-const   sceneMatch = [pause];
-const   sceneEnd = [];
+const   sceneMatch = [pause, abandon];
+const   sceneEnd = [home, exit];
 const   scene = [sceneGamode, sceneType, sceneCreate, sceneReady, sceneMatch, sceneEnd];
-let     idx = -1;
-let     status = gameMode.MATCH;
+let     idx = enu.sceneIdx.WELCOME;
+let     status = enu.gameMode.MATCH;
 
 
+/*** menu deplacement ****/
 export const clearMenu = () => {
-    document.querySelectorAll(".menu-element").forEach(div => {
-        div.style.display = "none";
-    });
+    document.querySelectorAll(".menu-element").forEach(div => {div.style.display = "none";});
     circle.style.background = '#ee0e0e';
-    invitationBox.style.display = 'none';
 }
 
-const move = (pas) => {
-    if (idx + pas === scene.length || idx + pas < 0) 
-        return ;
-    idx += pas;
-    console.log('move at: ' + idx)
+const goBack = () => {
+    if (idx == enu.sceneIdx.WELCOME) return ;
+    idx--;
+    console.log('go back to: ' + idx)
     clearMenu()
-    scene[idx].forEach( div => {
-        div.style.display = "block";
-    })
+    scene[idx].forEach(div => {div.style.display = "block";});
 }
 
 export const moveTo = (i) => {
-    if (i === scene.length || i < 0) 
-        return ;
+    if (i === scene.length || i < 0) return ;
     idx = i;
-    console.log('move to: ' + idx)
-    clearMenu()
-    scene[idx].forEach( div => {
-        div.style.display = "block";
-    })
+    console.log('move to: ' + i)
+    if (idx === enu.sceneIdx.END) clearGame();
+    clearMenu();
+    scene[idx].forEach(div => {div.style.display = "block";});
 }
 
-
+/*** event listener ****/
 fastGame.addEventListener('click', () => {
-	move(1);
+    moveTo(enu.sceneIdx.TYPE);
 });
 
 tournament.addEventListener('click', () => {
     status = gameMode.TOURNAMENT;
-    move(1);
+    moveTo(enu.sceneIdx.TYPE);
 });
 
 create.addEventListener('click', () => {
-	if (status === gameMode.MATCH)
-        var key = EventGame.CREATE
-    else
-        var key = EventTournament.CREATE
-    gameSocket.send(JSON.stringify({
-		'type': key
-	}));
-    move(1);
-
+    if (status === enu.gameMode.MATCH) gameSocket.send(JSON.stringify({'type': enu.EventGame.CREATE}));
+    else gameSocket.send(JSON.stringify({'type': enu.EventTournament.CREATE}));
+    moveTo(enu.sceneIdx.CREATION);
 });
 
 inviteButton.addEventListener('click', function() {
-    var userInput = document.getElementById('inviteInput').value;
+    var userInput = document.getElementById('game-menu-inviteInput').value;
     console.log('Texte saisi : ' + userInput);
-
-	gameSocket.send(JSON.stringify({
-		'type': EventGame.INVITE,
-		'message': userInput
-	}));
+    gameSocket.send(JSON.stringify({
+        'type': enu.EventGame.INVITE,
+        'message': userInput
+    }));
 });
 
 ready.addEventListener('click', () => {
-    gameSocket.send(JSON.stringify({
-		'type': EventGame.READY
-	}));
+    gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
 });
 
 pause.addEventListener('click', () => {
-    gameSocket.send(JSON.stringify({
-		'type': EventGame.PAUSE
-	}));
+    gameSocket.send(JSON.stringify({'type': enu.EventGame.PAUSE}));
 });
 
-join.addEventListener('click', () => {
-	gameSocket.send(JSON.stringify({
-		'type': EventGame.JOIN
-	}));
-
-    updateInvitationList();
-	invitationBox.style.display = 'block';
-});
 
 back.addEventListener('click', () => {
-	move(-1);
+    goBack();
 });
 
 exit.addEventListener('click', () => {
-	gameSocket.close();
-    idx = -1;
+    gameSocket.close();
+    idx = enu.sceneIdx.WELCOME;
     console.log(idx)
+    clearGame()
     clearMenu()
-    showHome()
+    navigateTo("/")
 });
+
+abandon.addEventListener('click', () => {
+    gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
+    moveTo(enu.sceneIdx.END);
+});
+
+home.addEventListener('click', () => {
+    moveTo(enu.sceneIdx.WELCOME);
+});
+

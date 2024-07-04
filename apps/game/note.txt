@@ -1,5 +1,13 @@
+DONE:
+    - setup key binding
+
+
 TODO:
     MATCH
+    - display score + username display
+    - abandon button
+    - quit button
+    - handle game broke/game quit
     - change game-button pause to resume 
     - clear threeJS scene at start/end
     - use naviguateTo
@@ -11,6 +19,16 @@ TODO:
     - everything
 
     LOCAL
-    - merge MAtch and tournament consumer
+    - merge match and tournament consumer
     - copy front
 
+host -> left player + ws
+guest -> right player + arrowkey
+
+sPressed + downPressed => sPressed
+
+
+BUG:
+    - p2 can unpause pause from p1
+    - game_quit not implemented
+    - key not working ?

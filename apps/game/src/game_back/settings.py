@@ -59,7 +59,7 @@ CHANNEL_LAYERS = {
 }
 
 
-
+ROOT_URLCONF = "game_back.urls"
 
 ASGI_APPLICATION = "game_back.asgi.application"
 

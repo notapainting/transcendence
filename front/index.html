@@ -30,7 +30,7 @@
     </nav>
     <div id="home" class="view">
         <div class="parallax-container">
-            <!-- <div class="background-threes"></div> -->
+            <div class="background-threes"></div>
             <div class="back-threes parallax-items"></div>
             <div class="middle-threes parallax-items"></div>
             <div class="front-threes parallax-items"></div>
@@ -208,25 +208,23 @@
             <canvas id="canvas" width="1920" height="1080"></canvas>
 
         </div>
-        <div id="gameMenu">
-            <button id="fastGame" class="menu-element button-menu" type="button">Partie rapide</button> 
-            <button id="tournament" class="menu-element button-menu" type="button">Tournoi</button>
-            <button id="exit" class="menu-element button-menu" type="button">Exit</button>
-            
-            <button id="create" class="menu-element button-menu" type="button">Create</button>
-            <button id="join" class="menu-element button-menu" type="button">Join</button>
-            <button id="back" class="menu-element button-menu" type="button">Back</button>
-
-            <input type="text" id="inviteInput" class="menu-element" placeholder="Nom d'un joueur...">
-            <button id="inviteButton" class="menu-element button-menu">Invite</button>
-
-            <div id="invitationBox">
+        <div id="game-menu">
+            <button id="game-menu-fastGame" class="menu-element button-menu" type="button">Partie rapide</button> 
+            <button id="game-menu-tournament" class="menu-element button-menu" type="button">Tournoi</button>
+            <button id="game-menu-exit" class="menu-element button-menu" type="button">Exit</button>
+            <button id="game-menu-create" class="menu-element button-menu" type="button">Create</button>
+            <button id="game-menu-back" class="menu-element button-menu" type="button">Back</button>
+            <input type="text" id="game-menu-inviteInput" class="menu-element" placeholder="Nom d'un joueur...">
+            <button id="game-menu-home" class="menu-element button-menu" type="button">Play Again</button> 
+            <button id="game-menu-inviteButton" class="menu-element button-menu">Invite</button>
+            <button id="game-menu-ready" class="menu-element button-menu" type="button">Ready?</button> 
+            <div id="game-menu-ready-circle" class="menu-element"></div>
+            <div id="game-menu-invitationBox" class="menu-element">
                 <h3>Invitations Reçues: </h3>
-                <ul id="invitationList"></ul>
+                <ul id="game-menu-invitationList"></ul>
             </div>
-            <button id="ready" class="menu-element button-menu" type="button">Ready?</button> 
-            <div id="ready-circle" class="menu-element"></div>
-            <button id="game-pause" class="game-button" type="button">Pause</button> 
+            <button id="game-pause" class="game-element game-button" type="button">Pause</button> 
+            <button id="game-abandon" class="game-element game-button" type="button">Abandon</button> 
         </div>
 
     </div>
