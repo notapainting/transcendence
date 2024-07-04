@@ -10,6 +10,7 @@ DONE:
     - abandon button
     - use naviguateTo
     - clear threeJS scene at start/end
+    - change game-button pause to resume 
 
 
 TODO:
@@ -17,7 +18,6 @@ TODO:
     - clear ThreeJS stuff after match 
     - display score + username display
     - quit button
-    - change game-button pause to resume 
     - add a end screen :
         ==> handle game broke/game quit
         - back : send game data
@@ -35,7 +35,7 @@ TODO:
 
 SOLVED:
     - double connection
+    - p2 can unpause pause from p1
 
 BUG:
-    - p2 can unpause pause from p1
     - game_quit not implemented 

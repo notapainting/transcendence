@@ -83,10 +83,30 @@ ready.addEventListener('click', () => {
     gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
 });
 
+let paused = false;
 pause.addEventListener('click', () => {
+    if (locked === true) return ;
     gameSocket.send(JSON.stringify({'type': enu.EventGame.PAUSE}));
+    togglePause();
 });
 
+let locked = false;
+export const toggleLock = () => {
+    if (locked == false) locked = true;
+    else if (locked == true) locked = false;
+    console.log('locked : ' + locked);
+}
+
+export const togglePause = () => {
+    if (paused === false) {
+        paused = true;
+        pause.innerHTML = "Resume";
+    } else {
+        paused = false;
+        pause.innerHTML = "Pause";
+    }
+    console.log('paused : ' + paused);
+}
 
 back.addEventListener('click', () => {
     goBack();

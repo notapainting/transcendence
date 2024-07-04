@@ -326,23 +326,16 @@ async def loop_remote_ultime(self):
     global reset
     try :
         while self.match.game_state.status['game_running']:
-            print(f"{self.username} ({self.status}):  loop is {self.match.game_state.status['game_running']}")
-
             end = self.match.game_state.update()
             if end is not None:
                 message = {"type":enu.Game.END, "message":self.match.compute()}
                 await self.match.broadcast()
                 return 
-            print(f"{self.username} ({self.status}):  loop2 is {self.match.game_state.status['game_running']}")
-            
             await self.match.broadcast({'type':enu.Game.UPDATE, 'author': self.username, 'message':self.match.game_state.to_dict('none')})
-            
             if reset==  2:
                 time.sleep(0.5)
                 reset= 0 
             await asyncio.sleep(0.5)
-            print(f"{self.username} ({self.status}):  loop3 is {self.match.game_state.status['game_running']}")
-
     except asyncio.CancelledError as error:
         print(error)
 
