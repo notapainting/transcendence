@@ -10,8 +10,10 @@ logger = getLogger(__name__)
 
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
-        # print(f"msg type : {message['type']}")
-        print(f"msg : {message}")
+        if message['type'] == enu.Game.UPDATE:
+            print(f"msg : {message['type']}")
+        else:
+            print(f"msg : {message}")
         try :
             await super().dispatch(message)
         except ValueError as error:

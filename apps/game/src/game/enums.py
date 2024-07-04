@@ -26,6 +26,7 @@ class Game(enum.StrEnum):
 
     START = "game.start"
     PAUSE = "game.pause"
+    RESUME = "game.resume"
     END = "game.end"
 
 class Tournament(enum.StrEnum):
