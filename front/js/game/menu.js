@@ -1,5 +1,6 @@
 import { navigateTo } from "../index.js"
 import { gameSocket, clearGame } from "./websocket.js"
+import { fullClear } from './index.js';
 import * as enu from './enums.js'
 export let invitations = [];
 
@@ -95,13 +96,13 @@ exit.addEventListener('click', () => {
     gameSocket.close();
     idx = enu.sceneIdx.WELCOME;
     console.log(idx)
-    clearGame()
-    clearMenu()
+    fullClear();
     navigateTo("/")
 });
 
 abandon.addEventListener('click', () => {
     gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
+    fullClear();
     moveTo(enu.sceneIdx.END);
 });
 
