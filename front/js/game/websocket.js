@@ -3,8 +3,8 @@ import { gameData } from './game.js';
 import { moveTo, invitations } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
-
-
+import * as utils from './utils.js';
+import { composer } from './game.js';
 
 function updateTimer() {
 	gameData.elapsedTime += 1;
@@ -162,7 +162,11 @@ export const clearGame = () => {
     document.removeEventListener('keydown', bindKeyPress)
     document.removeEventListener('keyup', bindKeyRelease)
     document.querySelectorAll(".game-element").forEach(div => {div.style.display = "none";});
-    
+    utils.clearScene(); 
+    composer.render();
+    game.scene.children
+        .filter(obj => obj.userData.isTrailSphere)
+        .forEach(obj => game.scene.remove(obj));
     // const canvas = document.getElementById('game-canvas')
     // const context = canvas.getContext('2d');
     // context.clearRect(0, 0, canvas.width, canvas.height);

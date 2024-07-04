@@ -18,6 +18,26 @@ scene.background = new THREE.Color(0x031d44);
 renderer.setSize(width, height);
 camera.position.set( 0, -100, 85 );
 
+var canvas = document.createElement('canvas');
+var context = canvas.getContext('2d');
+canvas.width = 512;
+canvas.height = 512;
+
+// Dessiner du texte sur le canvas
+context.fillStyle = 'white';
+context.fillRect(0, 0, canvas.width, canvas.height);
+context.font = '48px sans-serif';
+context.fillStyle = 'black';
+context.fillText('Bonjour, monde !', 50, 256);
+
+// Créer une texture à partir du canvas
+var texture = new THREE.CanvasTexture(canvas);
+
+var material = new THREE.MeshBasicMaterial({ map: texture });
+var geometry = new THREE.PlaneGeometry(50, 50);
+var mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
 export const clearThree = () => {renderer.clear();};
 
 import * as load from './loader.js';
