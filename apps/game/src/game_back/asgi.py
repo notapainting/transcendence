@@ -22,5 +22,6 @@ django_asgi_app = get_asgi_application()
 import game.routing
 
 application = ProtocolTypeRouter({
+    "http": django_asgi_app,
     "websocket": CookieMiddleware((URLRouter(websocket_urlpatterns))),
 })

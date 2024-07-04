@@ -277,3 +277,4 @@ export function gameRenderer(data) {
 }
 
 animate();
+

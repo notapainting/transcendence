@@ -14,7 +14,7 @@
     transform: translate(-50%, -50%);
 }
 
-#gameMenu {
+#game-menu {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -24,10 +24,12 @@
 .menu-element {
     
 }
+.game-element {
+}
 
 .game-button{
     position:absolute;
-    left:50%;
+    top: 80%;
     font-family: Roboto, sans-serif;
     font-weight: 0;
     font-size: 14px;
@@ -59,13 +61,18 @@
 }
 
 #game-pause {
-    top: 80%;
+    left:40%;
+    display: none;
+}
+
+#game-abandon {
+    left:60%;
     display: none;
 }
 
 
 
-#invitationBox {
+#game-menu-invitationBox {
   position: absolute;
   display: flex;
   left:70%;
@@ -75,24 +82,24 @@
   background-color: #fafafa;
 }
 
-#invitationBox h3 {
+#game-menu-invitationBox h3 {
   top: 0;
   color: black;
 }
 
-#invitationList {
+#game-menu-invitationList {
   list-style-type: none;
   color: black;
   padding: 0;
 }
 
-#invitationList li {
+#game-menu-invitationList li {
   padding: 8px;
   color: black;
   border-bottom: 1px solid #ddd;
 }
 
-#invitationList li:last-child {
+#game-menu-invitationList li:last-child {
   border-bottom: none;
 }
 
@@ -109,48 +116,53 @@
   background-color: #0056b3;
 }
 
-#inviteInput {
+#game-menu-inviteInput {
   position: absolute;
   display: none;
   top: 60%;
 }
 
-#inviteButton {
+#game-menu-inviteButton {
     display: none;
     top: 70%;
 }
 
-#fastGame {
+#game-menu-fastGame {
   /* display: none; */
     top: 60%;
 }
 
-#tournament {
-  /* display: none; */
+#game-menu-tournament {
+    display: none;
     top: 70%;
 }
 
-#exit {
-  /* display: none; */
+#game-menu-exit {
+    display: none;
     top: 80%;
 }
 
-#create {
+#game-menu-create {
     display: none;
     top: 60%;
 }
 
-#join {
+#game-menu-join {
     display: none;
     top: 70%;
 }
 
-#back {
+#game-menu-home {
+    display: none;
+    top: 70%;
+}
+
+#game-menu-back {
     display: none;
     top: 80%;
 }
 
-#ready {
+#game-menu-ready {
     display: none;
     top: 40%;
 }
@@ -194,7 +206,7 @@
   }
   }
 
-  #ready-circle{
+#game-menu-ready-circle{
     position:absolute;
     left:40%;
     top:40%;
