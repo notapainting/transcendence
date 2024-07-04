@@ -138,11 +138,13 @@ class RemoteGamer(BaseConsumer):
                 if self.match.game_state.status['game_running'] == True:
                     await self.gaming({"message":"stopButton"})
                     self.match.game_state.status['game_running'] = False
-                    self.match.broadcast(data)
+                    await self.match.broadcast(data)
                 else:
+                    data['type'] = enu.Game.RESUME
+                    await self.match.broadcast(data)
                     await self.gaming({"message":"startButton"})
-                    self.match.game_state.status['game_running'] = True
             case _: 
+                print(f"unknow : {data['type']}")
                 await self.send_json({'type':enu.Errors.TYPE})
 
     async def game_guest(self, data):
@@ -157,7 +159,8 @@ class RemoteGamer(BaseConsumer):
                 await self.send_cs(self.host, data)
             case enu.Game.PAUSE: 
                 await self.send_cs(self.host, data)
-            case _: 
+            case _:
+                print(f"unknow : {data['type']}")
                 await self.send_json({'type':enu.Errors.TYPE})
 
     async def tournament_host(self, data):
@@ -219,15 +222,21 @@ class RemoteGamer(BaseConsumer):
 
     async def game_pause(self, data):
         if self.status == enu.Game.HOST:
+            if data['author'] == self.username:
+                return
             if self.match.game_state.status['game_running'] == True:
                 await self.gaming({"message":"stopButton"})
                 self.match.game_state.status['game_running'] = False
-                self.match.broadcast(data)
             else:
                 await self.gaming({"message":"startButton"})
                 self.match.game_state.status['game_running'] = True
+                data['type'] = enu.Game.RESUME
         await self.send_json(data)
-            
+
+    async def game_resume(self, data):
+        if data['author'] == self.username:
+            return ;
+        await self.send_json(data)
 
     async def game_update(self, data):
         if self.status == enu.Game.HOST and data['author'] != self.username:
@@ -275,7 +284,6 @@ class RemoteGamer(BaseConsumer):
         if message == "startButton":
             if self.match.game_state.status['game_running'] == False :
                 self.match.game_state.status['game_running'] = True
-                print(f"{self.username} ({self.status}): here")
                 self.match.task = asyncio.create_task(loop_remote_ultime(self))
         elif message == "bonus":
             self.match.game_state.status['randB'] = data["bonus"]
