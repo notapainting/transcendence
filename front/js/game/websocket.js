@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { moveTo, invitations } from './menu.js';
+import { moveTo, invitations, toggleLock, togglePause } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 
@@ -50,10 +50,16 @@ const messageHandler = (e) => {
             game.gameRenderer(content.message);
             break;
         case enu.EventGame.PAUSE:
+            togglePause();
+            toggleLock();
             if (gameData.timerInterval) {
                 clearInterval(gameData.timerInterval);
                 gameData.timerInterval = null;
             }
+            break;
+        case enu.EventGame.RESUME:
+            togglePause();
+            toggleLock();
             break;
         case enu.EventGame.BROKE:
             moveTo(enu.sceneIdx.END);
@@ -63,6 +69,9 @@ const messageHandler = (e) => {
             break;
         case enu.EventGame.QUIT:
             moveTo(enu.sceneIdx.END);
+            break;
+        case enu.EventError.TYPE:
+            console.error(content.type)
             break;
         default:
             console.log("unknow type : ", content.type)

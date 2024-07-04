@@ -11,6 +11,7 @@ export const EventGame = Object.freeze({
     UPDATE: "game.update",
     START: "game.start",
     PAUSE: "game.pause",
+    RESUME: "game.resume",
     END: "game.end",
     BROKE: "game.broke",
 })
@@ -27,6 +28,12 @@ export const EventTournament = Object.freeze({
     RESULT: "tournament.result",
     BROKE: "tournament.broke",
 })
+
+export const EventError = Object.freeze({
+    TYPE: "error.type",
+    DATA: "error.data",
+})
+
 
 export const sceneIdx = Object.freeze({
     WELCOME: 0,
