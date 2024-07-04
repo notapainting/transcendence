@@ -1,7 +1,7 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
 import { moveTo, invitations } from './menu.js';
-import { clearScene } from './utils.js';
+import { fullClear } from './index.js';
 import * as enu from './enums.js'
 
 
@@ -10,7 +10,7 @@ function updateTimer() {
 	gameData.elapsedTime += 1;
 }
 
-export let gameSocket;
+export let gameSocket = null;
 
 const messageHandler = (e) => {
     const content = JSON.parse(e.data);
@@ -72,6 +72,7 @@ const messageHandler = (e) => {
 };
 
 export const initWebSocket = (path) => {
+    if (gameSocket !== null) return ; 
     gameSocket = new WebSocket(
         'wss://'
         + window.location.host
@@ -79,8 +80,9 @@ export const initWebSocket = (path) => {
     );
     gameSocket.onmessage = messageHandler;
     gameSocket.onclose = function(e) {
-        clearGame()
+        fullClear();
         console.log('Game socket closed');
+        gameSocket = null;
     };
 }
 
@@ -160,7 +162,10 @@ export const clearGame = () => {
     document.removeEventListener('keydown', bindKeyPress)
     document.removeEventListener('keyup', bindKeyRelease)
     document.querySelectorAll(".game-element").forEach(div => {div.style.display = "none";});
-    clearScene()
+    
+    // const canvas = document.getElementById('game-canvas')
+    // const context = canvas.getContext('2d');
+    // context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 
@@ -177,8 +182,6 @@ export const clearGame = () => {
     // console.log("ping = ", lastPingTime);
 
 
-// const context = canvas.getContext('2d');
-// context.clearRect(0, 0, canvas.width, canvas.height);
 
 /*
 

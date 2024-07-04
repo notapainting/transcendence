@@ -18,6 +18,8 @@ scene.background = new THREE.Color(0x031d44);
 renderer.setSize(width, height);
 camera.position.set( 0, -100, 85 );
 
+export const clearThree = () => {renderer.clear();};
+
 import * as load from './loader.js';
 
 var trailPositions = [];
