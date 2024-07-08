@@ -7,6 +7,8 @@ class Errors(enum.StrEnum):
     DATA = "error.data"
 
 
+
+
 class Game(enum.StrEnum):
     HOST = "game.host"
     GUEST = "game.guest"
@@ -22,7 +24,6 @@ class Game(enum.StrEnum):
     DENY = "game.deny"
     BROKE = "game.broke"
     UPDATE = "game.update"
-
 
     START = "game.start"
     PAUSE = "game.pause"
@@ -45,14 +46,17 @@ class Tournament(enum.StrEnum):
     BROKE = "tournament.broke"
 
 
+class Local(enum.StrEnum):
+    PLAYERS = "local.players"
+    PHASE = "local.phase"
+    MATCH = "local.match"
+    START = Game.START
+    UPDATE = Game.UPDATE
+    PAUSE = Game.PAUSE
+    NEXT = "local.next"
+    END_GAME = "local.end.game"
+    END_TRN = "local.end.tournament"
+    QUIT = "local.quit"
+
 class CStatus(enum.StrEnum):
     IDLE = "status.idle"
-    LOCAL = "status.local"
-    HOST = "status.host"
-    GUEST = "status.guest"
-
-    GHOST = "status.game.host"
-    GGUEST = "status.game.guest"
-    THOST = "status.game.host"
-    TGUEST = "status.game.guest"
-

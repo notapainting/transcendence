@@ -29,11 +29,22 @@ export const EventTournament = Object.freeze({
     BROKE: "tournament.broke",
 })
 
+export const EventLocal = Object.freeze({
+    PLAYERS: "local.players",
+    PHASE: "local.phase",
+    MATCH: "local.match",
+    UPDATE: "local.update",
+    NEXT: "local.next",
+    END_GAME: "local.end.game",
+    END_TRN: "local.end.tournament",
+    QUIT: "local.quit",
+
+})
+
 export const EventError = Object.freeze({
     TYPE: "error.type",
     DATA: "error.data",
 })
-
 
 export const sceneIdx = Object.freeze({
     WELCOME: 0,
@@ -45,7 +56,22 @@ export const sceneIdx = Object.freeze({
     BROKE:6,
 })
 
-export const gameMode = Object.freeze({
-    MATCH: 0,
-    TOURNAMENT: 1
+export const sceneLocIdx = Object.freeze({
+    WELCOME: 0,
+    PHASE: 1,
+    PREMATCH:2,
+    MATCH:3,
+    END:4,
 })
+
+export const gameMode = Object.freeze({
+    LOCAL: 0,
+    MATCH: 1,
+    TOURNAMENT: 2,
+})
+
+
+export const backendPath = Object.freeze({
+    LOCAL: "/game/local/",
+    REMOTE: "/game/",
+});

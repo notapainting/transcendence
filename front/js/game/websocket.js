@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { moveTo, invitations, toggleLock, togglePause } from './menu.js';
+import { announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
@@ -12,7 +12,44 @@ function updateTimer() {
 
 export let gameSocket = null;
 
-const messageHandler = (e) => {
+const localHandler = (e) => {
+    const content = JSON.parse(e.data);
+    console.log("message: ", content.type);
+    switch (content.type) {
+        case enu.EventLocal.PHASE:
+            moveTo(enu.sceneLocIdx.PHASE);
+            announcePhase(content.message);
+            break;
+        case enu.EventLocal.MATCH:
+            moveTo(enu.sceneLocIdx.PREMATCH);
+            announceMatch(content.message);
+            document.addEventListener('keydown', bindKeyPress)
+            document.addEventListener('keyup', bindKeyRelease)
+            break;
+        case enu.EventLocal.UPDATE:
+            game.gameRenderer(content.message);
+            break;
+        case enu.EventLocal.END_GAME:
+            document.removeEventListener('keydown', bindKeyPress)
+            document.removeEventListener('keyup', bindKeyRelease)
+            gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}));
+            break;
+        case enu.EventLocal.END_TRN:
+            moveTo(enu.sceneLocIdx.END)
+            break;
+    }
+}
+
+
+/*
+enu.Local.PLAYERS
+enu.Local.UPDATE
+enu.Local.NEXT
+enu.Local.QUIT
+*/
+
+
+const remoteHandler = (e) => {
     const content = JSON.parse(e.data);
     console.log("message: ", content.type);
     updateInvitationList();
@@ -76,8 +113,6 @@ const messageHandler = (e) => {
         default:
             console.log("unknow type : ", content.type)
     }
-
-
 };
 
 export const initWebSocket = (path) => {
@@ -87,7 +122,8 @@ export const initWebSocket = (path) => {
         + window.location.host
         + path
     );
-    gameSocket.onmessage = messageHandler;
+    if (path === enu.backendPath.REMOTE) gameSocket.onmessage = remoteHandler;
+    else gameSocket.onmessage = localHandler;
     gameSocket.onclose = function(e) {
         fullClear();
         console.log('Game socket closed');
@@ -104,7 +140,7 @@ function updateInvitationList() {
         const listItem = document.createElement('li');
         const invitationText = document.createElement('span');
         invitationText.textContent = `${index + 1}. ${invitation}`;
-        
+
         const acceptButton = document.createElement('button');
         acceptButton.textContent = 'Accepter';
         acceptButton.className = 'accept-button';
@@ -112,11 +148,10 @@ function updateInvitationList() {
         acceptButton.addEventListener('click', function() {
             invitationText.textContent = `${index + 1}. ${invitation} - Ok`;
             acceptButton.disabled = true;
-			gameSocket.send(JSON.stringify({
-				'type': 'game.join',
-				'message': invitation
-			}));
-
+            gameSocket.send(JSON.stringify({
+                'type': 'game.join',
+                'message': invitation
+            }));
         });
 
         listItem.appendChild(invitationText);
@@ -176,9 +211,6 @@ export const clearGame = () => {
     game.scene.children
         .filter(obj => obj.userData.isTrailSphere)
         .forEach(obj => game.scene.remove(obj));
-    // const canvas = document.getElementById('game-canvas')
-    // const context = canvas.getContext('2d');
-    // context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 
