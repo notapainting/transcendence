@@ -49,20 +49,17 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 
 import random
-import enum
 
-class Local(enum.StrEnum):
-    PLAYERS = "local.tournament.players"
-    PHASE = "local.tournament.phase"
-    MATCH = "local.tournament.match"
-    UPDATE = "local.game.update"
-    NEXT = "local.game.next"
 
-class TournamentConsumer(BaseConsumer):
+
+
+class LocalConsumer(BaseConsumer):
     async def connect(self):
         await self.accept()
         self.players = []
         self.losers = []
+        self.current = []
+        self.matchIdx = -2
         self.task = None
 
     async def disconnect(self, close_code):
@@ -71,32 +68,48 @@ class TournamentConsumer(BaseConsumer):
 
     async def receive_json(self, json_data):
         match json_data['type']:
-            case Local.PLAYERS: 
+            case enu.Local.PLAYERS: 
                 self.players = list(json_data['message'])
-                await self.matchmake()
-                await self.announce_next()
-            case Local.UPDATE:
+                if len(self.players) % 2 != 0:
+                    await self.send_json({'type':'error.players'})
+                else:
+                    await self.matchmake()
+                    await self.announce_next()
+            case enu.Local.UPDATE:
                 await self.gaming(json_data)
-            case Local.NEXT:
+            case enu.Local.START:
+                await self.gaming({"message":"startButton"})
+            case enu.Local.PAUSE:
+                if self.match.game_state.status['game_running'] == True:
+                    await self.gaming({"message":"stopButton"})
+                else:
+                    await self.gaming({"message":"startButton"})
+            case enu.Local.NEXT:
                 await self.announce_next()
+            case enu.Local.QUIT:
+                self.clear()
             case _:
-                print(f"error in local trn: wrong type")
+                print(f"error in local: bad type")
 
     async def matchmake(self):
         random.suffle(self.players)
         self.current = [(self.players[i],self.players[i + 1]) for i in range(0, len(self.players), 2)]
         self.matchIdx = -1
-        await self.send_json({"type":Local.PHASE, "message":self.current})
+        await self.send_json({"type":enu.Local.PHASE, "message":self.current})
 
     async def announce_next(self):
+        if self.matchIdx == -2:
+            return
         self.matchIdx += 1
         if self.matchIdx == len(self.current):
+            if len(self.current) == 1:
+                return
             await self.machmake()
             await self.announce_next()
-            return
-        match = self.current[self.matchIdx]
-        await self.send_json({"type":Local.MATCH, "message":match})
-        self.game_state = GameState()
+        else:
+            match = self.current[self.matchIdx]
+            await self.send_json({"type":enu.Local.MATCH, "message":match})
+            self.game_state = GameState()
 
     async def game_end(self, data):
         await self.send(json.dumps(self.game_state.to_dict('none')))
@@ -107,8 +120,18 @@ class TournamentConsumer(BaseConsumer):
             loser = self.current[self.matchIdx][0]
         self.losers.append(loser)
         self.players.remove(loser)
+        await self.send_json({'type':enu.Local.END_GAME})
         if len(self.current) == 1:
-            raise StopConsumer
+            self.clear()
+            await self.send_json({'type':enu.Local.END_TRN})
+
+    def clear(self, data):
+        self.players = []
+        self.losers = []
+        self.current = []
+        self.task = None
+        del self.game_state
+        self.matchIdx = -2
 
     async def gaming(self, data):
         message = data["message"]

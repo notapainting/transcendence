@@ -7,7 +7,7 @@
   }
 
 
-  #scoreMessage {
+#scoreMessage {
     position: absolute;
     top: 30%;
     left: 50%;
@@ -22,7 +22,7 @@
 }
 
 .menu-element {
-    
+    position:absolute;
 }
 .game-element {
 }
@@ -58,6 +58,34 @@
     background-color: #fff;
     color: #0066cc;
     border: solid 2px #0066cc;
+}
+
+#game-menu-players {
+    display: none;
+    top: 20%;
+    left: 20%;
+}
+
+.list-tournoi{
+    position:absolute;
+}
+
+#list-tournoi-element{
+    left:60%;
+}
+
+#game-menu-local-input {
+    top: 60%;
+    left: 40%;
+}
+#game-menu-local-input-button {
+    top:60%;
+    left:25%;
+}
+
+#game-menu-list {
+    top:20%;
+    left:60%;
 }
 
 #game-pause {
@@ -168,7 +196,6 @@
 }
 
 .button-menu {
-	display: none;
     position: absolute;
     left: 30%;
     transform: translate(-50%, -50%);
