@@ -5,12 +5,17 @@ guest -> right player + arrowkey
 sPressed + downPressed => sPressed
 
 
+test score game 
+
 DONE:
     - setup key binding
     - abandon button
     - use naviguateTo
     - clear threeJS scene at start/end
     - change game-button pause to resume 
+    LOCAL
+    - merge match and tournament consumer
+    - copy front
 
 
 TODO:
@@ -28,8 +33,9 @@ TODO:
     - everything
 
     LOCAL
-    - merge match and tournament consumer
-    - copy front
+        - in game score + alias
+        - end matc hscreen, 
+        - end tournament screen
 
 
 

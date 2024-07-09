@@ -25,7 +25,10 @@ const   locInputBut = document.getElementById('game-menu-local-input-button');
 const   locList = document.getElementById('game-menu-list');
 const   nextMatch = document.getElementById('game-menu-next');
 const   start = document.getElementById('game-menu-start');
-const   banner = document.getElementById('game-menu-banner');
+const   bannerPhase = document.getElementById('game-menu-banner-phase')
+const   bannerMatch = document.getElementById('game-menu-banner-match')
+const   bannerScore = document.getElementById('game-menu-banner-score')
+const   bannerEnd = document.getElementById('game-menu-banner-end')
 
 /*** scene list ****/
 const   sceneRem = [
@@ -39,29 +42,39 @@ const   sceneRem = [
 
 const   sceneLoc = [
     [locInput, locInputBut, locList, start, exit],
-    [banner, nextMatch, exit],
-    [banner, ready],
-    [pause, exit],
+    [bannerPhase, nextMatch, exit],
+    [bannerMatch, ready],
+    [bannerScore, pause, exit],
+    [bannerEnd],
     [home, exit],
 ];
 
 export const announcePhase = (data) => {
+    const   banner = document.getElementById('game-menu-banner-phase')
     banner.innerHTML = '';
-    data.forEach((matchData) => {
-        banner.innerHTML += matchData[0] + " VS " + matchData[1];
-    })
-    banner.style.display = "block";
-    console.table(data);
+    data.forEach((matchData) => {banner.innerHTML += matchData[0] + " VS " + matchData[1] + "<br>";})
 }
 
 export const announceMatch = (data) => {
+    const   banner = document.getElementById('game-menu-banner-match')
     banner.innerHTML = data[0] + " VS " + data[1];
-    banner.style.display = "block";
-    console.table(data);
+    currentPlayers = [data[0], data[1]];
+    currentScore = [0, 0];
+}
+
+export const announceScore = (data) => {
+    const   banner = document.getElementById('game-menu-banner-score')
+    banner.innerHTML = data.players[0] + " : " + data.score[0] + "                " + data.players[1] + " : " + data.score[1];
+}
+
+export const announceWinner = (data) => {
+    const   banner = document.getElementById('game-menu-banner-end')
+    banner.innerHTML = "WINNER IS " + data;
 }
 
 let   scene = null;
-
+let     currentPlayers = [];
+let     currentScore = [0, 0];
 let     idx = enu.sceneIdx.WELCOME;
 let     status = enu.gameMode.MATCH;
 let     paused = false;
@@ -73,7 +86,6 @@ export const initMenu = (path) => {
         scene = sceneLoc;
         players = [];
         clearLocList();
-        banner.innerHTML = '';
         console.log("init : local");
     } else {
         status = enu.gameMode.MATCH;
@@ -85,10 +97,8 @@ export const initMenu = (path) => {
 
 const clearLocList = () => {
     const local = document.getElementById('game-menu-list');
-    while (local.firstChild) {
-      local.removeChild(local.lastChild);
-    }
-  }
+    while (local.firstChild) {local.removeChild(local.lastChild);}
+}
 
 /*** menu deplacement ****/
 export const clearMenu = () => {
@@ -222,9 +232,24 @@ start.addEventListener('click', () => {
 
 let players = [];
 
+function isAlphaNumeric(str) {
+    var code, i, len;
+
+    for (i = 0, len = str.length; i < len; i++) {
+      code = str.charCodeAt(i);
+      if (!(code > 47 && code < 58) && 
+          !(code > 64 && code < 91) && 
+          !(code > 96 && code < 123)) { 
+        return false;
+      }
+    }
+    return true;
+  };
+
 const validate_name = (name) => {
     if (name.length > 20) return false;
     if (name === "") return false;
+    if (isAlphaNumeric(name) === false) return false;
     return true;
 }
 

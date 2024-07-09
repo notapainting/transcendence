@@ -28,6 +28,35 @@
 .game-element {
 }
 
+.game-announce-base{
+    position:absolute;
+    display:none;
+    background-color:#61e8d8;
+    border-radius:10% 10% 10% 10% / 10% 10% 10% 10% ;
+    font-size:25px;
+}
+
+#game-menu-banner-phase{
+    top:10%;
+    left:45%;
+}
+
+#game-menu-banner-match{
+    top:50%;
+    left:40%;
+    font-size:60px;
+}
+
+#game-menu-banner-score{
+    top:5%;
+    left:40%;
+}
+
+#game-menu-banner-end{
+    top:5%;
+    left:40%;
+}
+
 .game-button{
     position:absolute;
     top: 80%;
@@ -83,10 +112,10 @@
     left:30%;
 }
 
-#game-menu-banner {
+/* #game-menu-banner {
     top:30%;
     left:25%;
-}
+} */
 #game-menu-next {
     top:70%;
 
