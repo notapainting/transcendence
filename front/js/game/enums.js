@@ -33,12 +33,11 @@ export const EventLocal = Object.freeze({
     PLAYERS: "local.players",
     PHASE: "local.phase",
     MATCH: "local.match",
-    UPDATE: "local.update",
+    UPDATE: EventGame.UPDATE,
     NEXT: "local.next",
     END_GAME: "local.end.game",
     END_TRN: "local.end.tournament",
     QUIT: "local.quit",
-
 })
 
 export const EventError = Object.freeze({

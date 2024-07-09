@@ -50,7 +50,7 @@ class Local(enum.StrEnum):
     PLAYERS = "local.players"
     PHASE = "local.phase"
     MATCH = "local.match"
-    START = Game.START
+    READY = Game.READY
     UPDATE = Game.UPDATE
     PAUSE = Game.PAUSE
     NEXT = "local.next"
