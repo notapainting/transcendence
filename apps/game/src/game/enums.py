@@ -24,6 +24,7 @@ class Game(enum.StrEnum):
     DENY = "game.deny"
     BROKE = "game.broke"
     UPDATE = "game.update"
+    SCORE = "game.score"
 
     START = "game.start"
     PAUSE = "game.pause"
@@ -52,6 +53,7 @@ class Local(enum.StrEnum):
     MATCH = "local.match"
     READY = Game.READY
     UPDATE = Game.UPDATE
+    SCORE = Game.SCORE
     PAUSE = Game.PAUSE
     NEXT = "local.next"
     END_GAME = "local.end.game"

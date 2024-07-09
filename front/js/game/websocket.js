@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause } from './menu.js';
+import { announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, announceScore } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
@@ -11,6 +11,10 @@ function updateTimer() {
 }
 
 export let gameSocket = null;
+
+async function sleep (ms) { new Promise(r => setTimeout(r, ms));}
+
+function askNext() {gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}))}
 
 const localHandler = (e) => {
     const content = JSON.parse(e.data);
@@ -37,11 +41,16 @@ const localHandler = (e) => {
         case enu.EventLocal.UPDATE:
             game.gameRenderer(content.message);
             break;
+        case enu.EventLocal.SCORE:
+            announceScore(content.message);
+            break;
         case enu.EventLocal.END_GAME:
             clearGame();
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
-            gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}));
+            announceWinner(content.message);
+            moveTo(enu.sceneLocIdx.END_GAME)
+            setTimeout(askNext, 3000);
             break;
         case enu.EventLocal.END_TRN:
             moveTo(enu.sceneLocIdx.END)

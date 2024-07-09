@@ -9,6 +9,7 @@ export const EventGame = Object.freeze({
     ACCEPTED: "game.accepted",
     DENY: "game.deny",
     UPDATE: "game.update",
+    SCORE: "game.score",
     START: "game.start",
     PAUSE: "game.pause",
     RESUME: "game.resume",
@@ -34,6 +35,7 @@ export const EventLocal = Object.freeze({
     PHASE: "local.phase",
     MATCH: "local.match",
     UPDATE: EventGame.UPDATE,
+    SCORE: EventGame.SCORE,
     NEXT: "local.next",
     END_GAME: "local.end.game",
     END_TRN: "local.end.tournament",
@@ -60,7 +62,8 @@ export const sceneLocIdx = Object.freeze({
     PHASE: 1,
     PREMATCH:2,
     MATCH:3,
-    END:4,
+    END_GAME:4,
+    END:5,
 })
 
 export const gameMode = Object.freeze({

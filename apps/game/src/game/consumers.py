@@ -11,7 +11,7 @@ import game.enums as enu
 TOURNAMENT_MAX_PLAYER = 16
 
 
-MAX_SCORE = 3
+MAX_SCORE = 1
 TIME_REFRESH = 0.02
 width = 50
 height = 30
@@ -72,7 +72,6 @@ class LocalConsumer(BaseConsumer):
                     await self.send_json({'type':'error.players'})
                 else:
                     await self.matchmake()
-                    # await self.announce_next()
             case enu.Local.UPDATE:
                 await self.gaming(json_data)
             case enu.Local.READY:
@@ -98,31 +97,33 @@ class LocalConsumer(BaseConsumer):
     async def announce_next(self):
         if self.matchIdx == -2:
             return
+        if self.matchIdx == -3:
+            return await self.send_json({'type':enu.Local.END_TRN})
         self.matchIdx += 1
         if self.matchIdx == len(self.current):
             if len(self.current) == 1:
                 return
             await self.matchmake()
-            await self.announce_next()
         else:
             match = self.current[self.matchIdx]
             self.game_state = GameState()
             await self.send_json({"type":enu.Local.MATCH, "message":match, "state":self.game_state.to_dict('none')})
 
     async def game_end(self, data):
-        # await self.send_json(json.dumps(self.game_state.to_dict('none')))
         print("gameend here")
         winner = self.game_state.status['winner']
         if winner == 'leftWin':
+            winner = self.current[self.matchIdx][0]
             loser = self.current[self.matchIdx][1]
         else:
+            winner = self.current[self.matchIdx][1]
             loser = self.current[self.matchIdx][0]
         self.losers.append(loser)
         self.players.remove(loser)
-        await self.send_json({'type':enu.Local.END_GAME})
+        await self.send_json({'type':enu.Local.END_GAME, "message":winner})
         if len(self.current) == 1:
             self.clear()
-            await self.send_json({'type':enu.Local.END_TRN})
+            self.matchIdx =-3
 
     def clear(self):
         self.players = []
@@ -288,29 +289,33 @@ class GameState:
             hit_pos = (self.status['leftPaddleY'] - self.status['ballY']) / self.status['paddleHeightL']
             self.status['ballSpeedY'] = hit_pos * max_speed
             self.status['playerBonus'] = 1
-    
+
+        score = None
         if self.status['ballX'] <= self.status['leftPaddleX']:
             self.status['rightPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
             self.reset()
+            score = {"score":[self.status['leftPlayerScore'], self.status['rightPlayerScore']]}
         elif self.status['ballX'] >= self.status['rightPaddleX']:
             self.status['leftPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
             self.reset()
+            score = {"score":[self.status['leftPlayerScore'], self.status['rightPlayerScore']]}
+
         if self.status['leftPlayerScore'] == maxScore:
             self.reset()
             self.status['winner'] = 'leftWin'
             self.status['game_running'] = False
-            return True
+            return True, score
         elif self.status['rightPlayerScore'] == maxScore:
             self.reset()
             self.status['winner'] = 'rightWin'
             self.status['game_running'] = False
-            return False
+            return False, score
 
-        return None
+        return None, score
 
     
     def reset(self):
@@ -331,11 +336,13 @@ async def loop(self):
     global reset
     try :
         while self.game_state.status['game_running']:
-            end = self.game_state.update()
+            end, score = self.game_state.update()
+            if score is not None:
+                message['players'] = [self.current[self.idx]]
+                print(message)
+                await self.channel_layer.send(self.channel_name, {"type":enu.Game.SCORE, "message":score})
             if end is not None:
-                print(f"exit by end")
-                await self.channel_layer.send(self.channel_name, {"type":enu.Game.END})
-                return
+                return await self.channel_layer.send(self.channel_name, {"type":enu.Game.END})
             await self.send_json({"type": enu.Local.UPDATE, "message":self.game_state.to_dict('none')})
             if reset ==  2:
                 time.sleep(0.5)
@@ -352,8 +359,7 @@ async def loop_remote_ultime(self):
             end = self.match.game_state.update()
             if end is not None:
                 message = {"type":enu.Game.END, "message":self.match.compute()}
-                await self.match.broadcast()
-                return 
+                return await self.match.broadcast(message)
             await self.match.broadcast({'type':enu.Game.UPDATE, 'author': self.username, 'message':self.match.game_state.to_dict('none')})
             if reset==  2:
                 time.sleep(0.5)
