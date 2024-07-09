@@ -25,17 +25,29 @@ const localHandler = (e) => {
             announceMatch(content.message);
             document.addEventListener('keydown', bindKeyPress)
             document.addEventListener('keyup', bindKeyRelease)
+            game.gameRenderer(content.state);
+            if (gameData.start) {
+                if (!gameData.timerInterval)
+                    gameData.timerInterval = setInterval(updateTimer, 1000);
+            } else {
+                gameData.sceneHandler = 1;
+                game.gameRenderer(null);
+            }
             break;
         case enu.EventLocal.UPDATE:
             game.gameRenderer(content.message);
             break;
         case enu.EventLocal.END_GAME:
+            clearGame();
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}));
             break;
         case enu.EventLocal.END_TRN:
             moveTo(enu.sceneLocIdx.END)
+            break;
+        default:
+            console.log("unknow type");
             break;
     }
 }
@@ -73,15 +85,13 @@ const remoteHandler = (e) => {
             break;
         case enu.EventGame.START:
             moveTo(enu.sceneIdx.MATCH);
-            if (gameData.start)
-                {
-                    if (!gameData.timerInterval)
-                        gameData.timerInterval = setInterval(updateTimer, 1000);
-                }
-                else {
-                    gameData.sceneHandler = 1;
-                    game.gameRenderer(null);
-                }
+            if (gameData.start) {
+                if (!gameData.timerInterval)
+                    gameData.timerInterval = setInterval(updateTimer, 1000);
+            } else {
+                gameData.sceneHandler = 1;
+                game.gameRenderer(null);
+            }
             break;
         case enu.EventGame.UPDATE:
             game.gameRenderer(content.message);

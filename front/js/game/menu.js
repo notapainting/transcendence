@@ -2,6 +2,7 @@ import { navigateTo } from "../index.js"
 import { gameSocket, clearGame } from "./websocket.js"
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
+import { gameData } from './game.js';
 
 
 export let invitations = [];
@@ -24,7 +25,7 @@ const   locInputBut = document.getElementById('game-menu-local-input-button');
 const   locList = document.getElementById('game-menu-list');
 const   nextMatch = document.getElementById('game-menu-next');
 const   start = document.getElementById('game-menu-start');
-const   banner = document.getElementById('game-menu-Banner');
+const   banner = document.getElementById('game-menu-banner');
 
 /*** scene list ****/
 const   sceneRem = [
@@ -37,19 +38,26 @@ const   sceneRem = [
 ];
 
 const   sceneLoc = [
-    [locInput, locInputBut, locList, exit],
+    [locInput, locInputBut, locList, start, exit],
     [banner, nextMatch, exit],
-    [banner, start],
+    [banner, ready],
     [pause, exit],
     [home, exit],
 ];
 
 export const announcePhase = (data) => {
-
+    banner.innerHTML = '';
+    data.forEach((matchData) => {
+        banner.innerHTML += matchData[0] + " VS " + matchData[1];
+    })
+    banner.style.display = "block";
+    console.table(data);
 }
 
 export const announceMatch = (data) => {
-
+    banner.innerHTML = data[0] + " VS " + data[1];
+    banner.style.display = "block";
+    console.table(data);
 }
 
 let   scene = null;
@@ -63,12 +71,24 @@ export const initMenu = (path) => {
     if (path === enu.backendPath.LOCAL) {
         status = enu.gameMode.LOCAL;
         scene = sceneLoc;
+        players = [];
+        clearLocList();
+        banner.innerHTML = '';
+        console.log("init : local");
     } else {
         status = enu.gameMode.MATCH;
         scene = sceneRem;
+        console.log("init : remote");
     }
     moveTo(enu.sceneIdx.WELCOME);
 }
+
+const clearLocList = () => {
+    const local = document.getElementById('game-menu-list');
+    while (local.firstChild) {
+      local.removeChild(local.lastChild);
+    }
+  }
 
 /*** menu deplacement ****/
 export const clearMenu = () => {
@@ -107,7 +127,7 @@ fastGame.addEventListener('click', () => {
 });
 
 tournament.addEventListener('click', () => {
-    status = gameMode.TOURNAMENT;
+    status = enu.gameMode.TOURNAMENT;
     moveTo(enu.sceneIdx.TYPE);
 });
 
@@ -129,6 +149,7 @@ inviteButton.addEventListener('click', function() {
 
 ready.addEventListener('click', () => {
     gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
+    if (status === enu.gameMode.LOCAL) moveTo(enu.sceneLocIdx.MATCH);
 });
 
 
@@ -136,6 +157,12 @@ pause.addEventListener('click', () => {
     if (locked === true) return ;
     gameSocket.send(JSON.stringify({'type': enu.EventGame.PAUSE}));
     togglePause();
+    if (status === enu.gameMode.LOCAL) {
+        if (gameData.timerInterval) {
+            clearInterval(gameData.timerInterval);
+            gameData.timerInterval = null;
+        }
+    }
 });
 
 export const toggleLock = () => {
@@ -182,32 +209,47 @@ nextMatch.addEventListener('click', () => {
 })
 
 start.addEventListener('click', () => {
-    gameSocket.send(JSON.stringify({'type': enu.EventGame.START}));
-    moveTo(enu.sceneLocIdx.MATCH);
+    if (status === enu.gameMode.LOCAL) {
+        gameSocket.send(JSON.stringify({
+            'type': enu.EventLocal.PLAYERS,
+            'message':players,
+        }));
+    } else {
+        gameSocket.send(JSON.stringify({'type': enu.EventGame.START}));
+        moveTo(enu.sceneLocIdx.MATCH);
+    }
 })
 
 let players = [];
-let nPlayers = 0;
+
+const validate_name = (name) => {
+    if (name.length > 20) return false;
+    if (name === "") return false;
+    return true;
+}
 
 document.getElementById('game-menu-local-input-button').addEventListener('click', () => {
     const   user = document.getElementById('game-menu-local-input').value;
-    nPlayers = players.push(user);
+    document.getElementById('game-menu-local-input').value = '';
+    if (validate_name(user) === false) return ;
+    players.push(user);
 
     const   listItem = document.createElement('li');
     const   listItemName = document.createElement('span');
     const   removeButton = document.createElement('button');
+
     listItemName.textContent = user;
     listItem.className = 'list-tournoi-element';
-
     removeButton.textContent = 'Remove';
     removeButton.className = 'accept-button';
     removeButton.addEventListener('click', (e) => {
-        // let pos = players.indexOf();
+        let pos = players.indexOf(e.target.parentNode.firstChild.innerHTML);
+        players.splice(pos, 1);
         e.target.parentElement.remove();
     });
     listItem.appendChild(listItemName);
     listItem.appendChild(removeButton);
-    document.getElementById('game-menu-local-input-button').appendChild(listItem);
+    document.getElementById('game-menu-list').appendChild(listItem);
 })
 
 /*

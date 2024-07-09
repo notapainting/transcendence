@@ -23,6 +23,7 @@
 
 .menu-element {
     position:absolute;
+    display: none;
 }
 .game-element {
 }
@@ -61,7 +62,6 @@
 }
 
 #game-menu-players {
-    display: none;
     top: 20%;
     left: 20%;
 }
@@ -75,17 +75,30 @@
 }
 
 #game-menu-local-input {
-    top: 60%;
+    top: 50%;
     left: 40%;
 }
 #game-menu-local-input-button {
-    top:60%;
+    top:51%;
+    left:30%;
+}
+
+#game-menu-banner {
+    top:30%;
     left:25%;
+}
+#game-menu-next {
+    top:70%;
+
 }
 
 #game-menu-list {
     top:20%;
     left:60%;
+}
+
+#game-menu-start {
+    top:70%;
 }
 
 #game-pause {

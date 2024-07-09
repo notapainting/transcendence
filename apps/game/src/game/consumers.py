@@ -11,7 +11,8 @@ import game.enums as enu
 TOURNAMENT_MAX_PLAYER = 16
 
 
-MAX_SCORE = 50
+MAX_SCORE = 3
+TIME_REFRESH = 0.02
 width = 50
 height = 30
 maxScore = MAX_SCORE
@@ -48,10 +49,6 @@ class GameConsumer(AsyncWebsocketConsumer):
             asyncio.create_task(self.game_state.update_player_position(message))
 
 
-import random
-
-
-
 
 class LocalConsumer(BaseConsumer):
     async def connect(self):
@@ -61,6 +58,7 @@ class LocalConsumer(BaseConsumer):
         self.current = []
         self.matchIdx = -2
         self.task = None
+        self.game_state = None
 
     async def disconnect(self, close_code):
         if self.task is not None:
@@ -70,17 +68,17 @@ class LocalConsumer(BaseConsumer):
         match json_data['type']:
             case enu.Local.PLAYERS: 
                 self.players = list(json_data['message'])
-                if len(self.players) % 2 != 0:
+                if len(self.players) % 2 != 0 or len(self.players) == 0:
                     await self.send_json({'type':'error.players'})
                 else:
                     await self.matchmake()
-                    await self.announce_next()
+                    # await self.announce_next()
             case enu.Local.UPDATE:
                 await self.gaming(json_data)
-            case enu.Local.START:
+            case enu.Local.READY:
                 await self.gaming({"message":"startButton"})
             case enu.Local.PAUSE:
-                if self.match.game_state.status['game_running'] == True:
+                if self.game_state.status['game_running'] == True:
                     await self.gaming({"message":"stopButton"})
                 else:
                     await self.gaming({"message":"startButton"})
@@ -92,7 +90,7 @@ class LocalConsumer(BaseConsumer):
                 print(f"error in local: bad type")
 
     async def matchmake(self):
-        random.suffle(self.players)
+        random.shuffle(self.players)
         self.current = [(self.players[i],self.players[i + 1]) for i in range(0, len(self.players), 2)]
         self.matchIdx = -1
         await self.send_json({"type":enu.Local.PHASE, "message":self.current})
@@ -104,15 +102,16 @@ class LocalConsumer(BaseConsumer):
         if self.matchIdx == len(self.current):
             if len(self.current) == 1:
                 return
-            await self.machmake()
+            await self.matchmake()
             await self.announce_next()
         else:
             match = self.current[self.matchIdx]
-            await self.send_json({"type":enu.Local.MATCH, "message":match})
             self.game_state = GameState()
+            await self.send_json({"type":enu.Local.MATCH, "message":match, "state":self.game_state.to_dict('none')})
 
     async def game_end(self, data):
-        await self.send(json.dumps(self.game_state.to_dict('none')))
+        # await self.send_json(json.dumps(self.game_state.to_dict('none')))
+        print("gameend here")
         winner = self.game_state.status['winner']
         if winner == 'leftWin':
             loser = self.current[self.matchIdx][1]
@@ -125,7 +124,7 @@ class LocalConsumer(BaseConsumer):
             self.clear()
             await self.send_json({'type':enu.Local.END_TRN})
 
-    def clear(self, data):
+    def clear(self):
         self.players = []
         self.losers = []
         self.current = []
@@ -334,13 +333,14 @@ async def loop(self):
         while self.game_state.status['game_running']:
             end = self.game_state.update()
             if end is not None:
+                print(f"exit by end")
                 await self.channel_layer.send(self.channel_name, {"type":enu.Game.END})
                 return
-            await asyncio.sleep(0.02)
-            await self.send(json.dumps(self.game_state.to_dict('none')))
+            await self.send_json({"type": enu.Local.UPDATE, "message":self.game_state.to_dict('none')})
             if reset ==  2:
                 time.sleep(0.5)
                 reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+            await asyncio.sleep(TIME_REFRESH)
     except asyncio.CancelledError as error:
         print(error)
 
@@ -358,7 +358,7 @@ async def loop_remote_ultime(self):
             if reset==  2:
                 time.sleep(0.5)
                 reset= 0 
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(TIME_REFRESH)
     except asyncio.CancelledError as error:
         print(error)
 
