@@ -48,9 +48,11 @@ function addUserToMenu(target, profile_picture) {
             <h4 class="username-person">${target}</h4>
             <div class="last-message">Last message</div>
         `;
-        personDiv.appendChild(picturePersonDiv);
-        personDiv.appendChild(descriptionPersonDiv);
+        const addFriend = document.createElement('i');
+        addFriend.classList.add("fa-solid", "fa-plus", "add-button");
+        personDiv.append(picturePersonDiv, descriptionPersonDiv, addFriend);
         displayMenu.insertBefore(personDiv, displayMenu.children[1]);
+        addFriend.addEventListener("click", () => console.log("YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"))
         personDiv.addEventListener("click", async function() {
             document.querySelectorAll('.person').forEach(elem => {
                 elem.classList.remove('focus');
@@ -193,7 +195,7 @@ async function handleMessage(message) {
         createGroup(message);
     }
     else if (message.type === 'message.text') {
-        console.log(message)
+        console.log("EVENT TEXT");
         console.log("EVENT MESSAGE TEXT");
         receiveMessage(message);
     }

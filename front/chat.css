@@ -290,3 +290,8 @@
 .chat-send {
     cursor: pointer;
 }
+
+.add-button {
+    font-size: 20px;
+    margin-left: 70px;
+}
