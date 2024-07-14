@@ -147,9 +147,13 @@ class ChatConsumer(BaseConsumer):
         await self.send_json(event)
 
     async def contact_update(self, event):
+        self.contact_list = await cuti.get_contact_list()
         await self.send_json(event)
 
     async def group_update(self, event):
+        self.group_list = await cuti.get_group_list()
+        for id in self.group_list:
+            await self.channel_layer.group_add(id, self.channel_name)
         await self.send_json(event)
 
 
