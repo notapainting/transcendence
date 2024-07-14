@@ -1,0 +1,41 @@
+services:
+  game:
+    container_name: game
+    build:
+      context: apps/game/
+      dockerfile: Dockerfile.dev
+    image: game_image
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - game_volume:/app
+    networks:
+      - app_network
+      - game_network
+    restart: unless-stopped
+    depends_on:
+      - game-redis
+    stdin_open: true 
+    tty: true
+    # entrypoint: ["python", "/app/manage.py", "runserver", "0.0.0.0:8000"]
+
+  game-redis:
+    container_name: game-redis
+    image: redis:7.2.4-alpine
+    networks: 
+      - game_network
+    restart: unless-stopped
+
+networks:
+  game_network:
+    driver: bridge
+
+volumes:
+  game_volume:
+    name: game_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: apps/game/src
+      o: bind
+      

@@ -1,9 +1,11 @@
 import { logoutRequest, showHome } from "./home.js"
 import { showProfile } from "./profile.js"
+
 import {showSettings} from "./settings.js"
 import { loggedInStatus } from "./home.js";
-
+import { showGame, showGameLocal } from "./game/index.js"
 export let whoIam;
+
 
 export const navigateTo = url => {
     history.pushState(null, null, url)
@@ -56,6 +58,8 @@ const router = async () => {
         {path: "/", view:() => showHome() },
         {path: "/profile", view:() => showProfile()},
         {path: "/settings", view:() => showSettings()},
+        {path: "/play", view:() => showGame()},
+        {path: "/play/local", view:() => showGameLocal()},
     ];
     const potentialMatches = routes.map(route => {
         return {

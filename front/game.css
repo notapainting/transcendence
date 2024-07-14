@@ -1,0 +1,292 @@
+.containerGame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #0066CC;
+  }
+
+
+#scoreMessage {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#game-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-element {
+    position:absolute;
+    display: none;
+}
+.game-element {
+}
+
+.game-announce-base{
+    position:absolute;
+    display:none;
+    background-color:#61e8d8;
+    border-radius:10% 10% 10% 10% / 10% 10% 10% 10% ;
+    font-size:25px;
+}
+
+#game-menu-banner-phase{
+    top:10%;
+    left:45%;
+}
+
+#game-menu-banner-match{
+    top:50%;
+    left:40%;
+    font-size:60px;
+}
+
+#game-menu-banner-score{
+    top:5%;
+    left:40%;
+}
+
+#game-menu-banner-end{
+    top:5%;
+    left:40%;
+}
+
+.game-button{
+    position:absolute;
+    top: 80%;
+    font-family: Roboto, sans-serif;
+    font-weight: 0;
+    font-size: 14px;
+    color: #fff;
+    background-color: #0066CC;
+    padding: 10px 30px;
+    border: 2px solid #0066cc;
+    box-shadow: none;
+    border-radius: 50px;
+    transition : 1000ms;
+    transform: translateY(0);
+    display: none;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    padding-left: 5%;
+    padding-right: 5%;
+    margin-top: 2%;
+	z-index: 999;
+}
+
+.game-button:hover{
+    transition : 500ms;
+    transform : translateY(-0px);
+    transform: scale(1.08);
+    background-color: #fff;
+    color: #0066cc;
+    border: solid 2px #0066cc;
+}
+
+#game-menu-players {
+    top: 20%;
+    left: 20%;
+}
+
+.list-tournoi{
+    position:absolute;
+}
+
+#list-tournoi-element{
+    left:60%;
+}
+
+#game-menu-local-input {
+    top: 50%;
+    left: 40%;
+}
+#game-menu-local-input-button {
+    top:51%;
+    left:30%;
+}
+
+/* #game-menu-banner {
+    top:30%;
+    left:25%;
+} */
+#game-menu-next {
+    top:70%;
+
+}
+
+#game-menu-list {
+    top:20%;
+    left:60%;
+}
+
+#game-menu-start {
+    top:70%;
+}
+
+#game-pause {
+    left:40%;
+    display: none;
+}
+
+#game-abandon {
+    left:60%;
+    display: none;
+}
+
+
+
+#game-menu-invitationBox {
+  position: absolute;
+  display: flex;
+  left:70%;
+  top: 60%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fafafa;
+}
+
+#game-menu-invitationBox h3 {
+  top: 0;
+  color: black;
+}
+
+#game-menu-invitationList {
+  list-style-type: none;
+  color: black;
+  padding: 0;
+}
+
+#game-menu-invitationList li {
+  padding: 8px;
+  color: black;
+  border-bottom: 1px solid #ddd;
+}
+
+#game-menu-invitationList li:last-child {
+  border-bottom: none;
+}
+
+.accept-button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.accept-button:hover {
+  background-color: #0056b3;
+}
+
+#game-menu-inviteInput {
+  position: absolute;
+  display: none;
+  top: 60%;
+}
+
+#game-menu-inviteButton {
+    display: none;
+    top: 70%;
+}
+
+#game-menu-fastGame {
+  /* display: none; */
+    top: 60%;
+}
+
+#game-menu-tournament {
+    display: none;
+    top: 70%;
+}
+
+#game-menu-exit {
+    display: none;
+    top: 80%;
+}
+
+#game-menu-create {
+    display: none;
+    top: 60%;
+}
+
+#game-menu-join {
+    display: none;
+    top: 70%;
+}
+
+#game-menu-home {
+    display: none;
+    top: 70%;
+}
+
+#game-menu-back {
+    display: none;
+    top: 80%;
+}
+
+#game-menu-ready {
+    display: none;
+    top: 40%;
+}
+
+.button-menu {
+    position: absolute;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    padding: .8em 2.2em;
+    width: 300px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 0 #e76f51;
+    line-height: 1;
+    text-decoration: none;
+    color: #dc5406;
+    font-size: 18px;
+    border-radius: 20px;
+    width: 200px;
+    height: 50px;
+    font-weight: bold;
+    border-bottom: 5px solid #b46436;
+    transition: 0.3s;
+    background-color: #f4a261;
+    animation: glow 3s linear infinite;
+  }
+
+.button-menu:hover {
+	border-bottom-width: 0;
+  }
+
+@keyframes glow {
+  0% {
+      box-shadow: 0 0 0 0 #e76f51;
+  }
+  
+  50% {
+      box-shadow: 0 0 30px 0 #e76f51;
+  }
+  }
+
+#game-menu-ready-circle{
+    position:absolute;
+    left:40%;
+    top:40%;
+    background:#ee0e0e;
+    border-radius:50%;
+    width:16px;
+    height:16px;
+    border:2px solid #d826cf; 
+  }
+
+  /* #0eee28 vert
+  #ee0e0e red
+  
+  */
