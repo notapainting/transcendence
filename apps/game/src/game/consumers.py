@@ -11,8 +11,8 @@ import game.enums as enu
 TOURNAMENT_MAX_PLAYER = 16
 
 
-MAX_SCORE = 1
-TIME_REFRESH = 0.02
+MAX_SCORE = 3
+TIME_REFRESH = 0.5
 width = 50
 height = 30
 maxScore = MAX_SCORE
@@ -136,9 +136,10 @@ class LocalConsumer(BaseConsumer):
     async def gaming(self, data):
         message = data["message"]
         if message == "startButton":
-            if self.game_state.status['game_running'] == False :
-                self.game_state.status['game_running'] = True
-                self.task = asyncio.create_task(loop(self))
+            self.game_state.status['game_running'] = True
+            self.task = asyncio.create_task(loop(self))
+        elif message == "stopButton":
+            self.game_state.status['game_running'] = False
         elif message == "bonus":
             self.game_state.status['randB'] = data["bonus"]
         else :
@@ -338,9 +339,9 @@ async def loop(self):
         while self.game_state.status['game_running']:
             end, score = self.game_state.update()
             if score is not None:
-                message['players'] = [self.current[self.idx]]
-                print(message)
-                await self.channel_layer.send(self.channel_name, {"type":enu.Game.SCORE, "message":score})
+                score['players'] = self.current[self.matchIdx]
+                print(f"score is {score}")
+                await self.send_json({"type":enu.Game.SCORE, "message":score})
             if end is not None:
                 return await self.channel_layer.send(self.channel_name, {"type":enu.Game.END})
             await self.send_json({"type": enu.Local.UPDATE, "message":self.game_state.to_dict('none')})
@@ -356,9 +357,13 @@ async def loop_remote_ultime(self):
     global reset
     try :
         while self.match.game_state.status['game_running']:
-            end = self.match.game_state.update()
+            end, score = self.match.game_state.update()
+            if score is not None:
+                score['players'] = list(self.match._players)
+                print(f"score is {score}")
+                await self.match.broadcast({"type":enu.Game.SCORE, "message":score})
             if end is not None:
-                message = {"type":enu.Game.END, "message":self.match.compute()}
+                message = {"type":enu.Game.END, "author":self.username, "message":self.match.compute()}
                 return await self.match.broadcast(message)
             await self.match.broadcast({'type':enu.Game.UPDATE, 'author': self.username, 'message':self.match.game_state.to_dict('none')})
             if reset==  2:

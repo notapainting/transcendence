@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, announceScore } from './menu.js';
+import { announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
@@ -42,7 +42,8 @@ const localHandler = (e) => {
             game.gameRenderer(content.message);
             break;
         case enu.EventLocal.SCORE:
-            announceScore(content.message);
+            updateScore(content.message);
+            announceScore();
             break;
         case enu.EventLocal.END_GAME:
             clearGame();
@@ -74,7 +75,7 @@ const remoteHandler = (e) => {
     const content = JSON.parse(e.data);
     console.log("message: ", content.type);
     updateInvitationList();
-    switch(content.type){
+    switch(content.type) {
         case enu.EventGame.INVITE:
             console.log("invitation from: ", content.author);
             invitations.push(content.author);
@@ -88,12 +89,14 @@ const remoteHandler = (e) => {
             document.addEventListener('keyup', bindKeyRelease)
             game.gameRenderer(content.message);
             moveTo(enu.sceneIdx.READY);
+            announceMatch(content.players);
             break;
         case enu.EventGame.READY:
             document.getElementById('game-menu-ready-circle').style.background = '#0eee28';
             break;
         case enu.EventGame.START:
             moveTo(enu.sceneIdx.MATCH);
+            announceScore();
             if (gameData.start) {
                 if (!gameData.timerInterval)
                     gameData.timerInterval = setInterval(updateTimer, 1000);
@@ -104,6 +107,10 @@ const remoteHandler = (e) => {
             break;
         case enu.EventGame.UPDATE:
             game.gameRenderer(content.message);
+            break;
+        case enu.EventGame.SCORE:
+            updateScore(content.message);
+            announceScore();
             break;
         case enu.EventGame.PAUSE:
             togglePause();
