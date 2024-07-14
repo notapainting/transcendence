@@ -1,20 +1,39 @@
-
-#chat {
+.bubble {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: white;
+    width: 100px;
+    height: 100px;
     display: none;
-    height: 100vh;
-    background-color: #F6F6F6;
+    border-radius: 50%;
     align-items: center;
     justify-content: center;
-    color: black;
-    display: flex; 
+    cursor: pointer;
 }
 
+.bubble i {
+    font-size: 60px;
+    color: black;
+}
 
 .chatbox {
     width: 600px;
     height: 400px;
-    display: flex;
+    display: none;
+    position: fixed;
     align-items: center;
+    bottom: 10px;
+    right: 10px;
+    color: black;
+}
+
+.close-chat{
+    position: absolute;
+    top: 5.5%;
+    right:15px;
+    font-size: 18px;
+    cursor: pointer;
 }
 
 .menu-container, .chat-container {
@@ -22,12 +41,12 @@
     height: 100%;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     border-radius: 15px;
-    background-color: #FAFAFA;
+    background-color: rgba(250, 250, 250, 0.5);
 }
-
 
 .menu-container {
     height: 90%;
+    transform: scale(0);
 }
 
 .menu {
@@ -62,7 +81,7 @@
     max-height: 200px;
     overflow-y: auto;
     display: none;
-    z-index: 1000;
+    z-index: 50;
 }
 
 .search-results .result-item {
@@ -76,7 +95,7 @@
 
 .display-menu {
     height: 90%;
-    overflow-y: scroll;
+    overflow-y: auto;
     position: relative;
 }
 
@@ -90,10 +109,7 @@
     cursor: pointer;
 }
 
-.person:nth-child(1) {
-    background-color: pink;
-    color: black;
-}
+
 
 .picture-person{
     height: 50px;
@@ -113,12 +129,47 @@
     height: 100%;
 }
 
-.person-chat {
-    height: 15%;
-    background-color: #FFFFFF;
+.left-display {
+    background-color: rgba(250, 250, 250, 0.5);
+    height: 50%;
+    width: 20px;
     display: flex;
     align-items: center;
-    border-radius: 15px;
+    justify-content: center;
+    border-radius: 30px 0 0 30px;
+    cursor: pointer;
+    position: absolute;
+    left: 48.3%;
+}
+
+.left-hide {
+    background-color: rgba(250, 250, 250, 0.5);
+    height: 50%;
+    width: 20px;
+    display: flex;
+    transform: scale(0);
+    align-items: center;
+    justify-content: center;
+    border-radius: 30px 0 0 30px;
+    cursor: pointer;
+}
+
+.left-display i {
+    color: black;
+    transition: transform 0.5s ease;
+}
+
+.left-display:hover i {
+    transform: translateX(-2px);
+    font-size: 20px;
+}
+
+.person-chat {
+    height: 15%;
+    background-color: rgba(250, 250, 250, 0.5);
+    display: flex;
+    align-items: center;
+    border-radius: 15px 15px 0 0;
 }
 
 .picture-chat {
@@ -142,7 +193,7 @@
 
 .messages {
     height: 75%;
-    background-color: #F6F6F6;
+    background-color: rgba(250, 250, 250, 0.2);
     
 }
 
@@ -151,20 +202,28 @@
     height: 100%;
     overflow-y: auto;
     flex-direction: column;
-    display: none;
+    display: none; /* Assurez-vous que votre conteneur utilise flex */
+}
+
+.message-person::-webkit-scrollbar {
+    width: 0; /* Cacher la barre de défilement */
+}
+
+.message-person > :first-child {
+    margin-top: auto; /* Aligner le premier enfant en bas */
 }
 
 .message {
     min-height: 55px;
     width: 60%;
-    background-color: aqua;
-    margin: 5px 0;
+    margin: 10px 0;
     display: flex;
     align-items: center;
     box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
     padding: 10px;
     word-wrap: break-word;
     overflow-wrap: break-word;
+
 }
 
 .message p {
@@ -173,6 +232,10 @@
     overflow-wrap: break-word;
     word-break: break-all; /* Assure que le texte reviendra à la ligne */
     flex: 1; /* Prend tout l'espace disponible */
+}
+
+.message span {
+    font-size: 10px;
 }
 
 .left-message {
@@ -196,7 +259,7 @@
     display: flex;
     align-items: center;
     justify-content: end;
-    background-color: #FFFFFF;
+    background-color: rgba(250, 250, 250, 0.5);
 
 }
 

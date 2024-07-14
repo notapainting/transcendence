@@ -21,11 +21,14 @@
 	  </script>
 </head> 
 <body>
+    <audio id="newMessageSound">
+        <source src="img/goofy.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
     <nav class="navbar">
-        <i class="item fa-solid fa-house"data-link data-href="/"></i>
-        <i class="item fa-solid fa-user" data-link data-href="/profile"></i>
-        <i class="item fa-solid fa-comment" data-link data-href="/chatbox"></i>
-        <i class="item fa-solid fa-sliders"data-link data-href="/settings"></i>
+        <!-- <i class="item fa-solid fa-house"data-link data-href="/"></i> -->
+        <p class="welcome-msg">Welcome <br>username</p>
+        <div class="profile-picture-home" data-link data-href="/profile"></div>
         <i class="item fa-solid fa-right-from-bracket"></i>
     </nav>
     <div id="home" class="view">
@@ -56,7 +59,10 @@
                         </div><p>I have read and accepted terms..</p>
                     </div>
                     <div class="login-or-create">
-                        <button class="btn home-form-btn">LOGIN</button>
+                        <div class="login-or-42">
+                            <button class="btn home-form-btn">LOGIN</button>
+                            <div class="login-42"></div>
+                        </div>
                         <p class="login-or-register-text">Don't have an account ? <br><span class="switch-form">Create One</span></p>
                     </div>
                     <div class="message-box"></div>
@@ -65,7 +71,6 @@
         </div>
     </div>
     <div id="profile" class="view">
-
         <div class="profile-container">
             <div class="my-profile-container">
                 <div class="my-profile">
@@ -109,10 +114,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="grid-item">
-                                <label for="date-of-birth">Date <br>of Birth</label>
-                                <input class="text-input" type="date" id="date-of-birth" name="date-of-birth">
-                            </div>
+
                         </div>  
                         <button class="profile-btn modify">MODIFY</button>
                     </div>
@@ -170,35 +172,37 @@
             </div>
         </div>
     </div>
-    <div id="chat" class="view" style="display: none;">
-        <div class="chatbox">
-            <div class="menu-container">
-                <div class="menu">
-                    <i class="fa-solid fa-bars"></i>
-                    <h3 class="menu-title">TEST</h3>
-                    <input type="text" class="searchbar">
-                    
-                </div>
-                <div class="display-menu">
-                    <div class="search-results"></div>
+    <div class="bubble"><i class="fa-solid fa-comment"></i></div>
+    <div class="chatbox">
+        <i class="fa-sharp fa-solid fa-xmark close-chat"></i>
+        <div class="left-hide"><i class="fa-sharp fa-solid fa-arrow-right"></i></div>
+        <div class="menu-container">
+            <div class="menu">
+                <i class="fa-solid fa-bars"></i>
+                <h3 class="menu-title">TEST</h3>
+                <input type="text" class="searchbar">
+                
+            </div>
+            <div class="display-menu">
+                <div class="search-results"></div>
+            </div>
+        </div>
+        <div class="left-display"><i class="fa-solid fa-arrow-left"></i></div>
+        <div class="chat-container">
+            <div class="person-chat">
+                <div class="picture-chat"></div>
+                <div class="description-chat">
+                    <h4 class="username-title"></h4>
+                    <p class="data">Today a 16:00PM</p>
                 </div>
             </div>
-            <div class="chat-container">
-                <div class="person-chat">
-                    <div class="picture-chat"></div>
-                    <div class="description-chat">
-                        <h4 class="username-title">John</h4>
-                        <p class="data">Today a 16:00PM</p>
-                    </div>
-                </div>
-                <div class="messages">
-                </div>
-                <div class="send-container">
-                    <input type="text" class="message-input">
-                    <div class="emoji-send">
-                        <i class="fa-regular fa-face-smile emoji"></i>
-                        <i class="fa-solid fa-arrow-right chat-send"></i>
-                    </div>
+            <div class="messages">
+            </div>
+            <div class="send-container">
+                <input type="text" class="message-input">
+                <div class="emoji-send">
+                    <i class="fa-regular fa-face-smile emoji"></i>
+                    <i class="fa-solid fa-arrow-right chat-send"></i>
                 </div>
             </div>
         </div>

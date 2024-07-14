@@ -41,9 +41,9 @@ class MessageFirst(BaseSerializer):
     def create(self, data):
         group = uti.create_private_conv(data['author'], data['target'])
         if  data.get('body', None) is not None:
-            first_message = ser.Message(data={'author':data['author'].name, 'group':group.id, 'body':data['body']})
+            first_message = ser.Message(data={'author':data['author'], 'group':group.id, 'body':data['body']})
             first_message.is_valid(raise_exception=True)
-            first_message.create(first_message.data)
+            first_message.create(first_message.validated_data)
         self.obj = group
         logger.info(f"CREATE private group {group.id} by {data['author']}")
         return group

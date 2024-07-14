@@ -16,10 +16,6 @@ logger = getLogger('django')
 
 CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
 
-        # if data['type'] in enu.Event.CLIENT:
-        #     super().dispatch(data)
-        # else:
-        #     super().dispatch("{'type':'error.badtype'}")
 
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
@@ -71,11 +67,6 @@ class BaseConsumer(AsyncWebsocketConsumer):
 
 
 class ChatConsumer(BaseConsumer):
-
-    group_list = []
-    contact_list = []
-
-
     async def connect(self):
         self.user = self.scope['user']
         if self.user is None:
@@ -90,7 +81,7 @@ class ChatConsumer(BaseConsumer):
 
         await self.channel_layer.group_add(self.user.name, self.channel_name)#attention au name
 
-        # add user to channel groups,
+        # add user to channel groups
         self.group_list = await cuti.get_group_list(self.user)
         for id in self.group_list:
             await self.channel_layer.group_add(id, self.channel_name)
@@ -123,11 +114,15 @@ class ChatConsumer(BaseConsumer):
             type = await cuti.validate_data(username=self.user.name, data=json_data)
             serial = await cuti.get_serializer(type)
             ser_data = await cuti.serializer_wrapper(serial, json_data['data'])
-            targets, event = await cuti.get_targets(self.user, type, ser_data)
-
+            if type == enu.Event.Message.FIRST:
+                targets, event = await cuti.get_targets(self.user, type, ser_data)
+                self.group_list = await cuti.get_group_list(self.user)
+                await self.channel_layer.group_add(ser_data['id'], self.channel_name)
+            else:
+                targets, event = await cuti.get_targets(self.user, type, ser_data)
         except DrfValidationError as error:
-                logger.info(error)
-                await self.send_json({"type": enu.Event.Errors.DATA})
+            logger.info(error)
+            await self.send_json({"type": enu.Event.Errors.DATA})
         else:
             if targets == enu.Self.LOCAL:
                 await self.send_json(event)

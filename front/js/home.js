@@ -1,5 +1,6 @@
-import { navigateTo } from "./index.js";
-import { clearView } from "./index.js";
+import { navigateTo, whoIam } from "./index.js";
+import { clearView, isUserAuthenticated } from "./index.js";
+import { fetchUsers, showChat } from "./chat.js";
 
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
@@ -19,6 +20,23 @@ const parallaxEffect = (event) => {
     middleThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.4}px) calc(50% + ${yAxis * 0.4}px)`;
     frontThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.9}px) calc(50% + ${yAxis * 0.9}px)`;
 }
+
+function authenticateWith42() {
+    fetch('auth/authenticate_with_42/', {
+        method: 'GET',
+        redirect: 'follow'
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        const authorizationUrl = data.authorization_url;
+        window.location.href = authorizationUrl;
+    })
+    .catch(error => {
+    });
+}
+
 let isScrolling = false;
 
 const scrollUpEffect = (event) => {
@@ -136,10 +154,13 @@ const switchForm = (event) => {
 
 const messageBox = document.querySelector(".message-box");
 
-const loggedInStatus = () => {
-    document.querySelector(".navbar").style.display= "flex"
+export const loggedInStatus = (profile_picture, username) => {
     document.querySelector(".login-signin-form").style.display = "none"
     document.querySelector(".play-online-btn").style.display = "block"
+    showChat();
+    document.querySelector(".welcome-msg").innerHTML = `Welcome<br>${username}`;
+    document.querySelector(".profile-picture-home").style.backgroundImage = `url('${profile_picture}')`
+    document.querySelector(".navbar").style.display= "flex"
     setTimeout(()=> {
         document.querySelector(".play-online-btn").style.transform = "scale(1)"
     }, 100)
@@ -148,8 +169,6 @@ const loggedInStatus = () => {
 const twoFactorDisplay = document.querySelector(".two-factor-display");
 const twoFactorContainerLogin = document.querySelector(".two-factor-container-login");
 const login2faButton = document.querySelector(".login-2fa")
-
-
 
 const closeTwoFactorLogin = (event) => {
     login2faButton.removeEventListener("click", loginRequest);
@@ -177,7 +196,6 @@ const loginRequest = (event) => {
     })
     .then(response => {
         if (response.ok){
-            loggedInStatus();
             closeTwoFactorLogin();
             return response.json();
         } else if (response.status === 403) {
@@ -187,18 +205,20 @@ const loginRequest = (event) => {
                     displayTwoFactorLogin();
                 }
                 else {
-                    messageBox.innerHTML = `${data.detail} <span" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+                    messageBox.innerHTML = `Username / e-mail or password incorrect.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
                     messageBox.style.transform = "scale(1)";
                 }
             });
         } else {
             messageBox.style.backgroundColor = "#f44336";
-            messageBox.innerHTML = `Username / e-mail or password incorrect.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+            messageBox.innerHTML = `Server error, please retry later.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
             messageBox.style.transform = "scale(1)";
         }
-        return null;
     })
     .then(data => {
+        console.log("YOOO")
+        console.log(data)
+        loggedInStatus(data.profile_picture, data.username);
     })  
     .catch(error => {
     })
@@ -209,6 +229,7 @@ const displayTwoFactorLogin = async ()  => {
     setTimeout(()=> {
         twoFactorContainerLogin.style.transform = "scale(1)"
     }, 200)
+    login2faButton.removeEventListener("click", loginRequest);
     login2faButton.addEventListener("click", loginRequest);
 }
 
@@ -227,14 +248,19 @@ const registerRequest = (event) => {
     })
     .then(response => {
         if (response.ok){
+            console.log('OKKK');
             messageBox.style.backgroundColor = "#36B985";
             messageBox.innerHTML = `An link have been send to your e-mail address<br> please check you mailbox.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
             messageBox.style.transform = "scale(1)";
             return response.json();
         }
         else {
-            console.log("IL Y A UNE ERREUR");
-            throw new Error("Identifiant ou mot de passe incorrect");
+            messageBox.style.backgroundColor = "#f44336";
+            return response.json().then(data => {
+                console.log(data);
+                messageBox.innerHTML = `${data.email || data.username}<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+                messageBox.style.transform = "scale(1)";
+            });
         }
     })
     .then(data => {
@@ -251,32 +277,6 @@ const loginOrRegisterRequest = (event) => {
         registerRequest();
 }
 
-const isUserAuthenticated = () => {
-    return fetch('auth/validate_token/', {
-        method: 'POST',
-        credentials: 'same-origin'
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log("Je return true dans access")
-            return true;
-        } else {
-            return fetch('auth/token/refresh/', {
-                method: 'POST',
-                credentials: 'same-origin'
-            })
-            .then(refreshResponse => {
-                if (refreshResponse.ok) {
-                    console.log("Je return true dans refresh")
-                    return true;
-                } else {
-                    console.log("Je return false dans refresh")
-                    return false;  
-                }
-            });
-        }
-    });
-}
 let isZooming = false;
 let indexZoom = 0;
 let zoomFactor = 1;
@@ -335,6 +335,7 @@ const adjustZoom = (event) => {
 };
 
 export let logoutRequest = (event) => {
+    event.preventDefault();
     fetch('/auth/logout/', {
         method: 'POST',
         headers: {
@@ -354,39 +355,56 @@ export let logoutRequest = (event) => {
     });
 }
 
-const playOfflineBtnElement = document.querySelector(".play-offline-btn");
-const playOnlineBtnElement = document.querySelector(".play-online-btn");
-playOfflineBtnElement.addEventListener("click", event => {
-    // scrollUpEffect()
+const smoothSroll = (event) => {
+
     window.scrollTo({
         top: 0,
         behavior: "smooth",
     });
+    document.removeEventListener('wheel', scrollDownEffect);
+    document.addEventListener('wheel', adjustZoom);
+}
+
+
+const playOfflineBtnElement = document.querySelector(".play-offline-btn");
+const playOnlineBtnElement = document.querySelector(".play-online-btn");
+
+playOfflineBtnElement.addEventListener("click", event => {
     navigateTo("/play/local");
 })
+
 playOnlineBtnElement.addEventListener("click", event => {
     window.scrollTo({
         top: 0,
         behavior: "smooth",
     });
-    // document.removeEventListener('wheel', scrollDownEffect);
-    // document.addEventListener('wheel', adjustZoom);
     navigateTo("/play");
 })
 
+
 export const showHome = async () => {
-    let isAuthenticated = await isUserAuthenticated();
     clearView();
+    let isAuthenticated = await isUserAuthenticated();
     const homeElement = document.querySelector("#home");
     homeElement.style.display = "block";
+    const personData = await fetchUsers(whoIam);
     if (isAuthenticated)
-        loggedInStatus();
+        loggedInStatus(personData.profile_picture, personData.username);
+    document.removeEventListener('mousemove', parallaxEffect);
+    document.removeEventListener('wheel', scrollDownEffect);
     document.addEventListener('mousemove', parallaxEffect);
     document.addEventListener('wheel', scrollDownEffect);
+//     playOfflineBtnElement.removeEventListener("click", scrollUpEffect)
+//     playOnlineBtnElement.removeEventListener("click", smoothSroll)
+//     playOfflineBtnElement.addEventListener("click", scrollUpEffect)
+//     playOnlineBtnElement.addEventListener("click", smoothSroll)
+    document.removeEventListener("click", switchForm);
+
     document.addEventListener("click", switchForm);
+    document.querySelector(".close-two-factor-login").removeEventListener("click", closeTwoFactorLogin)
+    homeFormButton.removeEventListener("click", loginOrRegisterRequest)
+    document.querySelector(".login-42").removeEventListener('click', authenticateWith42);
     document.querySelector(".close-two-factor-login").addEventListener("click", closeTwoFactorLogin)
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
-    const logoutButton = document.querySelector(".fa-right-from-bracket");
-    logoutButton.addEventListener("click", logoutRequest);
+    document.querySelector(".login-42").addEventListener('click', authenticateWith42);
 } 
-
