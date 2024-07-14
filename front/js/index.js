@@ -50,8 +50,8 @@ const router = async () => {
         {path: "/profile", view:() => showProfile()},
         {path: "/chatbox", view:() => showChat()},
         {path: "/settings", view:() => showSettings()},
-        {path: "/game", view:() => showGame()},
-        {path: "/game/local", view:() => showGameLocal()},
+        {path: "/play", view:() => showGame()},
+        {path: "/play/local", view:() => showGameLocal()},
     ];
     const potentialMatches = routes.map(route => {
         return {

@@ -11,7 +11,8 @@ logger = getLogger(__name__)
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
         if message['type'] == enu.Game.UPDATE:
-            print(f"msg : {message['type']}")
+            pass
+            # print(f"msg : {message['type']}")
         else:
             print(f"msg : {message}")
         try :

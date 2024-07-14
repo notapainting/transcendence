@@ -362,7 +362,7 @@ playOfflineBtnElement.addEventListener("click", event => {
         top: 0,
         behavior: "smooth",
     });
-    navigateTo("/game/local");
+    navigateTo("/play/local");
 })
 playOnlineBtnElement.addEventListener("click", event => {
     window.scrollTo({
@@ -371,7 +371,7 @@ playOnlineBtnElement.addEventListener("click", event => {
     });
     // document.removeEventListener('wheel', scrollDownEffect);
     // document.addEventListener('wheel', adjustZoom);
-    navigateTo("/game");
+    navigateTo("/play");
 })
 
 export const showHome = async () => {

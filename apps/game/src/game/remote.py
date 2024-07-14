@@ -207,6 +207,9 @@ class RemoteGamer(BaseConsumer):
     async def game_start(self, data):
         await self.send_json(data)
 
+    async def game_score(self, data):
+        await self.send_json(data)
+
     async def game_broke(self, data):
         if self.status == enu.Game.HOST:
             await self.match.end(cancelled=True)
@@ -257,7 +260,8 @@ class RemoteGamer(BaseConsumer):
             self.match._players.add(data['author'])
             data['message'] = self.match.game_state.to_dict('none')
             # await self.send_json(data)
-            await self.match.broadcast({"type":enu.Game.ACCEPTED, "author":self.username, "message":self.match.game_state.to_dict('none')})
+            plist = list(self.match._players)
+            await self.match.broadcast({"type":enu.Game.ACCEPTED, "author":self.username, "message":self.match.game_state.to_dict('none'), "players":plist})
         else:
             await self.send_cs(data['author'], {"type":enu.Game.DENY})
 

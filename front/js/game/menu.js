@@ -35,8 +35,8 @@ const   sceneRem = [
     [fastGame, tournament, invitationBox, exit], 
     [create, invitationBox, back], 
     [userInput, inviteButton, back], 
-    [ready, circle, exit], 
-    [pause, abandon], 
+    [ready, bannerMatch, circle, exit], 
+    [bannerScore, pause, abandon], 
     [home, exit],
 ];
 
@@ -48,6 +48,11 @@ const   sceneLoc = [
     [bannerEnd],
     [home, exit],
 ];
+
+export const updateScore = (data) => {
+    currentScore = data.score;
+    currentPlayers = data.players;
+}
 
 export const announcePhase = (data) => {
     const   banner = document.getElementById('game-menu-banner-phase')
@@ -62,9 +67,9 @@ export const announceMatch = (data) => {
     currentScore = [0, 0];
 }
 
-export const announceScore = (data) => {
+export const announceScore = () => {
     const   banner = document.getElementById('game-menu-banner-score')
-    banner.innerHTML = data.players[0] + " : " + data.score[0] + "                " + data.players[1] + " : " + data.score[1];
+    banner.innerHTML = currentPlayers[0] + " : " + currentScore[0] + "                " + currentPlayers[1] + " : " + currentScore[1];
 }
 
 export const announceWinner = (data) => {
@@ -72,7 +77,7 @@ export const announceWinner = (data) => {
     banner.innerHTML = "WINNER IS " + data;
 }
 
-let   scene = null;
+let     scene = null;
 let     currentPlayers = [];
 let     currentScore = [0, 0];
 let     idx = enu.sceneIdx.WELCOME;
@@ -159,7 +164,10 @@ inviteButton.addEventListener('click', function() {
 
 ready.addEventListener('click', () => {
     gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
-    if (status === enu.gameMode.LOCAL) moveTo(enu.sceneLocIdx.MATCH);
+    if (status === enu.gameMode.LOCAL) {
+        moveTo(enu.sceneLocIdx.MATCH);
+        announceScore();
+    }
 });
 
 
