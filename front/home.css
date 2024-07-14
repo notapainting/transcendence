@@ -80,30 +80,34 @@ input:focus::placeholder {
 }
 
 .navbar {
-    width: 100px;
-    height: 400px;
+    width: 250px;
+    height: 80px;
     position: fixed;
-    top: 50%;
-    right: 0;
+    right: 10px;
+    top: 10px;
     display: none;
-    transform: translateY(-50%);
-    flex-direction: column;
     align-items: center;
     justify-content: space-around;
-    background-color: rgba(255, 255, 255, 0.8);
     border-radius: 20px;
     transition: transfrom 0.4s ease;
     z-index: 2;
+    text-align: center;
+}
+
+.profile-picture-home {
+    height: 55px;
+    width: 55px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .item {
     font-size: 32px;
     cursor: pointer;
-    color: black;
-}
-
-.item:hover {
-    color: #99CCFF;
+    color: white;
 }
 
 .profile {
@@ -201,13 +205,14 @@ input:focus::placeholder {
 .login-signin-form {
     display: flex;
     flex-direction: column;
-    
+    justify-content: center;
+    position: relative;
 }
 
 
 .login-signin-form input {
     text-align: center;
-    width: 350px;
+    width: 100%;
     height: 40px;
     font-size: 20px;
     border-radius: 15px;
@@ -216,6 +221,7 @@ input:focus::placeholder {
 #home-email {
     transform: scale(0);
     transition: transform 0.3s ease;
+    margin-top: 20px;
 }
 
 #home-username, #home-password {
@@ -306,8 +312,11 @@ input:focus::placeholder {
 
 .login-or-create {
     display: flex;
+}
+
+.login-or-42 {
+    display: flex;
     align-items: center;
-    justify-content: space-between;
 }
 
 .login-or-create p {
@@ -324,6 +333,21 @@ input:focus::placeholder {
     margin-left: 10px;
 }
 
+.login-42 {
+    height: 50px;
+    width: 50px;
+    bottom: 0;
+    left: 20px;
+    background-image: url("img/42_Logo.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin-left: 10px;
+    background-color: white;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
 .message-box {
     color: white;
     margin-top: 30px;
@@ -334,6 +358,7 @@ input:focus::placeholder {
     height: 50px;
     display: flex;
     align-items: center;
+    word-wrap: break-word;
     justify-content: center;
 }
 

@@ -59,6 +59,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+ADMIN_USERNAME = 'admin'
+ADMIN_EMAIL = 'admin@admin.com'
+
 ROOT_URLCONF = 'user_managment.urls'
 
 TEMPLATES = [

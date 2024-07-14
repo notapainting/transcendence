@@ -1,3 +1,4 @@
+import { loggedInStatus } from "./home.js";
 import { isUserAuthenticated } from "./index.js";
 import { clearView } from "./index.js";
 
@@ -41,8 +42,6 @@ let displayUserInformations = (data) => {
     lastnameInput.placeholder = !data.last_name ? "Not Defined" : "";
     emailInput.value = data.email || "";
     emailInput.placeholder = !data.email ? "Not Defined" : "";
-    dateOfBirthInput.value = data.date_of_birth || "";
-    dateOfBirthInput.placeholder = !data.date_of_birth ? "Not Defined" : "";
     profilePictureImage.style.backgroundImage = `url("${data.profile_picture}")`
     determineGender(data.gender);
     if (data.is_2fa_enabled){ 
@@ -51,58 +50,49 @@ let displayUserInformations = (data) => {
     }
 
     else{
+        twoFactorButton.removeEventListener("click", displayTwoFactorActivation);
         twoFactorButton.addEventListener("click", displayTwoFactorActivation);
         twoFactorButton.innerText = 'ENABLE 2FA';
     }
     
 };
 
+const updateProfilePicture = () => {
+    const selectedFile = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("profile_picture", selectedFile);
+
+    fetch('/auth/update_picture/', {
+        method: 'PUT',
+        credentials: 'same-origin',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log("Image de profil mise à jour avec succès !");
+            window.location.reload();
+        } else {
+            throw new Error("Erreur lors de la mise à jour de l'image de profil !");
+        }
+    })
+    .catch(error => {
+        console.error(error);
+    });
+    document.body.removeChild(fileInput);
+}
+
 const modifyProfilePicture = async () => {
-    // Créer un input de type "file"
     const fileInput = document.createElement("input");
     fileInput.type = "file";
 
-    // Définir les attributs pour permettre le choix de fichiers d'image uniquement
     fileInput.accept = "image/*";
 
-    // Cacher l'input de type "file"
     fileInput.style.display = "none";
 
-    // Ajouter l'input de type "file" au document
     document.body.appendChild(fileInput);
     await isUserAuthenticated();
-    // Écouter l'événement de changement sur l'input de type "file"
-    fileInput.addEventListener("change", () => {
-        // Récupérer le fichier sélectionné par l'utilisateur
-        const selectedFile = fileInput.files[0];
-
-        // Créer un objet FormData pour envoyer le fichier
-        const formData = new FormData();
-        formData.append("profile_picture", selectedFile);
-
-        // Envoyer le fichier à l'API via une requête fetch
-        fetch('/auth/update_picture/', {
-            method: 'PUT',
-            credentials: 'same-origin',
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log("Image de profil mise à jour avec succès !");
-                window.location.reload();
-            } else {
-                throw new Error("Erreur lors de la mise à jour de l'image de profil !");
-            }
-        })
-        .catch(error => {
-            console.error(error);
-        });
-
-        // Supprimer l'input de type "file" du document
-        document.body.removeChild(fileInput);
-    });
-
-    // Simuler un clic sur l'input de type "file"
+    fileInput.removeEventListener("change", updateProfilePicture);
+    fileInput.addEventListener("change", updateProfilePicture);
     fileInput.click();
 };
 
@@ -124,7 +114,6 @@ let updateUserInfosRequest = async () => {
         last_name: lastnameInput.value,
         email: emailInput.value,
         gender: genderValue,
-        date_of_birth: dateOfBirthInput.value
     };
     fetch('/auth/update_client/', {
             method: 'PUT',
@@ -208,7 +197,6 @@ const confirm2FaRequest = async (event) => {
     });
 }
 
-
 export const showProfile = async () => {
     await isUserAuthenticated();
     fetch('/auth/get_pers_infos/', {
@@ -226,16 +214,22 @@ export const showProfile = async () => {
     })
     .then(data => {
         clearView();
+        loggedInStatus(data.profile_picture, data.username);
         displayUserInformations(data);
         const profileElement = document.querySelector("#profile");
         profileElement.style.display = "block";
         console.log(data);
     })
     const modifyButton = document.querySelector(".modify");
+    modifyButton.removeEventListener("click", updateUserInfosRequest);
     modifyButton.addEventListener("click", updateUserInfosRequest);
     const uploadButton = document.querySelector(".upload");
+    uploadButton.removeEventListener("click", modifyProfilePicture)
+    twoFactorButton.removeEventListener("click", displayTwoFactorActivation);
     uploadButton.addEventListener("click", modifyProfilePicture)
     twoFactorButton.addEventListener("click", displayTwoFactorActivation);
+    document.querySelector(".close-two-factor").removeEventListener("click", closeTwoFactorActivate)
     document.querySelector(".close-two-factor").addEventListener("click", closeTwoFactorActivate)
+    activate2FaButton.removeEventListener("click", confirm2FaRequest);
     activate2FaButton.addEventListener("click", confirm2FaRequest);
 }
