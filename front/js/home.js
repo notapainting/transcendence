@@ -331,6 +331,7 @@ const adjustZoom = (event) => {
     setTimeout(() => {
         isZooming = false; // Réinitialiser l'indicateur après 2 secondes
     }, 400); // Attendre 2 secondes avant de permettre un autre événement wheel
+    
 };
 
 export let logoutRequest = (event) => {
@@ -355,6 +356,7 @@ export let logoutRequest = (event) => {
 }
 
 const smoothSroll = (event) => {
+
     window.scrollTo({
         top: 0,
         behavior: "smooth",
@@ -362,6 +364,23 @@ const smoothSroll = (event) => {
     document.removeEventListener('wheel', scrollDownEffect);
     document.addEventListener('wheel', adjustZoom);
 }
+
+
+const playOfflineBtnElement = document.querySelector(".play-offline-btn");
+const playOnlineBtnElement = document.querySelector(".play-online-btn");
+
+playOfflineBtnElement.addEventListener("click", event => {
+    navigateTo("/play/local");
+})
+
+playOnlineBtnElement.addEventListener("click", event => {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    });
+    navigateTo("/play");
+})
+
 
 export const showHome = async () => {
     clearView();
@@ -371,17 +390,16 @@ export const showHome = async () => {
     const personData = await fetchUsers(whoIam);
     if (isAuthenticated)
         loggedInStatus(personData.profile_picture, personData.username);
-    const playOfflineBtnElement = document.querySelector(".play-offline-btn");
-    const playOnlineBtnElement = document.querySelector(".play-online-btn");
     document.removeEventListener('mousemove', parallaxEffect);
     document.removeEventListener('wheel', scrollDownEffect);
     document.addEventListener('mousemove', parallaxEffect);
     document.addEventListener('wheel', scrollDownEffect);
-    playOfflineBtnElement.removeEventListener("click", scrollUpEffect)
-    playOnlineBtnElement.removeEventListener("click", smoothSroll)
-    playOfflineBtnElement.addEventListener("click", scrollUpEffect)
-    playOnlineBtnElement.addEventListener("click", smoothSroll)
+//     playOfflineBtnElement.removeEventListener("click", scrollUpEffect)
+//     playOnlineBtnElement.removeEventListener("click", smoothSroll)
+//     playOfflineBtnElement.addEventListener("click", scrollUpEffect)
+//     playOnlineBtnElement.addEventListener("click", smoothSroll)
     document.removeEventListener("click", switchForm);
+
     document.addEventListener("click", switchForm);
     document.querySelector(".close-two-factor-login").removeEventListener("click", closeTwoFactorLogin)
     homeFormButton.removeEventListener("click", loginOrRegisterRequest)

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Simple Engine Plume Test
+* source:	https://sketchfab.com/3d-models/simple-engine-plume-test-792866451d30414080ed52070818dc51
+* author:	lowerbadger (https://sketchfab.com/lowerbadger)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Simple Engine Plume Test" (https://sketchfab.com/3d-models/simple-engine-plume-test-792866451d30414080ed52070818dc51) by lowerbadger (https://sketchfab.com/lowerbadger) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

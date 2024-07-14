@@ -1,0 +1,47 @@
+tips: 
+host -> left player + ws
+guest -> right player + arrowkey
+
+sPressed + downPressed => sPressed
+
+
+test score game 
+
+DONE:
+    - setup key binding
+    - abandon button
+    - use naviguateTo
+    - clear threeJS scene at start/end
+    - change game-button pause to resume 
+    LOCAL
+    - merge match and tournament consumer
+    - copy front
+
+
+TODO:
+    MATCH
+    - clear ThreeJS stuff after match 
+    - display score + username display
+    - quit button
+    - add a end screen :
+        ==> handle game broke/game quit
+        - back : send game data
+        - front: nice display
+        - button to quit, relance, etc
+
+    TOURNAMENT
+    - everything
+
+    LOCAL
+        - in game score + alias
+        - end matc hscreen, 
+        - end tournament screen
+
+
+
+SOLVED:
+    - double connection
+    - p2 can unpause pause from p1
+
+BUG:
+    - game_quit not implemented 

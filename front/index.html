@@ -7,10 +7,19 @@
     <link rel="stylesheet" href="./home.css">
     <link rel="stylesheet" href="./profile.css">
     <link rel="stylesheet" href="/chat.css">
+    <link rel="stylesheet" href="./game.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica+SC&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-</head>
+	<script type="importmap">
+		{
+		  "imports": {
+			"three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+			"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+		  }
+		}
+	  </script>
+</head> 
 <body>
     <audio id="newMessageSound">
         <source src="img/goofy.mp3" type="audio/mpeg">
@@ -197,6 +206,43 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div id ="game" class="view" style="display: none;">
+        <div class="containerGame">
+            <canvas id="canvas" width="1920" height="1080"></canvas>
+
+        </div>
+        <div id="game-menu">
+            <button id="game-menu-fastGame" class="menu-element button-menu" type="button">Partie rapide</button> 
+            <button id="game-menu-tournament" class="menu-element button-menu" type="button">Tournoi</button>
+            <button id="game-menu-exit" class="menu-element button-menu" type="button">Exit</button>
+            <button id="game-menu-create" class="menu-element button-menu" type="button">Create</button>
+            <button id="game-menu-back" class="menu-element button-menu" type="button">Back</button>
+            <input type="text" id="game-menu-inviteInput" class="menu-element" placeholder="Nom d'un joueur...">
+            <button id="game-menu-home" class="menu-element button-menu" type="button">Play Again</button> 
+            <button id="game-menu-inviteButton" class="menu-element button-menu">Invite</button>
+            <button id="game-menu-ready" class="menu-element button-menu" type="button">Ready?</button> 
+            <div id="game-menu-ready-circle" class="menu-element"></div>
+
+            <input type="text" id="game-menu-local-input" class="list-tournoi menu-element" placeholder="Nom d'un joueur...">
+            <button id="game-menu-local-input-button" class="list-tournoi menu-element button-menu">Add</button>
+            <ul id ="game-menu-list" class="list-tournoi menu-element"></ul>
+            <div id="game-menu-banner-phase" class="menu-element game-announce-base"></div>
+            <div id="game-menu-banner-match" class="menu-element game-announce-base"></div>
+            <div id="game-menu-banner-score" class="menu-element game-announce-base"></div>
+            <div id="game-menu-banner-end" class="menu-element game-announce-base"></div>
+
+            <button id="game-menu-next" class="menu-element button-menu" type="button">Next Match</button> 
+            <button id="game-menu-start" class="menu-element button-menu" type="button">Start</button> 
+
+            <div id="game-menu-invitationBox" class="menu-element">
+                <h3>Invitations Reçues: </h3>
+                <ul id="game-menu-invitationList"></ul>
+            </div>
+            <button id="game-pause" class="game-element game-button" type="button">Pause</button> 
+            <button id="game-abandon" class="game-element game-button" type="button">Abandon</button> 
+        </div>
+
     </div>
     <!-- <div id="settings" class="view">
         <h1>settings OHH</h1>
