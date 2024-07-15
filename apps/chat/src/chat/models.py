@@ -76,7 +76,7 @@ class User(models.Model):
         else:
             return self.inbox.filter(Q(status=Relation.Types.INVIT) | Q(status=Relation.Types.BLOCK))
 
-    def get_contacts(self, status='C'):
+    def get_contacts(self, status=Relation.Types.COMRADE):
         return self.contacts.filter(inbox__status=status)
 
 class GroupShip(models.Model):
