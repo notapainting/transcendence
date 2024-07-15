@@ -128,6 +128,7 @@ const remoteHandler = (e) => {
             moveTo(enu.sceneIdx.END);
             break;
         case enu.EventGame.END:
+            fullClear();
             moveTo(enu.sceneIdx.END);
             break;
         case enu.EventGame.QUIT:

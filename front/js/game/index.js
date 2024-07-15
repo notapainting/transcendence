@@ -11,6 +11,7 @@ export const showGame = () => {initGame(enu.backendPath.REMOTE);}
 export const showGameLocal = () => {initGame(enu.backendPath.LOCAL);}
 
 const initGame = (path) => {
+    clearView();
     fullClear();
     initWebSocket(path);
     document.querySelector("#game").style.display = "block";
@@ -20,6 +21,5 @@ const initGame = (path) => {
 export const fullClear = () => {
     clearScene();
     clearGame();
-    clearView();
     clearThree();
 }
