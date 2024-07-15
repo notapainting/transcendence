@@ -1,6 +1,6 @@
 import { navigateTo, whoIam } from "./index.js";
 import { clearView, isUserAuthenticated } from "./index.js";
-import { fetchUsers, showChat } from "./chat.js";
+import { fetchUsers, initializeWebSocket, showChat } from "./chat.js";
 
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
@@ -156,6 +156,15 @@ const messageBox = document.querySelector(".message-box");
 
 export const loggedInStatus = (profile_picture, username) => {
     document.querySelector(".login-signin-form").style.display = "none"
+    const notificationContainer = document.querySelector(".notification-container");
+    document.querySelector(".fa-bell").addEventListener('click', () => {
+        const currentDisplay = window.getComputedStyle(notificationContainer).display;
+        if (currentDisplay === 'none') {
+            notificationContainer.style.display = "flex";
+        } else {
+            notificationContainer.style.display = "none";
+        }
+    })
     document.querySelector(".play-online-btn").style.display = "block"
     showChat();
     document.querySelector(".welcome-msg").innerHTML = `Welcome<br>${username}`;
