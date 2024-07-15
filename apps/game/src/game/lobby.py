@@ -100,8 +100,13 @@ class Match(Lobby):
             if hasattr(self, "result") is False:
                 self.result = self.compute()
             # send match history data to usermgt
-            # import httpx
-            # await httpx.AsyncClient().post(url='http://auth-service:8000/user/match/', data=self.result)
+            import httpx
+            from rest_framework.renderers import JSONRenderer
+            data = self.result
+            data['score_w'] = self.result['scores'][data['winner']]
+            data['score_l'] = self.result['scores'][data['loser']]
+            del data['scores']
+            await httpx.AsyncClient().post(url='http://user:8000/user/match_history/new/', data=JSONRenderer().render(data))
             if self.tournament is True:
                 await self._chlayer.send_group(self.tournament, {"type":enu.Tournament.RESULT, "message":self.result})
         if self.task is not None:
