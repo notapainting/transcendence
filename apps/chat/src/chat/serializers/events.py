@@ -98,11 +98,12 @@ class ContactUpdate(BaseSerializer):
     operation = serializers.ChoiceField(choices=enu.Operations)
 
     def validate(self, data):
-        if data['author'] == data['target']:
+        if data['author'] == data['name']:
             raise ValidationError('no self contact operation with yourself!', code=403)
         if data['operation'] in [enu.Operations.CONTACT, enu.Operations.INVIT]:
-            if data['target'].get_relation(data['author']) is mod.Relation.Types.BLOCK:
+            if data['name'].get_relation(data['author']) is mod.Relation.Types.BLOCK:
                 raise ValidationError('your blocked', code=403)
+        return data
 
     def alter_pgroup_if_exist(self, userA, userB, new_role):
         try : 
@@ -116,25 +117,25 @@ class ContactUpdate(BaseSerializer):
 
     def create(self, data):
         if data['operation'] == enu.Operations.REMOVE:
-            data['author'].delete_relation(data['target'])
-            target_rel = data['target'].get_relation(data['author'])
+            data['author'].delete_relation(data['name'])
+            target_rel = data['name'].get_relation(data['author'])
             if target_rel is not None and target_rel != mod.Relation.Types.BLOCK:
-                data['target'].delete_relation(data['author'])
-                self.alter_pgroup_if_exist(data['author'], data['target'], mod.GroupShip.Roles.WRITER)
+                data['name'].delete_relation(data['author'])
+                self.alter_pgroup_if_exist(data['author'], data['name'], mod.GroupShip.Roles.WRITER)
 
         elif data['operation'] == enu.Operations.BLOCK:
-            self.alter_pgroup_if(data['author'], data['target'], mod.GroupShip.Roles.READER)
-            data['author'].update_relation(data['target'], mod.Relation.Types.BLOCK)
-            if data['target'].get_relation(data['author']) != mod.Relation.Types.BLOCK:
-                data['target'].delete_relation(data['author'])
+            self.alter_pgroup_if(data['author'], data['name'], mod.GroupShip.Roles.READER)
+            data['author'].update_relation(data['name'], mod.Relation.Types.BLOCK)
+            if data['name'].get_relation(data['author']) != mod.Relation.Types.BLOCK:
+                data['name'].delete_relation(data['author'])
 
         else:
-            if data['target'].get_relation(data['author']) == mod.Relation.Types.INVIT:
-                data['author'].update_relation(data['target'], mod.Relation.Types.COMRADE)
-                data['target'].update_relation(data['author'], mod.Relation.Types.COMRADE)
+            if data['name'].get_relation(data['author']) == mod.Relation.Types.INVIT:
+                data['author'].update_relation(data['name'], mod.Relation.Types.COMRADE)
+                data['name'].update_relation(data['author'], mod.Relation.Types.COMRADE)
                 data['operation'] = enu.Operations.CONTACT
             else:
-                data['author'].update_relation(data['target'], mod.Relation.Types.INVIT)
+                data['author'].update_relation(data['name'], mod.Relation.Types.INVIT)
                 data['operation'] = enu.Operations.INVIT
 
         return data
