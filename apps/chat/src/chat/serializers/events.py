@@ -115,7 +115,12 @@ class ContactUpdate(BaseSerializer):
             pass
 
     def create(self, data):
-        if data['operation'] == enu.Operations.REMOVE:
+        if data['operation'] == enu.Operations.DENY:
+            target_rel = data['target'].get_relation(data['author'])
+            if target_rel is not None and target_rel == mod.Relation.Types.INVIT:
+                data['target'].delete_relation(data['author'])
+
+        elif data['operation'] == enu.Operations.REMOVE:
             data['author'].delete_relation(data['target'])
             target_rel = data['target'].get_relation(data['author'])
             if target_rel is not None and target_rel != mod.Relation.Types.BLOCK:

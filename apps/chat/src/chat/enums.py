@@ -57,6 +57,7 @@ class Operations(TextChoices):
     BLOCK = rel.Types.BLOCK
     CONTACT = rel.Types.COMRADE
     REMOVE = "remove"
+    DENY = "deny"
 
 class SpecialUser(TextChoices):
     ADMIN = 'admin'
