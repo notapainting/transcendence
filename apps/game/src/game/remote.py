@@ -215,7 +215,7 @@ class RemoteGamer(BaseConsumer):
         await self.send_json(data)
 
     async def game_end(self, data):
-        if self.status == enu.Game.HOST and data['author'] != self.username:
+        if self.status == enu.Game.HOST : #and data['author'] != self.username
             await self.match.end()
         self.set_mode()
         await self.send_json(data)

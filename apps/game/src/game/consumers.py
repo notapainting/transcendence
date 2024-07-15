@@ -11,7 +11,7 @@ import game.enums as enu
 TOURNAMENT_MAX_PLAYER = 16
 
 
-MAX_SCORE = 3
+MAX_SCORE = 1
 TIME_REFRESH = 0.5
 width = 50
 height = 30
