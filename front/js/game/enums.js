@@ -24,6 +24,7 @@ export const EventTournament = Object.freeze({
     QUIT: "tournament.quit",
     KICK: "tournament.kick",
     ACCEPTED: "tournament.accepted",
+    READY: "tournament.ready",
     PHASE: "tournament.phase",
     MATCH: "tournament.match",
     RESULT: "tournament.result",
@@ -39,7 +40,7 @@ export const EventLocal = Object.freeze({
     NEXT: "local.next",
     END_GAME: "local.end.game",
     END_TRN: "local.end.tournament",
-    QUIT: "local.quit",
+    QUIT: EventGame.QUIT,
 })
 
 export const EventError = Object.freeze({
@@ -49,12 +50,11 @@ export const EventError = Object.freeze({
 
 export const sceneIdx = Object.freeze({
     WELCOME: 0,
-    TYPE: 1,
-    CREATION:2,
-    READY:3,
-    MATCH:4,
-    END:5,
-    BROKE:6,
+    CREATION:1,
+    READY:2,
+    MATCH:3,
+    END:4,
+    BROKE:5,
 })
 
 export const sceneLocIdx = Object.freeze({
