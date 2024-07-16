@@ -89,7 +89,7 @@ function addUserToMenu(target, profile_picture) {
         descriptionPersonDiv.innerHTML = `
             <div class="username-status">
                 <h4 class="username-person">${target}</h4>
-                <span class="status ${friendStatus.find(elem => elem === target) ? "online" : "offline"}"><span>
+                <span class="status ${friendStatus.find(elem => elem === target) ? "online" : "offline"}" style="display: ${friendStatus.find(elem => elem === target) ? 'inline-block' : 'none'};"><span>
             </div>
             <div class="last-message">Last message</div>
         `;
@@ -319,8 +319,6 @@ const deleteNotif = (target) => {
     incrDecrNotifNumber("decrement");
 }
 
-
-
 const deletePlusIcon = (target) => {
     const personElem = document.querySelector(`.person[data-username="${target}"]`);
     if (personElem){
@@ -347,6 +345,7 @@ const changeExistingStatus = (target, mode) => {
     const personDiv = document.querySelector(`.person[data-username="${target}"]`);
     if (personDiv){
         const statusDiv = personDiv.querySelector(".status");
+        statusDiv.style.display = "inline-block"
         mode === "online" ? statusDiv.style.backgroundColor = "green" : statusDiv.style.backgroundColor = "gray"
     }
 }
@@ -411,6 +410,7 @@ async function handleMessage(message) {
         console.log(message);
         console.log(friendStatus);
     }
+    statusPromiseResolve();
 }
 
 let flg = 0;
