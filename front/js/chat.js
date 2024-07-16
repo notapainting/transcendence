@@ -94,7 +94,8 @@ function addUserToMenu(target, profile_picture) {
             <div class="last-message">Last message</div>
         `;
         personDiv.append(picturePersonDiv, descriptionPersonDiv);
-        if (!contactSummary.data.contacts.find(elem => elem === target)){
+        if (!contactSummary.data.contacts.find(elem => elem === target) && !contactSummary.data.invited_by.find(elem => elem === target) && !contactSummary.data.invitations.find(elem => elem === target)){
+            console.log("salut");
             const addFriend = document.createElement('i');
             addFriend.classList.add("fa-solid", "fa-plus", "add-button");
             addFriend.addEventListener("click", event => addToFriend(target));
