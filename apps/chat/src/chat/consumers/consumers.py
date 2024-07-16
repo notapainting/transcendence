@@ -132,7 +132,7 @@ class ChatConsumer(BaseConsumer):
 
     async def status_fetch(self, event):
         logger.info(event)
-        await self.channel_layer.group_send(event['data']['author'], {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":"o"}})
+        await self.channel_layer.group_send(event['data']['author'], {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":mod.User.Status.ONLINE}})
 
     async def message_text(self, event):
         await self.send_json(event)
