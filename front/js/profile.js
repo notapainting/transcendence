@@ -12,7 +12,7 @@ let otherInput = document.querySelector("#other")
 let dateOfBirthInput = document.querySelector("#date-of-birth")
 let profilePictureImage = document.querySelector(".profile-picture")
 let genderValue;
-
+let fileInput;
 let determineGender = (gender) => {
     switch (gender) {
         case 'M':
@@ -82,7 +82,7 @@ const updateProfilePicture = () => {
 }
 
 const modifyProfilePicture = async () => {
-    const fileInput = document.createElement("input");
+    fileInput = document.createElement("input");
     fileInput.type = "file";
 
     fileInput.accept = "image/*";

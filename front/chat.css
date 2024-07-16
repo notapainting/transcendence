@@ -290,3 +290,30 @@
 .chat-send {
     cursor: pointer;
 }
+
+.add-button {
+    font-size: 20px;
+    margin-left: 70px;
+}
+
+.username-status {
+    display: flex;
+    align-items: center;
+}
+
+.status {
+    height: 10px;
+    width: 10px;
+
+    display: inline-block;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.online {
+    background-color: green;
+}
+
+.offline {
+    background-color: gray;  
+}

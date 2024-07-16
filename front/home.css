@@ -108,6 +108,77 @@ input:focus::placeholder {
     font-size: 32px;
     cursor: pointer;
     color: white;
+    position: relative;
+}
+
+.cpt {
+    width: 13px;
+    height: 13px;
+    display: inline-block;
+    font-size: 10px;
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+    position: absolute;
+    right: 2px;
+    top: 3px;
+    border-radius: 50%;
+}
+
+.notification-container {
+    display: none;
+    flex-direction: column;
+    width: 350px;
+    font-size: 16px;
+    height: 500px;
+    border-radius: 5px;
+    position: fixed;
+    z-index: 2;
+    right: 10px;
+    top: 85px;
+    overflow-y: auto;
+    color: black;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.notif {
+    width: 100%;
+    height: 50px;
+    padding: 10px;
+    margin: 2px 0;
+    display: flex;
+    align-items: center;
+}
+
+.notif p {
+    display: block;
+    width: 400px;
+}
+
+.n-btn-container {
+    color: white;
+    width: 85%;
+    justify-content: space-around;
+    display: flex;
+}
+
+.n-btn {
+    width: 60px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.accept-friend {
+    background-color: green;
+}
+
+.decline-friend {
+    background-color: red;
 }
 
 .profile {
