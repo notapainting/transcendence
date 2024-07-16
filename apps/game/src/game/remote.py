@@ -61,8 +61,8 @@ class RemoteGamer(BaseConsumer):
             self.set_mode()
 
         if self.status == enu.Tournament.HOST:
-            self.tounament.end(True)
-            await self.match.broadcast({"type":enu.Tournament.BROKE, "author":self.username})
+            self.tournament.end(True)
+            await self.tournament.broadcast({"type":enu.Tournament.BROKE, "author":self.username})
         if self.status == enu.Tournament.GUEST:
             await self.send_cs(self.thost, {"type":enu.Tournament.BROKE, "author":self.username})
 
@@ -81,15 +81,15 @@ class RemoteGamer(BaseConsumer):
             case enu.CStatus.IDLE : self.mode = self.idle
             case enu.Game.HOST : self.mode = self.game_host
             case enu.Game.GUEST : self.mode = self.game_guest
-            case enu.Tournament.HOST : self.mode = self.tournament_guest
-            case enu.Tournament.GUEST : self.mode = self.tournament_host
+            case enu.Tournament.HOST : self.mode = self.tournament_host
+            case enu.Tournament.GUEST : self.mode = self.tournament_guest
 
     async def receive_json(self, json_data):
         if json_data.get('type') == None: # enu.Errors.DECODE
             return await self.send_json({'type':enu.Errors.TYPE})
         if json_data['type'] == enu.Errors.DECODE:
             return await self.send_json({'type':enu.Errors.DECODE})
-
+        json_data['author'] = self.username
         print(f"{self.username} ({self.status}): type is {json_data['type']} ")
         await self.mode(json_data)
 
@@ -171,7 +171,7 @@ class RemoteGamer(BaseConsumer):
             case enu.Tournament.KICK:
                 await self.tournament.kick(data['message'])
             case enu.Tournament.READY:
-                await self.tournament.set_ready(self.username)
+                await self.tournament.add_ready(self.username)
                 if self.tournament.ready() is True:
                     self.tournament.start()
                     self.tournament.make_phase()
@@ -249,15 +249,16 @@ class RemoteGamer(BaseConsumer):
     async def game_quit(self, data):
         if self.status == enu.Game.HOST and data['author'] != self.username:
             await self.match.end(True)
-        await self.send_json(data)
-        # await self.send_json({'type':enu.Game.END})
-        self.set_mode()
+        if data['author'] != self.username:
+            await self.send_json(data)
+            self.set_mode()
 
     async def game_join(self, data):
         if self.match.invited(data['author']) and self.match.full() is False:
-            self.match._players.add(data['author'])
+            if await self.match.add(data['author']) is False:
+                return await self.send_cs(data['author'], {"type":enu.Game.DENY})
             data['message'] = self.match.game_state.to_dict('none')
-            # await self.send_json(data)
+            await self.send_json(data)
             plist = list(self.match._players)
             await self.match.broadcast({"type":enu.Game.ACCEPTED, "author":self.username, "message":self.match.game_state.to_dict('none'), "players":plist})
         else:
@@ -322,6 +323,16 @@ class RemoteGamer(BaseConsumer):
 
     async def tournament_start(self, data):
         await self.send_json(data)
+
+    async def tournament_ready(self, data):
+        if self.status == enu.Tournament.HOST and data['author'] != self.username:
+            await self.tournament.add_ready(self.username)
+            if self.tournament.ready() is True:
+                self.tournament.start()
+                self.tournament.make_phase()
+                self.tournament.order_match()
+        if data['author'] != self.username:
+            await self.send_json(data)
 
 
 def format_paddle_key(status, key):

@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore } from './menu.js';
+import { announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearSentList } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
@@ -82,20 +82,21 @@ const remoteHandler = (e) => {
             updateInvitationList();
             break;
         case enu.EventGame.JOIN:
-            game.gameRenderer(content.message);
+            document.getElementById(content.author).innerHTML = 'accepted!';
             break;
         case enu.EventGame.ACCEPTED:
-            document.addEventListener('keydown', bindKeyPress)
-            document.addEventListener('keyup', bindKeyRelease)
             game.gameRenderer(content.message);
             moveTo(enu.sceneIdx.READY);
             announceMatch(content.players);
+            clearSentList();
             break;
         case enu.EventGame.READY:
             document.getElementById('game-menu-ready-circle').style.background = '#0eee28';
             break;
         case enu.EventGame.START:
             moveTo(enu.sceneIdx.MATCH);
+            document.addEventListener('keydown', bindKeyPress)
+            document.addEventListener('keyup', bindKeyRelease)
             announceScore();
             if (gameData.start) {
                 if (!gameData.timerInterval)

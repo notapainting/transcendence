@@ -41,6 +41,7 @@ class Tournament(enum.StrEnum):
     QUIT = "tournament.quit"
     KICK = "tournament.kick"
     ACCEPTED = "tournament.accepted"
+    READY = "tournament.ready"
     PHASE = "tournament.phase"
     MATCH = "tournament.match"
     RESULT = "tournament.result"
@@ -58,7 +59,7 @@ class Local(enum.StrEnum):
     NEXT = "local.next"
     END_GAME = "local.end.game"
     END_TRN = "local.end.tournament"
-    QUIT = "local.quit"
+    QUIT = Game.QUIT
 
 class CStatus(enum.StrEnum):
     IDLE = "status.idle"

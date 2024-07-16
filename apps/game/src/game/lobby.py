@@ -38,14 +38,23 @@ class Lobby:
         self._invited.discard(user)
         await self._chlayer.group_send(user, {"type":self.types.KICK, "author":self.host})
 
+    async def add(self, user):
+        self._players.add(user)
+        if self.n_players < len(self._players):
+            print(f"too much player : len is {len(self._players)}, max is {self.n_players}")
+            self._players.discard(user)
+            return False
+        return True
+
     async def add_ready(self, user):
         if user == "":
             return ;
         self._ready.add(user)
+
         await self.broadcast({"type":self.types.READY, "author":user, "r":True})
 
     def ready(self):
-        if len(self._ready) == self.n_players:
+        if len(self._ready) == len(self._players):
             return True
         return False
 
@@ -126,11 +135,11 @@ class Tournament(Lobby):
         random.shuffle(tmp)
         self.current = [(tmp[i],tmp[i + 1]) for i in range(0, len(tmp), 2)]
         self.match_count = len(self.current)
-        self.broadcast({"type":types.PHASE, "message":self.current, "author":self.host})
+        self.broadcast({"type":self.types.PHASE, "message":self.current, "author":self.host})
 
     async def order_match(self):
         for match in self.current:
-            message = {"type":types.MATCH, "author":self.host, "message":{"host":match[0],"guest":match[1]}}
+            message = {"type":self.types.MATCH, "author":self.host, "message":{"host":match[0],"guest":match[1]}}
             await self._chlayer.group_send(match[0], message)
             await self._chlayer.group_send(match[1], message)
 

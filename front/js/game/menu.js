@@ -4,31 +4,44 @@ import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import { gameData } from './game.js';
 
-
-
-
-const   fastGame = document.getElementById('game-menu-fastGame');
-const   tournament = document.getElementById('game-menu-tournament');
+// html element
+// <!-- deplacement -->
 const   exit = document.getElementById('game-menu-exit');
 const   back = document.getElementById('game-menu-back');
-const   create = document.getElementById('game-menu-create');
-const   userInput = document.getElementById('game-menu-inviteInput');
-const   inviteButton = document.getElementById('game-menu-inviteButton');
-const   invitationBox = document.getElementById('game-menu-invitationBox');
-const   ready = document.getElementById('game-menu-ready');
-const   circle = document.getElementById('game-menu-ready-circle');
 const   home = document.getElementById('game-menu-home');
-const   pause = document.getElementById('game-pause');
-const   abandon = document.getElementById('game-abandon');
+const   start = document.getElementById('game-menu-start');
+const   nextMatch = document.getElementById('game-menu-next');
+
+// <!-- local  -->
 const   locInput = document.getElementById('game-menu-local-input');
 const   locInputBut = document.getElementById('game-menu-local-input-button');
 const   locList = document.getElementById('game-menu-list');
-const   nextMatch = document.getElementById('game-menu-next');
-const   start = document.getElementById('game-menu-start');
-const   bannerPhase = document.getElementById('game-menu-banner-phase')
-const   bannerMatch = document.getElementById('game-menu-banner-match')
-const   bannerScore = document.getElementById('game-menu-banner-score')
-const   bannerEnd = document.getElementById('game-menu-banner-end')
+
+// <!-- remote -->
+// <!-- choose mode -->
+const   createMatch = document.getElementById('game-menu-fastGame');
+const   createTournament = document.getElementById('game-menu-tournament');
+
+// <!-- invite player -->
+const   userInput = document.getElementById('game-menu-inviteInput');
+const   inviteButton = document.getElementById('game-menu-inviteButton');
+const   invitationBox = document.getElementById('game-menu-invitationBox');
+const   invitationSent = document.getElementById('game-menu-invite-sent-list');
+
+// <!-- set ready -->
+const   ready = document.getElementById('game-menu-ready');
+const   circle = document.getElementById('game-menu-ready-circle');
+
+// <!-- in game banner -->
+const   bannerPhase = document.getElementById('game-menu-banner-phase');
+const   bannerMatch = document.getElementById('game-menu-banner-match');
+const   bannerScore = document.getElementById('game-menu-banner-score');
+const   bannerEnd = document.getElementById('game-menu-banner-end');
+
+// <!-- in game button -->
+const   pause = document.getElementById('game-pause');
+const   abandon = document.getElementById('game-abandon');
+
 
 /*** variable ****/
 
@@ -44,10 +57,11 @@ let     idx = enu.sceneIdx.WELCOME;
 // invitations received in remote mode
 export let invitations = [];
 
-// list of players in local mode
+// list of players in local mode and invited players in remote
 let     players = [];
+let     invited = []
 
-// current matc hdata
+// current match data
 let     currentPlayers = [];
 let     currentScore = [0, 0];
 let     paused = false;
@@ -55,10 +69,9 @@ let     locked = false;
 
 // scene
 const   sceneRem = [
-    [fastGame, tournament, invitationBox, exit], 
-    [create, invitationBox, back], 
-    [userInput, inviteButton, back], 
-    [ready, bannerMatch, circle, exit], 
+    [createMatch, createTournament, invitationBox, exit], 
+    [userInput, inviteButton, invitationSent, ready, home], 
+    [bannerMatch, circle, exit], 
     [bannerScore, pause, abandon], 
     [home, exit],
 ];
@@ -84,6 +97,7 @@ export const initMenu = (path) => {
     } else {
         status = enu.gameMode.MATCH;
         scene = sceneRem;
+        clearSentList();
         console.log("init : remote");
     }
     moveTo(enu.sceneIdx.WELCOME);
@@ -93,6 +107,13 @@ const clearLocList = () => {
     const local = document.getElementById('game-menu-list');
     while (local.firstChild) {local.removeChild(local.lastChild);}
 }
+
+export const clearSentList = () => {
+    const local = document.getElementById('game-menu-invite-sent-list');
+    while (local.firstChild) {local.removeChild(local.lastChild);}
+    invited = []
+}
+
 
 /*** utils ***/
 function isAlphaNumeric(str) {
@@ -195,33 +216,75 @@ export const moveTo = (i) => {
 }
 
 /*** event listener ****/
-fastGame.addEventListener('click', () => {
-    moveTo(enu.sceneIdx.TYPE);
-});
-
-tournament.addEventListener('click', () => {
-    status = enu.gameMode.TOURNAMENT;
-    moveTo(enu.sceneIdx.TYPE);
-});
-
-create.addEventListener('click', () => {
-    if (status === enu.gameMode.MATCH) gameSocket.send(JSON.stringify({'type': enu.EventGame.CREATE}));
-    else gameSocket.send(JSON.stringify({'type': enu.EventTournament.CREATE}));
+createMatch.addEventListener('click', () => {
+    status = enu.gameMode.MATCH;
+    gameSocket.send(JSON.stringify({'type': enu.EventGame.CREATE}));
     moveTo(enu.sceneIdx.CREATION);
 });
 
+createTournament.addEventListener('click', () => {
+    status = enu.gameMode.TOURNAMENT;
+    gameSocket.send(JSON.stringify({'type': enu.EventTournament.CREATE}));
+    moveTo(enu.sceneIdx.CREATION);
+});
+
+
 inviteButton.addEventListener('click', function() {
     var userInput = document.getElementById('game-menu-inviteInput').value;
+    if (userInput === "") return ;
     document.getElementById('game-menu-inviteInput').value = '';
+
     console.log('Texte saisi : ' + userInput);
+
+    if (status === enu.gameMode.MATCH) {
+        var inviteType = enu.EventGame.INVITE
+        var kickType = enu.EventGame.KICK
+    } else {
+        var inviteType = enu.EventTournament.INVITE;
+        var kickType = enu.EventTournament.KICK
+    }
+    
     gameSocket.send(JSON.stringify({
-        'type': enu.EventGame.INVITE,
+        'type': inviteType,
         'message': userInput
     }));
+    invited.push(userInput);
+
+    const   listItem = document.createElement('li');
+    listItem.className = 'remote-list-element';
+    
+    const   listItemName = document.createElement('span');
+    listItemName.textContent = userInput;
+
+    const   removeButton = document.createElement('button');
+    removeButton.textContent = 'Remove';
+    removeButton.className = 'accept-button';
+    removeButton.addEventListener('click', (e) => {
+        let pos = players.indexOf(e.target.parentNode.firstChild.innerHTML);
+        players.splice(pos, 1);
+        e.target.parentElement.remove();
+        gameSocket.send(JSON.stringify({
+            'type': kickType,
+            'message': userInput
+        }));
+    });
+    
+    const   listItemStatus = document.createElement('span');
+    listItemStatus.id = userInput;
+    listItemStatus.className = 'remote-list-element';
+    listItemStatus.textContent = '...waiting...';
+
+    listItem.appendChild(listItemName);
+    listItem.appendChild(removeButton);
+    listItem.appendChild(listItemStatus);
+
+    document.getElementById('game-menu-invite-sent-list').appendChild(listItem);
+
 });
 
 ready.addEventListener('click', () => {
-    gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
+    if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.READY}));
+    else gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
     if (status === enu.gameMode.LOCAL) {
         moveTo(enu.sceneLocIdx.MATCH);
         announceScore();
@@ -260,6 +323,9 @@ abandon.addEventListener('click', () => {
 
 home.addEventListener('click', () => {
     moveTo(enu.sceneIdx.WELCOME);
+    if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.QUIT}));
+    else gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
+    clearSentList();
 });
 
 nextMatch.addEventListener('click', () => {

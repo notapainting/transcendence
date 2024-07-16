@@ -120,6 +120,19 @@
     top:70%;
 
 }
+.remote-list{
+    position:absolute;
+
+}
+
+#remote-list-element{
+    left:60%;
+}
+
+#game-menu-invite-sent-list {
+    top:20%;
+    left:60%;
+}
 
 #game-menu-list {
     top:20%;
@@ -224,7 +237,7 @@
 
 #game-menu-home {
     display: none;
-    top: 70%;
+    top: 80%;
 }
 
 #game-menu-back {
