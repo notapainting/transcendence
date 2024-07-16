@@ -2,16 +2,21 @@ import { clearView } from "./index.js";
 import { isUserAuthenticated } from "./index.js";
 import { whoIam } from "./index.js";
 
+// enlever le bouton + lorsque la demande damis a ete accepte
+// enlever la notif lorsque lautre personne accepte
+
 const searchbar = document.querySelector('.searchbar');
 const searchResults = document.querySelector('.search-results');
 const displayMenu = document.querySelector('.display-menu');
 const messageInput = document.querySelector(".message-input");
 let host = window.location.host;
-let contactSummary;
+let contactSummary = null;
 
 let socket;
 
 let cpt = 0;
+
+let friendStatus = [];
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -60,7 +65,6 @@ const addToFriend = (target) => {
     catch (e) {
         console.log(e);
     }
-    console.log(target);
 }
 
 function addUserToMenu(target, profile_picture) {
@@ -81,14 +85,21 @@ function addUserToMenu(target, profile_picture) {
 
         const descriptionPersonDiv = document.createElement('div');
         descriptionPersonDiv.classList.add('description-person');
+        console.log(friendStatus);
         descriptionPersonDiv.innerHTML = `
-            <h4 class="username-person">${target}</h4>
+            <div class="username-status">
+                <h4 class="username-person">${target}</h4>
+                <span class="status ${friendStatus.find(elem => elem === target) ? "online" : "offline"}"><span>
+            </div>
             <div class="last-message">Last message</div>
         `;
-        const addFriend = document.createElement('i');
-        addFriend.classList.add("fa-solid", "fa-plus", "add-button");
-        addFriend.addEventListener("click", event => addToFriend(target));
-        personDiv.append(picturePersonDiv, descriptionPersonDiv, addFriend);
+        personDiv.append(picturePersonDiv, descriptionPersonDiv);
+        if (!contactSummary.data.contacts.find(elem => elem === target)){
+            const addFriend = document.createElement('i');
+            addFriend.classList.add("fa-solid", "fa-plus", "add-button");
+            addFriend.addEventListener("click", event => addToFriend(target));
+            personDiv.appendChild(addFriend);
+        }
         displayMenu.insertBefore(personDiv, displayMenu.children[1]);
         personDiv.removeEventListener("click", (event) => displayFocusedPerson(personDiv, targe, profile_picture));
         personDiv.addEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
@@ -156,8 +167,6 @@ let receiveMessage = async (message) => {
     messageInput.value = ``;
     const focusedPerson = document.querySelector('.person.focus');
     messageContainer.scrollTop = messageContainer.scrollHeight;
-    // if (focusedPerson === message.data.author)
-    //         messageContainer.style.display = 'flex';
 }
 
 
@@ -304,10 +313,55 @@ const newFriendRequest = (target) => {
     notificationContainer.appendChild(notifElem);
 }
 
+const deleteNotif = (target) => {
+    document.querySelector(`.notif[data-user="${target}"]`).remove();
+    cpt--;
+    incrDecrNotifNumber("decrement");
+}
+
+
+
+const deletePlusIcon = (target) => {
+    const personElem = document.querySelector(`.person[data-username="${target}"]`);
+    if (personElem){
+        const plusElem = personElem.querySelector(".add-button");
+        if (plusElem)
+            plusElem.remove();
+    }
+}
+
+let contactSummaryPromiseResolve;
+const contactSummaryPromise = new Promise(resolve => {
+    contactSummaryPromiseResolve = resolve;
+});
+let statusPromiseResolve;
+const statusPromise = new Promise(resolve => {
+    statusPromiseResolve = resolve;
+});
+
+const pushToContact = (target) => {
+    contactSummary.data.contacts.push(target);
+}
+
+const changeExistingStatus = (target, mode) => {
+    const personDiv = document.querySelector(`.person[data-username="${target}"]`);
+    if (personDiv){
+        const statusDiv = personDiv.querySelector(".status");
+        mode === "online" ? statusDiv.style.backgroundColor = "green" : statusDiv.style.backgroundColor = "gray"
+    }
+}
 
 async function handleMessage(message) {
-    if (message.type === 'group.summary'){
+    if (message.type === 'contact.summary'){
+        contactSummary = message;
         console.log(message);
+        fillNotification();
+        contactSummaryPromiseResolve();
+    }
+    else if (message.type === 'group.summary'){
+        console.log(message);
+        await contactSummaryPromise;
+        await statusPromise;
         while (displayMenu.children.length > 1) {
             displayMenu.removeChild(displayMenu.children[1]);
         }
@@ -319,11 +373,6 @@ async function handleMessage(message) {
             displayHistoryConversations(id, person, messages, personList);
         })
     }
-    else if (message.type === 'contact.summary'){
-        contactSummary = message;
-        console.log(message);
-        fillNotification();
-    }
     else if (message.type === 'group.update'){
         console.log("EVENT GROUP UPDATE");
         createGroup(message);
@@ -334,9 +383,33 @@ async function handleMessage(message) {
         receiveMessage(message);
     }
     else if (message.type === "contact.update"){
-        if (message.data.author !== whoIam && message.data.operation === "invitation")
-            newFriendRequest(message.data.author);
+        if (message.data.operation === "invitation"){
+            if (message.data.author !== whoIam){
+                newFriendRequest(message.data.author); //si je ne suis celui qui recoit linvit
+                deletePlusIcon(message.data.author);
+                pushToContact(message.data.author);
+            }
+            else {
+                deletePlusIcon(message.data.name); //si je suis celui qui envoie linvit
+                pushToContact(message.data.name);
+            }
+        }
+        if (message.data.author === whoIam && message.data.operation === "contact") //si je suis celui qui accepte
+            deleteNotif(message.data.name);
         console.log(message);
+    }
+    else if (message.type === "status.update"){
+        if (message.data.status === "o" || message.data.status === "online"){
+            friendStatus.push(message.data.author);
+            changeExistingStatus(message.data.author, "online");
+        }
+        else {
+            friendStatus = friendStatus.filter(author => author !== message.data.author);
+            changeExistingStatus(message.data.author, "offline");
+        }
+        statusPromiseResolve();
+        console.log(message);
+        console.log(friendStatus);
     }
 }
 
@@ -375,6 +448,8 @@ function displaySearchResults(users) {
     searchResults.innerHTML = '';
     if (users.length > 0) {
         users.forEach(user => {
+            if (user.username === whoIam)
+                return ;
             const userDiv = document.createElement('div');
             userDiv.classList.add('result-item');
             userDiv.textContent = user.username;
