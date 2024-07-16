@@ -308,7 +308,7 @@ back.addEventListener('click', () => {
 });
 
 exit.addEventListener('click', () => {
-    gameSocket.close();
+    if (gameSocket !== null) gameSocket.close();
     idx = enu.sceneIdx.WELCOME;
     console.log("quit")
     fullClear();

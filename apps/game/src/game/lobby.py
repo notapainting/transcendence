@@ -7,7 +7,7 @@ import game.enums as enu
 import random
 
 
-TOURNAMENT_MAX_PLAYER = 16
+TOURNAMENT_MAX_PLAYER = 4
 
 class Lobby:
     def __init__(self, host, n_players=2, types=enu.Game) -> None:
@@ -54,7 +54,7 @@ class Lobby:
         await self.broadcast({"type":self.types.READY, "author":user, "r":True})
 
     def ready(self):
-        if len(self._ready) == len(self._players):
+        if len(self._ready) == self.n_players:
             return True
         return False
 
