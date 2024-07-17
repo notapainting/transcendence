@@ -29,6 +29,7 @@ export const EventTournament = Object.freeze({
     MATCH: "tournament.match",
     RESULT: "tournament.result",
     BROKE: "tournament.broke",
+    END: "tournament.end",
 })
 
 export const EventLocal = Object.freeze({
@@ -51,10 +52,13 @@ export const EventError = Object.freeze({
 export const sceneIdx = Object.freeze({
     WELCOME: 0,
     CREATION:1,
-    READY:2,
-    MATCH:3,
-    END:4,
-    BROKE:5,
+    WAITING:2,
+    PHASES:3,
+    PREMATCH:4,
+    MATCH:5,
+    END:6,
+    END_TR:7,
+    BROKE:8,
 })
 
 export const sceneLocIdx = Object.freeze({

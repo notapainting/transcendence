@@ -74,19 +74,18 @@ enu.Local.QUIT
 const remoteHandler = (e) => {
     const content = JSON.parse(e.data);
     console.log("message: ", content.type);
-    updateInvitationList();
     switch(content.type) {
+// match
         case enu.EventGame.INVITE:
             console.log("invitation from: ", content.author);
-            invitations.push(content.author);
-            updateInvitationList();
+            updateInvitationList(enu.EventGame.INVITE, content.author);
             break;
         case enu.EventGame.JOIN:
             document.getElementById(content.author).innerHTML = 'accepted!';
             break;
         case enu.EventGame.ACCEPTED:
             game.gameRenderer(content.message);
-            moveTo(enu.sceneIdx.READY);
+            moveTo(enu.sceneIdx.PREMATCH);
             announceMatch(content.players);
             clearSentList();
             break;
@@ -126,6 +125,7 @@ const remoteHandler = (e) => {
             toggleLock();
             break;
         case enu.EventGame.BROKE:
+            fullClear();
             moveTo(enu.sceneIdx.END);
             break;
         case enu.EventGame.END:
@@ -133,10 +133,39 @@ const remoteHandler = (e) => {
             moveTo(enu.sceneIdx.END);
             break;
         case enu.EventGame.QUIT:
+            fullClear();
             moveTo(enu.sceneIdx.END);
             break;
         case enu.EventError.TYPE:
             console.error(content.type)
+            break;
+
+// tournament
+        case enu.EventTournament.INVITE:
+            console.log("invitation from: ", content.author);
+            updateInvitationList(enu.EventTournament.INVITE, content.author);
+            break;
+
+        case enu.EventTournament.JOIN:
+            break;
+
+        case enu.EventTournament.KICK:
+            break;
+        case enu.EventTournament.ACCEPTED:
+            break;
+        case enu.EventTournament.READY:
+            break;
+        case enu.EventTournament.PHASE:
+            break;
+        case enu.EventTournament.MATCH:
+            break;
+        case enu.EventTournament.RESULT:
+            break;
+        case enu.EventTournament.QUIT:
+            break;
+        case enu.EventTournament.BROKE:
+            break;
+        case enu.EventTournament.END:
             break;
         default:
             console.log("unknow type : ", content.type)
@@ -159,8 +188,46 @@ export const initWebSocket = (path) => {
     };
 }
 
+export const clearInvList = () => {
+    const local = document.getElementById('game-menu-invitationList');
+    while (local.firstChild) {local.removeChild(local.lastChild);}
+}
 
-function updateInvitationList() {
+function updateInvitationList(type, user) {
+    if (type === enu.EventGame.INVITE) {
+        var joinType = enu.EventGame.JOIN;
+        var typeGame = "match";
+    } else {
+        var joinType = enu.EventTournament.JOIN;
+        var typeGame = "tournoi";
+    }
+
+    const listItem = document.createElement('li');
+    listItem.className = 'remote-list-element';
+
+    const   listItemName = document.createElement('span');
+    listItemName.textContent = `(${typeGame}) ${user}`;
+    
+    const acceptButton = document.createElement('button');
+    acceptButton.textContent = 'Accepter';
+    acceptButton.className = 'accept-button';
+
+    acceptButton.addEventListener('click', function() {
+        acceptButton.disabled = true;
+        gameSocket.send(JSON.stringify({
+            'type': joinType,
+            'message': user
+        }));
+    });
+
+    listItem.appendChild(listItemName);
+    listItem.appendChild(acceptButton);
+
+    document.getElementById('game-menu-invitationList').appendChild(listItem);
+
+}
+
+function updateInvitationList2() {
     const invitationList = document.getElementById('game-menu-invitationList');
     invitationList.innerHTML = '';
 
