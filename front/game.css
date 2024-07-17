@@ -199,6 +199,19 @@
   background-color: #0056b3;
 }
 
+.remove-button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #ce0a31;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .remove-button:hover {
+    background-color: #ff008c;
+  }
+
 #game-menu-inviteInput {
   position: absolute;
   display: none;

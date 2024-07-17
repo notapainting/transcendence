@@ -1,5 +1,5 @@
 import { navigateTo } from "../index.js"
-import { gameSocket, clearGame } from "./websocket.js"
+import { gameSocket, clearGame, clearInvList } from "./websocket.js"
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import { gameData } from './game.js';
@@ -69,11 +69,15 @@ let     locked = false;
 
 // scene
 const   sceneRem = [
-    [createMatch, createTournament, invitationBox, exit], 
-    [userInput, inviteButton, invitationSent, ready, home], 
-    [bannerMatch, circle, exit], 
-    [bannerScore, pause, abandon], 
-    [home, exit],
+    [createMatch, createTournament, invitationBox, exit], // acceuil du jeu
+    [userInput, inviteButton, invitationSent, home], // creation de partie/tournoi (host only)
+    [], // waiting room pour creation de tournoi (guest only)
+    [bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
+    [bannerMatch, ready, circle, exit], // afk check
+    [bannerScore, pause, abandon], // in game
+    [bannerEnd, home, exit], // ecran de fin de match 
+    [], // ecran de fin de tournoi (recap)
+    [], // ecran erreur
 ];
 
 const   sceneLoc = [
@@ -258,7 +262,7 @@ inviteButton.addEventListener('click', function() {
 
     const   removeButton = document.createElement('button');
     removeButton.textContent = 'Remove';
-    removeButton.className = 'accept-button';
+    removeButton.className = 'remove-button';
     removeButton.addEventListener('click', (e) => {
         let pos = players.indexOf(e.target.parentNode.firstChild.innerHTML);
         players.splice(pos, 1);
@@ -311,6 +315,7 @@ exit.addEventListener('click', () => {
     if (gameSocket !== null) gameSocket.close();
     idx = enu.sceneIdx.WELCOME;
     console.log("quit")
+    clearInvList();
     fullClear();
     navigateTo("/")
 });

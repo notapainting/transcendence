@@ -299,7 +299,6 @@ class RemoteGamer(BaseConsumer):
             return
         await self.tournament.update_result(data)
 
-
     async def tournament_match(self, data):
         await self.send_json(data)
         if self.username == data['message']['host']:
@@ -307,7 +306,6 @@ class RemoteGamer(BaseConsumer):
             self.match = Match(self.username, data['author'])
         else:
             self.set_mode(enu.Game.GUEST)
-        
 
     async def tournament_broke(self, data):
         if self.status == enu.Tournament.HOST:
@@ -317,6 +315,9 @@ class RemoteGamer(BaseConsumer):
 
     async def tournament_quit(self, data):
         await self.tournament.kick(data['message'])
+
+    async def tournament_invite(self, data):
+        await self.send_json(data)
 
     async def tournament_kick(self, data):
         await self.send_json(data)

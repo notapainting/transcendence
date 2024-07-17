@@ -13,6 +13,7 @@ DONE:
     - use naviguateTo
     - clear threeJS scene at start/end
     - change game-button pause to resume 
+    - display score + username display
     LOCAL
     - merge match and tournament consumer
     - in game score + alias
@@ -22,7 +23,6 @@ DONE:
 TODO:
     MATCH
     - clear ThreeJS stuff after match 
-    - display score + username display
     - add a end screen :
         ==> handle game broke/game quit
         - back : send game data
@@ -31,7 +31,9 @@ TODO:
 
 
     TOURNAMENT
-    - everything
+    - waiting screen : current players ? invited ? waiting ???
+    - phase screen -> all mathch with current status + option to start match
+    - end screen 
 
     LOCAL
         - end matc hscreen, 
