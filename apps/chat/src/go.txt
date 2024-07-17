@@ -1,1 +1,0 @@
-{"winner":"islem","loser":"lael","score_w":"5","score_l":"6"}

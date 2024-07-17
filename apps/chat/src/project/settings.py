@@ -11,7 +11,7 @@ ROOT_URLCONF = 'project.urls'
 USE_I18N = True
 LANGUAGE_CODE = 'en-us'
 
-USE_TZ = False
+USE_TZ = True
 TIME_ZONE = 'CET'
 
 ADMIN_USERNAME = 'admin'

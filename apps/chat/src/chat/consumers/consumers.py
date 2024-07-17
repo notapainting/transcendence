@@ -76,7 +76,7 @@ class ChatConsumer(BaseConsumer):
         await self.accept(self.scope.get('subprotocol', None))
         logger.info("%s Connected!", self.user.name)
 
-        await self.send_json(await cuti.get_group_summary(self.user, n_messages=2))
+        await self.send_json(await cuti.get_group_summary(self.user))
         await self.send_json(await cuti.get_contact_summary(self.user))
 
         await self.channel_layer.group_add(self.user.name, self.channel_name)#attention au name
