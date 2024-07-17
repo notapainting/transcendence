@@ -86,10 +86,11 @@ function addUserToMenu(target, profile_picture) {
         const descriptionPersonDiv = document.createElement('div');
         descriptionPersonDiv.classList.add('description-person');
         console.log(friendStatus);
+        console.log(contactSummary);
         descriptionPersonDiv.innerHTML = `
             <div class="username-status">
                 <h4 class="username-person">${target}</h4>
-                <span class="status ${friendStatus.find(elem => elem === target) ? "online" : "offline"}" style="display: ${friendStatus.find(elem => elem === target) ? 'inline-block' : 'none'};"><span>
+                <span class="status ${friendStatus.find(elem => elem === target) ? "online" : "offline"}" style="display: ${friendStatus.find(elem => elem === target) || contactSummary.data.contacts.find(elem => elem === target) ? 'inline-block' : 'none'};"><span>
             </div>
             <div class="last-message">Last message</div>
         `;
