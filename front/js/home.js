@@ -39,7 +39,9 @@ function authenticateWith42() {
 
 let isScrolling = false;
 
-const scrollUpEffect = (event) => {
+
+
+const scrollUpEffect = (event, path) => {
     document.removeEventListener('wheel', scrollDownEffect);
     event.preventDefault();
     window.scrollTo({
@@ -83,6 +85,10 @@ const scrollUpEffect = (event) => {
                         backThrees.style.transform = `scale(${zoomFactor * 3})`;
                         backgroundThrees.style.filter = 'blur(0px)';
                         backThrees.style.opacity = "0";
+                        setTimeout(() => {
+                            navigateTo(path);
+                         }, 800);
+
                 }
             }, i * 180);
         }
@@ -228,6 +234,7 @@ const loginRequest = (event) => {
         console.log("YOOO")
         console.log(data)
         loggedInStatus(data.profile_picture, data.username);
+        
     })  
     .catch(error => {
     })
@@ -335,6 +342,7 @@ const adjustZoom = (event) => {
             setTimeout(() => {
                document.querySelectorAll(".parallax-items").forEach(x => x.style.display = "none")
             }, 800);
+
     }
     indexZoom++;
     setTimeout(() => {
@@ -379,15 +387,11 @@ const playOfflineBtnElement = document.querySelector(".play-offline-btn");
 const playOnlineBtnElement = document.querySelector(".play-online-btn");
 
 playOfflineBtnElement.addEventListener("click", event => {
-    navigateTo("/local");
+    scrollUpEffect(event, "/local");
 })
 
 playOnlineBtnElement.addEventListener("click", event => {
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-    });
-    navigateTo("/play");
+    scrollUpEffect(event, "/play");
 })
 
 

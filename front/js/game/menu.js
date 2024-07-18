@@ -95,7 +95,7 @@ const   sceneLoc = [
 /*** initialisation ****/
 export const initMenu = (path) => {
     if (path === enu.backendPath.LOCAL) {
-        status = enu.gameMode.LOCAL;
+        status = enu.gameMode.ANON;
         scene = sceneLoc;
         players = [];
         clearLocList();
@@ -321,10 +321,10 @@ back.addEventListener('click', () => {
 });
 
 exit.addEventListener('click', () => {
-    // if (status === enu.gameMode.LOCAL)
-    if (gameSocket !== null) gameSocket.close();
+    if (status === enu.gameMode.ANON && gameSocket !== null) gameSocket.close();
+
     idx = enu.sceneIdx.WELCOME;
-    console.log("quit")
+    console.log("quit");
     clearInvList();
     fullClear();
     navigateTo("/")
@@ -348,7 +348,7 @@ nextMatch.addEventListener('click', () => {
 })
 
 start.addEventListener('click', () => {
-    if (status === enu.gameMode.LOCAL) {
+    if (status === enu.gameMode.LOCAL || status === enu.gameMode.ANON) {
         gameSocket.send(JSON.stringify({
             'type': enu.EventLocal.PLAYERS,
             'message':players,

@@ -211,7 +211,6 @@ async def local_loop(self):
     global reset
     try :
         while self.local_game_state.status['game_running']:
-            print(f"we starte")
             end, score = self.local_game_state.update()
             if score is not None:
                 score['players'] = self.local_current[self.local_matchIdx]
