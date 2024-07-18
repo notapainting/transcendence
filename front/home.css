@@ -458,8 +458,9 @@ input:focus::placeholder {
     cursor: pointer;
 }
 
-.play-offline-btn {
+.play-btn {
     background-image: url("img/play-offline.png");
+    transition: transform 0.5s ease;
 }
 
 
