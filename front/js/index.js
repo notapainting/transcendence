@@ -74,7 +74,7 @@ function resetHomePage() {
 
 const router = async () => {
     console.log("Appel Router")
-    if (window.location.pathname === '/') { // Remplacez '/your-home-page-path' par le chemin de votre page d'accueil
+    if (window.location.pathname === '/') { 
         resetHomePage();
     }
     const routes = [
