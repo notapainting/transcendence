@@ -51,9 +51,32 @@ export const isUserAuthenticated = () => {
         return false;
     });
 };
+function resetHomePage() {
+    const backThrees = document.querySelector('.back-threes');
+    const backgroundThrees = document.querySelector('.background-threes');
+    const middleThrees = document.querySelector('.middle-threes');
+    const frontThrees = document.querySelector('.front-threes');
+    
+    backThrees.style.transform = 'scale(1)';
+    backgroundThrees.style.filter = 'blur(0px)';
+    middleThrees.style.transform = 'scale(1)';
+    frontThrees.style.transform = 'scale(1)';
+    
+    document.querySelectorAll(".banner").forEach(x => x.style.opacity = "1");
+    frontThrees.style.opacity = "1";
+    middleThrees.style.opacity = "1";
+    backThrees.style.opacity = "1";
+
+    document.querySelector("#game").style.display = " none"
+    document.querySelector("#game").style.opacity = "0";
+}
+
 
 const router = async () => {
     console.log("Appel Router")
+    if (window.location.pathname === '/') { // Remplacez '/your-home-page-path' par le chemin de votre page d'accueil
+        resetHomePage();
+    }
     const routes = [
         {path: "/", view:() => showHome() },
         {path: "/profile", view:() => showProfile()},
@@ -76,6 +99,8 @@ const router = async () => {
     }
     match.route.view()
 };
+
+
 
 window.addEventListener("popstate", router);
 
