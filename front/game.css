@@ -233,6 +233,10 @@
     top: 70%;
 }
 
+#game-menu-local{
+    top:90%;
+}
+
 #game-menu-exit {
     display: none;
     top: 80%;

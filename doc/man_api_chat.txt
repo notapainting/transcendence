@@ -216,7 +216,7 @@ WebSocket :
                         {
                             "author":"",
                             "name":"target",
-                            "operation":"contact/blocked/invitation/remove"
+                            "operation":"contact/blocked/invitation/remove/deny"
                         }
                     }
 

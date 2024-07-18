@@ -22,6 +22,7 @@ const   locContainerList = document.getElementById('game-menu-list-tournament');
 // <!-- choose mode -->
 const   createMatch = document.getElementById('game-menu-fastGame');
 const   createTournament = document.getElementById('game-menu-tournament');
+const   startLocal = document.getElementById('game-menu-local');
 
 // <!-- invite player -->
 const   userInput = document.getElementById('game-menu-inviteInput');
@@ -70,7 +71,7 @@ let     locked = false;
 
 // scene
 const   sceneRem = [
-    [createMatch, createTournament, invitationBox, exit], // acceuil du jeu
+    [startLocal,createMatch, createTournament, invitationBox, exit], // accueil du jeu
     [userInput, inviteButton, invitationSent, home], // creation de partie/tournoi (host only)
     [], // waiting room pour creation de tournoi (guest only)
     [bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
@@ -234,6 +235,13 @@ createTournament.addEventListener('click', () => {
 });
 
 
+startLocal.addEventListener('click', () => {
+    status = enu.gameMode.LOCAL;
+    gameSocket.send(JSON.stringify({'type': enu.EventLocal.MODE}));
+    scene = sceneLoc;
+    moveTo(enu.sceneIdx.WELCOME);
+})
+
 inviteButton.addEventListener('click', function() {
     var userInput = document.getElementById('game-menu-inviteInput').value;
     if (userInput === "") return ;
@@ -313,6 +321,7 @@ back.addEventListener('click', () => {
 });
 
 exit.addEventListener('click', () => {
+    // if (status === enu.gameMode.LOCAL)
     if (gameSocket !== null) gameSocket.close();
     idx = enu.sceneIdx.WELCOME;
     console.log("quit")

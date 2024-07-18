@@ -76,7 +76,7 @@ class ChatConsumer(BaseConsumer):
         await self.accept(self.scope.get('subprotocol', None))
         logger.info("%s Connected!", self.user.name)
 
-        await self.send_json(await cuti.get_group_summary(self.user, n_messages=2))
+        await self.send_json(await cuti.get_group_summary(self.user))
         await self.send_json(await cuti.get_contact_summary(self.user))
 
         await self.channel_layer.group_add(self.user.name, self.channel_name)#attention au name
@@ -132,7 +132,7 @@ class ChatConsumer(BaseConsumer):
 
     async def status_fetch(self, event):
         logger.info(event)
-        await self.channel_layer.group_send(event['data']['author'], {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":"o"}})
+        await self.channel_layer.group_send(event['data']['author'], {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":mod.User.Status.ONLINE}})
 
     async def message_text(self, event):
         await self.send_json(event)
@@ -147,11 +147,14 @@ class ChatConsumer(BaseConsumer):
         await self.send_json(event)
 
     async def contact_update(self, event):
-        self.contact_list = await cuti.get_contact_list()
+        self.contact_list = await cuti.get_contact_list(self.user)
+        for contact in self.contact_list:
+            await self.channel_layer.group_send(contact, {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":mod.User.Status.ONLINE}})
+            await self.channel_layer.group_send(contact, {"type":enu.Event.Status.FETCH, "data":{"author":self.user.name}})
         await self.send_json(event)
 
     async def group_update(self, event):
-        self.group_list = await cuti.get_group_list()
+        self.group_list = await cuti.get_group_list(self.user)
         for id in self.group_list:
             await self.channel_layer.group_add(id, self.channel_name)
         await self.send_json(event)

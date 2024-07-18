@@ -5,6 +5,9 @@ import uuid
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
+
+import user_managment.models as mod
 
 from django.utils import timezone
 def validate_date_of_birth(value):
@@ -70,3 +73,25 @@ class UserSerializer(serializers.ModelSerializer):
 			setattr(instance, attr, value)
 		instance.save()
 		return instance
+
+
+# fields
+class UserRelatedField(serializers.RelatedField):
+    def display_value(self, instance):
+        return instance
+    def to_representation(self, value):
+        return str(value)
+    def to_internal_value(self, data):
+        try :
+            return mod.CustomUser.objects.get(username=data)
+        except ObjectDoesNotExist:
+            raise ValidationError({'User': 'User not found'})
+
+class MatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = mod.Match
+        fields = ['winner', 'loser', 'score_w', 'score_l', 'date']
+    
+    winner = UserRelatedField(queryset=mod.CustomUser.objects.all())
+    loser = UserRelatedField(queryset=mod.CustomUser.objects.all())
+

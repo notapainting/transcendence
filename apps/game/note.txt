@@ -34,6 +34,9 @@ TODO:
     - waiting screen : current players ? invited ? waiting ???
     - phase screen -> all mathch with current status + option to start match
     - end screen 
+        BACK -> trn kick 
+            -> start match
+            -> new phase auto
 
     LOCAL
         - end matc hscreen, 

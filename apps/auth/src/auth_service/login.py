@@ -28,15 +28,18 @@ class CustomTokenRefreshView(TokenRefreshView):
 			return Response({'error': 'Refresh token cookie not found'}, status=status.HTTP_400_BAD_REQUEST)
 		try:
 			refresh_token = RefreshToken(refresh_token_cookie)
+			print(refresh_token)
 			access_token = refresh_token.access_token
+			print(access_token)
 			user_id = access_token['user_id']
-			user = User.objects.get(id=user_id)
+			user = CustomUser.objects.get(id=user_id)
 			username = user.username
 
 			response = Response({'username': username}, status=status.HTTP_200_OK)
 			response.set_cookie('access', str(access_token), httponly=True, secure=True)
 			return response
 		except Exception as e:
+			print(e)
 			return Response({'error': 'Failed to refresh access token'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

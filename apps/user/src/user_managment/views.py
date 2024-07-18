@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from rest_framework.views import APIView
 from user_managment.serializers import UserSerializer
 from rest_framework.response import Response
@@ -7,6 +7,13 @@ from user_managment.models import CustomUser
 import requests
 from django.core.files.base import ContentFile
 from django.core.files.images import ImageFile
+
+from user_managment.serializers import MatchSerializer
+from user_managment.models import Match
+from rest_framework.serializers import ValidationError as DrfValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+
+
 
 
 class UserCreate(APIView):
@@ -122,3 +129,46 @@ class GetAllUserInfos(APIView):
 				for user in users
 			]
 			return Response(user_data, status=status.HTTP_200_OK)
+		
+
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+from io import BytesIO
+from django.db.models import Q
+
+def parse_json(data):
+    return JSONParser().parse(BytesIO(data))
+
+def render_json(data):
+        return (JSONRenderer().render(data))
+
+class MatchHistory(APIView):
+    def post(self, request, username):
+        try :
+            data = parse_json(request.body)
+            s = MatchSerializer(data=data)
+            s.is_valid(raise_exception=True)
+            s.create(s.validated_data)
+            return HttpResponse(status=201)
+        except DrfValidationError:
+            return HttpResponse(status=400)
+
+    def get(self, request, username):
+        try :
+            qset1 = Match.objects.filter(winner__username=username)
+            qset2 = Match.objects.filter(loser__username=username)
+            m = qset1.union(qset1, qset2)
+            s = MatchSerializer(m, many=True)
+            return HttpResponse(status=200, content=s.data)
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
+
+    def delete(self, request, username):
+        try :
+            qset1 = Match.objects.filter(winner__username=username)
+            qset2 = Match.objects.filter(loser__username=username)
+            m = qset1.union(qset1, qset2)
+            m.delete()
+            return HttpResponse(status=200)
+        except (ValidationError, ObjectDoesNotExist):
+            return HttpResponse(status=404)
