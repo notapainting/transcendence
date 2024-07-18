@@ -11,6 +11,7 @@ function updateTimer() {
 }
 
 export let gameSocket = null;
+export let localGameSocket = null;
 
 async function sleep (ms) { new Promise(r => setTimeout(r, ms));}
 
@@ -70,6 +71,35 @@ enu.Local.NEXT
 enu.Local.QUIT
 */
 
+export const initLocalGameWebSocket = () => {
+    if (localGameSocket !== null) return ; 
+    localGameSocket = new WebSocket(
+        'wss://'
+        + window.location.host
+        + enu.backendPath.LOCAL
+    );
+    localGameSocket.onmessage = localHandler;
+    localGameSocket.onclose = function(e) {
+        console.log('GameWebSocket connection closed');
+        setTimeout(initLocalGameWebSocket, 5000)
+        localGameSocket = null;
+    };
+}
+
+export const initGameWebSocket = () => {
+    if (gameSocket !== null) return ; 
+    gameSocket = new WebSocket(
+        'wss://'
+        + window.location.host
+        + enu.backendPath.REMOTE
+    );
+    gameSocket.onmessage = remoteHandler;
+    gameSocket.onclose = function(e) {
+        console.log('GameWebSocket connection closed');
+        setTimeout(initGameWebSocket, 5000)
+        gameSocket = null;
+    };
+}
 
 const remoteHandler = (e) => {
     const content = JSON.parse(e.data);
@@ -207,21 +237,6 @@ const remoteHandler = (e) => {
     }
 };
 
-export const initWebSocket = (path) => {
-    if (gameSocket !== null) return ; 
-    gameSocket = new WebSocket(
-        'wss://'
-        + window.location.host
-        + path
-    );
-    if (path === enu.backendPath.REMOTE) gameSocket.onmessage = remoteHandler;
-    else gameSocket.onmessage = localHandler;
-    gameSocket.onclose = function(e) {
-        fullClear();
-        console.log('Game socket closed');
-        gameSocket = null;
-    };
-}
 
 export const clearInvList = () => {
     const local = document.getElementById('game-menu-invitationList');
