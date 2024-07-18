@@ -1,3 +1,4 @@
+
 .containerGame {
     display: flex;
     flex-direction: column;
@@ -5,7 +6,6 @@
     justify-content: center;
     background-color: #0066CC;
   }
-
 
 #scoreMessage {
     position: absolute;
@@ -120,6 +120,19 @@
     top:70%;
 
 }
+.remote-list{
+    position:absolute;
+
+}
+
+#remote-list-element{
+    left:60%;
+}
+
+#game-menu-invite-sent-list {
+    top:20%;
+    left:60%;
+}
 
 #game-menu-list {
     top:20%;
@@ -186,6 +199,19 @@
   background-color: #0056b3;
 }
 
+.remove-button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #ce0a31;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .remove-button:hover {
+    background-color: #ff008c;
+  }
+
 #game-menu-inviteInput {
   position: absolute;
   display: none;
@@ -207,6 +233,10 @@
     top: 70%;
 }
 
+#game-menu-local{
+    top:90%;
+}
+
 #game-menu-exit {
     display: none;
     top: 80%;
@@ -224,7 +254,7 @@
 
 #game-menu-home {
     display: none;
-    top: 70%;
+    top: 80%;
 }
 
 #game-menu-back {
@@ -238,6 +268,7 @@
 }
 
 .button-menu {
+    perspective: 40vw;
     position: absolute;
     left: 30%;
     transform: translate(-50%, -50%);
@@ -290,3 +321,126 @@
   #ee0e0e red
   
   */
+
+
+
+/* TOURNAMENT */
+
+.containerTournament {
+    position: absolute;
+    top:50px;
+    width: 500px;
+    height: 500px;
+    background-color: #024ba5;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    overflow: hidden;
+}
+
+/* .form-container {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+} */
+
+h1 {
+    margin-bottom: 20px;
+}
+
+form {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    width: calc(100% - 22px);
+    margin-right: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.player-box {
+    height: 300px; 
+    overflow-y: auto; 
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #024ba5;
+}
+
+.player-box::-webkit-scrollbar {
+    width: 8px; 
+}
+
+.player-box::-webkit-scrollbar-thumb {
+    background-color: #003369;
+    border-radius: 10px; 
+}
+
+.player-box::-webkit-scrollbar-track {
+    background-color: #2b5f97; 
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+}
+
+
+.player-box h2 {
+    margin-top: 0;
+    height: 200px;
+    overflow-y: auto; 
+    border: 1px solid #ddd;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.list-tournoi-element {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-tournoi-element span {
+    flex-grow: 1;
+    color: #000;
+}
+
+.accept-button {
+    padding: 5px 10px;
+    font-size: 14px;
+    color: #fff;
+    background-color: #dc3545;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.accept-button:hover {
+    background-color: #c82333;
+}

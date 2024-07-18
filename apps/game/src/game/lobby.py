@@ -1,13 +1,13 @@
 # game/lobby.py
 
 from channels.layers import get_channel_layer
-from game.consumers import GameState
+from game.gamestate import GameState
 
 import game.enums as enu
 import random
 
 
-TOURNAMENT_MAX_PLAYER = 16
+TOURNAMENT_MAX_PLAYER = 4
 
 class Lobby:
     def __init__(self, host, n_players=2, types=enu.Game) -> None:
@@ -38,10 +38,14 @@ class Lobby:
         self._invited.discard(user)
         await self._chlayer.group_send(user, {"type":self.types.KICK, "author":self.host})
 
+    def add(self, user):
+        self._players.add(user)
+
     async def add_ready(self, user):
         if user == "":
             return ;
         self._ready.add(user)
+
         await self.broadcast({"type":self.types.READY, "author":user, "r":True})
 
     def ready(self):
@@ -131,11 +135,11 @@ class Tournament(Lobby):
         random.shuffle(tmp)
         self.current = [(tmp[i],tmp[i + 1]) for i in range(0, len(tmp), 2)]
         self.match_count = len(self.current)
-        self.broadcast({"type":types.PHASE, "message":self.current, "author":self.host})
+        self.broadcast({"type":self.types.PHASE, "message":self.current, "author":self.host})
 
     async def order_match(self):
         for match in self.current:
-            message = {"type":types.MATCH, "author":self.host, "message":{"host":match[0],"guest":match[1]}}
+            message = {"type":self.types.MATCH, "author":self.host, "message":{"host":match[0],"guest":match[1]}}
             await self._chlayer.group_send(match[0], message)
             await self._chlayer.group_send(match[1], message)
 
@@ -147,3 +151,6 @@ class Tournament(Lobby):
         self.match_count -= 1
         if self.match_count == 0:
             await self.make_phase()
+
+    def players_state(self):
+        return {"invited":list(self._invited), "players":list(self._players), "host":self.host, "size":self.n_players}

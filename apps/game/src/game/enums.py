@@ -37,10 +37,12 @@ class Tournament(enum.StrEnum):
 
     CREATE = "tournament.create"
     INVITE = "tournament.invite"
+    DENY = "tournament.deny"
     JOIN = "tournament.join"
     QUIT = "tournament.quit"
     KICK = "tournament.kick"
     ACCEPTED = "tournament.accepted"
+    READY = "tournament.ready"
     PHASE = "tournament.phase"
     MATCH = "tournament.match"
     RESULT = "tournament.result"
@@ -48,6 +50,7 @@ class Tournament(enum.StrEnum):
 
 
 class Local(enum.StrEnum):
+    MODE = "local.mode"
     PLAYERS = "local.players"
     PHASE = "local.phase"
     MATCH = "local.match"
@@ -58,7 +61,7 @@ class Local(enum.StrEnum):
     NEXT = "local.next"
     END_GAME = "local.end.game"
     END_TRN = "local.end.tournament"
-    QUIT = "local.quit"
+    QUIT = Game.QUIT
 
 class CStatus(enum.StrEnum):
     IDLE = "status.idle"
