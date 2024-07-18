@@ -379,7 +379,7 @@ const playOfflineBtnElement = document.querySelector(".play-offline-btn");
 const playOnlineBtnElement = document.querySelector(".play-online-btn");
 
 playOfflineBtnElement.addEventListener("click", event => {
-    navigateTo("/play/local");
+    navigateTo("/local");
 })
 
 playOnlineBtnElement.addEventListener("click", event => {
