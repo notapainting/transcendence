@@ -2,6 +2,20 @@ import { navigateTo, whoIam } from "./index.js";
 import { clearView, isUserAuthenticated } from "./index.js";
 import { fetchUsers, initializeWebSocket, showChat } from "./chat.js";
 
+export const getPersInfo = () => {
+    return fetch('/auth/get_pers_infos/', {
+        method: 'GET',
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok)
+            return response.json();
+        else {
+            throw new Error("Unauthorized");
+        }
+    })
+}
+
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
     const middleThrees = document.querySelector('.middle-threes');
