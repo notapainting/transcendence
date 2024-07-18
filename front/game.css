@@ -140,7 +140,14 @@
 }
 
 #game-menu-start {
-    top:70%;
+    top:80%;
+    left: calc(50% - 150px);
+}
+
+#game-menu-exit {
+    display: none;
+    top: 80%;
+    left: calc(50% + 150px);
 }
 
 #game-pause {
@@ -237,10 +244,7 @@
     top:90%;
 }
 
-#game-menu-exit {
-    display: none;
-    top: 80%;
-}
+
 
 #game-menu-create {
     display: none;
@@ -328,12 +332,13 @@
 
 .containerTournament {
     position: absolute;
-    top:50px;
+    top: 250px;
+    left: calc(50% + 50px);
     width: 500px;
-    height: 500px;
+    height: 530px;
     background-color: #024ba5;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     overflow: hidden;
@@ -356,7 +361,7 @@ form {
     justify-content: center;
 }
 
-input[type="text"] {
+input[type="textList"] {
     padding: 10px;
     font-size: 16px;
     border: 1px solid #000000;
@@ -365,7 +370,7 @@ input[type="text"] {
     margin-right: 10px;
 }
 
-button {
+#game-menu-local-input-button {
     padding: 10px 20px;
     font-size: 16px;
     color: #fff;
@@ -375,7 +380,7 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+#game-menu-local-input-button:hover {
     background-color: #0056b3;
 }
 
@@ -383,8 +388,8 @@ button:hover {
     height: 300px; 
     overflow-y: auto; 
     padding: 10px;
-    border-radius: 4px;
-    background-color: #024ba5;
+    border-radius: 10px;
+    background-color: #0c58b4;
 }
 
 .player-box::-webkit-scrollbar {
@@ -443,4 +448,118 @@ ul {
 
 .accept-button:hover {
     background-color: #c82333;
+}
+
+
+/*  SETTINGS TOURNOI */
+
+
+.settings-box {
+    position: absolute;
+    top: 230px;
+    right: calc(50% + 50px);
+    width: 500px;
+    height: 530px;
+    background-color: #024ba5;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    color: #ffffff;
+
+}
+
+.settings-box h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.settings-list {
+    list-style-type: none; 
+    padding: 0;
+}
+
+.settings-list li {
+    margin-bottom: 15px;
+}
+
+.toggle-item {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-item label {
+    flex: 1;
+    margin-bottom: 0; 
+}
+
+.toggle-button {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-left: 10px; 
+}
+
+.toggle-input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-label {
+    display: block;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.toggle-label:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.toggle-input:checked + .toggle-label {
+    background-color: #007bff;
+}
+
+.toggle-input:checked + .toggle-label:before {
+    transform: translateX(26px);
+}
+
+.center-button {
+    position: absolute; 
+    bottom: 20px;
+    left: 50%; 
+    transform: translateX(-50%);
+    text-align: center; 
+}
+
+
+#saveSettingsButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#saveSettingsButton:hover {
+    background-color: #0056b3;
 }
