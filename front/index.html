@@ -242,28 +242,19 @@
                     </li>
                     <li class="score-item">
                         <label for="score">Score maximum :</label>
-                        <select id="score" name="score"> 
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5" selected>5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                            <option value="13">13</option>
-                            <option value="14">14</option>
-                            <option value="15">15</option>
-                        </select>
+                        <input type="range" id="scoreRange" name="scoreRange" min="1" max="15" value="5" oninput="this.nextElementSibling.value = this.value">
+                        <output>5</output>
+                    </li>
+                    <li class="score-item">
+                        <label for="players">Nombre joueurs max :</label>
+                        <input type="range" id="playersRange" name="playersRange" min="2" max="24" step="2" value="4" oninput="this.nextElementSibling.value = this.value">
+                        <output>4</output>
                     </li>
                 </ul>
                 <div class="center-button">
-                    <button type="button" id="saveSettingsButton">Enregistrer</button>
-                </div>
+                    <button type="button" class="settings-button">Réinitialiser</button>
+                    <button type="button" class="settings-button">Enregistrer</button>
+                </div>                
             </div>
                   
             
@@ -273,11 +264,6 @@
             <button id="game-menu-home" class="menu-element button-menu" type="button">Menu</button> 
             <button id="game-menu-next" class="menu-element button-menu" type="button">Next Match</button> 
             <button id="game-menu-start" class="menu-element button-menu" type="button">Start</button> 
-
-            <!-- local  -->
-            <input type="text" id="game-menu-local-input" class="list-tournoi menu-element" placeholder="Nom d'un joueur...">
-            <button id="game-menu-local-input-button" class="list-tournoi menu-element button-menu">Add</button>
-            <ul id ="game-menu-list" class="list-tournoi menu-element"></ul>
 
             <!-- remote -->
             <!-- choose mode -->
