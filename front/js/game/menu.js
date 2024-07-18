@@ -16,6 +16,7 @@ const   nextMatch = document.getElementById('game-menu-next');
 const   locInput = document.getElementById('game-menu-local-input');
 const   locInputBut = document.getElementById('game-menu-local-input-button');
 const   locList = document.getElementById('game-menu-list');
+const   locContainerList = document.getElementById('game-menu-list-tournament');
 
 // <!-- remote -->
 // <!-- choose mode -->
@@ -81,7 +82,7 @@ const   sceneRem = [
 ];
 
 const   sceneLoc = [
-    [locInput, locInputBut, locList, start, exit],
+    [locInput, locInputBut, locList, start, exit, locContainerList],
     [bannerPhase, nextMatch, exit],
     [bannerMatch, ready],
     [bannerScore, pause, exit],

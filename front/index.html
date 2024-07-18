@@ -213,6 +213,20 @@
 
         </div>
         <div id="game-menu">
+
+            <div id="game-menu-list-tournament" class="containerTournament">
+                <h1>Tournoi de Pong</h1>
+                <form id="playerForm">
+                    <input type="text" id="game-menu-local-input" placeholder="Ajouter un joueur" required>
+                    <button type="button" id="game-menu-local-input-button">Ajouter</button>
+                </form>
+                <h1>Joueurs :</h1>
+                <div class="player-box" id="playerBox">
+                    <ul id="game-menu-list"></ul>
+                </div>        
+            </div>
+
+            
             
             <!-- deplacement -->
             <button id="game-menu-exit" class="menu-element button-menu" type="button">Exit</button>
@@ -220,7 +234,7 @@
             <button id="game-menu-home" class="menu-element button-menu" type="button">Menu</button> 
             <button id="game-menu-next" class="menu-element button-menu" type="button">Next Match</button> 
             <button id="game-menu-start" class="menu-element button-menu" type="button">Start</button> 
-            
+
             <!-- local  -->
             <input type="text" id="game-menu-local-input" class="list-tournoi menu-element" placeholder="Nom d'un joueur...">
             <button id="game-menu-local-input-button" class="list-tournoi menu-element button-menu">Add</button>
