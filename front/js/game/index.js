@@ -14,7 +14,11 @@ const initGame = (path) => {
     clearView();
     fullClear();
     initWebSocket(path);
-    document.querySelector("#game").style.display = "block";
+    document.querySelector("body").style.backgroundColor = "#34A0A4"
+    document.querySelector("#game").style.display = " block"
+    setTimeout(()=> {
+        document.querySelector("#game").style.opacity = "1";
+    }, 200)
     initMenu(path);
 }
 
