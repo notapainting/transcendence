@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore } from './menu.js';
+import { announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearSentList } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
@@ -74,28 +74,61 @@ enu.Local.QUIT
 const remoteHandler = (e) => {
     const content = JSON.parse(e.data);
     console.log("message: ", content.type);
-    updateInvitationList();
     switch(content.type) {
-        case enu.EventGame.INVITE:
-            console.log("invitation from: ", content.author);
-            invitations.push(content.author);
-            updateInvitationList();
+// LOCAL
+        case enu.EventLocal.PHASE:
+            moveTo(enu.sceneLocIdx.PHASE);
+            announcePhase(content.message);
             break;
-        case enu.EventGame.JOIN:
-            game.gameRenderer(content.message);
-            break;
-        case enu.EventGame.ACCEPTED:
+        case enu.EventLocal.MATCH:
+            moveTo(enu.sceneLocIdx.PREMATCH);
+            announceMatch(content.message);
             document.addEventListener('keydown', bindKeyPress)
             document.addEventListener('keyup', bindKeyRelease)
+            game.gameRenderer(content.state);
+            if (gameData.start) {
+                if (!gameData.timerInterval)
+                    gameData.timerInterval = setInterval(updateTimer, 1000);
+            } else {
+                gameData.sceneHandler = 1;
+                game.gameRenderer(null);
+            }
+            break;
+        case enu.EventLocal.END_GAME:
+            clearGame();
+            document.removeEventListener('keydown', bindKeyPress)
+            document.removeEventListener('keyup', bindKeyRelease)
+            announceWinner(content.message);
+            moveTo(enu.sceneLocIdx.END_GAME)
+            setTimeout(askNext, 3000);
+            break;
+        case enu.EventLocal.END_TRN:
+            moveTo(enu.sceneLocIdx.END)
+            break;
+
+// match
+        case enu.EventGame.INVITE:
+            console.log("invitation from: ", content.author);
+            updateInvitationList(enu.EventGame.INVITE, content.author);
+            break;
+        case enu.EventGame.JOIN:
+            // not used
+            document.getElementById(content.author).innerHTML = 'accepted!';
+            break;
+        case enu.EventGame.ACCEPTED:
+            // when accepted for a match
             game.gameRenderer(content.message);
-            moveTo(enu.sceneIdx.READY);
+            moveTo(enu.sceneIdx.PREMATCH);
             announceMatch(content.players);
+            clearSentList();
             break;
         case enu.EventGame.READY:
             document.getElementById('game-menu-ready-circle').style.background = '#0eee28';
             break;
         case enu.EventGame.START:
             moveTo(enu.sceneIdx.MATCH);
+            document.addEventListener('keydown', bindKeyPress)
+            document.addEventListener('keyup', bindKeyRelease)
             announceScore();
             if (gameData.start) {
                 if (!gameData.timerInterval)
@@ -125,16 +158,49 @@ const remoteHandler = (e) => {
             toggleLock();
             break;
         case enu.EventGame.BROKE:
-            moveTo(enu.sceneIdx.END);
-            break;
-        case enu.EventGame.END:
-            moveTo(enu.sceneIdx.END);
-            break;
+            // connection lost
+        case enu.EventGame.DENY:
+            // try to join a match but refused
         case enu.EventGame.QUIT:
+            // a player has quit match
+        case enu.EventGame.END:
+            fullClear();
             moveTo(enu.sceneIdx.END);
             break;
         case enu.EventError.TYPE:
             console.error(content.type)
+            break;
+
+// tournament
+        case enu.EventTournament.INVITE:
+            console.log("invitation from: ", content.author);
+            updateInvitationList(enu.EventTournament.INVITE, content.author);
+            break;
+
+        case enu.EventTournament.JOIN:
+            // receive new player sjoining trn
+            break;
+
+        case enu.EventTournament.ACCEPTED:
+            // received whe naccepted in trn
+            break;
+        case enu.EventTournament.READY:
+            // players is ready 
+            break;
+        case enu.EventTournament.PHASE:
+            // planning of match for that phase
+            break;
+        case enu.EventTournament.MATCH:
+            // match you have to play
+            break;
+        case enu.EventTournament.RESULT:
+            // result of a match
+            break;
+        case enu.EventTournament.QUIT:
+        case enu.EventTournament.DENY:
+        case enu.EventTournament.KICK:
+        case enu.EventTournament.BROKE:
+        case enu.EventTournament.END:
             break;
         default:
             console.log("unknow type : ", content.type)
@@ -157,8 +223,46 @@ export const initWebSocket = (path) => {
     };
 }
 
+export const clearInvList = () => {
+    const local = document.getElementById('game-menu-invitationList');
+    while (local.firstChild) {local.removeChild(local.lastChild);}
+}
 
-function updateInvitationList() {
+function updateInvitationList(type, user) {
+    if (type === enu.EventGame.INVITE) {
+        var joinType = enu.EventGame.JOIN;
+        var typeGame = "match";
+    } else {
+        var joinType = enu.EventTournament.JOIN;
+        var typeGame = "tournoi";
+    }
+
+    const listItem = document.createElement('li');
+    listItem.className = 'remote-list-element';
+
+    const   listItemName = document.createElement('span');
+    listItemName.textContent = `(${typeGame}) ${user}`;
+    
+    const acceptButton = document.createElement('button');
+    acceptButton.textContent = 'Accepter';
+    acceptButton.className = 'accept-button';
+
+    acceptButton.addEventListener('click', function() {
+        acceptButton.disabled = true;
+        gameSocket.send(JSON.stringify({
+            'type': joinType,
+            'message': user
+        }));
+    });
+
+    listItem.appendChild(listItemName);
+    listItem.appendChild(acceptButton);
+
+    document.getElementById('game-menu-invitationList').appendChild(listItem);
+
+}
+
+function updateInvitationList2() {
     const invitationList = document.getElementById('game-menu-invitationList');
     invitationList.innerHTML = '';
 

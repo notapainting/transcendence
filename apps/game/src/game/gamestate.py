@@ -1,12 +1,8 @@
-# game/consumers.py
-import json, random, asyncio, time
-import sys
-
-from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.exceptions import StopConsumer
+# game/gamestate.py
 import game.utils as utils
 import game.power_up as pow
 import game.enums as enu
+import random, asyncio, time
 
 TOURNAMENT_MAX_PLAYER = 16
 
@@ -23,128 +19,6 @@ acceleration = 0.05
 reset = 0
 counter = 0
 max_speed = 2
-
-from game.base import BaseConsumer
-
-class GameConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        self.game_state = GameState()
-        await self.accept()
-        # self.game_state.__init__()
-        await self.send(json.dumps(self.game_state.to_dict('none')))
-
-    async def disconnect(self, close_code):
-        del self.game_state
-
-    async def receive(self, text_data):
-        global game_running, upPressed, downPressed, wPressed, sPressed
-        text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-        if message == "startButton":
-            if self.game_state.status['game_running'] == False :
-                self.game_state.status['game_running'] = True
-                self.game_state.timer.resume()
-                asyncio.create_task(loop(self))
-        else :
-            asyncio.create_task(self.game_state.update_player_position(message))
-
-
-
-class LocalConsumer(BaseConsumer):
-    async def connect(self):
-        await self.accept()
-        self.players = []
-        self.losers = []
-        self.current = []
-        self.matchIdx = -2
-        self.task = None
-        self.game_state = None
-
-    async def disconnect(self, close_code):
-        if self.task is not None:
-            self.task.cancel()
-
-    async def receive_json(self, json_data):
-        match json_data['type']:
-            case enu.Local.PLAYERS: 
-                self.players = list(json_data['message'])
-                if len(self.players) % 2 != 0 or len(self.players) == 0:
-                    await self.send_json({'type':'error.players'})
-                else:
-                    await self.matchmake()
-            case enu.Local.UPDATE:
-                await self.gaming(json_data)
-            case enu.Local.READY:
-                await self.gaming({"message":"startButton"})
-            case enu.Local.PAUSE:
-                if self.game_state.status['game_running'] == True:
-                    await self.gaming({"message":"stopButton"})
-                else:
-                    await self.gaming({"message":"startButton"})
-            case enu.Local.NEXT:
-                await self.announce_next()
-            case enu.Local.QUIT:
-                self.clear()
-            case _:
-                print(f"error in local: bad type")
-
-    async def matchmake(self):
-        random.shuffle(self.players)
-        self.current = [(self.players[i],self.players[i + 1]) for i in range(0, len(self.players), 2)]
-        self.matchIdx = -1
-        await self.send_json({"type":enu.Local.PHASE, "message":self.current})
-
-    async def announce_next(self):
-        if self.matchIdx == -2:
-            return
-        if self.matchIdx == -3:
-            return await self.send_json({'type':enu.Local.END_TRN})
-        self.matchIdx += 1
-        if self.matchIdx == len(self.current):
-            if len(self.current) == 1:
-                return
-            await self.matchmake()
-        else:
-            match = self.current[self.matchIdx]
-            self.game_state = GameState()
-            await self.send_json({"type":enu.Local.MATCH, "message":match, "state":self.game_state.to_dict('none')})
-
-    async def game_end(self, data):
-        print("gameend here")
-        winner = self.game_state.status['winner']
-        if winner == 'leftWin':
-            winner = self.current[self.matchIdx][0]
-            loser = self.current[self.matchIdx][1]
-        else:
-            winner = self.current[self.matchIdx][1]
-            loser = self.current[self.matchIdx][0]
-        self.losers.append(loser)
-        self.players.remove(loser)
-        await self.send_json({'type':enu.Local.END_GAME, "message":winner})
-        if len(self.current) == 1:
-            self.clear()
-            self.matchIdx =-3
-
-    def clear(self):
-        self.players = []
-        self.losers = []
-        self.current = []
-        self.task = None
-        del self.game_state
-        self.matchIdx = -2
-
-    async def gaming(self, data):
-        message = data["message"]
-        if message == "startButton":
-            self.game_state.status['game_running'] = True
-            self.task = asyncio.create_task(loop(self))
-        elif message == "stopButton":
-            self.game_state.status['game_running'] = False
-        elif message == "bonus":
-            self.game_state.status['randB'] = data["bonus"]
-        else :
-            asyncio.create_task(self.game_state.update_player_position(message))
-
 
 class GameState:
     def __init__(self):
@@ -333,18 +207,18 @@ class GameState:
         self.status['ballSpeedY'] = random.uniform(-1, 1)
         reset = 1
 
-async def loop(self):
+async def local_loop(self):
     global reset
     try :
-        while self.game_state.status['game_running']:
-            end, score = self.game_state.update()
+        while self.local_game_state.status['game_running']:
+            print(f"we starte")
+            end, score = self.local_game_state.update()
             if score is not None:
-                score['players'] = self.current[self.matchIdx]
-                print(f"score is {score}")
+                score['players'] = self.local_current[self.local_matchIdx]
                 await self.send_json({"type":enu.Game.SCORE, "message":score})
             if end is not None:
                 return await self.channel_layer.send(self.channel_name, {"type":enu.Game.END})
-            await self.send_json({"type": enu.Local.UPDATE, "message":self.game_state.to_dict('none')})
+            await self.send_json({"type": enu.Local.UPDATE, "message":self.local_game_state.to_dict('none')})
             if reset ==  2:
                 time.sleep(0.5)
                 reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
@@ -353,7 +227,7 @@ async def loop(self):
         print(error)
 
 
-async def loop_remote_ultime(self):
+async def remote_loop(self):
     global reset
     try :
         while self.match.game_state.status['game_running']:
@@ -375,13 +249,12 @@ async def loop_remote_ultime(self):
 
 """
     global reset
-    while self.game_state.status['game_running']:
-        message = self.game_state.update()
+    while self.local_game_state.status['game_running']:
+        message = self.local_game_state.update()
         await asyncio.sleep(0.02)
-        asyncio.create_task(self.game_state.update_player_position(message))
-        await self.send(json.dumps(self.game_state.to_dict('none')))
+        asyncio.create_task(self.local_game_state.update_player_position(message))
+        await self.send(json.dumps(self.local_game_state.to_dict('none')))
         if reset ==  2:
             time.sleep(0.5)
             reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 """
-
