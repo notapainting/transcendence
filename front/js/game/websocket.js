@@ -75,15 +75,48 @@ const remoteHandler = (e) => {
     const content = JSON.parse(e.data);
     console.log("message: ", content.type);
     switch(content.type) {
+// LOCAL
+        case enu.EventLocal.PHASE:
+            moveTo(enu.sceneLocIdx.PHASE);
+            announcePhase(content.message);
+            break;
+        case enu.EventLocal.MATCH:
+            moveTo(enu.sceneLocIdx.PREMATCH);
+            announceMatch(content.message);
+            document.addEventListener('keydown', bindKeyPress)
+            document.addEventListener('keyup', bindKeyRelease)
+            game.gameRenderer(content.state);
+            if (gameData.start) {
+                if (!gameData.timerInterval)
+                    gameData.timerInterval = setInterval(updateTimer, 1000);
+            } else {
+                gameData.sceneHandler = 1;
+                game.gameRenderer(null);
+            }
+            break;
+        case enu.EventLocal.END_GAME:
+            clearGame();
+            document.removeEventListener('keydown', bindKeyPress)
+            document.removeEventListener('keyup', bindKeyRelease)
+            announceWinner(content.message);
+            moveTo(enu.sceneLocIdx.END_GAME)
+            setTimeout(askNext, 3000);
+            break;
+        case enu.EventLocal.END_TRN:
+            moveTo(enu.sceneLocIdx.END)
+            break;
+
 // match
         case enu.EventGame.INVITE:
             console.log("invitation from: ", content.author);
             updateInvitationList(enu.EventGame.INVITE, content.author);
             break;
         case enu.EventGame.JOIN:
+            // not used
             document.getElementById(content.author).innerHTML = 'accepted!';
             break;
         case enu.EventGame.ACCEPTED:
+            // when accepted for a match
             game.gameRenderer(content.message);
             moveTo(enu.sceneIdx.PREMATCH);
             announceMatch(content.players);
@@ -125,14 +158,12 @@ const remoteHandler = (e) => {
             toggleLock();
             break;
         case enu.EventGame.BROKE:
-            fullClear();
-            moveTo(enu.sceneIdx.END);
-            break;
-        case enu.EventGame.END:
-            fullClear();
-            moveTo(enu.sceneIdx.END);
-            break;
+            // connection lost
+        case enu.EventGame.DENY:
+            // try to join a match but refused
         case enu.EventGame.QUIT:
+            // a player has quit match
+        case enu.EventGame.END:
             fullClear();
             moveTo(enu.sceneIdx.END);
             break;
@@ -147,24 +178,28 @@ const remoteHandler = (e) => {
             break;
 
         case enu.EventTournament.JOIN:
+            // receive new player sjoining trn
             break;
 
-        case enu.EventTournament.KICK:
-            break;
         case enu.EventTournament.ACCEPTED:
+            // received whe naccepted in trn
             break;
         case enu.EventTournament.READY:
+            // players is ready 
             break;
         case enu.EventTournament.PHASE:
+            // planning of match for that phase
             break;
         case enu.EventTournament.MATCH:
+            // match you have to play
             break;
         case enu.EventTournament.RESULT:
+            // result of a match
             break;
         case enu.EventTournament.QUIT:
-            break;
+        case enu.EventTournament.DENY:
+        case enu.EventTournament.KICK:
         case enu.EventTournament.BROKE:
-            break;
         case enu.EventTournament.END:
             break;
         default:

@@ -1,7 +1,7 @@
 # game/lobby.py
 
 from channels.layers import get_channel_layer
-from game.consumers import GameState
+from game.gamestate import GameState
 
 import game.enums as enu
 import random
@@ -38,13 +38,8 @@ class Lobby:
         self._invited.discard(user)
         await self._chlayer.group_send(user, {"type":self.types.KICK, "author":self.host})
 
-    async def add(self, user):
+    def add(self, user):
         self._players.add(user)
-        if self.n_players < len(self._players):
-            print(f"too much player : len is {len(self._players)}, max is {self.n_players}")
-            self._players.discard(user)
-            return False
-        return True
 
     async def add_ready(self, user):
         if user == "":
@@ -109,8 +104,13 @@ class Match(Lobby):
             if hasattr(self, "result") is False:
                 self.result = self.compute()
             # send match history data to usermgt
-            # import httpx
-            # await httpx.AsyncClient().post(url='http://auth-service:8000/user/match/', data=self.result)
+            import httpx
+            from rest_framework.renderers import JSONRenderer
+            data = self.result
+            data['score_w'] = self.result['scores'][data['winner']]
+            data['score_l'] = self.result['scores'][data['loser']]
+            del data['scores']
+            await httpx.AsyncClient().post(url='http://user:8000/user/match_history/new/', data=JSONRenderer().render(data))
             if self.tournament is True:
                 await self._chlayer.send_group(self.tournament, {"type":enu.Tournament.RESULT, "message":self.result})
         if self.task is not None:
@@ -151,3 +151,6 @@ class Tournament(Lobby):
         self.match_count -= 1
         if self.match_count == 0:
             await self.make_phase()
+
+    def players_state(self):
+        return {"invited":list(self._invited), "players":list(self._players), "host":self.host, "size":self.n_players}

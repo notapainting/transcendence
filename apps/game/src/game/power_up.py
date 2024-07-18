@@ -1,6 +1,5 @@
 import random, time, math
 import game.utils as utils
-import game.consumers as game
 
 class PowerUpManager:
     randB = None
