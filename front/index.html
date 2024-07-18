@@ -216,10 +216,11 @@
         </div>
         <div id="game-menu">
 
+            <!-- Ajout au tournoi -->
             <div id="game-menu-list-tournament" class="containerTournament menu-element">
                 <h1>Tournoi de Pong</h1>
                 <form id="playerForm">
-                    <input type="text" id="game-menu-local-input" placeholder="Ajouter un joueur" required>
+                    <input type="textList" id="game-menu-local-input" placeholder="Ajouter un joueur" required>
                     <button type="button" id="game-menu-local-input-button">Ajouter</button>
                 </form>
                 <h1>Joueurs :</h1>
@@ -228,7 +229,43 @@
                 </div>        
             </div>
 
-            
+            <!-- Settings tournoi -->
+            <div class="settings-box">
+                <h1>Paramètres du jeu</h1>
+                <ul class="settings-list">
+                    <li class="toggle-item">
+                        <label for="bonus">Activer les power-ups :</label>
+                        <div class="toggle-button">
+                            <input type="checkbox" id="bonusToggle" name="bonusToggle" class="toggle-input">
+                            <label for="bonusToggle" class="toggle-label"></label>
+                        </div>
+                    </li>
+                    <li class="score-item">
+                        <label for="score">Score maximum :</label>
+                        <select id="score" name="score"> 
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5" selected>5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                        </select>
+                    </li>
+                </ul>
+                <div class="center-button">
+                    <button type="button" id="saveSettingsButton">Enregistrer</button>
+                </div>
+            </div>
+                  
             
             <!-- deplacement -->
             <button id="game-menu-exit" class="menu-element button-menu" type="button">Exit</button>
@@ -279,7 +316,7 @@
     </div> -->
     <script src="https://kit.fontawesome.com/3db1c2f3ab.js" crossorigin="anonymous"></script>
     <script type="module" src="js/index.js"></script>
-    <script type="module" src="js/home.js"></script>
+    <!-- <script type="module" src="js/home.js"></script> -->
 </body>
 </html>
 
