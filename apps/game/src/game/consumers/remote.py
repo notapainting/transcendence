@@ -167,7 +167,6 @@ class RemoteGamer(BaseConsumer):
             await self.send_json({"type":enu.Local.MATCH, "message":match, "state":self.local_game_state.to_dict('none')})
 
     async def local_game_end(self, data):
-        print("local game end here")
         winner = self.local_game_state.status['winner']
         if winner == 'leftWin':
             winner = self.local_current[self.local_matchIdx][0]
@@ -183,7 +182,6 @@ class RemoteGamer(BaseConsumer):
             self.local_matchIdx =-3
 
     async def local_gaming(self, data):
-        print(f"here")
         message = data["message"]
         if message == "startButton":
             self.local_game_state.status['game_running'] = True
@@ -201,8 +199,8 @@ class RemoteGamer(BaseConsumer):
         self.local_current = []
         if self.local_task is not None:
             self.local_task.cancel()
-        self.local_task = None
-        del self.local_game_state
+        if hasattr(self, "local_game_state"):
+            del self.local_game_state
         self.local_matchIdx = -2
 
 
