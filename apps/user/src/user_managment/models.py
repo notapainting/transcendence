@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils.timezone import now 
 
 
 class CustomUser(AbstractUser):
@@ -15,3 +16,15 @@ class CustomUser(AbstractUser):
 		('O', 'Other'),
 	)
 	gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
+	
+
+class Match(models.Model):
+    class Meta:
+        default_related_name = "match"
+        ordering = ["-date"]
+
+    winner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='won_match')
+    loser = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='lost_match')
+    score_w = models.IntegerField()
+    score_l = models.IntegerField()
+    date = models.DateTimeField(default=now)
