@@ -3,12 +3,14 @@ import { initGameWebSocket, initLocalGameWebSocket, clearGame } from './websocke
 import { clearScene } from './utils.js';
 import { clearThree } from './game.js';
 import { clearView } from "../index.js";
+import { loggedInStatus } from '../home.js';
 import * as enu from './enums.js'
 
 
 export const showGame = () => {
     clearView();
     fullClear();
+    loggedInStatus();
     initGameWebSocket()
     document.querySelector("body").style.backgroundColor = "#34A0A4"
     document.querySelector("#game").style.display = " block"
@@ -22,6 +24,7 @@ export const showGame = () => {
 export const showGameLocal = () => {
     clearView();
     fullClear();
+    loggedInStatus();
     initLocalGameWebSocket();
     document.querySelector("body").style.backgroundColor = "#34A0A4"
     document.querySelector("#game").style.display = " block"
