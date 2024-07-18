@@ -1,7 +1,5 @@
-import asyncio, time, enum
+import asyncio, time
 
-
-# await loop.time() ??????? in atimer
 
 class BaseTimer:
     _start = None

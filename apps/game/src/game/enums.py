@@ -37,6 +37,7 @@ class Tournament(enum.StrEnum):
 
     CREATE = "tournament.create"
     INVITE = "tournament.invite"
+    DENY = "tournament.deny"
     JOIN = "tournament.join"
     QUIT = "tournament.quit"
     KICK = "tournament.kick"
@@ -49,6 +50,7 @@ class Tournament(enum.StrEnum):
 
 
 class Local(enum.StrEnum):
+    MODE = "local.mode"
     PLAYERS = "local.players"
     PHASE = "local.phase"
     MATCH = "local.match"

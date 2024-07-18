@@ -1,7 +1,7 @@
 # game/lobby.py
 
 from channels.layers import get_channel_layer
-from game.consumers import GameState
+from game.gamestate import GameState
 
 import game.enums as enu
 import random
@@ -38,13 +38,8 @@ class Lobby:
         self._invited.discard(user)
         await self._chlayer.group_send(user, {"type":self.types.KICK, "author":self.host})
 
-    async def add(self, user):
+    def add(self, user):
         self._players.add(user)
-        if self.n_players < len(self._players):
-            print(f"too much player : len is {len(self._players)}, max is {self.n_players}")
-            self._players.discard(user)
-            return False
-        return True
 
     async def add_ready(self, user):
         if user == "":
@@ -151,3 +146,6 @@ class Tournament(Lobby):
         self.match_count -= 1
         if self.match_count == 0:
             await self.make_phase()
+
+    def players_state(self):
+        return {"invited":list(self._invited), "players":list(self._players), "host":self.host, "size":self.n_players}

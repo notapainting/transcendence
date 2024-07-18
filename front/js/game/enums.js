@@ -20,6 +20,7 @@ export const EventGame = Object.freeze({
 export const EventTournament = Object.freeze({
     CREATE: "tournament.create",
     INVITE: "tournament.invite",
+    DENY: "tournament.deny",
     JOIN: "tournament.join",
     QUIT: "tournament.quit",
     KICK: "tournament.kick",
@@ -33,6 +34,7 @@ export const EventTournament = Object.freeze({
 })
 
 export const EventLocal = Object.freeze({
+    MODE: "local.mode",
     PLAYERS: "local.players",
     PHASE: "local.phase",
     MATCH: "local.match",
@@ -74,6 +76,7 @@ export const gameMode = Object.freeze({
     LOCAL: 0,
     MATCH: 1,
     TOURNAMENT: 2,
+    ANON: 3,
 })
 
 
