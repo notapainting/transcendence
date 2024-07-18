@@ -172,6 +172,18 @@ const switchForm = (event) => {
     }
 }
 
+const playBtnElement = document.querySelector(".play-btn");
+
+const playOfflineEvent = (event) => {
+    scrollUpEffect(event, "/local");
+}
+
+const playOnlineEvent = (event) => {
+    scrollUpEffect(event, "/play");
+}
+
+playBtnElement.addEventListener("click", playOfflineEvent);
+
 const messageBox = document.querySelector(".message-box");
 
 export const loggedInStatus = (profile_picture, username) => {
@@ -185,14 +197,15 @@ export const loggedInStatus = (profile_picture, username) => {
             notificationContainer.style.display = "none";
         }
     })
-    document.querySelector(".play-online-btn").style.display = "block"
+    playBtnElement.removeEventListener("click", playOfflineEvent);
+    playBtnElement.addEventListener("click", playOnlineEvent);
+    setTimeout(() => {
+        playBtnElement.style.transform = "translateX(100%)";
+    }, 200)
     showChat();
     document.querySelector(".welcome-msg").innerHTML = `Welcome<br>${username}`;
     document.querySelector(".profile-picture-home").style.backgroundImage = `url('${profile_picture}')`
     document.querySelector(".navbar").style.display= "flex"
-    setTimeout(()=> {
-        document.querySelector(".play-online-btn").style.transform = "scale(1)"
-    }, 100)
 }
 
 const twoFactorDisplay = document.querySelector(".two-factor-display");
@@ -395,19 +408,6 @@ const smoothSroll = (event) => {
     document.removeEventListener('wheel', scrollDownEffect);
     document.addEventListener('wheel', adjustZoom);
 }
-
-
-const playOfflineBtnElement = document.querySelector(".play-offline-btn");
-const playOnlineBtnElement = document.querySelector(".play-online-btn");
-
-playOfflineBtnElement.addEventListener("click", event => {
-    scrollUpEffect(event, "/local");
-})
-
-playOnlineBtnElement.addEventListener("click", event => {
-    scrollUpEffect(event, "/play");
-})
-
 
 export const showHome = async () => {
     clearView();

@@ -2,7 +2,7 @@ import { initMenu } from './menu.js';
 import { initGameWebSocket, initLocalGameWebSocket, clearGame } from './websocket.js';
 import { clearScene } from './utils.js';
 import { clearThree } from './game.js';
-import { clearView, isUserAuthenticated } from "../index.js";
+import { clearView, isUserAuthenticated, navigateTo } from "../index.js";
 import { loggedInStatus, getPersInfo } from '../home.js';
 import * as enu from './enums.js'
 
@@ -29,9 +29,9 @@ export const showGame = async () => {
 export const showGameLocal  = async () => {
     clearView();
     fullClear();
-    if (await isUserAuthenticated()) {
-        const data = await getPersInfo();
-        loggedInStatus(data.profile_picture, data.username);
+    if (await isUserAuthenticated()){
+        navigateTo("/");
+        return ;
     }
     if (!flg2)
         initLocalGameWebSocket();
