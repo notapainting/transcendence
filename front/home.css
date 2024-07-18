@@ -68,7 +68,9 @@ input:focus::placeholder {
 }
 
 #game {
-    display: none;
+    display: block;
+    opacity: 0;
+    transition: opacity 2s ease;
 }
 
 /* parallax-threes */
@@ -217,7 +219,7 @@ input:focus::placeholder {
 }
 
 .background-threes {
-    background-image: url("img/screnshot-game.png");
+    background-color: #34A0A4;
 }
 
 .back-threes {
@@ -250,6 +252,7 @@ input:focus::placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: #34A0A4;
 }
 .play-offline-online h2 {
     margin-top: 0px;
