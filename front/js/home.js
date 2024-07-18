@@ -386,7 +386,7 @@ const playOfflineBtnElement = document.querySelector(".play-offline-btn");
 const playOnlineBtnElement = document.querySelector(".play-online-btn");
 
 playOfflineBtnElement.addEventListener("click", event => {
-    scrollUpEffect(event, "/play/local");
+    scrollUpEffect(event, "/local");
 })
 
 playOnlineBtnElement.addEventListener("click", event => {
