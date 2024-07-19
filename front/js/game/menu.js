@@ -16,7 +16,7 @@ const   nextMatch = document.getElementById('game-menu-next');
 const   locInput = document.getElementById('game-menu-local-input');
 const   locInputBut = document.getElementById('game-menu-local-input-button');
 const   locList = document.getElementById('game-menu-list');
-const   locContainerList = document.getElementById('game-menu');
+const   locContainerList = document.getElementById('game-menu-list-tournament');
 
 // <!-- remote -->
 // <!-- choose mode -->
@@ -348,12 +348,7 @@ nextMatch.addEventListener('click', () => {
 })
 
 start.addEventListener('click', () => {
-    if (status === enu.gameMode.ANON) {
-        localGameSocket.send(JSON.stringify({
-            'type': enu.EventLocal.PLAYERS,
-            'message':players,
-        }));
-    } else if (status === enu.gameMode.LOCAL) {
+    if (status === enu.gameMode.LOCAL || status === enu.gameMode.ANON) {
         gameSocket.send(JSON.stringify({
             'type': enu.EventLocal.PLAYERS,
             'message':players,
