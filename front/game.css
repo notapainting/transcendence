@@ -14,18 +14,23 @@
     transform: translate(-50%, -50%);
 }
 
+
+
 #game-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 }
 
 .menu-element {
-    position:absolute;
+    /* position:absolute; */
     display: none;
-}
-.game-element {
 }
 
 .game-announce-base{
@@ -139,12 +144,12 @@
     left:60%;
 }
 
-#game-menu-start {
+/* #game-menu-start {
     top:80%;
     left: calc(50% - 150px);
-}
+} */
 
-#game-menu-exit {
+#game-menu-quit {
     display: none;
     top: 80%;
     left: calc(50% + 150px);
@@ -261,17 +266,17 @@
     top: 80%;
 }
 
-#game-menu-back {
+/* #game-menu-back {
     display: none;
     top: 80%;
-}
+} */
 
 #game-menu-ready {
     display: none;
     top: 40%;
 }
 
-.button-menu {
+/* .button-menu {
     perspective: 40vw;
     position: absolute;
     left: 30%;
@@ -308,7 +313,7 @@
   50% {
       box-shadow: 0 0 30px 0 #e76f51;
   }
-  }
+  } */
 
 #game-menu-ready-circle{
     position:absolute;
@@ -330,10 +335,12 @@
 
 /* TOURNAMENT */
 
+.inner-container {
+    display: flex;
+    gap: 200px; 
+}
+
 .containerTournament {
-    position: absolute;
-    top: 250px;
-    left: calc(50% + 50px);
     width: 500px;
     height: 530px;
     background-color: #024ba5;
@@ -341,14 +348,10 @@
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-/* .form-container {
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ccc;
-} */
 
 h1 {
     margin-bottom: 20px;
@@ -455,18 +458,16 @@ ul {
 
 
 .settings-box {
-    position: absolute;
-    top: 230px;
-    right: calc(50% + 50px);
     width: 500px;
     height: 530px;
     background-color: #024ba5;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
     color: #ffffff;
-
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 .settings-box h1 {
@@ -554,16 +555,19 @@ ul {
     text-align: center;
 }
 
+.settings-box .settings-list {
+    flex-grow: 1; 
+}
+
+
 .center-button {
-    position: absolute; 
-    bottom: 20px; 
-    left: 50%;
-    transform: translateX(-50%); 
+    margin-top: auto;
     display: flex;
     justify-content: center;
     gap: 20px;
 }
 
+/* Settings Button */
 .settings-button {
     padding: 10px 20px;
     font-size: 16px;
@@ -575,5 +579,26 @@ ul {
 }
 
 .settings-button:hover {
+    background-color: #0056b3;
+}
+
+.bottom-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15%;
+    margin-top: 5%;
+}
+
+.button-menu {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button-menu:hover {
     background-color: #0056b3;
 }

@@ -257,7 +257,7 @@ export const moveTo = (i) => {
     console.log('move to: ' + i)
     if (idx === enu.sceneIdx.END) clearGame();
     clearMenu();
-    scene[idx].forEach(div => {div.style.display = "block";});
+    scene[idx].forEach(div => {div.style.display = "flex";});
 }
 
 /*** event listener ****/
