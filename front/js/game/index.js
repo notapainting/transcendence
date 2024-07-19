@@ -23,7 +23,7 @@ export const showGame = async () => {
     setTimeout(()=> {
         document.querySelector("#game").style.opacity = "1";
     }, 200)
-    initMenu(enu.backendPath.LOCAL);
+    initMenu(enu.backendPath.REMOTE);
 }
 
 export const showGameLocal  = async () => {
