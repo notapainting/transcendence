@@ -1,23 +1,20 @@
 import { navigateTo } from "../index.js"
-import { gameSocket, clearGame, clearInvList, localGameSocket } from "./websocket.js"
+import { gameSocket, clearGame, clearInvList } from "./websocket.js"
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import { gameData } from './game.js';
 
 // html element
 // <!-- deplacement -->
-const   exit = document.getElementById('game-menu-exit');
-const   back = document.getElementById('game-menu-back');
-const   home = document.getElementById('game-menu-home');
+
 const   start = document.getElementById('game-menu-start');
 const   nextMatch = document.getElementById('game-menu-next');
 const   quit = document.getElementById('game-menu-quit');
 
 // <!-- local  -->
-const   locInput = document.getElementById('game-menu-local-input');
-const   locInputBut = document.getElementById('game-menu-local-input-button');
-const   locList = document.getElementById('game-menu-list');
 const   locContainerList = document.getElementById('game-menu-list-tournament');
+const   locContainerSettings = document.getElementById('game-menu-settings');
+
 
 // <!-- remote -->
 // <!-- choose mode -->
@@ -43,7 +40,6 @@ const   bannerEnd = document.getElementById('game-menu-banner-end');
 
 // <!-- in game button -->
 const   pause = document.getElementById('game-pause');
-const   abandon = document.getElementById('game-abandon');
 
 
 /*** variable ****/
@@ -72,24 +68,24 @@ let     locked = false;
 
 // scene
 const   sceneRem = [
-    [startLocal,createMatch, createTournament, invitationBox, exit], // accueil du jeu
-    [userInput, inviteButton, invitationSent, home], // creation de partie/tournoi (host only)
+    [startLocal,createMatch, createTournament, invitationBox, quit], // accueil du jeu
+    [userInput, inviteButton, invitationSent, quit], // creation de partie/tournoi (host only)
     [], // waiting room pour creation de tournoi (guest only)
     [bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
-    [bannerMatch, ready, circle, exit], // afk check
-    [bannerScore, pause, abandon], // in game
-    [bannerEnd, home, exit], // ecran de fin de match 
+    [bannerMatch, ready, circle, quit], // afk check
+    [bannerScore, pause, quit], // in game
+    [bannerEnd, quit], // ecran de fin de match 
     [], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
 
 const   sceneLoc = [
-    [locInput, locInputBut, locList, start, quit, locContainerList],
+    [start, quit, locContainerList, locContainerSettings],
     [bannerPhase, nextMatch, quit],
     [bannerMatch, ready],
     [bannerScore, pause, quit],
     [bannerEnd],
-    [home, quit],
+    [quit],
 ];
 
 /*
@@ -291,7 +287,76 @@ startLocal.addEventListener('click', () => {
     moveTo(enu.sceneIdx.WELCOME);
 })
 
-inviteButton.addEventListener('click', function() {
+
+
+ready.addEventListener('click', () => {
+    if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.READY}));
+    else gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
+    if (status === enu.gameMode.LOCAL) {
+        moveTo(enu.sceneLocIdx.MATCH);
+        announceScore();
+    }
+});
+
+pause.addEventListener('click', () => {
+    if (locked === true) return ;
+    gameSocket.send(JSON.stringify({'type': enu.EventGame.PAUSE}));
+    togglePause();
+    if (status === enu.gameMode.LOCAL) {
+        if (gameData.timerInterval) {
+            clearInterval(gameData.timerInterval);
+            gameData.timerInterval = null;
+        }
+    }
+});
+
+
+
+quit.addEventListener('click', () => {
+    if (status === enu.gameMode.ANON) {
+        if (idx == enu.sceneIdx.CREATION) {
+            console.log("ANON exit")
+            if (gameSocket !== null) gameSocket.close();
+            fullClear()
+            navigateTo("/");
+            return ;
+        }
+        var to = enu.sceneIdx.CREATION;
+    } else var to = enu.sceneIdx.WELCOME;
+        scene = sceneRem
+        if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.QUIT}));
+        else if (status === enu.gameMode.MATCH || status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));    
+        if (idx === enu.sceneIdx.WELCOME) {
+            fullClear()
+            navigateTo("/");
+        }
+        moveTo(to);
+    }
+)
+
+nextMatch.addEventListener('click', () => {
+    gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}));
+})
+
+start.addEventListener('click', () => {
+    if (status === enu.gameMode.ANON) {
+        gameSocket.send(JSON.stringify({
+            'type': enu.EventLocal.PLAYERS,
+            'message':players,
+        }));
+    } else if (status === enu.gameMode.LOCAL) {
+        gameSocket.send(JSON.stringify({
+            'type': enu.EventLocal.PLAYERS,
+            'message':players,
+        }));
+    } else {
+        gameSocket.send(JSON.stringify({'type': enu.EventGame.START}));
+        moveTo(enu.sceneLocIdx.MATCH);
+    }
+})
+
+// invitation list for remote
+document.getElementById('game-menu-inviteButton').addEventListener('click', function() {
     var userInput = document.getElementById('game-menu-inviteInput').value;
     if (userInput === "") return ;
     document.getElementById('game-menu-inviteInput').value = '';
@@ -344,94 +409,7 @@ inviteButton.addEventListener('click', function() {
 
 });
 
-ready.addEventListener('click', () => {
-    if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.READY}));
-    else gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
-    if (status === enu.gameMode.LOCAL) {
-        moveTo(enu.sceneLocIdx.MATCH);
-        announceScore();
-    }
-});
-
-pause.addEventListener('click', () => {
-    if (locked === true) return ;
-    gameSocket.send(JSON.stringify({'type': enu.EventGame.PAUSE}));
-    togglePause();
-    if (status === enu.gameMode.LOCAL) {
-        if (gameData.timerInterval) {
-            clearInterval(gameData.timerInterval);
-            gameData.timerInterval = null;
-        }
-    }
-});
-
-back.addEventListener('click', () => {
-    goBack();
-});
-
-exit.addEventListener('click', () => {
-    if (status === enu.gameMode.ANON && localGameSocket !== null) localGameSocket.close();
-
-    idx = enu.sceneIdx.WELCOME;
-    console.log("quit");
-    clearInvList();
-    fullClear();
-    navigateTo("/")
-});
-
-abandon.addEventListener('click', () => {
-    gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
-    fullClear();
-    moveTo(enu.sceneIdx.END);
-});
-
-home.addEventListener('click', () => {
-    moveTo(enu.sceneIdx.WELCOME);
-    if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.QUIT}));
-    else if (status === enu.gameMode.MATCH || status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
-    clearSentList();
-});
-
-quit.addEventListener('click', () => {
-    if (status === enu.gameMode.ANON) {
-        if (idx == enu.sceneIdx.CREATION) {
-            console.log("ANON exit")
-            if (localGameSocket !== null) localGameSocket.close();
-            fullClear()
-            navigateTo("/");
-            return ;
-        }
-        var to = enu.sceneIdx.CREATION;
-        } else var to = enu.sceneIdx.WELCOME;
-        scene = sceneRem
-        moveTo(to);
-        if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.QUIT}));
-        else if (status === enu.gameMode.MATCH || status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));    
-    }
-)
-
-nextMatch.addEventListener('click', () => {
-    localGameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}));
-})
-
-start.addEventListener('click', () => {
-    if (status === enu.gameMode.ANON) {
-        localGameSocket.send(JSON.stringify({
-            'type': enu.EventLocal.PLAYERS,
-            'message':players,
-        }));
-    } else if (status === enu.gameMode.LOCAL) {
-        gameSocket.send(JSON.stringify({
-            'type': enu.EventLocal.PLAYERS,
-            'message':players,
-        }));
-    } else {
-        gameSocket.send(JSON.stringify({'type': enu.EventGame.START}));
-        moveTo(enu.sceneLocIdx.MATCH);
-    }
-})
-
-
+// invitation list for local
 /*** list of players in local mode ****/
 document.getElementById('game-menu-local-input-button').addEventListener('click', () => {
     const   user = document.getElementById('game-menu-local-input').value;
