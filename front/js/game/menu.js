@@ -246,7 +246,7 @@ export const goBack = () => {
     idx--;
     console.log('go back to: ' + idx)
     clearMenu()
-    scene[idx].forEach(div => {div.style.display = "block";});
+    scene[idx].forEach(div => {div.style.display = "flex";});
 }
 
 export const goNext = () => {
@@ -254,7 +254,7 @@ export const goNext = () => {
     idx++;
     console.log('go next to: ' + idx)
     clearMenu()
-    scene[idx].forEach(div => {div.style.display = "block";});
+    scene[idx].forEach(div => {div.style.display = "flex";});
 }
 
 export const moveTo = (i) => {
@@ -263,7 +263,7 @@ export const moveTo = (i) => {
     console.log('move to: ' + i)
     if (idx === enu.sceneIdx.END) clearGame();
     clearMenu();
-    scene[idx].forEach(div => {div.style.display = "block";});
+    scene[idx].forEach(div => {div.style.display = "flex";});
 }
 
 /*** event listener ****/
