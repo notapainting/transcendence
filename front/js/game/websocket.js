@@ -11,7 +11,6 @@ function updateTimer() {
 }
 
 export let gameSocket = null;
-export let localGameSocket = null;
 
 async function sleep (ms) { new Promise(r => setTimeout(r, ms));}
 
@@ -72,17 +71,18 @@ enu.Local.QUIT
 */
 
 export const initLocalGameWebSocket = () => {
-    if (localGameSocket !== null) return ; 
-    localGameSocket = new WebSocket(
+    if (gameSocket !== null) return ; 
+    gameSocket = new WebSocket(
         'wss://'
         + window.location.host
         + enu.backendPath.LOCAL
     );
-    localGameSocket.onmessage = localHandler;
-    localGameSocket.onclose = function(e) {
+    console.log("Local GWS connection open")
+    gameSocket.onmessage = localHandler;
+    gameSocket.onclose = function(e) {
         console.log('GameWebSocket connection closed');
         setTimeout(initLocalGameWebSocket, 5000)
-        localGameSocket = null;
+        gameSocket = null;
     };
 }
 
@@ -93,6 +93,7 @@ export const initGameWebSocket = () => {
         + window.location.host
         + enu.backendPath.REMOTE
     );
+    console.log("Remote GWS connection open")
     gameSocket.onmessage = remoteHandler;
     gameSocket.onclose = function(e) {
         console.log('GameWebSocket connection closed');
