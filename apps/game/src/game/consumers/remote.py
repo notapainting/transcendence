@@ -216,6 +216,10 @@ class RemoteGamer(BaseConsumer):
                 await self.match.invite(data['message'])
             case enu.Game.KICK:
                 await self.match.kick(data['message'])
+            case enu.Game.START:
+                if self.match.ready() is True:
+                    await self.match.start()
+                    await self.gaming({"message":"startButton"})
             case enu.Game.READY:
                 await self.match.add_ready(self.username)
                 if self.match.ready() is True:
@@ -297,6 +301,10 @@ class RemoteGamer(BaseConsumer):
         if self.status == enu.Game.HOST and data['author'] != self.username:
             await self.match.end()
         self.set_mode()
+        if self.status == enu.Tournament.GUEST or self.status == enu.Tournament.HOST:
+            data['tournament'] = True
+        else:
+            data['tournament'] = False
         await self.send_json(data)
 
     async def game_pause(self, data):
@@ -370,9 +378,13 @@ class RemoteGamer(BaseConsumer):
             case enu.Tournament.READY:
                 await self.tournament.add_ready(self.username)
                 if self.tournament.ready() is True:
-                    self.tournament.start()
-                    self.tournament.make_phase()
-                    self.tournament.order_match()
+                    await self.tournament.start()
+                    await self.tournament.make_phase()
+                    await self.tournament.order_match()
+            case enu.Tournament.START:
+                await self.tournament.start()
+                await self.tournament.make_phase()
+                await self.tournament.order_match()
 
     async def tournament_guest(self, data):
         match data['type']:
@@ -389,13 +401,18 @@ class RemoteGamer(BaseConsumer):
             return
         await self.tournament.update_result(data)
 
+    async def tournament_phase(self, data):
+        await self.send_json(data)
+
     async def tournament_match(self, data):
         await self.send_json(data)
         if self.username == data['message']['host']:
             self.set_mode(enu.Game.HOST)
             self.match = Match(self.username, data['author'])
-        else:
+            self.match.add(data['message']['guest'])
+        else: 
             self.set_mode(enu.Game.GUEST)
+            self.host = data['message']['host']
 
     async def tournament_broke(self, data):
         if self.status == enu.Tournament.HOST:

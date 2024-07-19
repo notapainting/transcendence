@@ -43,6 +43,7 @@ class Tournament(enum.StrEnum):
     KICK = "tournament.kick"
     ACCEPTED = "tournament.accepted"
     READY = "tournament.ready"
+    START = "tournament.start"
     PHASE = "tournament.phase"
     MATCH = "tournament.match"
     RESULT = "tournament.result"

@@ -7,7 +7,7 @@ import game.enums as enu
 import random
 
 
-TOURNAMENT_MAX_PLAYER = 4
+TOURNAMENT_MAX_PLAYER = 2
 
 class Lobby:
     def __init__(self, host, n_players=2, types=enu.Game) -> None:
@@ -128,14 +128,15 @@ class Tournament(Lobby):
         pass
 
     async def start(self):
-        super().start()
+        await super().start()
+        print(f"state {self.players_state()}")
 
     async def make_phase(self):
         tmp = list(self._players)
         random.shuffle(tmp)
         self.current = [(tmp[i],tmp[i + 1]) for i in range(0, len(tmp), 2)]
         self.match_count = len(self.current)
-        self.broadcast({"type":self.types.PHASE, "message":self.current, "author":self.host})
+        await self.broadcast({"type":self.types.PHASE, "message":self.current, "author":self.host})
 
     async def order_match(self):
         for match in self.current:
