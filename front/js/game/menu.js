@@ -1,5 +1,5 @@
 import { navigateTo } from "../index.js"
-import { gameSocket, clearGame, clearInvList } from "./websocket.js"
+import { gameSocket, clearGame, clearInvList, localGameSocket } from "./websocket.js"
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import { gameData } from './game.js';
@@ -11,6 +11,7 @@ const   back = document.getElementById('game-menu-back');
 const   home = document.getElementById('game-menu-home');
 const   start = document.getElementById('game-menu-start');
 const   nextMatch = document.getElementById('game-menu-next');
+const   quit = document.getElementById('game-menu-quit');
 
 // <!-- local  -->
 const   locInput = document.getElementById('game-menu-local-input');
@@ -83,13 +84,61 @@ const   sceneRem = [
 ];
 
 const   sceneLoc = [
-    [locInput, locInputBut, locList, start, exit, locContainerList],
-    [bannerPhase, nextMatch, exit],
+    [locInput, locInputBut, locList, start, quit, locContainerList],
+    [bannerPhase, nextMatch, quit],
     [bannerMatch, ready],
-    [bannerScore, pause, exit],
+    [bannerScore, pause, quit],
     [bannerEnd],
-    [home, exit],
+    [home, quit],
 ];
+
+/*
+quit = home(C)/exit(A)
+
+m1 : local match tournoi exit
+m2 : start quit
+m2a : ready quit
+m3 : next quit
+m4 : ready
+m5 : pause quit (abandon)
+m6 : quit 
+m7 : quit 
+
+*/
+
+
+// status == idle/match/tournoi/local/anon
+const   sceneWIP = [
+    [], // 0 (C) acceuil du jeu -> containerMenu (Local+Match+Tournament+quit), containerInvitedBy
+    [], // 1 (C/A)(host) creation de partie/tournoi -> containerSettings, containerInvitations (simple/status+ready), containerMenu (start+((C)home/(A)exit))
+    [], // 2 (C)(guest) waiting room -> containerSettingsFrozen, containerInvitationsFrozen, containerMenuGuest (ready+quit)
+    [], // 3 (C/A) tounoi phase -> containerPhase, containerMenu (nextmatch+quit)
+    [], // 4 (C/A) pre match, ready check -> ready, 
+    [], // 5 (C/A) match -> conatinerScores, containerMenu (pause+abandon)
+    [], // 6 (C/A) fin match -> containerWinner (5s)
+    [], // 7 (C/A) fin tournoi -> containerClassement, containerMenu (home+quit)
+    [], // 8 (C) broken/quit containerError, containerMenu (home+quit)
+]
+// ANON : 1 -> 3 -> 4 -> 5 -> 6
+//             ^         |
+//             |<---  <---
+
+// CONNECTED : TOURNOI
+// (HOST)
+//  : 0 -> 1 -> 3 -> 4 -> 5 -> 6
+//              ^         |
+//              |<---  <---
+// (GUEST)
+//  : 0 -> 2 -> ...same as host
+
+// CONNECTED : MATCH
+// (HOST)
+//  : 0 -> 1 -> 4 -> 5 -> 6
+
+// (GUEST)
+//  : 0-> 4 -> 5 -> 6
+
+
 
 
 /*** initialisation ****/
@@ -321,7 +370,7 @@ back.addEventListener('click', () => {
 });
 
 exit.addEventListener('click', () => {
-    if (status === enu.gameMode.ANON && gameSocket !== null) gameSocket.close();
+    if (status === enu.gameMode.ANON && localGameSocket !== null) localGameSocket.close();
 
     idx = enu.sceneIdx.WELCOME;
     console.log("quit");
@@ -339,16 +388,39 @@ abandon.addEventListener('click', () => {
 home.addEventListener('click', () => {
     moveTo(enu.sceneIdx.WELCOME);
     if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.QUIT}));
-    else gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
+    else if (status === enu.gameMode.MATCH || status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
     clearSentList();
 });
 
+quit.addEventListener('click', () => {
+    if (status === enu.gameMode.ANON) {
+        if (idx == enu.sceneIdx.CREATION) {
+            console.log("ANON exit")
+            if (localGameSocket !== null) localGameSocket.close();
+            fullClear()
+            navigateTo("/");
+            return ;
+        }
+        var to = enu.sceneIdx.CREATION;
+        } else var to = enu.sceneIdx.WELCOME;
+        scene = sceneRem
+        moveTo(to);
+        if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.QUIT}));
+        else if (status === enu.gameMode.MATCH || status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));    
+    }
+)
+
 nextMatch.addEventListener('click', () => {
-    gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}));
+    localGameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}));
 })
 
 start.addEventListener('click', () => {
-    if (status === enu.gameMode.LOCAL || status === enu.gameMode.ANON) {
+    if (status === enu.gameMode.ANON) {
+        localGameSocket.send(JSON.stringify({
+            'type': enu.EventLocal.PLAYERS,
+            'message':players,
+        }));
+    } else if (status === enu.gameMode.LOCAL) {
         gameSocket.send(JSON.stringify({
             'type': enu.EventLocal.PLAYERS,
             'message':players,

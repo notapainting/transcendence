@@ -15,9 +15,7 @@ export const showGame = async () => {
     clearView();
     fullClear();
     loggedInStatus(data.profile_picture, data.username);
-    if (!flg3)
-        initGameWebSocket();
-    flg3 = 1;
+    initGameWebSocket();
     document.querySelector("body").style.backgroundColor = "#34A0A4"
     document.querySelector("#game").style.display = " block"
     setTimeout(()=> {
@@ -33,9 +31,7 @@ export const showGameLocal  = async () => {
         navigateTo("/");
         return ;
     }
-    if (!flg2)
-        initLocalGameWebSocket();
-    flg2 = 1;
+    initLocalGameWebSocket();
     document.querySelector("body").style.backgroundColor = "#34A0A4"
     document.querySelector("#game").style.display = " block"
     setTimeout(()=> {

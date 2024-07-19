@@ -78,6 +78,7 @@ export const initLocalGameWebSocket = () => {
         + window.location.host
         + enu.backendPath.LOCAL
     );
+    console.log("Local GWS connection open")
     localGameSocket.onmessage = localHandler;
     localGameSocket.onclose = function(e) {
         console.log('GameWebSocket connection closed');
@@ -93,6 +94,7 @@ export const initGameWebSocket = () => {
         + window.location.host
         + enu.backendPath.REMOTE
     );
+    console.log("Remote GWS connection open")
     gameSocket.onmessage = remoteHandler;
     gameSocket.onclose = function(e) {
         console.log('GameWebSocket connection closed');
