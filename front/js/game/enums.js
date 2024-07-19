@@ -63,6 +63,7 @@ export const sceneIdx = Object.freeze({
     BROKE:8,
 })
 
+
 export const sceneLocIdx = Object.freeze({
     WELCOME: 0,
     PHASE: 1,
