@@ -142,6 +142,7 @@ class RemoteGamer(BaseConsumer):
                 await self.local_announce_next()
             case enu.Local.QUIT:
                 self.local_clear()
+                self.set_mode(enu.CStatus.IDLE)
             case _:
                 print(f"error in local: bad type")
 
