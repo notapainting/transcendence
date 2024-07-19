@@ -28,7 +28,7 @@
 }
 
 .menu-element {
-    position:absolute;
+    /* position:absolute; */
     display: none;
 }
 
@@ -148,7 +148,7 @@
     left: calc(50% - 150px);
 }
 
-#game-menu-exit {
+#game-menu-quit {
     display: none;
     top: 80%;
     left: calc(50% + 150px);
@@ -334,12 +334,12 @@
 
 /* TOURNAMENT */
 
-
+.inner-container {
+    display: flex;
+    gap: 200px; 
+}
 
 .containerTournament {
-    position: absolute;
-    top: 250px;
-    left: calc(50% + 50px);
     width: 500px;
     height: 530px;
     background-color: #024ba5;
@@ -347,14 +347,11 @@
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-/* .form-container {
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ccc;
-} */
+
 
 h1 {
     margin-bottom: 20px;
@@ -461,18 +458,16 @@ ul {
 
 
 .settings-box {
-    position: absolute;
-    top: 230px;
-    right: calc(50% + 50px);
     width: 500px;
     height: 530px;
     background-color: #024ba5;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
     color: #ffffff;
-
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 .settings-box h1 {
@@ -560,16 +555,19 @@ ul {
     text-align: center;
 }
 
+.settings-box .settings-list {
+    flex-grow: 1; 
+}
+
+
 .center-button {
-    position: absolute; 
-    bottom: 20px; 
-    left: 50%;
-    transform: translateX(-50%); 
+    margin-top: auto;
     display: flex;
     justify-content: center;
     gap: 20px;
 }
 
+/* Settings Button */
 .settings-button {
     padding: 10px 20px;
     font-size: 16px;

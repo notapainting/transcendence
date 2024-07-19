@@ -1,5 +1,6 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,8 +11,10 @@
     <link rel="stylesheet" href="./game.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica+SC&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-	<script type="importmap">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica+SC&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <script type="importmap">
 		{
 		  "imports": {
 			"three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
@@ -19,7 +22,8 @@
 		  }
 		}
 	  </script>
-</head> 
+</head>
+
 <body>
     <audio id="newMessageSound">
         <source src="img/goofy.mp3" type="audio/mpeg">
@@ -58,14 +62,16 @@
                         <div class="checkbox-wrapper-3">
                             <input type="checkbox" id="cbx-3" />
                             <label for="cbx-3" class="toggle"><span></span></label>
-                        </div><p>I have read and accepted terms..</p>
+                        </div>
+                        <p>I have read and accepted terms..</p>
                     </div>
                     <div class="login-or-create">
                         <div class="login-or-42">
                             <button class="btn home-form-btn">LOGIN</button>
                             <div class="login-42"></div>
                         </div>
-                        <p class="login-or-register-text">Don't have an account ? <br><span class="switch-form">Create One</span></p>
+                        <p class="login-or-register-text">Don't have an account ? <br><span class="switch-form">Create
+                                One</span></p>
                     </div>
                     <div class="message-box"></div>
                 </form>
@@ -117,7 +123,7 @@
                                 </div>
                             </div>
 
-                        </div>  
+                        </div>
                         <button class="profile-btn modify">MODIFY</button>
                     </div>
                     <div class="profile-picture-info">
@@ -140,11 +146,11 @@
                             <label for="">Current Password</label>
                             <input type="password">
                         </div>
-                        <div class="container-password">  
+                        <div class="container-password">
                             <label for="">New Password</label>
                             <input type="password">
                         </div>
-                        <div class="container-password">                     
+                        <div class="container-password">
                             <label for="">Confirm Password</label>
                             <input type="password">
                         </div>
@@ -154,25 +160,25 @@
                 </div>
             </div>
 
-            </div>
         </div>
-        <div class="two-factor-display">
-            <div class="two-factor-container">
-                <span class="close-btn close-two-factor">&times;</span>
-                <div class="manual-qrcode-container">
-                    <img src="" alt="" width="300px" height="300px" class="qr-code-img">
-                    <p class="manual-code"></p>
-                </div>
-                <input type="text" class="input-f2a-activation">
-                <button class="profile-btn activate-2fa">ACTIVATE 2FA</button>
+    </div>
+    <div class="two-factor-display">
+        <div class="two-factor-container">
+            <span class="close-btn close-two-factor">&times;</span>
+            <div class="manual-qrcode-container">
+                <img src="" alt="" width="300px" height="300px" class="qr-code-img">
+                <p class="manual-code"></p>
             </div>
-            <div class="two-factor-container-login">
-                <p>Please enter the code of your authentificator app</p>
-                <span class="close-btn close-two-factor-login">&times;</span>
-                <input type="text" class="input-f2a-login">
-                <button class="profile-btn login-2fa">LOGIN</button>
-            </div>
+            <input type="text" class="input-f2a-activation">
+            <button class="profile-btn activate-2fa">ACTIVATE 2FA</button>
         </div>
+        <div class="two-factor-container-login">
+            <p>Please enter the code of your authentificator app</p>
+            <span class="close-btn close-two-factor-login">&times;</span>
+            <input type="text" class="input-f2a-login">
+            <button class="profile-btn login-2fa">LOGIN</button>
+        </div>
+    </div>
     </div>
     <div class="bubble"><i class="fa-solid fa-comment"></i></div>
     <div class="chatbox">
@@ -183,7 +189,7 @@
                 <i class="fa-solid fa-bars"></i>
                 <h3 class="menu-title">CHAT</h3>
                 <input type="text" class="searchbar">
-                
+
             </div>
             <div class="display-menu">
                 <div class="search-results"></div>
@@ -193,7 +199,7 @@
         <div class="chat-container">
             <div class="person-chat">
                 <div class="picture-chat"></div>
-                <div class="description-chat">                  
+                <div class="description-chat">
                     <h4 class="username-title"></h4>
                 </div>
             </div>
@@ -208,77 +214,80 @@
             </div>
         </div>
     </div>
-    <div id ="game" class="view" style="display: none;">
+    <div id="game" class="view" style="display: none;">
         <div class="containerGame">
             <canvas id="canvas" width="1920" height="1080"></canvas>
         </div>
 
-        
+
         <div id="game-menu">
-            
-            <!-- Ajout au tournoi -->
-            <div id="game-menu-list-tournament" class="containerTournament menu-element">
-                <h1>Tournoi de Pong</h1>
-                <form id="playerForm">
-                    <input type="textList" id="game-menu-local-input" placeholder="Ajouter un joueur" required>
-                    <button type="button" id="game-menu-local-input-button">Ajouter</button>
-                </form>
-                <h1>Joueurs :</h1>
-                <div class="player-box" id="playerBox">
-                    <ul id="game-menu-list"></ul>
-                </div>        
+            <div class="inner-container">
+                <!-- Ajout au tournoi -->
+                <div id="game-menu-list-tournament" class="containerTournament menu-element">
+                    <h1>Tournoi de Pong</h1>
+                    <form id="playerForm">
+                        <input type="textList" id="game-menu-local-input" placeholder="Ajouter un joueur" required>
+                        <button type="button" id="game-menu-local-input-button">Ajouter</button>
+                    </form>
+                    <h1>Joueurs :</h1>
+                    <div class="player-box" id="playerBox">
+                        <ul id="game-menu-list"></ul>
+                    </div>
+                </div>
+
+                <!-- Settings tournoi -->
+                <div id="game-menu-settings" class="settings-box menu-element">
+                    <h1>Paramètres du jeu</h1>
+                    <ul class="settings-list">
+                        <li class="toggle-item">
+                            <label for="bonus">Activer les power-ups :</label>
+                            <div class="toggle-button">
+                                <input type="checkbox" id="bonusToggle" name="bonusToggle" class="toggle-input">
+                                <label for="bonusToggle" class="toggle-label"></label>
+                            </div>
+                        </li>
+                        <li class="score-item">
+                            <label for="score">Score maximum :</label>
+                            <input type="range" id="scoreRange" name="scoreRange" min="1" max="15" value="5"
+                                oninput="this.nextElementSibling.value = this.value">
+                            <output>5</output>
+                        </li>
+                        <li class="score-item">
+                            <label for="players">Nombre joueurs max :</label>
+                            <input type="range" id="playersRange" name="playersRange" min="2" max="24" step="2"
+                                value="4" oninput="this.nextElementSibling.value = this.value">
+                            <output>4</output>
+                        </li>
+                    </ul>
+                    <div class="center-button">
+                        <button type="button" class="settings-button">Réinitialiser</button>
+                        <button type="button" class="settings-button">Enregistrer</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Settings tournoi -->
-            <div id="game-menu-settings" class="settings-box menu-element">
-                <h1>Paramètres du jeu</h1>
-                <ul class="settings-list">
-                    <li class="toggle-item">
-                        <label for="bonus">Activer les power-ups :</label>
-                        <div class="toggle-button">
-                            <input type="checkbox" id="bonusToggle" name="bonusToggle" class="toggle-input">
-                            <label for="bonusToggle" class="toggle-label"></label>
-                        </div>
-                    </li>
-                    <li class="score-item">
-                        <label for="score">Score maximum :</label>
-                        <input type="range" id="scoreRange" name="scoreRange" min="1" max="15" value="5" oninput="this.nextElementSibling.value = this.value">
-                        <output>5</output>
-                    </li>
-                    <li class="score-item">
-                        <label for="players">Nombre joueurs max :</label>
-                        <input type="range" id="playersRange" name="playersRange" min="2" max="24" step="2" value="4" oninput="this.nextElementSibling.value = this.value">
-                        <output>4</output>
-                    </li>
-                </ul>
-                <div class="center-button">
-                    <button type="button" class="settings-button">Réinitialiser</button>
-                    <button type="button" class="settings-button">Enregistrer</button>
-                </div>                
-            </div>
-                  
-            
+
             <!-- deplacement -->
-            <button id="game-menu-next" class="menu-element button-menu" type="button">Next Match</button> 
-            <button id="game-menu-start" class="menu-element button-menu" type="button">Start</button> 
-            <button id="game-menu-quit" class="menu-element button-menu" type="button">Quit</button> 
+            <button id="game-menu-next" class="menu-element button-menu" type="button">Next Match</button>
+            <button id="game-menu-start" class="menu-element button-menu" type="button">Start</button>
+            <button id="game-menu-quit" class="menu-element button-menu" type="button">Quit</button>
 
             <!-- choose mode -->
-            <button id="game-menu-fastGame" class="menu-element button-menu" type="button">Partie rapide</button> 
+            <button id="game-menu-fastGame" class="menu-element button-menu" type="button">Partie rapide</button>
             <button id="game-menu-tournament" class="menu-element button-menu" type="button">Tournoi</button>
             <button id="game-menu-local" class="menu-element button-menu" type="button">Mode local</button>
 
             <!-- invite player -->
             <input type="text" id="game-menu-inviteInput" class="menu-element" placeholder="Nom d'un joueur...">
             <button id="game-menu-inviteButton" class="menu-element button-menu">Invite</button>
-            <ul id ="game-menu-invite-sent-list" class="remote-list menu-element"></ul>
+            <ul id="game-menu-invite-sent-list" class="remote-list menu-element"></ul>
             <div id="game-menu-invitationBox" class="menu-element">
                 <h3>Invitations Reçues: </h3>
                 <ul id="game-menu-invitationList"></ul>
             </div>
 
             <!-- set ready -->
-            <button id="game-menu-ready" class="menu-element button-menu" type="button">Ready?</button> 
+            <button id="game-menu-ready" class="menu-element button-menu" type="button">Ready?</button>
             <div id="game-menu-ready-circle" class="menu-element"></div>
 
             <!-- in game banner -->
@@ -288,7 +297,7 @@
             <div id="game-menu-banner-end" class="menu-element game-announce-base"></div>
 
             <!-- in game button -->
-            <button id="game-pause" class="game-element game-button" type="button">Pause</button> 
+            <button id="game-pause" class="game-element game-button" type="button">Pause</button>
         </div>
 
     </div>
@@ -300,5 +309,5 @@
     <script type="module" src="js/index.js"></script>
     <!-- <script type="module" src="js/home.js"></script> -->
 </body>
-</html>
 
+</html>
