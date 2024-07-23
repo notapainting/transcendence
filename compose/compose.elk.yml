@@ -19,60 +19,14 @@ networks:
 
 services:
  setup:
-   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+   container_name: setup
+   build:
+      context: ./elk_struct/setup
+      dockerfile: Dockerfile
    volumes:
-     - ../elk_struct/certs:/usr/share/elasticsearch/config/certs
+     - certs:/usr/share/elasticsearch/config/certs
    user: "0"
-   command: >
-     bash -c '
-       if [ x${ELASTIC_PASSWORD} == x ]; then
-         echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
-         exit 1;
-       elif [ x${KIBANA_PASSWORD} == x ]; then
-         echo "Set the KIBANA_PASSWORD environment variable in the .env file";
-         exit 1;
-       fi;
-       if [ ! -f config/certs/ca.zip ]; then
-         echo "Creating CA";
-         bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
-         unzip config/certs/ca.zip -d config/certs;
-       fi;
-       if [ ! -f config/certs/certs.zip ]; then
-         echo "Creating certs";
-         echo -ne \
-         "instances:\n"\
-         "  - name: es01\n"\
-         "    dns:\n"\
-         "      - es01\n"\
-         "      - localhost\n"\
-         "    ip:\n"\
-         "      - 127.0.0.1\n"\
-         "  - name: kibana\n"\
-         "    dns:\n"\
-         "      - kibana\n"\
-         "      - localhost\n"\
-         "  - name: logstash\n"\
-         "    dns:\n"\
-         "      - logstash\n"\
-         "      - localhost\n"\
-         "    ip:\n"\
-         "      - 127.0.0.1\n"\
-         > config/certs/instances.yml;
-         bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
-         unzip config/certs/certs.zip -d config/certs;
-       fi;
-       echo "Setting file permissions"
-       chown -R root:root config/certs;
-       find . -type d -exec chmod 750 \{\} \;;
-       find . -type f -exec chmod 640 \{\} \;;
-       echo "Waiting for Elasticsearch availability";
-       echo -e "/////////////////////////////////////////////////////////////////Convert the Logstash key to pkcs8/////////////////////////////////////////////////////////////////"
-       openssl pkcs8 -inform PEM -in config/certs/logstash/logstash.key -topk8 -nocrypt -outform PEM -out config/certs/logstash/logstash.pkcs8.key
-       until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
-       echo "Setting kibana_system password";
-       until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 5; done;
-       echo "All done!";
-     '
+   command: bash /usr/share/elasticsearch/tools/setup.sh
    healthcheck:
      test: 
        [
@@ -99,7 +53,7 @@ services:
    labels:
      co.elastic.logs/module: elasticsearch
    volumes:
-     - ../elk_struct/certs:/usr/share/elasticsearch/config/certs:ro
+     - certs:/usr/share/elasticsearch/config/certs:ro
      - esdata01:/usr/share/elasticsearch/data
    ports:
      - ${ES_PORT}:9200
@@ -151,7 +105,7 @@ services:
    labels:
      co.elastic.logs/module: kibana
    volumes:
-     - ../elk_struct/certs:/usr/share/kibana/config/certs
+     - certs:/usr/share/kibana/config/certs
      - kibanadata:/usr/share/kibana/data
    ports:
      - ${KIBANA_PORT}:5601
@@ -194,7 +148,7 @@ services:
       dockerfile: Dockerfile
    user: root
    volumes:
-     - ../elk_struct/certs:/usr/share/filebeat/certs
+     - certs:/usr/share/filebeat/certs
      - filebeatdata01:/usr/share/filebeat/data
      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
      - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -225,7 +179,7 @@ services:
      co.elastic.logs/module: logstash
    user: root
    volumes:
-     - ../elk_struct/certs:/usr/share/logstash/certs:ro
+     - certs:/usr/share/logstash/certs:ro
      - logstashdata01:/usr/share/logstash/data
    environment:
      - xpack.monitoring.enabled=false
@@ -256,7 +210,7 @@ services:
     kibana:
       condition: service_healthy
   container_name: policy
-  image: docker:latest
+  image: docker:19.03-dind
   networks:
     - app_network
     - elk_log
@@ -280,7 +234,7 @@ services:
       logstash01:
         condition: service_healthy
     container_name: data_views
-    image: docker:latest
+    image: docker:19.03-dind
     networks:
      - app_network
      - elk_log
@@ -299,7 +253,7 @@ services:
       data_views:
         condition: service_healthy
     container_name: dashboards
-    image: docker:latest
+    image: docker:19.03-dind
     networks:
      - app_network
      - elk_log
