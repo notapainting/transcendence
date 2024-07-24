@@ -15,6 +15,7 @@ export const EventGame = Object.freeze({
     RESUME: "game.resume",
     END: "game.end",
     BROKE: "game.broke",
+    SETTINGS: "game.settings",
 })
 
 export const EventTournament = Object.freeze({
@@ -32,10 +33,12 @@ export const EventTournament = Object.freeze({
     RESULT: "tournament.result",
     BROKE: "tournament.broke",
     END: "tournament.end",
+    SETTINGS: "tournament.settings",
 })
 
 export const EventLocal = Object.freeze({
     MODE: "local.mode",
+    SETTINGS : EventTournament.SETTINGS,
     PLAYERS: "local.players",
     PHASE: "local.phase",
     MATCH: "local.match",
