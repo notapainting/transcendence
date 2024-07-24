@@ -4,7 +4,7 @@ import game.power_up as pow
 import game.enums as enu
 import random, asyncio, time
 
-TOURNAMENT_MAX_PLAYER = 16
+TOURNAMENT_MAX_PLAYER = 2
 
 
 MAX_SCORE = 1
