@@ -2,7 +2,7 @@ import { clearView } from "./index.js";
 import { isUserAuthenticated } from "./index.js";
 import { whoIam } from "./index.js";
 import {initGameWebSocket} from "./game/websocket.js"
-
+import * as enu from './game/enums.js'
 // enlever le bouton + lorsque la demande damis a ete accepte
 // enlever la notif lorsque lautre personne accepte
 
@@ -586,7 +586,7 @@ export const showChat = async () => {
     document.querySelector(".left-display").addEventListener("click", showChatLeft)
     if (!flg)
         initializeWebSocket();
-    initGameWebSocket();
+    initGameWebSocket(enu.backendPath.REMOTE);
     searchbar.addEventListener('input', searchUsers);
     const sendButton = document.querySelector(".chat-send");
     sendButton.addEventListener("click", sendMessage);
