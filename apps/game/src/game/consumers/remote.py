@@ -358,11 +358,11 @@ class RemoteGamer(BaseConsumer):
         await self.send_json(data)
 
     async def game_kick(self, data):
-        if data['author'] == self.host:
+        if self.status == enu.CStatus.IDLE:
+            self.invitations.discard(data['author'])
+        elif data['author'] == self.host:
             self.host = None
             self.set_mode(enu.CStatus.IDLE)
-        else:
-            self.invitations.discard(data['author'])
         await self.send_json(data)
 
 # TOURNAMENT
