@@ -266,20 +266,31 @@
                 </div>
             </div>
 
+            <!-- deplacement  menus-->
+            <div class="class-m1-button menu-element" id="menu-m1-button">
+                <button id="game-menu-local" class="button-menu" type="button">Mode local</button>
+                <button id="game-menu-fastGame" class="button-menu" type="button">Partie rapide</button>
+                <button id="game-menu-tournament" class="button-menu" type="button">Tournoi</button>
+                <button id="game-menu-m1-quit" class="button-menu" type="button">Quit</button>
+            </div>
 
-            <!-- deplacement -->
-            <div class="bottom-buttons">
-                <button id="game-menu-start" class="menu-element button-menu" type="button">Start</button>
-                <button id="game-menu-quit" class="menu-element button-menu" type="button">Quit</button>
+            <div class="class-m2a-button menu-element" id="menu-m2a-button">
+                <button id="game-menu-start" class="button-menu" type="button">Start</button>
+                <button id="game-menu-m2a-quit" class="button-menu" type="button">Quit</button>
             </div>
             
-            <button id="game-menu-next" class="menu-element button-menu" type="button">Next Match</button>
+            <!-- set ready -->
+            <div class="class-m2b-button menu-element" id="menu-m2b-button">
+                <button id="game-menu-ready" class="button-menu" type="button">Ready?</button>
+                <button id="game-menu-m2b-quit" class="button-menu" type="button">Quit</button>
+                <div id="game-menu-ready-circle" class="menu-element"></div>
+            </div>
 
-            <!-- choose mode -->
-            <button id="game-menu-fastGame" class="menu-element button-menu" type="button">Partie rapide</button>
-            <button id="game-menu-tournament" class="menu-element button-menu" type="button">Tournoi</button>
-            <button id="game-menu-local" class="menu-element button-menu" type="button">Mode local</button>
-
+            <div class="menu-m3-button menu-element" id="menu-m3-button">
+                <button id="game-menu-next" class="button-menu" type="button">Next Match</button>
+                <button id="game-menu-m3-quit" class="button-menu" type="button">Quit</button>
+            </div>
+            
             <!-- invite player -->
             <input type="text" id="game-menu-inviteInput" class="menu-element" placeholder="Nom d'un joueur...">
             <button id="game-menu-inviteButton" class="menu-element button-menu">Invite</button>
@@ -288,10 +299,6 @@
                 <h3>Invitations Reçues: </h3>
                 <ul id="game-menu-invitationList"></ul>
             </div>
-
-            <!-- set ready -->
-            <button id="game-menu-ready" class="menu-element button-menu" type="button">Ready?</button>
-            <div id="game-menu-ready-circle" class="menu-element"></div>
 
             <!-- in game banner -->
             <div id="game-menu-banner-phase" class="menu-element game-announce-base"></div>
