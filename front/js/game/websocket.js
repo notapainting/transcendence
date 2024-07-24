@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { changeStatus, announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearSentList } from './menu.js';
+import { changeStatus, announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearInvitationList } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
@@ -283,33 +283,6 @@ function updateInvitationList(type, user) {
 
 }
 
-function updateInvitationList2() {
-    const invitationList = document.getElementById('game-menu-invitationList');
-    invitationList.innerHTML = '';
-
-    invitations.forEach((invitation, index) => {
-        const listItem = document.createElement('li');
-        const invitationText = document.createElement('span');
-        invitationText.textContent = `${index + 1}. ${invitation}`;
-
-        const acceptButton = document.createElement('button');
-        acceptButton.textContent = 'Accepter';
-        acceptButton.className = 'accept-button';
-
-        acceptButton.addEventListener('click', function() {
-            invitationText.textContent = `${index + 1}. ${invitation} - Ok`;
-            acceptButton.disabled = true;
-            gameSocket.send(JSON.stringify({
-                'type': 'game.join',
-                'message': invitation
-            }));
-        });
-
-        listItem.appendChild(invitationText);
-        listItem.appendChild(acceptButton);
-        invitationList.appendChild(listItem);
-    });
-}
 
 const bindKeyPress = (event) => {
     let data = {'type': 'game.update','message': ''};
@@ -377,7 +350,34 @@ export const clearGame = () => {
     // lastPingTime = currentTime;
     // console.log("ping = ", lastPingTime);
 
-
+    function updateInvitationList2() {
+        const invitationList = document.getElementById('game-menu-invitationList');
+        invitationList.innerHTML = '';
+    
+        invitations.forEach((invitation, index) => {
+            const listItem = document.createElement('li');
+            const invitationText = document.createElement('span');
+            invitationText.textContent = `${index + 1}. ${invitation}`;
+    
+            const acceptButton = document.createElement('button');
+            acceptButton.textContent = 'Accepter';
+            acceptButton.className = 'accept-button';
+    
+            acceptButton.addEventListener('click', function() {
+                invitationText.textContent = `${index + 1}. ${invitation} - Ok`;
+                acceptButton.disabled = true;
+                gameSocket.send(JSON.stringify({
+                    'type': 'game.join',
+                    'message': invitation
+                }));
+            });
+    
+            listItem.appendChild(invitationText);
+            listItem.appendChild(acceptButton);
+            invitationList.appendChild(listItem);
+        });
+    }
+    
 
 /*
 

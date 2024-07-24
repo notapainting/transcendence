@@ -10,6 +10,7 @@ let flg2 = 0;
 let flg3 = 0;
 
 export const showGame = async () => {
+    console.log("in show : rem")
     await isUserAuthenticated();
     const data = await getPersInfo();
     clearView();
@@ -25,6 +26,8 @@ export const showGame = async () => {
 }
 
 export const showGameLocal  = async () => {
+    console.log("in show : loc")
+
     clearView();
     fullClear();
     if (await isUserAuthenticated()){
