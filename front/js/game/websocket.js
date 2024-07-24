@@ -29,7 +29,7 @@ const _initWebsocket = (path, handler) => {
     gameSocket.onmessage = handler;
     gameSocket.onclose = function(e) {
         console.log('GameWebSocket connection closed');
-        setTimeout(_initWebsocket, 5000, [path, handler])
+        setTimeout(_initWebsocket, 5000, path, handler)
         gameSocket = null;
     };
 }
@@ -336,108 +336,6 @@ export const clearGame = () => {
 }
 
 
-    // const currentTime = performance.now();
-    // const pingDelay = currentTime - lastPingTime;
-    // console.log("Ping delay:", pingDelay, "ms");
-
-    // if (message.winner == 'leftWin')
-    // 	playerWin('left')
-    // else if (message.winner == 'rightWin')
-    // 	playerWin('right')
-
-    // lastPingTime = currentTime;
-    // console.log("ping = ", lastPingTime);
-
-    function updateInvitationList2() {
-        const invitationList = document.getElementById('game-menu-invitationList');
-        invitationList.innerHTML = '';
-    
-        invitations.forEach((invitation, index) => {
-            const listItem = document.createElement('li');
-            const invitationText = document.createElement('span');
-            invitationText.textContent = `${index + 1}. ${invitation}`;
-    
-            const acceptButton = document.createElement('button');
-            acceptButton.textContent = 'Accepter';
-            acceptButton.className = 'accept-button';
-    
-            acceptButton.addEventListener('click', function() {
-                invitationText.textContent = `${index + 1}. ${invitation} - Ok`;
-                acceptButton.disabled = true;
-                gameSocket.send(JSON.stringify({
-                    'type': 'game.join',
-                    'message': invitation
-                }));
-            });
-    
-            listItem.appendChild(invitationText);
-            listItem.appendChild(acceptButton);
-            invitationList.appendChild(listItem);
-        });
-    }
-    
-
-/*
-
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'w') {
-        gameSocket.send(JSON.stringify({
-			'type': 'game.update',
-            'message': 'wPressed'
-        }));
-    }
-	else if (event.key === 's') {
-		gameSocket.send(JSON.stringify({
-			'type': 'game.update',
-			'message': 'sPressed'
-		}));
-	}
-	else if (event.key === 'ArrowUp') {
-		gameSocket.send(JSON.stringify({
-			'type': 'game.update',
-			'message': 'upPressed'
-		}));
-	}
-	else if (event.key === 'ArrowDown') {
-		gameSocket.send(JSON.stringify({
-			'type': 'game.update',
-			'message': 'downPressed'
-		}));
-	}
-});
-
-
-document.addEventListener('keyup', function(event) {
-    if (event.key === 'w') {
-        gameSocket.send(JSON.stringify({
-			'type': 'game.update',
-            'message': 'wRelease'
-        }));
-    }
-	else if (event.key === 's') {
-		gameSocket.send(JSON.stringify({
-			'type': 'game.update',
-			'message': 'sRelease'
-		}));
-	}
-	else if (event.key === 'ArrowUp') {
-		gameSocket.send(JSON.stringify({
-			'type': 'game.update',
-			'message': 'upRelease'
-		}));
-	}
-	else if (event.key === 'ArrowDown') {
-		gameSocket.send(JSON.stringify({
-			'type': 'game.update',
-			'message': 'downRelease'
-		}));
-	}
-});
-
-
-
-// let lastPingTime = performance.now();
-
 // bouton game
 /*
 
@@ -468,25 +366,4 @@ document.querySelector('#stopButton').onclick = function(e) {
 		gameData.timerInterval = null;
 	}
 };
-*/
-
-
-/*
-	fastGame.style.display = 'none';
-	tournament.style.display = 'none';
-	exit.style.display = 'none';
-
-	create.style.display = 'block';
-	join.style.display = 'block';
-});
-
-tournament.addEventListener('click', () => {
-	fastGame.style.display = 'none';
-	tournament.style.display = 'none';
-	exit.style.display = 'none';
-
-	create.style.display = 'block';
-	join.style.display = 'block';
-});
-
 */

@@ -12,6 +12,7 @@ class Errors(enum.StrEnum):
 class Game(enum.StrEnum):
     HOST = "game.host"
     GUEST = "game.guest"
+    SETTINGS = "game.settings"
 
     CREATE = "game.create"
     INVITE = "game.invite"
@@ -27,13 +28,14 @@ class Game(enum.StrEnum):
     SCORE = "game.score"
 
     START = "game.start"
-    PAUSE = "game.pause"
+    PAUSE = "game.pause" 
     RESUME = "game.resume"
     END = "game.end"
 
 class Tournament(enum.StrEnum):
     HOST = "tournament.host"
     GUEST = "tournament.guest"
+    SETTINGS = "tournament.settings"
 
     CREATE = "tournament.create"
     INVITE = "tournament.invite"
@@ -52,6 +54,7 @@ class Tournament(enum.StrEnum):
 
 class Local(enum.StrEnum):
     MODE = "local.mode"
+    SETTINGS = Tournament.SETTINGS
     PLAYERS = "local.players"
     PHASE = "local.phase"
     MATCH = "local.match"

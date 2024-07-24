@@ -4,6 +4,7 @@ import game.enums as enu
 import channels.exceptions as exchan
 
 from game.consumers.base import BaseConsumer
+from game.consumers.local import LocalConsumer
 from game.gamestate import GameState, remote_loop, local_loop
 from game.lobby import Match, Tournament
 
@@ -26,7 +27,7 @@ async def authenticate(headers):
         logger.error(error)
     return user
 
-class RemoteGamer(BaseConsumer):
+class RemoteGamer(LocalConsumer):
     def __init__(self):
         super().__init__()
         self.username = "Anon"
@@ -35,15 +36,8 @@ class RemoteGamer(BaseConsumer):
         self.mode = self.idle
         self.loopback = self.status
 
-        self.local_players = []
-        self.local_losers = []
-        self.local_current = []
-        self.local_matchIdx = -2
-        self.local_task = None
-        self.local_game_state = None
-
     async def connect(self):
-        self.username = await authenticate(dict(self.scope['headers'])) #str(self.scope.get('user', 'Anon'))
+        self.username = await authenticate(dict(self.scope['headers'])) 
         if self.username is None:
             raise exchan.DenyConnection()
         await self.accept()
@@ -56,7 +50,7 @@ class RemoteGamer(BaseConsumer):
         print(f"bye {self.username} ({self.status})...")
 
         if self.status == enu.Local.MODE:
-            self.local_clear()
+            super().local_clear()
         elif self.status == enu.Game.HOST:
             await self.match.end(True)
             await self.match.broadcast({"type":enu.Game.BROKE, "author":self.username})
@@ -122,87 +116,9 @@ class RemoteGamer(BaseConsumer):
 
 # LOCAL
     async def local(self, data):
-        match data['type']:
-            case enu.Local.PLAYERS: 
-                self.local_players = list(data['message'])
-                if len(self.local_players) % 2 != 0 or len(self.local_players) == 0:
-                    await self.send_json({'type':'error.players'})
-                else:
-                    await self.local_matchmake()
-            case enu.Local.UPDATE:
-                await self.local_gaming(data)
-            case enu.Local.READY:
-                await self.local_gaming({"message":"startButton"})
-            case enu.Local.PAUSE:
-                if self.local_game_state.status['game_running'] == True:
-                    await self.local_gaming({"message":"stopButton"})
-                else:
-                    await self.local_gaming({"message":"startButton"})
-            case enu.Local.NEXT:
-                await self.local_announce_next()
-            case enu.Local.QUIT:
-                self.local_clear()
-                self.set_mode(enu.CStatus.IDLE)
-            case _:
-                print(f"error in local: bad type")
-
-    async def local_matchmake(self):
-        random.shuffle(self.local_players)
-        self.local_current = [(self.local_players[i],self.local_players[i + 1]) for i in range(0, len(self.local_players), 2)]
-        self.local_matchIdx = -1
-        await self.send_json({"type":enu.Local.PHASE, "message":self.local_current})
-
-    async def local_announce_next(self):
-        if self.local_matchIdx == -2:
-            return
-        if self.local_matchIdx == -3:
-            return await self.send_json({'type':enu.Local.END_TRN})
-        self.local_matchIdx += 1
-        if self.local_matchIdx == len(self.local_current):
-            if len(self.local_current) == 1:
-                return
-            await self.local_matchmake()
-        else:
-            match = self.local_current[self.local_matchIdx]
-            self.local_game_state = GameState()
-            await self.send_json({"type":enu.Local.MATCH, "message":match, "state":self.local_game_state.to_dict('none')})
-
-    async def local_game_end(self, data):
-        winner = self.local_game_state.status['winner']
-        if winner == 'leftWin':
-            winner = self.local_current[self.local_matchIdx][0]
-            loser = self.local_current[self.local_matchIdx][1]
-        else:
-            winner = self.local_current[self.local_matchIdx][1]
-            loser = self.local_current[self.local_matchIdx][0]
-        self.local_losers.append(loser)
-        self.local_players.remove(loser)
-        await self.send_json({'type':enu.Local.END_GAME, "message":winner})
-        if len(self.local_current) == 1:
-            self.local_clear()
-            self.local_matchIdx =-3
-
-    async def local_gaming(self, data):
-        message = data["message"]
-        if message == "startButton":
-            self.local_game_state.status['game_running'] = True
-            self.task = asyncio.create_task(local_loop(self))
-        elif message == "stopButton":
-            self.local_game_state.status['game_running'] = False
-        elif message == "bonus":
-            self.local_game_state.status['randB'] = data["bonus"]
-        else :
-            asyncio.create_task(self.local_game_state.update_player_position(message))
-
-    def local_clear(self):
-        self.local_players = []
-        self.local_losers = []
-        self.local_current = []
-        if self.local_task is not None:
-            self.local_task.cancel()
-        if hasattr(self, "local_game_state"):
-            del self.local_game_state
-        self.local_matchIdx = -2
+        await super().local(data)
+        if data['type'] == enu.Local.QUIT:
+            self.set_mode(enu.CStatus.IDLE)
 
 
 # MATCH
@@ -306,7 +222,7 @@ class RemoteGamer(BaseConsumer):
         else:
             data['tournament'] = False
         await self.send_json(data)
-
+ 
     async def game_pause(self, data):
         if self.status == enu.Game.HOST:
             if data['author'] == self.username:
