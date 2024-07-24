@@ -16,16 +16,45 @@ async function sleep (ms) { new Promise(r => setTimeout(r, ms));}
 
 function askNext() {gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}))}
 
+
+
+/*
+enu.Local.PLAYERS
+enu.Local.UPDATE
+enu.Local.NEXT
+enu.Local.QUIT
+*/
+
+export const initGameWebSocket = (path) => {
+    _initWebsocket(path, (path === enu.backendPath.LOCAL) ? localHandler : remoteHandler)
+}
+
+const _initWebsocket = (path, handler) => {
+    if (gameSocket !== null) return ; 
+    gameSocket = new WebSocket(
+        'wss://'
+        + window.location.host
+        + path
+    );
+    console.log("GWS connection open on : " + path)
+    gameSocket.onmessage = handler;
+    gameSocket.onclose = function(e) {
+        console.log('GameWebSocket connection closed');
+        setTimeout(initLocalGameWebSocket, 5000)
+        gameSocket = null;
+    };
+}
+
 const localHandler = (e) => {
     const content = JSON.parse(e.data);
     console.log("message: ", content.type);
     switch (content.type) {
         case enu.EventLocal.PHASE:
-            moveTo(enu.sceneLocIdx.PHASE);
+            moveTo(enu.sceneIdx.PHASE);
             announcePhase(content.message);
             break;
         case enu.EventLocal.MATCH:
-            moveTo(enu.sceneLocIdx.PREMATCH);
+            moveTo(enu.sceneIdx.PREMATCH);
             announceMatch(content.message);
             document.addEventListener('keydown', bindKeyPress)
             document.addEventListener('keyup', bindKeyRelease)
@@ -50,11 +79,11 @@ const localHandler = (e) => {
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content.message);
-            moveTo(enu.sceneLocIdx.END_GAME)
+            moveTo(enu.sceneIdx.END_GAME)
             setTimeout(askNext, 3000);
             break;
         case enu.EventLocal.END_TRN:
-            moveTo(enu.sceneLocIdx.END)
+            moveTo(enu.sceneIdx.END)
             break;
         default:
             console.log("unknow type");
@@ -63,56 +92,17 @@ const localHandler = (e) => {
 }
 
 
-/*
-enu.Local.PLAYERS
-enu.Local.UPDATE
-enu.Local.NEXT
-enu.Local.QUIT
-*/
-
-export const initLocalGameWebSocket = () => {
-    if (gameSocket !== null) return ; 
-    gameSocket = new WebSocket(
-        'wss://'
-        + window.location.host
-        + enu.backendPath.LOCAL
-    );
-    console.log("Local GWS connection open")
-    gameSocket.onmessage = localHandler;
-    gameSocket.onclose = function(e) {
-        console.log('GameWebSocket connection closed');
-        setTimeout(initLocalGameWebSocket, 5000)
-        gameSocket = null;
-    };
-}
-
-export const initGameWebSocket = () => {
-    if (gameSocket !== null) return ; 
-    gameSocket = new WebSocket(
-        'wss://'
-        + window.location.host
-        + enu.backendPath.REMOTE
-    );
-    console.log("Remote GWS connection open")
-    gameSocket.onmessage = remoteHandler;
-    gameSocket.onclose = function(e) {
-        console.log('GameWebSocket connection closed');
-        setTimeout(initGameWebSocket, 5000)
-        gameSocket = null;
-    };
-}
-
 const remoteHandler = (e) => {
     const content = JSON.parse(e.data);
     console.log("message: ", content.type);
     switch(content.type) {
 // LOCAL
         case enu.EventLocal.PHASE:
-            moveTo(enu.sceneLocIdx.PHASE);
+            moveTo(enu.sceneIdx.PHASE);
             announcePhase(content.message);
             break;
         case enu.EventLocal.MATCH:
-            moveTo(enu.sceneLocIdx.PREMATCH);
+            moveTo(enu.sceneIdx.PREMATCH);
             announceMatch(content.message);
             document.addEventListener('keydown', bindKeyPress)
             document.addEventListener('keyup', bindKeyRelease)
@@ -130,11 +120,11 @@ const remoteHandler = (e) => {
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content.message);
-            moveTo(enu.sceneLocIdx.END_GAME)
+            moveTo(enu.sceneIdx.END_GAME)
             setTimeout(askNext, 3000);
             break;
         case enu.EventLocal.END_TRN:
-            moveTo(enu.sceneLocIdx.END)
+            moveTo(enu.sceneIdx.END)
             break;
 
 // match
@@ -221,7 +211,7 @@ const remoteHandler = (e) => {
             // players is ready 
             break;
         case enu.EventTournament.PHASE:
-            moveTo(enu.sceneIdx.PHASES)
+            moveTo(enu.sceneIdx.PHASE)
             announcePhase(content.message);
             // planning of match for that phase
             break;

@@ -56,7 +56,7 @@ export const sceneIdx = Object.freeze({
     WELCOME: 0,
     CREATION:1,
     WAITING:2,
-    PHASES:3,
+    PHASE:3,
     PREMATCH:4,
     MATCH:5,
     END:6,
@@ -65,20 +65,12 @@ export const sceneIdx = Object.freeze({
 })
 
 
-export const sceneLocIdx = Object.freeze({
-    WELCOME: 0,
-    PHASE: 1,
-    PREMATCH:2,
-    MATCH:3,
-    END_GAME:4,
-    END:5,
-})
+
 
 export const gameMode = Object.freeze({
     LOCAL: 0,
     MATCH: 1,
     TOURNAMENT: 2,
-    ANON: 3,
 })
 
 
