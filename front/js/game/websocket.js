@@ -40,7 +40,7 @@ const _initWebsocket = (path, handler) => {
     gameSocket.onmessage = handler;
     gameSocket.onclose = function(e) {
         console.log('GameWebSocket connection closed');
-        setTimeout(initLocalGameWebSocket, 5000)
+        setTimeout(_initWebsocket, 5000, [path, handler])
         gameSocket = null;
     };
 }
