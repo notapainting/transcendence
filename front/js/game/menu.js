@@ -28,10 +28,7 @@ const   createTournament = document.getElementById('game-menu-tournament');
 const   createLocal = document.getElementById('game-menu-local');
 
 // <!-- invite player -->
-const   userInput = document.getElementById('game-menu-inviteInput');
-const   inviteButton = document.getElementById('game-menu-inviteButton');
 const   invitationBox = document.getElementById('game-menu-invitationBox');
-const   invitationSent = document.getElementById('game-menu-invite-sent-list');
 
 // <!-- set ready -->
 const   ready = document.getElementById('game-menu-ready');
@@ -59,7 +56,7 @@ export const changeStatus = (type) => {
 
 }
 
-
+let quitInited = false;
 // scene idx
 let     idx = enu.sceneIdx.WELCOME;
 
@@ -88,20 +85,6 @@ const   scene = [
     [], // ecran erreur
 ];
 
-
-/*
-quit = home(C)/exit(A)
-
-m1 : local match tournoi exit
-m2 : start quit
-m2a : ready quit
-m3 : next quit
-m4 : ready
-m5 : pause quit (abandon)
-m6 : quit 
-m7 : quit 
-
-*/
 
 
 // status == idle/match/tournoi/local/anon
@@ -140,7 +123,6 @@ m7 : quit
 /*** initialisation ****/
 export const initMenu = (path) => {
     console.log("in intm")
-    
     if (path === enu.backendPath.LOCAL) {
         status = enu.gameMode.LOCAL;
         anon = true;
@@ -317,12 +299,8 @@ const quitFunc = () => {
     moveTo(to);
 };
 
-document.querySelectorAll("button-menu-quit").forEach(div => {div.addEventListener('click', quitFunc)});
 
-document.getElementById('game-menu-m1-quit').addEventListener('click', quitFunc);
-document.getElementById('game-menu-m2a-quit').addEventListener('click', quitFunc);
-document.getElementById('game-menu-m2b-quit').addEventListener('click', quitFunc);
-document.getElementById('game-menu-m3-quit').addEventListener('click', quitFunc);
+document.querySelectorAll(".button-menu-quit").forEach(div => {div.addEventListener('click', quitFunc)});
 
 
 start.addEventListener('click', () => {
@@ -367,7 +345,7 @@ const createListLocal = (user) => {
     item.className = 'list-tournoi-element';
     itemName.textContent = user;
     button.textContent = 'Remove';
-    button.className = 'accept-button';
+    button.className = 'remove-button';
     button.addEventListener('click', (e) => {
         const pos = players.indexOf(user);
         players.splice(pos, 1);
@@ -392,7 +370,7 @@ const createListRemote = (user, invite, kick) => {
     itemStatus.textContent = '...waiting...';
 
     button.textContent = 'Remove';
-    button.className = 'accept-button';
+    button.className = 'remove-button';
     button.addEventListener('click', (e) => {
         const pos = players.indexOf(user);
         players.splice(pos, 1);
