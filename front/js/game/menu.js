@@ -88,14 +88,6 @@ const   scene = [
     [], // ecran erreur
 ];
 
-// const   sceneLoc = [
-//     [start, quit, locContainerList, locContainerSettings],
-//     [bannerPhase, nextMatch, quit],
-//     [bannerMatch, ready],
-//     [bannerScore, pause, quit],
-//     [bannerEnd],
-//     [quit],
-// ];
 
 /*
 quit = home(C)/exit(A)
@@ -113,17 +105,16 @@ m7 : quit
 
 
 // status == idle/match/tournoi/local/anon
-const   sceneWIP = [
-    [], // 0 (C) acceuil du jeu -> containerMenu (Local+Match+Tournament+quit), containerInvitedBy
-    [], // 1 (C/A)(host) creation de partie/tournoi -> containerSettings, containerInvitations (simple/status+ready), containerMenu (start+((C)home/(A)exit))
-    [], // 2 (C)(guest) waiting room -> containerSettingsFrozen, containerInvitationsFrozen, containerMenuGuest (ready+quit)
-    [], // 3 (C/A) tounoi phase -> containerPhase, containerMenu (nextmatch+quit)
-    [], // 4 (C/A) pre match, ready check -> ready, 
-    [], // 5 (C/A) match -> conatinerScores, containerMenu (pause+abandon)
-    [], // 6 (C/A) fin match -> containerWinner (5s)
-    [], // 7 (C/A) fin tournoi -> containerClassement, containerMenu (home+quit)
-    [], // 8 (C) broken/quit containerError, containerMenu (home+quit)
-]
+ // 0 (C) acceuil du jeu -> containerMenu (Local+Match+Tournament+quit), containerInvitedBy
+ // 1 (C/A)(host) creation de partie/tournoi -> containerSettings, containerInvitations (simple/status+ready), containerMenu (start+((C)home/(A)exit))
+ // 2 (C)(guest) waiting room -> containerSettingsFrozen, containerInvitationsFrozen, containerMenuGuest (ready+quit)
+ // 3 (C/A) tounoi phase -> containerPhase, containerMenu (nextmatch+quit)
+ // 4 (C/A) pre match, ready check -> ready, 
+ // 5 (C/A) match -> conatinerScores, containerMenu (pause+abandon)
+ // 6 (C/A) fin match -> containerWinner (5s)
+ // 7 (C/A) fin tournoi -> containerClassement, containerMenu (home+quit)
+ // 8 (C) broken/quit containerError, containerMenu (home+quit)
+
 // ANON : 1 -> 3 -> 4 -> 5 -> 6
 //             ^         |
 //             |<---  <---
@@ -169,9 +160,8 @@ export const initMenu = (path) => {
 export const clearInvitationList = () => {
     const local = document.getElementById('game-menu-list');
     while (local.firstChild) {local.removeChild(local.lastChild);}
+    players = [];
 }
-
-
 
 
 /*** utils ***/
@@ -251,8 +241,6 @@ export const clearMenu = () => {
     circle.style.background = '#ee0e0e';
 }
 
-
-
 export const moveTo = (i) => {
     if (i === scene.length || i < 0) return ;
     idx = i;
@@ -308,6 +296,7 @@ pause.addEventListener('click', () => {
 
 
 const quitFunc = () => {
+    clearInvitationList();
     if (anon === true) {
         if (idx == enu.sceneIdx.CREATION) {
             console.log("ANON exit")
@@ -328,7 +317,7 @@ const quitFunc = () => {
     moveTo(to);
 };
 
-document.querySelectorAll("button-menu-quit").addEventListener('click', quitFunc);
+document.querySelectorAll("button-menu-quit").forEach(div => {div.addEventListener('click', quitFunc)});
 
 document.getElementById('game-menu-m1-quit').addEventListener('click', quitFunc);
 document.getElementById('game-menu-m2a-quit').addEventListener('click', quitFunc);
@@ -415,8 +404,8 @@ const createListRemote = (user, invite, kick) => {
     });
 
     item.appendChild(itemName);
-    item.appendChild(button);
     item.appendChild(itemStatus);
+    item.appendChild(button);
 
     document.getElementById('game-menu-list').appendChild(item);
 
