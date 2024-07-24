@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearSentList } from './menu.js';
+import { changeStatus, announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearSentList } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
@@ -197,6 +197,7 @@ const remoteHandler = (e) => {
         case enu.EventGame.END:
             fullClear();
             moveTo(enu.sceneIdx.END);
+            if (content.tournament) changeStatus(enu.gameMode.TOURNAMENT);
             break;
         case enu.EventError.TYPE:
             console.error(content.type)
@@ -214,15 +215,19 @@ const remoteHandler = (e) => {
 
         case enu.EventTournament.ACCEPTED:
             // received whe naccepted in trn
+            moveTo(enu.sceneIdx.WAITING)
             break;
         case enu.EventTournament.READY:
             // players is ready 
             break;
         case enu.EventTournament.PHASE:
+            moveTo(enu.sceneIdx.PHASES)
+            announcePhase(content.message);
             // planning of match for that phase
             break;
         case enu.EventTournament.MATCH:
             // match you have to play
+            changeStatus(enu.gameMode.MATCH);
             break;
         case enu.EventTournament.RESULT:
             // result of a match
@@ -258,7 +263,7 @@ function updateInvitationList(type, user) {
 
     const   listItemName = document.createElement('span');
     listItemName.textContent = `(${typeGame}) ${user}`;
-    
+
     const acceptButton = document.createElement('button');
     acceptButton.textContent = 'Accepter';
     acceptButton.className = 'accept-button';
