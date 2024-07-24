@@ -328,6 +328,8 @@ const quitFunc = () => {
     moveTo(to);
 };
 
+document.querySelectorAll("button-menu-quit").addEventListener('click', quitFunc);
+
 document.getElementById('game-menu-m1-quit').addEventListener('click', quitFunc);
 document.getElementById('game-menu-m2a-quit').addEventListener('click', quitFunc);
 document.getElementById('game-menu-m2b-quit').addEventListener('click', quitFunc);
