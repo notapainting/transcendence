@@ -266,14 +266,26 @@
                 </div>
             </div>
 
-            <!-- deplacement  menus-->
-            <div class="class-m1-button menu-element" id="menu-m1-button">
-                <button id="game-menu-local" class="button-menu" type="button">Mode local</button>
-                <button id="game-menu-fastGame" class="button-menu" type="button">Partie rapide</button>
-                <button id="game-menu-tournament" class="button-menu" type="button">Tournoi</button>
-                <button id="game-menu-m1-quit" class="button-menu" type="button">Quit</button>
+            <!-- menu principal online -->
+            <div class="main-menu-online">
+                <!-- invite player -->
+                <div id="game-menu-invitationBox" class="menu-element">
+                    <h1>Invitations Reçues: </h1>
+                    <div class="list-invitation-box">
+                        <ul id="game-menu-invitationList"></ul>
+                    </div>
+                </div>
+
+                <!-- deplacement menus 1 -->
+                <div class="class-m1-button menu-element" id="menu-m1-button">
+                    <button id="game-menu-local" class="button-menu" type="button">Mode local</button>
+                    <button id="game-menu-fastGame" class="button-menu" type="button">Partie rapide</button>
+                    <button id="game-menu-tournament" class="button-menu" type="button">Tournoi</button>
+                    <button id="game-menu-m1-quit" class="button-menu" type="button">Quit</button>
+                </div>
             </div>
 
+            <!-- deplacement menus autres -->
             <div class="class-m2a-button menu-element" id="menu-m2a-button">
                 <button id="game-menu-start" class="button-menu" type="button">Start</button>
                 <button id="game-menu-m2a-quit" class="button-menu" type="button">Quit</button>
@@ -291,14 +303,6 @@
                 <button id="game-menu-m3-quit" class="button-menu" type="button">Quit</button>
             </div>
             
-            <!-- invite player -->
-            <input type="text" id="game-menu-inviteInput" class="menu-element" placeholder="Nom d'un joueur...">
-            <button id="game-menu-inviteButton" class="menu-element button-menu">Invite</button>
-            <ul id="game-menu-invite-sent-list" class="remote-list menu-element"></ul>
-            <div id="game-menu-invitationBox" class="menu-element">
-                <h3>Invitations Reçues: </h3>
-                <ul id="game-menu-invitationList"></ul>
-            </div>
 
             <!-- in game banner -->
             <div id="game-menu-banner-phase" class="menu-element game-announce-base"></div>
