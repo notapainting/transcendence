@@ -54,8 +54,6 @@ export const changeStatus = (type) => {
 
 }
 
-// is sceneRem or sceneLoc depending on status
-let     scene = null;
 
 // scene idx
 let     idx = enu.sceneIdx.WELCOME;
@@ -63,9 +61,8 @@ let     idx = enu.sceneIdx.WELCOME;
 // invitations received in remote mode
 export let invitations = [];
 
-// list of players in local mode and invited players in remote
+// list of players invited
 let     players = [];
-let     invited = []
 
 // current match data
 let     currentPlayers = [];
@@ -74,9 +71,9 @@ let     paused = false;
 let     locked = false;
 
 // scene
-const   sceneRem = [
+const   scene = [
     [createLocal,createMatch, createTournament, invitationBox, quit], // accueil du jeu
-    [userInput, inviteButton, invitationSent, start, quit], // creation de partie/tournoi (host only)
+    [start, quit, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
     [], // waiting room pour creation de tournoi (guest only)
     [bannerPhase, nextMatch, quit], // phases du tournoi : montre les prochain match de la phas eet leur etat
     [bannerMatch, ready, circle, quit], // afk check
@@ -86,14 +83,14 @@ const   sceneRem = [
     [], // ecran erreur
 ];
 
-const   sceneLoc = [
-    [start, quit, locContainerList, locContainerSettings],
-    [bannerPhase, nextMatch, quit],
-    [bannerMatch, ready],
-    [bannerScore, pause, quit],
-    [bannerEnd],
-    [quit],
-];
+// const   sceneLoc = [
+//     [start, quit, locContainerList, locContainerSettings],
+//     [bannerPhase, nextMatch, quit],
+//     [bannerMatch, ready],
+//     [bannerScore, pause, quit],
+//     [bannerEnd],
+//     [quit],
+// ];
 
 /*
 quit = home(C)/exit(A)
@@ -146,32 +143,30 @@ const   sceneWIP = [
 
 /*** initialisation ****/
 export const initMenu = (path) => {
+    console.log("in intm")
+    
     if (path === enu.backendPath.LOCAL) {
         status = enu.gameMode.LOCAL;
-        scene = sceneLoc;
+        anon = true;
         players = [];
-        clearLocList();
+        clearInvitationList();
+        moveTo(enu.sceneIdx.CREATION);
         console.log("init : local");
     } else {
         status = enu.gameMode.IDLE;
         anon = false;
-        scene = sceneRem;
-        clearSentList();
+        clearInvitationList();
         console.log("init : remote");
+        moveTo(enu.sceneIdx.WELCOME);
     }
-    moveTo(enu.sceneIdx.WELCOME);
 }
 
-const clearLocList = () => {
+export const clearInvitationList = () => {
     const local = document.getElementById('game-menu-list');
     while (local.firstChild) {local.removeChild(local.lastChild);}
 }
 
-export const clearSentList = () => {
-    const local = document.getElementById('game-menu-invite-sent-list');
-    while (local.firstChild) {local.removeChild(local.lastChild);}
-    invited = []
-}
+
 
 
 /*** utils ***/
@@ -182,7 +177,8 @@ function isAlphaNumeric(str) {
       code = str.charCodeAt(i);
       if (!(code > 47 && code < 58) && 
           !(code > 64 && code < 91) && 
-          !(code > 96 && code < 123)) { 
+          !(code > 96 && code < 123) &&
+          (code != 95) && (code != 45)) { 
         return false;
       }
     }
@@ -190,6 +186,7 @@ function isAlphaNumeric(str) {
   };
 
 const validate_name = (name) => {
+    console.log("test value : " + name)
     if (name.length > 20) return false;
     if (name === "") return false;
     if (isAlphaNumeric(name) === false) return false;
@@ -277,8 +274,7 @@ createTournament.addEventListener('click', () => {
 createLocal.addEventListener('click', () => {
     status = enu.gameMode.LOCAL;
     gameSocket.send(JSON.stringify({'type': enu.EventLocal.MODE}));
-    scene = sceneLoc;
-    moveTo(enu.sceneIdx.WELCOME);
+    moveTo(enu.sceneIdx.CREATION);
 })
 
 
@@ -287,7 +283,7 @@ ready.addEventListener('click', () => {
     if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.READY}));
     else if (status === enu.gameMode.MATCH) gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
     else if (status === enu.gameMode.LOCAL) {
-        moveTo(enu.sceneLocIdx.MATCH);
+        moveTo(enu.sceneIdx.MATCH);
         announceScore();
     }
 });
@@ -317,10 +313,9 @@ quit.addEventListener('click', () => {
         }
         var to = enu.sceneIdx.CREATION;
     } else var to = enu.sceneIdx.WELCOME;
-        scene = sceneRem
-        status = enu.gameMode.IDLE;
         if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.QUIT}));
         else if (status === enu.gameMode.MATCH || status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
+        status = enu.gameMode.IDLE;
         if (idx === enu.sceneIdx.WELCOME) {
             fullClear()
             navigateTo("/");
@@ -338,10 +333,9 @@ start.addEventListener('click', () => {
         }));
     } else if (status === enu.gameMode.MATCH) {
         gameSocket.send(JSON.stringify({'type': enu.EventGame.START}));
-        moveTo(enu.sceneLocIdx.MATCH);
+        moveTo(enu.sceneIdx.MATCH);
     } else if (status === enu.gameMode.TOURNAMENT) {
         gameSocket.send(JSON.stringify({'type': enu.EventTournament.START}));
-
     }
 })
 
@@ -350,144 +344,82 @@ nextMatch.addEventListener('click', () => {
     else moveTo(enu.sceneIdx.PREMATCH)
 })
 
-// invitation list for remote
-document.getElementById('game-menu-inviteButton').addEventListener('click', function() {
-    var userInput = document.getElementById('game-menu-inviteInput').value;
-    if (userInput === "") return ;
-    document.getElementById('game-menu-inviteInput').value = '';
-
-    console.log('Texte saisi : ' + userInput);
-
-    if (status === enu.gameMode.MATCH) {
-        var inviteType = enu.EventGame.INVITE
-        var kickType = enu.EventGame.KICK
-    } else {
-        var inviteType = enu.EventTournament.INVITE;
-        var kickType = enu.EventTournament.KICK
-    }
-    
-    gameSocket.send(JSON.stringify({
-        'type': inviteType,
-        'message': userInput
-    }));
-    invited.push(userInput);
-
-    const   listItem = document.createElement('li');
-    listItem.className = 'remote-list-element';
-    
-    const   listItemName = document.createElement('span');
-    listItemName.textContent = userInput;
-
-    const   removeButton = document.createElement('button');
-    removeButton.textContent = 'Remove';
-    removeButton.className = 'remove-button';
-    removeButton.addEventListener('click', (e) => {
-        let pos = players.indexOf(e.target.parentNode.firstChild.innerHTML);
-        players.splice(pos, 1);
-        e.target.parentElement.remove();
-        gameSocket.send(JSON.stringify({
-            'type': kickType,
-            'message': userInput
-        }));
-    });
-    
-    const   listItemStatus = document.createElement('span');
-    listItemStatus.id = userInput;
-    listItemStatus.className = 'remote-list-element';
-    listItemStatus.textContent = '...waiting...';
-
-    listItem.appendChild(listItemName);
-    listItem.appendChild(removeButton);
-    listItem.appendChild(listItemStatus);
-
-    document.getElementById('game-menu-invite-sent-list').appendChild(listItem);
-
-});
-
-// invitation list for local
-/*** list of players in local mode ****/
 document.getElementById('game-menu-local-input-button').addEventListener('click', () => {
     const   user = document.getElementById('game-menu-local-input').value;
     document.getElementById('game-menu-local-input').value = '';
     if (validate_name(user) === false) return ;
     players.push(user);
 
-    const   listItem = document.createElement('li');
-    const   listItemName = document.createElement('span');
-    const   removeButton = document.createElement('button');
+    if (status === enu.gameMode.LOCAL) {
+        createListLocal(user)
+    } else if (status === enu.gameMode.MATCH) {
+        createListRemote(user, enu.EventGame.INVITE, enu.EventGame.KICK)
+    } else if (status === enu.gameMode.TOURNAMENT) {
+        createListRemote(user, enu.EventTournament.INVITE, enu.EventTournament.KICK)
+    }
+})
 
-    listItem.className = 'list-tournoi-element';
-    listItemName.textContent = user;
-    removeButton.textContent = 'Remove';
-    removeButton.className = 'accept-button';
-    removeButton.addEventListener('click', (e) => {
-        let pos = players.indexOf(e.target.parentNode.firstChild.innerHTML);
+const createListLocal = (user) => {
+    const   item = document.createElement('li');
+    const   itemName = document.createElement('span');
+    const   button = document.createElement('button');
+
+    item.className = 'list-tournoi-element';
+    itemName.textContent = user;
+    button.textContent = 'Remove';
+    button.className = 'accept-button';
+    button.addEventListener('click', (e) => {
+        const pos = players.indexOf(user);
         players.splice(pos, 1);
         e.target.parentElement.remove();
     });
-    listItem.appendChild(listItemName);
-    listItem.appendChild(removeButton);
-    document.getElementById('game-menu-list').appendChild(listItem);
-})
+    item.appendChild(itemName);
+    item.appendChild(button);
+    document.getElementById('game-menu-list').appendChild(item);
+}
+
+const createListRemote = (user, invite, kick) => {
+    const   item = document.createElement('li');
+    const   itemName = document.createElement('span');
+    const   button = document.createElement('button');
+    const   itemStatus = document.createElement('span');
+
+
+    item.className = 'list-tournoi-element';
+    itemName.textContent = user;
+    itemStatus.id = 'invite-status' + user;
+    itemStatus.className = 'remote-list-element';
+    itemStatus.textContent = '...waiting...';
+
+    button.textContent = 'Remove';
+    button.className = 'accept-button';
+    button.addEventListener('click', (e) => {
+        const pos = players.indexOf(user);
+        players.splice(pos, 1);
+        e.target.parentElement.remove();
+        gameSocket.send(JSON.stringify({
+            'type': kick,
+            'message': user
+        }));
+    });
+
+    item.appendChild(itemName);
+    item.appendChild(button);
+    item.appendChild(itemStatus);
+
+    document.getElementById('game-menu-list').appendChild(item);
+
+    gameSocket.send(JSON.stringify({
+        'type': invite,
+        'message': user,
+    }));
+}
+
+
 
 /*
 function createInviteListElement () {
     if (status === enu.gameMode.ANON || status === enu.gameMode.LOCAL) createInviteListElementLocal();
     else if (status === enu.gameMode.MATCH) createInviteListElementRemote();
-}
-
-function createInviteListElementLocal () {
-    const   input = document.getElementById('game-menu-local-input').value;
-    if (validate_name(user) === false) return ;
-
-    players.push(user);
-
-    const   item = document.createElement('li');
-    const   itemName = document.createElement('span');
-    const   itemButton = document.createElement('button');
-
-    item.className = 'list-tournoi-element';
-    item.id = `invite-${input}`
-    itemName.textContent = input;
-    itemButton.textContent = "remove";
-    removeButton.className = "remove-button";
-    
-    removeButton.addEventListener('click', (e) => {
-        let pos = players.indexOf(input);
-        players.splice(pos, 1);
-        e.target.parentElement.remove();
-    });
-
-    item.appendChild(itemName);
-    item.appendChild(itemButton);
-    document.getElementById('game-menu-list').appendChild(item);
-}
-
-function createInviteListElementRemote () {
-    const   input = document.getElementById('game-menu-local-input').value;
-    if (validate_name(user) === false) return ;
-
-    const   item = document.createElement('li');
-    const   itemName = document.createElement('span');
-    const   itemStatus = document.createElement('span');
-    const   itemButton = document.createElement('button');
-
-    item.className = 'list-tournoi-element';
-    itemName.textContent = input;
-    itemStatus.id = `invite-status-${input}`;
-    itemStatus.textContent = "..pending..";
-    itemButton.textContent = "remove";
-    removeButton.className = 'remove-button';
-    
-    removeButton.addEventListener('click', (e) => {
-        let pos = players.indexOf(input);
-        players.splice(pos, 1);
-        e.target.parentElement.remove();
-    });
-
-    item.appendChild(itemName);
-    item.appendChild(itemStatus);
-    item.appendChild(itemButton);
-    document.getElementById('game-menu-list').appendChild(item);
 }
 */
