@@ -247,7 +247,7 @@ function updateInvitationList(type, user) {
     const   acceptButton = document.createElement('button');
     const   refuseButton = document.createElement('button');
 
-    item.className = 'remote-list-element';
+    item.className = 'list-tournoi-element';
     item.id = "invited-by-" + user;
     itemStatus.textContent = typeGame;
     itemName.textContent = user;
