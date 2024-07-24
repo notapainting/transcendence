@@ -12,18 +12,7 @@ function updateTimer() {
 
 export let gameSocket = null;
 
-async function sleep (ms) { new Promise(r => setTimeout(r, ms));}
 
-function askNext() {gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}))}
-
-
-
-/*
-enu.Local.PLAYERS
-enu.Local.UPDATE
-enu.Local.NEXT
-enu.Local.QUIT
-*/
 
 export const initGameWebSocket = (path) => {
     _initWebsocket(path, (path === enu.backendPath.LOCAL) ? localHandler : remoteHandler)
@@ -40,7 +29,7 @@ const _initWebsocket = (path, handler) => {
     gameSocket.onmessage = handler;
     gameSocket.onclose = function(e) {
         console.log('GameWebSocket connection closed');
-        setTimeout(initLocalGameWebSocket, 5000)
+        setTimeout(_initWebsocket, 5000, [path, handler])
         gameSocket = null;
     };
 }
