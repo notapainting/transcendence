@@ -9,11 +9,7 @@ import { gameData } from './game.js';
 
 const   start = document.getElementById('game-menu-start');
 const   nextMatch = document.getElementById('game-menu-next');
-const   quit = document.getElementById('game-menu-m1-quit');
-const   quitM1 = document.getElementById('game-menu-m1-quit');
-const   quitM2a = document.getElementById('game-menu-m2a-quit');
-const   quitM2b = document.getElementById('game-menu-m2b-quit');
-const   quitM3 = document.getElementById('game-menu-m3-quit');
+
 
 // <!-- div buttons -->
 const   menuM1 = document.getElementById('menu-m1-button');
@@ -85,9 +81,9 @@ const   scene = [
     [menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
     [menuM2b], // waiting room pour creation de tournoi (guest only)
     [menuM3, bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
-    [bannerMatch, ready, circle, quit], // afk check
-    [bannerScore, pause, quit], // in game
-    [bannerEnd, quit], // ecran de fin de match 
+    [bannerMatch, ready, circle], // afk check
+    [bannerScore, pause], // in game
+    [bannerEnd], // ecran de fin de match 
     [], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
@@ -311,7 +307,7 @@ pause.addEventListener('click', () => {
 
 
 
-quit.addEventListener('click', () => {
+const quitFunc = () => {
     if (anon === true) {
         if (idx == enu.sceneIdx.CREATION) {
             console.log("ANON exit")
@@ -330,8 +326,12 @@ quit.addEventListener('click', () => {
             navigateTo("/");
         }
     moveTo(to);
-});
+};
 
+document.getElementById('game-menu-m1-quit').addEventListener('click', quitFunc);
+document.getElementById('game-menu-m2a-quit').addEventListener('click', quitFunc);
+document.getElementById('game-menu-m2b-quit').addEventListener('click', quitFunc);
+document.getElementById('game-menu-m3-quit').addEventListener('click', quitFunc);
 
 
 start.addEventListener('click', () => {
