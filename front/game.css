@@ -153,11 +153,11 @@
     left: calc(50% - 150px);
 } */
 
-#game-menu-quit {
+/* #game-menu-quit {
     display: none;
     top: 80%;
     left: calc(50% + 150px);
-}
+} */
 
 #game-pause {
     left:40%;
@@ -244,10 +244,7 @@
     top: 60%;
 }
 
-#game-menu-tournament {
-    display: none;
-    top: 70%;
-}
+
 
 #game-menu-local{
     top:90%;
@@ -586,7 +583,14 @@ ul {
     background-color: #0056b3;
 }
 
-.bottom-buttons {
+#menu-m2a-button {
+    display: flex;
+    justify-content: center;
+    gap: 15%;
+    margin-top: 5%;
+}
+
+#menu-m1-button {
     display: flex;
     justify-content: center;
     gap: 15%;

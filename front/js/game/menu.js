@@ -9,12 +9,21 @@ import { gameData } from './game.js';
 
 const   start = document.getElementById('game-menu-start');
 const   nextMatch = document.getElementById('game-menu-next');
-const   quit = document.getElementById('game-menu-quit');
+const   quit = document.getElementById('game-menu-m1-quit');
+const   quitM1 = document.getElementById('game-menu-m1-quit');
+const   quitM2a = document.getElementById('game-menu-m2a-quit');
+const   quitM2b = document.getElementById('game-menu-m2b-quit');
+const   quitM3 = document.getElementById('game-menu-m3-quit');
+
+// <!-- div buttons -->
+const   menuM1 = document.getElementById('menu-m1-button');
+const   menuM2a = document.getElementById('menu-m2a-button');
+const   menuM2b = document.getElementById('menu-m2b-button');
+const   menuM3 = document.getElementById('menu-m3-button');
 
 // <!-- local  -->
 const   locContainerList = document.getElementById('game-menu-list-tournament');
 const   locContainerSettings = document.getElementById('game-menu-settings');
-
 
 // <!-- remote -->
 // <!-- choose mode -->
@@ -75,13 +84,13 @@ let     locked = false;
 
 // scene
 const   sceneRem = [
-    [createLocal,createMatch, createTournament, invitationBox, quit], // accueil du jeu
-    [userInput, inviteButton, invitationSent, start, quit], // creation de partie/tournoi (host only)
-    [], // waiting room pour creation de tournoi (guest only)
-    [bannerPhase, nextMatch, quit], // phases du tournoi : montre les prochain match de la phas eet leur etat
-    [bannerMatch, ready, circle, quit], // afk check
-    [bannerScore, pause, quit], // in game
-    [bannerEnd, quit], // ecran de fin de match 
+    [menuM1, invitationBox], // m1 accueil du jeu
+    [menuM2a,userInput, inviteButton, invitationSent], // m2a creation de partie/tournoi (host only)
+    [menuM2b], // m2b waiting room pour creation de tournoi (guest only)
+    [menuM3,bannerPhase, nextMatch, quitM3], // m3 phases du tournoi : montre les prochain match de la phas eet leur etat
+    [bannerMatch, ready, circle, quit], //  afk check
+    [bannerScore, pause, quit], //  in game
+    [bannerEnd, quit], // ecran de fin de match quit
     [], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
@@ -257,7 +266,7 @@ export const moveTo = (i) => {
     console.log('move to: ' + i)
     if (idx === enu.sceneIdx.END) clearGame();
     clearMenu();
-    scene[idx].forEach(div => {div.style.display = "flex";});
+    scene[idx].forEach(div => {console.log(div);div.style.display = "flex";});
 }
 
 /*** event listener ****/
