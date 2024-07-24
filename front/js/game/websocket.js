@@ -141,7 +141,9 @@ const remoteHandler = (e) => {
             game.gameRenderer(content.message);
             moveTo(enu.sceneIdx.PREMATCH);
             announceMatch(content.players);
-            clearSentList();
+            break;
+        case enu.EventGame.KICK:
+            document.getElementById('game-menu-ready-circle').style.background = '#0eee28';
             break;
         case enu.EventGame.READY:
             document.getElementById('game-menu-ready-circle').style.background = '#0eee28';
@@ -242,34 +244,51 @@ export const clearInvList = () => {
 function updateInvitationList(type, user) {
     if (type === enu.EventGame.INVITE) {
         var joinType = enu.EventGame.JOIN;
+        var denyType = enu.EventGame.DENY;
         var typeGame = "match";
     } else {
         var joinType = enu.EventTournament.JOIN;
+        var denyType = enu.EventTournament.DENY;
         var typeGame = "tournoi";
     }
 
-    const listItem = document.createElement('li');
-    listItem.className = 'remote-list-element';
+    const   item = document.createElement('li');
+    const   itemName = document.createElement('span');
+    const   itemStatus = document.createElement('span');
+    const   acceptButton = document.createElement('button');
+    const   refuseButton = document.createElement('button');
 
-    const   listItemName = document.createElement('span');
-    listItemName.textContent = `(${typeGame}) ${user}`;
-
-    const acceptButton = document.createElement('button');
+    item.className = 'remote-list-element';
+    item.id = "invited-by-" + user;
+    itemStatus.textContent = typeGame;
+    itemName.textContent = user;
     acceptButton.textContent = 'Accepter';
     acceptButton.className = 'accept-button';
+    refuseButton.textContent = 'Refuse';
+    refuseButton.className = 'remove-button';
 
-    acceptButton.addEventListener('click', function() {
-        acceptButton.disabled = true;
+    acceptButton.addEventListener('click', () => {
         gameSocket.send(JSON.stringify({
             'type': joinType,
             'message': user
         }));
     });
 
-    listItem.appendChild(listItemName);
-    listItem.appendChild(acceptButton);
+    refuseButton.addEventListener('click', (e) => {
+        e.target.parentElement.remove();
+        gameSocket.send(JSON.stringify({
+            'type': denyType,
+            'message': user
+        }));
 
-    document.getElementById('game-menu-invitationList').appendChild(listItem);
+    });
+
+    item.appendChild(itemStatus);
+    item.appendChild(itemName);
+    item.appendChild(acceptButton);
+    item.appendChild(refuseButton);
+
+    document.getElementById('game-menu-invitationList').appendChild(item);
 
 }
 
