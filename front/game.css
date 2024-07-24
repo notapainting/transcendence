@@ -121,200 +121,11 @@
     left:30%;
 }
 
-/* #game-menu-banner {
-    top:30%;
-    left:25%;
-} */
-#game-menu-next {
-    top:70%;
-
-}
 .remote-list{
     position:absolute;
 
 }
 
-#remote-list-element{
-    left:60%;
-}
-
-#game-menu-invite-sent-list {
-    top:20%;
-    left:60%;
-}
-
-#game-menu-list {
-    top:20%;
-    left:60%;
-}
-
-/* #game-menu-start {
-    top:80%;
-    left: calc(50% - 150px);
-} */
-
-/* #game-menu-quit {
-    display: none;
-    top: 80%;
-    left: calc(50% + 150px);
-} */
-
-#game-pause {
-    left:40%;
-    display: none;
-}
-
-#game-abandon {
-    left:60%;
-    display: none;
-}
-
-
-
-#game-menu-invitationBox {
-  position: absolute;
-  display: flex;
-  left:70%;
-  top: 60%;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: #fafafa;
-}
-
-#game-menu-invitationBox h3 {
-  top: 0;
-  color: black;
-}
-
-#game-menu-invitationList {
-  list-style-type: none;
-  color: black;
-  padding: 0;
-}
-
-#game-menu-invitationList li {
-  padding: 8px;
-  color: black;
-  border-bottom: 1px solid #ddd;
-}
-
-#game-menu-invitationList li:last-child {
-  border-bottom: none;
-}
-
-.accept-button {
-  padding: 5px 10px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.accept-button:hover {
-  background-color: #0056b3;
-}
-
-.remove-button {
-    padding: 5px 10px;
-    border: none;
-    background-color: #ce0a31;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .remove-button:hover {
-    background-color: #ff008c;
-  }
-
-#game-menu-inviteInput {
-  position: absolute;
-  display: none;
-  top: 60%;
-}
-
-#game-menu-inviteButton {
-    display: none;
-    top: 70%;
-}
-
-#game-menu-fastGame {
-  /* display: none; */
-    top: 60%;
-}
-
-
-
-#game-menu-local{
-    top:90%;
-}
-
-
-
-#game-menu-create {
-    display: none;
-    top: 60%;
-}
-
-#game-menu-join {
-    display: none;
-    top: 70%;
-}
-
-#game-menu-home {
-    display: none;
-    top: 80%;
-}
-
-/* #game-menu-back {
-    display: none;
-    top: 80%;
-} */
-
-#game-menu-ready {
-    display: none;
-    top: 40%;
-}
-
-/* .button-menu {
-    perspective: 40vw;
-    position: absolute;
-    left: 30%;
-    transform: translate(-50%, -50%);
-    padding: .8em 2.2em;
-    width: 300px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 0 0 #e76f51;
-    line-height: 1;
-    text-decoration: none;
-    color: #dc5406;
-    font-size: 18px;
-    border-radius: 20px;
-    width: 200px;
-    height: 50px;
-    font-weight: bold;
-    border-bottom: 5px solid #b46436;
-    transition: 0.3s;
-    background-color: #f4a261;
-    animation: glow 3s linear infinite;
-  }
-
-.button-menu:hover {
-	border-bottom-width: 0;
-  }
-
-@keyframes glow {
-  0% {
-      box-shadow: 0 0 0 0 #e76f51;
-  }
-  
-  50% {
-      box-shadow: 0 0 30px 0 #e76f51;
-  }
-  } */
 
 #game-menu-ready-circle{
     position:absolute;
@@ -327,11 +138,6 @@
     border:2px solid #d826cf; 
   }
 
-  /* #0eee28 vert
-  #ee0e0e red
-  
-  */
-
 
 
 /* TOURNAMENT */
@@ -343,7 +149,7 @@
 
 .containerTournament {
     width: 500px;
-    height: 530px;
+    height: 500px;
     background-color: #024ba5;
     padding: 20px;
     border-radius: 10px;
@@ -352,7 +158,6 @@
     display: flex;
     flex-direction: column;
 }
-
 
 h1 {
     margin-bottom: 20px;
@@ -460,7 +265,7 @@ ul {
 
 .settings-box {
     width: 500px;
-    height: 530px;
+    height: 500px;
     background-color: #024ba5;
     padding: 20px;
     border-radius: 10px;
@@ -583,6 +388,109 @@ ul {
     background-color: #0056b3;
 }
 
+/*  invitation box */
+
+.main-menu-online {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 10%; 
+    flex-direction: row-reverse;
+}
+
+#game-menu-invitationBox {
+    flex: 1; 
+    margin: 10px;
+}
+
+#game-menu-invitationBox {
+    width: 500px;
+    height: 500px;
+    background-color: #024ba5;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.accept-button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+.accept-button:hover {
+    background-color: #0056b3;
+}
+
+.list-invitation-box {
+    height: 400px; 
+    overflow-y: auto; 
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #0c58b4;
+}
+
+.list-invitation-box::-webkit-scrollbar {
+    width: 8px; 
+}
+
+.list-invitation-box::-webkit-scrollbar-thumb {
+    background-color: #003369;
+    border-radius: 10px; 
+}
+
+.list-invitation-box::-webkit-scrollbar-track {
+    background-color: #2b5f97; 
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+}
+
+.list-invitation-box h2 {
+    margin-top: 0;
+    height: 200px;
+    overflow-y: auto; 
+    border: 1px solid #ddd;
+}
+
+.remote-list-element{
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remote-list-element span {
+    flex-grow: 1;
+    color: #000;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+  
+
+/* menus buttons */
+
+#menu-m1-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 5%;
+}
+
 #menu-m2a-button {
     display: flex;
     justify-content: center;
@@ -590,7 +498,14 @@ ul {
     margin-top: 5%;
 }
 
-#menu-m1-button {
+#menu-m2b-button {
+    display: flex;
+    justify-content: center;
+    gap: 15%;
+    margin-top: 5%;
+}
+
+#menu-m3-button {
     display: flex;
     justify-content: center;
     gap: 15%;
