@@ -4,14 +4,12 @@ import game.power_up as pow
 import game.enums as enu
 import random, asyncio, time
 
-TOURNAMENT_MAX_PLAYER = 2
 
 
 MAX_SCORE = 1
 TIME_REFRESH = 0.5
 width = 50
 height = 30
-maxScore = MAX_SCORE
 paddleHeight = 80
 paddleWidth = 10
 ballSpeedX = 0.8
@@ -24,6 +22,8 @@ class GameState:
     def __init__(self):
         self.timer = utils.Timer(verbose=False)
         self.p = pow.PowerUpManager()
+        self.scoreToWin = MAX_SCORE
+        self.bonused = True
         self.status = {
         'ballX': 0,
         'ballY': 0,
@@ -105,19 +105,28 @@ class GameState:
         'hitM': self.p.hitM
     }
 
+    def changeSettings(self, data):
+        setattr(self, data['param'], data['value'])
+        return self.getSettings()
+
+    def getSettings(self):
+        return ({
+            "scoreToWin": self.scoreToWin,
+            "bonused":self.bonused,
+        })
+
     def update(self):
         global reset, max_speed
 
         if reset == 1:
             reset = 2
-
-        self.p.addBonus(self.timer, self.status)
-        self.p.addMalus(self.timer, self.status)
-        
-        self.p.longPaddle(self.status)
-        self.p.shortPaddle(self.status)
-        self.p.slow(self.status)
-        self.p.boost(self.status)
+        if self.bonused:
+            self.p.addBonus(self.timer, self.status)
+            self.p.addMalus(self.timer, self.status)
+            self.p.longPaddle(self.status)
+            self.p.shortPaddle(self.status)
+            self.p.slow(self.status)
+            self.p.boost(self.status)
 
         # paddle displacement
         if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2 < height:
@@ -165,6 +174,7 @@ class GameState:
             self.status['ballSpeedY'] = hit_pos * max_speed
             self.status['playerBonus'] = 1
 
+        # compute score
         score = None
         if self.status['ballX'] <= self.status['leftPaddleX']:
             self.status['rightPlayerScore'] += 1
@@ -179,12 +189,13 @@ class GameState:
             self.reset()
             score = {"score":[self.status['leftPlayerScore'], self.status['rightPlayerScore']]}
 
-        if self.status['leftPlayerScore'] == maxScore:
+        # compute win
+        if self.status['leftPlayerScore'] == self.scoreToWin:
             self.reset()
             self.status['winner'] = 'leftWin'
             self.status['game_running'] = False
             return True, score
-        elif self.status['rightPlayerScore'] == maxScore:
+        elif self.status['rightPlayerScore'] == self.scoreToWin:
             self.reset()
             self.status['winner'] = 'rightWin'
             self.status['game_running'] = False

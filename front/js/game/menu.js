@@ -56,7 +56,6 @@ export const changeStatus = (type) => {
 
 }
 
-let quitInited = false;
 // scene idx
 let     idx = enu.sceneIdx.WELCOME;
 

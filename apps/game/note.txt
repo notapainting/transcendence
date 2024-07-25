@@ -58,3 +58,6 @@ put container game in none the nflex when game start
 start all ws meme temps
 use is auth func 
 display logging in game
+
+
+doing : change settings tnr + game 
