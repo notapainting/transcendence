@@ -1,29 +1,50 @@
 # game/lobby.py
 
 from channels.layers import get_channel_layer
-from game.gamestate import GameState
+from game.gamestate import GameState, MAX_SCORE
 
 import game.enums as enu
 import random
 
 
 TOURNAMENT_MAX_PLAYER = 2
+LOBBY_DEFAULT_MAX_PLAYERS = 2
+LOBBY_MINIMUM_MAX_PLAYERS = 2
 
 class Lobby:
-    def __init__(self, host, n_players=2, types=enu.Game) -> None:
+    def __init__(self, host, nPlayers=LOBBY_DEFAULT_MAX_PLAYERS, types=enu.Game) -> None:
         self.host = host
+        self._nPlayers = None
+        self._test = set()
         self._invited = set()
         self._ready = set()
         self._players = set()
         self._players.add(host)
-        self.n_players = n_players
+        self.nPlayers = nPlayers
         self._chlayer = get_channel_layer()
-        self.types=types
+        self.types = types
+        self.bonused = True
+        self.scoreToWin = MAX_SCORE
 
     async def clear(self):
         for user in self._invited:
             await self._chlayer.group_send(user, {"type":self.types.KICK, "author":self.host})
         self.broadcast({"type":self.types.KICK, "author":self.host})
+        self._invited = set()
+        self._ready = set()
+        self._players = set()
+        self._players.add(self.host)
+
+    @property
+    def nPlayers(self):
+        return self._nPlayers
+
+    @nPlayers.setter
+    def nPlayers(self, value):
+        if hasattr(self, "_players") and value < len(self._players):
+            return
+        self._nPlayers = value
+
 
     async def invite(self, user):
         if user == "" or user == self.host:
@@ -39,22 +60,23 @@ class Lobby:
         await self._chlayer.group_send(user, {"type":self.types.KICK, "author":self.host})
 
     def add(self, user):
-        self._players.add(user)
+        if len(self._players) < self.nPlayers:
+            self._players.add(user)
+        else :
+            print(f"cant add people")
 
     async def add_ready(self, user):
-        if user == "":
-            return ;
-        self._ready.add(user)
-
-        await self.broadcast({"type":self.types.READY, "author":user, "r":True})
+        if user in self._players:
+            self._ready.add(user)
+            await self.broadcast({"type":self.types.READY, "author":user, "r":True})
 
     def ready(self):
-        if len(self._ready) == self.n_players:
+        if len(self._ready) == self.nPlayers:
             return True
         return False
 
     def full(self):
-        if len(self._players) == self.n_players:
+        if len(self._players) == self.nPlayers:
             return True
         return False
 
@@ -87,6 +109,10 @@ class Match(Lobby):
         if self.tournament is None:
             await super().kick(user)
 
+    def changeSettings(self, data):
+        if hasattr(self, "game_state"):
+            self.game_state.changeSettings(data)
+
     def compute(self):
         guest = [x for x in list(self._players) if x != self.host][0]
         scores = {self.host:self.game_state.status['leftPlayerScore'], guest:self.game_state.status['rightPlayerScore']}
@@ -118,8 +144,8 @@ class Match(Lobby):
 
 
 class Tournament(Lobby):
-    def __init__(self, host, n_players=TOURNAMENT_MAX_PLAYER) -> None:
-        super().__init__(host=host, n_players=n_players, types=enu.Tournament)
+    def __init__(self, host, nPlayers=TOURNAMENT_MAX_PLAYER) -> None:
+        super().__init__(host=host, nPlayers=nPlayers, types=enu.Tournament)
         self.host = host
         self.losers = set()
         self.match_count = 0
@@ -130,6 +156,21 @@ class Tournament(Lobby):
     async def start(self):
         await super().start()
         print(f"state {self.players_state()}")
+
+
+    @Lobby.nPlayers.setter
+    def nPlayers(self, value):
+        if value % 2 == 0:
+            if hasattr(self, "_players") and value < len(self._players):
+                print(f"cant decrease max players")
+                return
+            if value < LOBBY_MINIMUM_MAX_PLAYERS:
+                value = LOBBY_MINIMUM_MAX_PLAYERS
+            self._nPlayers = value
+
+
+    def changeSettings(self, data):
+        setattr(self, data['param'], data['value'])
 
     async def make_phase(self):
         tmp = list(self._players)
@@ -154,4 +195,4 @@ class Tournament(Lobby):
             await self.make_phase()
 
     def players_state(self):
-        return {"invited":list(self._invited), "players":list(self._players), "host":self.host, "size":self.n_players}
+        return {"invited":list(self._invited), "players":list(self._players), "host":self.host, "size":self.nPlayers}
