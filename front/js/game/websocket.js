@@ -192,6 +192,7 @@ const remoteHandler = (e) => {
 
         case enu.EventTournament.JOIN:
             // receive new player sjoining trn
+            // do : update inviter list etc in WAITING
             break;
 
         case enu.EventTournament.ACCEPTED:
@@ -212,6 +213,7 @@ const remoteHandler = (e) => {
             break;
         case enu.EventTournament.RESULT:
             // result of a match
+            // update match tree in PHASE
             break;
         case enu.EventTournament.QUIT:
         case enu.EventTournament.DENY:
