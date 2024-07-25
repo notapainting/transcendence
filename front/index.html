@@ -227,7 +227,10 @@
                 <div id="game-menu-list-tournament" class="containerTournament menu-element">
                     <h1>Tournoi de Pong</h1>
                     <form id="playerForm">
-                        <input type="textList" id="game-menu-local-input" placeholder="Ajouter un joueur" required>
+                        <div id="game-menu-local-input" class="form">
+                            <input class="input" placeholder="Ajouter un joueur" required="" type="text">
+                            <span class="input-border"></span>
+                        </div>
                         <button type="button" id="game-menu-local-input-button">Ajouter</button>
                     </form>
                     <h1>Joueurs :</h1>
@@ -249,13 +252,13 @@
                         </li>
                         <li class="score-item">
                             <label for="score">Score maximum :</label>
-                            <input type="range" id="scoreRange" name="scoreRange" min="1" max="15" value="5"
+                            <input type="range" class="slider" id="scoreRange" name="scoreRange" min="1" max="15" value="5"
                                 oninput="this.nextElementSibling.value = this.value">
                             <output>5</output>
                         </li>
                         <li class="score-item">
                             <label for="players">Nombre joueurs max :</label>
-                            <input type="range" id="playersRange" name="playersRange" min="2" max="24" step="2"
+                            <input type="range" class="slider" id="playersRange" name="playersRange" min="2" max="24" step="2"
                                 value="4" oninput="this.nextElementSibling.value = this.value">
                             <output>4</output>
                         </li>
@@ -279,17 +282,77 @@
 
                 <!-- deplacement menus 1 -->
                 <div class="class-m1-button menu-element" id="menu-m1-button">
-                    <button id="game-menu-local" class="button-menu" type="button">Mode local</button>
-                    <button id="game-menu-fastGame" class="button-menu" type="button">Partie rapide</button>
-                    <button id="game-menu-tournament" class="button-menu" type="button">Tournoi</button>
-                    <button id="game-menu-m1-quit" class="button-menu button-menu-quit" type="button">Quit</button>
+                    <button id="game-menu-local" class="stylized-button"> 
+                        MODE LOCAL
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                    <button id="game-menu-fastGame" class="stylized-button"> 
+                        PARTIE RAPIDE
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                    <button id="game-menu-tournament" class="stylized-button"> 
+                        T O U R N O I
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                    <button id="game-menu-m1-quit" class="stylized-button"> 
+                        Q U I T
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
                 </div>
             </div>
 
             <!-- deplacement menus autres -->
             <div class="class-m2a-button menu-element" id="menu-m2a-button">
-                <button id="game-menu-start" class="button-menu" type="button">Start</button>
-                <button id="game-menu-m2a-quit" class="button-menu button-menu-quit" type="button">Quit</button>
+                <button id="game-menu-start" class="stylized-button"> 
+                    S T A R T
+                    <div id="clip">
+                        <div id="leftTop" class="corner"></div>
+                        <div id="rightBottom" class="corner"></div>
+                        <div id="rightTop" class="corner"></div>
+                        <div id="leftBottom" class="corner"></div>
+                    </div>
+                    <span id="rightArrow" class="arrow"></span>
+                    <span id="leftArrow" class="arrow"></span>
+                </button>
+                <button id="game-menu-m2a-quit" class="stylized-button"> 
+                    Q U I T
+                    <div id="clip">
+                        <div id="leftTop" class="corner"></div>
+                        <div id="rightBottom" class="corner"></div>
+                        <div id="rightTop" class="corner"></div>
+                        <div id="leftBottom" class="corner"></div>
+                    </div>
+                    <span id="rightArrow" class="arrow"></span>
+                    <span id="leftArrow" class="arrow"></span>
+                </button>
             </div>
             
             <!-- set ready -->
