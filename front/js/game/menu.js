@@ -28,7 +28,10 @@ const   createTournament = document.getElementById('game-menu-tournament');
 const   createLocal = document.getElementById('game-menu-local');
 
 // <!-- invite player -->
+const   userInput = document.getElementById('game-menu-inviteInput');
+const   inviteButton = document.getElementById('game-menu-inviteButton');
 const   invitationBox = document.getElementById('game-menu-invitationBox');
+const   invitationSent = document.getElementById('game-menu-invite-sent-list');
 
 // <!-- set ready -->
 const   ready = document.getElementById('game-menu-ready');
@@ -56,7 +59,7 @@ export const changeStatus = (type) => {
 
 }
 
-let quitInited = false;
+
 // scene idx
 let     idx = enu.sceneIdx.WELCOME;
 
@@ -85,6 +88,20 @@ const   scene = [
     [], // ecran erreur
 ];
 
+
+/*
+quit = home(C)/exit(A)
+
+m1 : local match tournoi exit
+m2 : start quit
+m2a : ready quit
+m3 : next quit
+m4 : ready
+m5 : pause quit (abandon)
+m6 : quit 
+m7 : quit 
+
+*/
 
 
 // status == idle/match/tournoi/local/anon
@@ -123,6 +140,7 @@ const   scene = [
 /*** initialisation ****/
 export const initMenu = (path) => {
     console.log("in intm")
+    
     if (path === enu.backendPath.LOCAL) {
         status = enu.gameMode.LOCAL;
         anon = true;
@@ -299,8 +317,12 @@ const quitFunc = () => {
     moveTo(to);
 };
 
+document.querySelectorAll("button-menu-quit").forEach(div => {div.addEventListener('click', quitFunc)});
 
-document.querySelectorAll(".button-menu-quit").forEach(div => {div.addEventListener('click', quitFunc)});
+document.getElementById('game-menu-m1-quit').addEventListener('click', quitFunc);
+document.getElementById('game-menu-m2a-quit').addEventListener('click', quitFunc);
+document.getElementById('game-menu-m2b-quit').addEventListener('click', quitFunc);
+document.getElementById('game-menu-m3-quit').addEventListener('click', quitFunc);
 
 
 start.addEventListener('click', () => {
@@ -345,7 +367,7 @@ const createListLocal = (user) => {
     item.className = 'list-tournoi-element';
     itemName.textContent = user;
     button.textContent = 'Remove';
-    button.className = 'remove-button';
+    button.className = 'accept-button';
     button.addEventListener('click', (e) => {
         const pos = players.indexOf(user);
         players.splice(pos, 1);
@@ -358,18 +380,20 @@ const createListLocal = (user) => {
 
 const createListRemote = (user, invite, kick) => {
     const   item = document.createElement('li');
-    const   itemName = document.createElement('span');
+    const   itemPicture = document.createElement('img');
+    const   itemName = document.createElement('div');
     const   button = document.createElement('button');
     const   itemStatus = document.createElement('span');
 
-
     item.className = 'list-tournoi-element';
+    itemPicture.className = 'list-tournoi-user-pic';
+    itemPicture.src = '../../img/anon.jpg'; // a remplacer !!!! (par la vrai foto)
     itemName.textContent = user;
+    itemName.className = 'list-tournoi-user-name';
     itemStatus.id = 'invite-status' + user;
     itemStatus.className = 'remote-list-element';
-    itemStatus.textContent = '...waiting...';
+    // itemStatus.textContent = '...waiting...';
 
-    button.textContent = 'Remove';
     button.className = 'remove-button';
     button.addEventListener('click', (e) => {
         const pos = players.indexOf(user);
@@ -381,8 +405,31 @@ const createListRemote = (user, invite, kick) => {
         }));
     });
 
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 448 512');
+    svg.setAttribute('class', 'svgIcon'); 
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z');
+    path.setAttribute('fill', 'white'); 
+
+    svg.appendChild(path);
+    item.appendChild(itemPicture);
     item.appendChild(itemName);
     item.appendChild(itemStatus);
+
+    item.innerHTML += `
+        <div class="typing-indicator">
+            <div class="typing-circle"></div>
+            <div class="typing-circle"></div>
+            <div class="typing-circle"></div>
+            <div class="typing-shadow"></div>
+            <div class="typing-shadow"></div>
+            <div class="typing-shadow"></div>
+        </div>
+    `;
+
+    button.appendChild(svg);
     item.appendChild(button);
 
     document.getElementById('game-menu-list').appendChild(item);
