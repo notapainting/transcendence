@@ -5,8 +5,8 @@ import game.enums as enu
 import random, asyncio, time
 
 
-
-MAX_SCORE = 1
+DEFAULT_SCORE = 1
+MAX_SCORE = 15
 TIME_REFRESH = 0.5
 width = 50
 height = 30
@@ -19,11 +19,11 @@ counter = 0
 max_speed = 2
 
 class GameState:
-    def __init__(self):
+    def __init__(self, bonused=True, scoreToWin=DEFAULT_SCORE):
         self.timer = utils.Timer(verbose=False)
         self.p = pow.PowerUpManager()
-        self.scoreToWin = MAX_SCORE
-        self.bonused = True
+        self.scoreToWin = scoreToWin
+        self.bonused = bonused
         self.status = {
         'ballX': 0,
         'ballY': 0,

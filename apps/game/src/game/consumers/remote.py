@@ -133,7 +133,7 @@ class RemoteGamer(LocalConsumer):
             case enu.Game.KICK:
                 await self.match.kick(data['message'])
             case enu.Game.SETTINGS:
-                newSettings = self.match.changeSettings(data)
+                newSettings = self.match.changeSettings(data['message'])
                 await self.match.broadcast({"type":enu.Game.SETTINGS, "message":newSettings})
             case enu.Game.START:
                 if self.match.ready() is True:
