@@ -16,6 +16,9 @@ const   menuM1 = document.getElementById('menu-m1-button');
 const   menuM2a = document.getElementById('menu-m2a-button');
 const   menuM2b = document.getElementById('menu-m2b-button');
 const   menuM3 = document.getElementById('menu-m3-button');
+const   menuM4 = document.getElementById('menu-m4-button');
+const   menuM5 = document.getElementById('menu-m5-button');
+const   menuM6 = document.getElementById('menu-m6-button');
 
 // <!-- local  -->
 const   locContainerList = document.getElementById('game-menu-list-tournament');
@@ -28,13 +31,11 @@ const   createTournament = document.getElementById('game-menu-tournament');
 const   createLocal = document.getElementById('game-menu-local');
 
 // <!-- invite player -->
-const   userInput = document.getElementById('game-menu-inviteInput');
-const   inviteButton = document.getElementById('game-menu-inviteButton');
 const   invitationBox = document.getElementById('game-menu-invitationBox');
-const   invitationSent = document.getElementById('game-menu-invite-sent-list');
 
 // <!-- set ready -->
 const   ready = document.getElementById('game-menu-ready');
+const   readyP = document.getElementById('game-menu-ready-prematch');
 const   circle = document.getElementById('game-menu-ready-circle');
 
 // <!-- in game banner -->
@@ -44,7 +45,7 @@ const   bannerScore = document.getElementById('game-menu-banner-score');
 const   bannerEnd = document.getElementById('game-menu-banner-end');
 
 // <!-- in game button -->
-const   pause = document.getElementById('game-pause');
+const   pause = document.getElementById('game-menu-pause');
 
 
 /*** variable ****/
@@ -81,9 +82,9 @@ const   scene = [
     [menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
     [menuM2b], // waiting room pour creation de tournoi (guest only)
     [menuM3, bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
-    [bannerMatch, ready, circle], // afk check
-    [bannerScore, pause], // in game
-    [bannerEnd], // ecran de fin de match 
+    [menuM4, bannerMatch], // afk check
+    [menuM5, bannerScore], // in game
+    [menuM6, bannerEnd], // ecran de fin de match 
     [], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
@@ -271,15 +272,17 @@ createLocal.addEventListener('click', () => {
 })
 
 
-
-ready.addEventListener('click', () => {
+const readyFunc = () => {
     if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.READY}));
     else if (status === enu.gameMode.MATCH) gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
     else if (status === enu.gameMode.LOCAL) {
         moveTo(enu.sceneIdx.MATCH);
         announceScore();
     }
-});
+};
+
+readyP.addEventListener('click', readyFunc);
+ready.addEventListener('click', readyFunc);
 
 pause.addEventListener('click', () => {
     if (locked === true) return ;
