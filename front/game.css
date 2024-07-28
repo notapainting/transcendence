@@ -136,17 +136,17 @@ form {
     justify-content: space-around;
 }
 
-.form {
+.game-menu-form {
     --width-of-input: 350px;
     --border-height: 1px;
     --border-before-color: rgba(217, 217, 217, 0.718);
     --border-after-color: #5891ff;
-    --input-hovered-color: #4985e01f;
+    --input-hovered-color: #a9a9a91f;
     position: relative;
     width: var(--width-of-input);
-   }
+}
 
-   .input {
+.game-menu-input {
     color: #fff;
     font-size: 0.9rem;
     background-color: transparent;
@@ -156,9 +156,9 @@ form {
     padding-block: 0.7em;
     border: none;
     border-bottom: var(--border-height) solid var(--border-before-color);
-   }
+}
 
-   .input-border {
+.game-menu-input-border {
     position: absolute;
     background: var(--border-after-color);
     width: 0%;
@@ -166,19 +166,21 @@ form {
     bottom: 0;
     left: 0;
     transition: 0.3s;
-   }
+}
 
-   input:hover {
+.game-menu-input:hover {
     background: var(--input-hovered-color);
-   }
-   
-   input:focus {
-    outline: none;
-   }
+}
 
-   input:focus ~ .input-border {
+.game-menu-input:focus {
+    outline: none;
+}
+
+.game-menu-input:focus + .game-menu-input-border {
     width: 100%;
-   }
+}
+
+
 
 #game-menu-local-input-button {
     padding: 10px 20px;

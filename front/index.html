@@ -227,9 +227,9 @@
                 <div id="game-menu-list-tournament" class="containerTournament menu-element">
                     <h1>Tournoi de Pong</h1>
                     <form id="playerForm">
-                        <div id="game-menu-local-input" class="form">
-                            <input class="input" placeholder="Ajouter un joueur" required="" type="text">
-                            <span class="input-border"></span>
+                        <div id="game-menu-local-input" class="game-menu-form">
+                            <input id="game-menu-input-player" class="game-menu-input" placeholder="Ajouter un joueur" required="" type="text">
+                            <span class="game-menu-input-border"></span>
                         </div>
                         <button type="button" id="game-menu-local-input-button">Ajouter</button>
                     </form>
@@ -357,8 +357,30 @@
             
             <!-- set ready -->
             <div class="class-m2b-button menu-element" id="menu-m2b-button">
-                <button id="game-menu-ready" class="button-menu" type="button">Ready?</button>
-                <button id="game-menu-m2b-quit" class="button-menu button-menu-quit" type="button">Quit</button>
+                <button id="game-menu-ready" class="stylized-button"> 
+                    R E A D Y ?
+                    <div id="clip">
+                        <div id="leftTop" class="corner"></div>
+                        <div id="rightBottom" class="corner"></div>
+                        <div id="rightTop" class="corner"></div>
+                        <div id="leftBottom" class="corner"></div>
+                    </div>
+                    <span id="rightArrow" class="arrow"></span>
+                    <span id="leftArrow" class="arrow"></span>
+                </button>
+                <button id="game-menu-m2b-quit" class="stylized-button"> 
+                    Q U I T
+                    <div id="clip">
+                        <div id="leftTop" class="corner"></div>
+                        <div id="rightBottom" class="corner"></div>
+                        <div id="rightTop" class="corner"></div>
+                        <div id="leftBottom" class="corner"></div>
+                    </div>
+                    <span id="rightArrow" class="arrow"></span>
+                    <span id="leftArrow" class="arrow"></span>
+                </button>
+                <!-- <button id="game-menu-ready" class="button-menu" type="button">Ready?</button>
+                <button id="game-menu-m2b-quit" class="button-menu button-menu-quit" type="button">Quit</button> -->
                 <div id="game-menu-ready-circle" class="menu-element"></div>
             </div>
 
