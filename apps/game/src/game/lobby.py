@@ -1,18 +1,18 @@
 # game/lobby.py
 
 from channels.layers import get_channel_layer
-from game.gamestate import GameState, MAX_SCORE
+from game.gamestate import GameState, MAX_SCORE, DEFAULT_SCORE
 
 import game.enums as enu
 import random
 
 
-TOURNAMENT_MAX_PLAYER = 2
-LOBBY_DEFAULT_MAX_PLAYERS = 2
-LOBBY_MINIMUM_MAX_PLAYERS = 2
+LOBBY_MAXIMUM_PLAYERS = 8
+LOBBY_DEFAULT_PLAYERS = 2
+LOBBY_MINIMUM_PLAYERS = 2
 
 class Lobby:
-    def __init__(self, host, nPlayers=LOBBY_DEFAULT_MAX_PLAYERS, types=enu.Game) -> None:
+    def __init__(self, host, nPlayers=LOBBY_DEFAULT_PLAYERS, types=enu.Game) -> None:
         self.host = host
         self._nPlayers = None
         self._test = set()
@@ -24,7 +24,7 @@ class Lobby:
         self._chlayer = get_channel_layer()
         self.types = types
         self.bonused = True
-        self.scoreToWin = MAX_SCORE
+        self.scoreToWin = DEFAULT_SCORE
 
     async def clear(self):
         for user in self._invited:
@@ -144,7 +144,7 @@ class Match(Lobby):
 
 
 class Tournament(Lobby):
-    def __init__(self, host, nPlayers=TOURNAMENT_MAX_PLAYER) -> None:
+    def __init__(self, host, nPlayers=LOBBY_MAXIMUM_PLAYERS) -> None:
         super().__init__(host=host, nPlayers=nPlayers, types=enu.Tournament)
         self.host = host
         self.losers = set()
@@ -164,13 +164,20 @@ class Tournament(Lobby):
             if hasattr(self, "_players") and value < len(self._players):
                 print(f"cant decrease max players")
                 return
-            if value < LOBBY_MINIMUM_MAX_PLAYERS:
-                value = LOBBY_MINIMUM_MAX_PLAYERS
+            if value < LOBBY_MINIMUM_PLAYERS:
+                value = LOBBY_MINIMUM_PLAYERS
             self._nPlayers = value
 
 
     def changeSettings(self, data):
         setattr(self, data['param'], data['value'])
+
+    def getSettings(self):
+        return {
+            "scoreToWin":self.scoreToWin,
+            "bonused":self.bonused,
+            "nPlayers":self.nPlayers,
+        }
 
     async def make_phase(self):
         tmp = list(self._players)
@@ -181,7 +188,7 @@ class Tournament(Lobby):
 
     async def order_match(self):
         for match in self.current:
-            message = {"type":self.types.MATCH, "author":self.host, "message":{"host":match[0],"guest":match[1]}}
+            message = {"type":self.types.MATCH, "author":self.host, "message":{"host":match[0],"guest":match[1], "settings":self.getSettings()}}
             await self._chlayer.group_send(match[0], message)
             await self._chlayer.group_send(match[1], message)
 
