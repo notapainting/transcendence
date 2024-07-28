@@ -4,7 +4,8 @@ import random, asyncio
 import game.enums as enu
 
 from game.consumers.base import BaseConsumer
-from game.gamestate import GameState, local_loop
+from game.gamestate import GameState, local_loop, MAX_SCORE, DEFAULT_SCORE
+from game.lobby import LOBBY_MAXIMUM_PLAYERS, LOBBY_MINIMUM_PLAYERS, LOBBY_DEFAULT_PLAYERS
 
 
 class LocalConsumer(BaseConsumer):
@@ -17,6 +18,9 @@ class LocalConsumer(BaseConsumer):
         self.local_matchIdx = -2
         self.local_task = None
         self.local_game_state = None
+        self.nPlayers = LOBBY_DEFAULT_PLAYERS
+        self.bonused = True
+        self.scoreToWin = DEFAULT_SCORE
 
     async def connect(self):
         await self.accept()
@@ -35,6 +39,8 @@ class LocalConsumer(BaseConsumer):
                     await self.send_json({'type':'error.players'})
                 else:
                     await self.local_matchmake()
+            case enu.Local.SETTINGS:
+                self.changeSettings(data['message'])
             case enu.Local.UPDATE:
                 await self.local_gaming(data)
             case enu.Local.READY:
@@ -50,6 +56,9 @@ class LocalConsumer(BaseConsumer):
                 self.local_clear()
             case _:
                 print(f"error in local: bad type")
+
+    def changeSettings(self, data):
+        setattr(self, data['param'], data['value'])
 
     async def local_matchmake(self):
         random.shuffle(self.local_players)
@@ -69,7 +78,7 @@ class LocalConsumer(BaseConsumer):
             await self.local_matchmake()
         else:
             match = self.local_current[self.local_matchIdx]
-            self.local_game_state = GameState()
+            self.local_game_state = GameState(self.bonused, self.scoreToWin)
             await self.send_json({"type":enu.Local.MATCH, "message":match, "state":self.local_game_state.to_dict('none')})
 
     async def local_game_end(self, data):
