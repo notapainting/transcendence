@@ -9,7 +9,6 @@
   }
 
 
-
 #game-menu {
     position: absolute;
     top: 0;
@@ -900,6 +899,13 @@ ul {
 }
 
 #menu-m3-button {
+    display: flex;
+    justify-content: center;
+    gap: 25%;
+    margin-top: 5%;
+}
+
+#menu-m5-button {
     display: flex;
     justify-content: center;
     gap: 25%;
