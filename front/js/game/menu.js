@@ -61,7 +61,6 @@ let     anon = true;
 export const changeStatus = (type) => {
     console.log("change from " + status + " to " + type)
     status = type;
-
 }
 
 
@@ -86,7 +85,7 @@ const   scene = [
     [menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
     [menuM2b], // waiting room pour creation de tournoi (guest only)
     [menuM3, bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
-    [menuM4, bannerMatch], // afk check
+    [menuM4], // afk check
     [menuM5, bannerScore], // in game
     [menuM6, bannerEnd], // ecran de fin de match 
     [], // ecran de fin de tournoi (recap)

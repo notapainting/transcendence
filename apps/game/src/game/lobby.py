@@ -160,6 +160,7 @@ class Tournament(Lobby):
 
     @Lobby.maxPlayer.setter
     def maxPlayer(self, value):
+        value = int(value)
         if value % 2 == 0:
             if hasattr(self, "_players") and value < len(self._players):
                 print(f"cant decrease max players")
