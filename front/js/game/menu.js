@@ -11,6 +11,7 @@ const   start = document.getElementById('game-menu-start');
 const   nextMatch = document.getElementById('game-menu-next');
 
 
+const   transition = document.getElementById('menu-transition');
 // <!-- div buttons -->
 const   menuM1 = document.getElementById('menu-m1-button');
 const   menuM2a = document.getElementById('menu-m2a-button');
@@ -84,6 +85,7 @@ let     locked = false;
 
 // scene
 const   scene = [
+    [transition],
     [menuBG, menuM1, invitationBox], // accueil du jeu
     [menuBG, menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
     [menuBG, menuM2b], // waiting room pour creation de tournoi (guest only)
@@ -526,3 +528,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Video element not found');
     }
 });
+
+window.onload = function() {
+    const menuTransition = document.getElementById('menu-transition');
+    setTimeout(() => {
+        menuTransition.style.backgroundPosition = 'center top'; /* Anime vers le haut de l'image */
+    }, 100); /* Délai avant de déclencher l'animation, ajustez si nécessaire */
+};
