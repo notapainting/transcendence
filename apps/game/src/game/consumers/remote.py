@@ -134,7 +134,7 @@ class RemoteGamer(LocalConsumer):
                 await self.match.kick(data['message'])
             case enu.Game.SETTINGS:
                 newSettings = self.match.changeSettings(data['message'])
-                await self.match.broadcast({"type":enu.Game.SETTINGS, "message":newSettings})
+                await self.match.broadcast({"type":enu.Game.SETTINGS, "author":self.username, "message":newSettings})
             case enu.Game.START:
                 if self.match.ready() is True:
                     await self.match.start()
@@ -298,6 +298,9 @@ class RemoteGamer(LocalConsumer):
                 self.set_mode(enu.CStatus.IDLE)
             case enu.Tournament.INVITE:
                 await self.tournament.invite(data['message'])
+            case enu.Tournament.SETTINGS:
+                newSettings = self.tournament.changeSettings(data['message'])
+                await self.tournament.broadcast({"type":enu.Game.SETTINGS, "author":self.username, "message":newSettings})
             case enu.Tournament.KICK:
                 await self.tournament.kick(data['message'])
             case enu.Tournament.READY:

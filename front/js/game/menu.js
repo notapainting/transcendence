@@ -367,6 +367,7 @@ pause.addEventListener('click', () => {
 
 
 const quitFunc = () => {
+    updateRequested.forEach(req => {clearTimeout(req[1]);});
     clearInvitationList();
     if (anon === true) {
         if (idx == enu.sceneIdx.CREATION) {

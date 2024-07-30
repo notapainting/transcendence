@@ -35,7 +35,7 @@ class Game(enum.StrEnum):
 class Tournament(enum.StrEnum):
     HOST = "tournament.host"
     GUEST = "tournament.guest"
-    SETTINGS = "tournament.settings"
+    SETTINGS = Game.SETTINGS
 
     CREATE = "tournament.create"
     INVITE = "tournament.invite"
