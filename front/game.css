@@ -128,14 +128,42 @@
     position: relative;
     width: 500px;
     height: 500px;
-    background-color: #024ba5;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    background-image: linear-gradient(163deg, #10173F 0%, #8346a5 100%);
+    transition: all .3s; 
+}
+
+.containerTournament2 {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    color: #A78FDB;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     display: flex;
     flex-direction: column;
+    background-image: url('img/box-bg.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    transition: all .2s;
 }
+
+.containerTournament2:hover {
+    transform: scale(0.98);
+    border-radius: 20px;
+  }
+  
+.containerTournament:hover {
+    box-shadow: 0px 0px 30px 1px rgba(170, 0, 255, 0.3);
+  }
 
 h1 {
     margin-bottom: 20px;
@@ -151,8 +179,8 @@ form {
 .game-menu-form {
     --width-of-input: 350px;
     --border-height: 1px;
-    --border-before-color: rgba(217, 217, 217, 0.718);
-    --border-after-color: #5891ff;
+    --border-before-color: rgba(255, 190, 250, 0.718);
+    --border-after-color: #822ea4;
     --input-hovered-color: #a9a9a91f;
     position: relative;
     width: var(--width-of-input);
@@ -180,10 +208,6 @@ form {
     transition: 0.3s;
 }
 
-.game-menu-input:hover {
-    background: var(--input-hovered-color);
-}
-
 .game-menu-input:focus {
     outline: none;
 }
@@ -195,17 +219,18 @@ form {
 
 
 #game-menu-local-input-button {
-    padding: 10px 20px;
+    padding: 8px 15px;
     font-size: 16px;
-    color: #fff;
-    background-color: #007bff;
+    margin-left: 10px;
     border: none;
-    border-radius: 4px;
+    border-radius: 50px; 
+    background-color: #72ddf7;
+    color: #1C2341;
     cursor: pointer;
 }
 
 #game-menu-local-input-button:hover {
-    background-color: #0056b3;
+    background-color: #8093f1;
 }
 
 .player-box {
@@ -213,7 +238,7 @@ form {
     overflow-y: auto; 
     padding: 10px;
     border-radius: 10px;
-    background-color: #0c58b4;
+    background-color: #0c11265d;
 }
 
 .player-box::-webkit-scrollbar {
@@ -274,20 +299,47 @@ ul {
 
 /*  SETTINGS TOURNOI */
 
-
 .settings-box {
     position: relative;
     width: 500px;
     height: 500px;
-    background-color: #024ba5;
-    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    color: #ffffff;
+    color: #A78FDB;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    background-image: linear-gradient(163deg, #10173F 0%, #8346a5 100%);
+    transition: all .3s; 
 }
+
+.settings-box2 {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #A78FDB;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-image: url('img/box-bg.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    transition: all .2s;
+}
+
+.settings-box2:hover {
+    transform: scale(0.98);
+    border-radius: 20px;
+  }
+  
+.settings-box:hover {
+    box-shadow: 0px 0px 30px 1px rgba(170, 0, 255, 0.3);
+  }
 
 .settings-box h1 {
     margin-top: 0;
@@ -317,49 +369,105 @@ ul {
 .toggle-button {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
-    margin-left: 10px;
 }
 
-.toggle-input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-label {
-    display: block;
-    position: absolute;
+.checkbox-wrapper-5 .check {
+    margin-right: 10px;
+    position: relative;
+    display: inline-block;
+    --size: 30px;
+    background: linear-gradient(90deg, #f19af3, #f099b5);
+    line-height: 0;
+    perspective: 400px;
+    font-size: var(--size);
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"],
+    .checkbox-wrapper-5 .check label,
+    .checkbox-wrapper-5 .check label::before,
+    .checkbox-wrapper-5 .check label::after,
+    .checkbox-wrapper-5 .check {
+    appearance: none;
+    display: inline-block;
+    border-radius: var(--size);
+    border: 0;
+    transition: .35s ease-in-out;
+    box-sizing: border-box;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    border-radius: 20px;
-    transition: background-color 0.3s;
-}
-
-.toggle-label:before {
+  }
+  
+  .checkbox-wrapper-5 .check label {
+    width: calc(2.2 * var(--size));
+    height: var(--size);
+    background: #d7d7d7;
+    overflow: hidden;
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"] {
     position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: #fff;
-    border-radius: 50%;
-    transition: transform 0.3s;
-}
-
-.toggle-input:checked + .toggle-label {
-    background-color: #007bff;
-}
-
-.toggle-input:checked + .toggle-label:before {
-    transform: translateX(26px);
-}
+    z-index: 1;
+    width: calc(.8 * var(--size));
+    height: calc(.8 * var(--size));
+    top: calc(.1 * var(--size));
+    left: calc(.1 * var(--size));
+    background: linear-gradient(45deg, #dedede, #ffffff);
+    box-shadow: 0 6px 7px rgba(0,0,0,0.3);
+    outline: none;
+    margin: 0;
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"]:checked {
+    left: calc(1.3 * var(--size));
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"]:checked + label {
+    background: transparent;
+  }
+  
+  .checkbox-wrapper-5 .check label::before,
+    .checkbox-wrapper-5 .check label::after {
+    content: "· ·";
+    position: absolute;
+    overflow: hidden;
+    left: calc(.15 * var(--size));
+    top: calc(.5 * var(--size));
+    height: var(--size);
+    letter-spacing: calc(-0.04 * var(--size));
+    color: #9b9b9b;
+    font-family: "Times New Roman", serif;
+    z-index: 2;
+    font-size: calc(.6 * var(--size));
+    border-radius: 0;
+    transform-origin: 0 0 calc(-0.5 * var(--size));
+    backface-visibility: hidden;
+  }
+  
+  .checkbox-wrapper-5 .check label::after {
+    content: "●";
+    top: calc(.65 * var(--size));
+    left: calc(.2 * var(--size));
+    height: calc(.1 * var(--size));
+    width: calc(.35 * var(--size));
+    font-size: calc(.2 * var(--size));
+    transform-origin: 0 0 calc(-0.4 * var(--size));
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"]:checked + label::before,
+    .checkbox-wrapper-5 .check input[type="checkbox"]:checked + label::after {
+    left: calc(1.55 * var(--size));
+    top: calc(.4 * var(--size));
+    line-height: calc(.1 * var(--size));
+    transform: rotateY(360deg);
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"]:checked + label::after {
+    height: calc(.16 * var(--size));
+    top: calc(.55 * var(--size));
+    left: calc(1.6 * var(--size));
+    font-size: calc(.6 * var(--size));
+    line-height: 0;
+  }
+  
 
 .score-item input[type="range"] {
     flex: 1;
@@ -517,15 +625,15 @@ ul {
 .settings-button {
     padding: 10px 20px;
     font-size: 16px;
-    color: #fff;
-    background-color: #007bff;
+    border-radius: 50px; 
+    background-color: #72ddf7;
+    color: #1C2341;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
 }
 
 .settings-button:hover {
-    background-color: #0056b3;
+    background-color: #8093f1;
 }
 
 /*  invitation box */
@@ -594,11 +702,18 @@ ul {
     padding-right: 10px;
     margin-right: 10px;
     border-radius: 30px;
-    background-color: rgb(185, 81, 250);
+}
+
+.invitationTypeContainerMatch {
+    background-color: #c951a4;
+}
+
+.invitationTypeContainerTournament{
+    background-color: #b5179e;
 }
 
 .invitationTypeContainer {
-    color: black; 
+    color: #f9c3f1; 
 }
 
 .invitationTypeContainer::after {
@@ -637,22 +752,22 @@ ul {
     padding: 5px 10px;
     border: none;
     border-radius: 50px; 
-    background-color: #007bff;
-    color: white;
+    background-color: #72ddf7;
+    color: #1C2341;
     cursor: pointer;
     margin-right: 5px;
     display: inline-block; 
 }
   
 .accept-button:hover {
-    background-color: #0056b3;
+    background-color: #8093f1;
 }
 
 .remove-button {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background-color: rgb(211, 37, 37);
+    background-color: #c1121f;
     border: none;
     display: flex;
     align-items: center;
@@ -709,7 +824,7 @@ ul {
     overflow-y: auto; 
     padding: 10px;
     border-radius: 10px;
-    background-color: #1c23415d;
+    background-color: #0c11265d;
 }
 
 .list-invitation-box::-webkit-scrollbar {
@@ -737,8 +852,8 @@ ul {
 
 .list-tournoi-element {
     padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
+    background-color: #c08fdb92;
+    border: 1px solid #c08fdbda;
     border-radius: 4px;
     margin-bottom: 10px;
     display: flex;
@@ -748,7 +863,7 @@ ul {
 
 .list-tournoi-element span {
     flex-grow: 1;
-    color: #000;
+    color: #ceb1de;
 }
 
 
@@ -851,13 +966,13 @@ ul {
   }
   
   .stylized-button:hover #rightArrow {
-    background-color: #7C63C2;
+    background-color: #8346a5;
     left: -15%;
     animation: 0.6s ease-in-out both infinite alternate rightArrow8;
   }
   
   .stylized-button:hover #leftArrow {
-    background-color: #7C63C2;
+    background-color: #8346a5;
     left: 103%;
     animation: 0.6s ease-in-out both infinite alternate leftArrow8;
   }
@@ -918,7 +1033,7 @@ ul {
   
   button:hover #clip {
     animation: 0.2s ease-in-out 0.55s both greenLight8;
-    --color: #7C63C2;
+    --color: #8346a5;
   }
   
   @keyframes changeColor8 {
@@ -927,17 +1042,17 @@ ul {
     }
   
     to {
-      background-color: #7C63C2;
+      background-color: #8346a5;
     }
   }
   
   @keyframes lightEffect8 {
     from {
-      box-shadow: 1px 1px 5px #7C63C2;
+      box-shadow: 1px 1px 5px #8346a5;
     }
   
     to {
-      box-shadow: 0 0 2px #7C63C2;
+      box-shadow: 0 0 2px #8346a5;
     }
   }
   
@@ -946,7 +1061,7 @@ ul {
     }
   
     to {
-      box-shadow: inset 0px 0px 32px #7C63C2;
+      box-shadow: inset 0px 0px 32px #8346a5;
     }
   }
   
