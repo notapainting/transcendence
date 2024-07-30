@@ -20,6 +20,9 @@ const   menuM4 = document.getElementById('menu-m4-button');
 const   menuM5 = document.getElementById('menu-m5-button');
 const   menuM6 = document.getElementById('menu-m6-button');
 
+// <!-- animated background -->
+const   menuBG = document.getElementById('menu_bg_video');
+
 // <!-- local  -->
 const   locContainerList = document.getElementById('game-menu-list-tournament');
 const   locContainerSettings = document.getElementById('game-menu-settings');
@@ -81,13 +84,13 @@ let     locked = false;
 
 // scene
 const   scene = [
-    [menuM1, invitationBox], // accueil du jeu
-    [menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
-    [menuM2b], // waiting room pour creation de tournoi (guest only)
-    [menuM3, bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
-    [menuM4], // afk check
+    [menuBG, menuM1, invitationBox], // accueil du jeu
+    [menuBG, menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
+    [menuBG, menuM2b], // waiting room pour creation de tournoi (guest only)
+    [menuBG, menuM3, bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
+    [menuBG, menuM4, bannerMatch], // afk check
     [menuM5, bannerScore], // in game
-    [menuM6, bannerEnd], // ecran de fin de match 
+    [menuBG, menuM6, bannerEnd], // ecran de fin de match 
     [], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
@@ -199,10 +202,10 @@ export const toggleLock = () => {
 export const togglePause = () => {
     if (paused === false) {
         paused = true;
-        pause.innerHTML = "Resume";
+        document.getElementById('game-menu-pause-text').innerHTML = "R E S U M E";
     } else {
         paused = false;
-        pause.innerHTML = "Pause";
+        document.getElementById('game-menu-pause-text').innerHTML = "P A U S E";
     }
     console.log('paused : ' + paused);
 }
