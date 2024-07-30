@@ -23,6 +23,10 @@ const   menuM6 = document.getElementById('menu-m6-button');
 // <!-- local  -->
 const   locContainerList = document.getElementById('game-menu-list-tournament');
 const   locContainerSettings = document.getElementById('game-menu-settings');
+const   settingsSendBonus = document.getElementById('bonusToggle');
+const   settingsSendScore = document.getElementById('scoreRange');
+const   settingsSendPlayer = document.getElementById('playersRange');
+
 
 // <!-- remote -->
 // <!-- choose mode -->
@@ -140,8 +144,6 @@ m7 : quit
 
 /*** initialisation ****/
 export const initMenu = (path) => {
-    console.log("in intm")
-    
     if (path === enu.backendPath.LOCAL) {
         status = enu.gameMode.LOCAL;
         anon = true;
@@ -153,7 +155,6 @@ export const initMenu = (path) => {
         status = enu.gameMode.IDLE;
         anon = false;
         clearInvitationList();
-        console.log("init : remote");
         moveTo(enu.sceneIdx.WELCOME);
     }
 }
@@ -271,6 +272,73 @@ createLocal.addEventListener('click', () => {
     moveTo(enu.sceneIdx.CREATION);
 })
 
+function getBonused() { return bonused; };
+function getScoreToWin() { return settingsSendScore.value; };
+function getMaxPlayer() { return settingsSendPlayer.value; };
+
+let bonused = true;
+let updateRequested = [
+    ["bonused", null, getBonused], 
+    ["scoreToWin", null, getScoreToWin], 
+    ["maxPlayer", null, getMaxPlayer]
+];
+
+settingsSendBonus.addEventListener('input', () => {
+    prepRequest(0);
+});
+
+settingsSendScore.addEventListener('input', () => {
+    prepRequest(1);
+});
+
+settingsSendPlayer.addEventListener('input', () => {
+    prepRequest(2);
+})
+
+const prepRequest = (type) => {
+    if (updateRequested[type][1] === null) {
+        console.log("request scoreToWin update")
+        updateRequested[type][1] = setTimeout(updateSettings, 700, type);
+    }
+}
+
+const updateSettings = (type) => {
+    if (type === 0) {
+        if (bonused === true) bonused = false;
+        else bonused = true;
+    }
+
+    gameSocket.send(JSON.stringify({
+        'type': enu.EventGame.SETTINGS,
+         'message':{
+            'param':updateRequested[type][0],
+            'value':updateRequested[type][2](),
+        }}));
+
+    updateRequested[type][1] = null;
+    console.log("settings: " + updateRequested[type][0] + ", update to: " + updateRequested[type][2]());
+}
+
+start.addEventListener('click', () => {
+    updateRequested.forEach((req, index) => {
+        if (req[1] !== null) {
+            clearTimeout(updateRequested)
+            updateSettings(index)
+            req[1] = null;
+        }
+    } )
+    if (status === enu.gameMode.LOCAL) {
+        gameSocket.send(JSON.stringify({
+            'type': enu.EventLocal.PLAYERS,
+            'message':players,
+        }));
+    } else if (status === enu.gameMode.MATCH) {
+        gameSocket.send(JSON.stringify({'type': enu.EventGame.START}));
+        moveTo(enu.sceneIdx.MATCH);
+    } else if (status === enu.gameMode.TOURNAMENT) {
+        gameSocket.send(JSON.stringify({'type': enu.EventTournament.START}));
+    }
+})
 
 const readyFunc = () => {
     if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.READY}));
@@ -320,27 +388,8 @@ const quitFunc = () => {
     moveTo(to);
 };
 
-document.querySelectorAll("button-menu-quit").forEach(div => {div.addEventListener('click', quitFunc)});
+document.querySelectorAll(".button-menu-quit").forEach(div => {div.addEventListener('click', quitFunc)});
 
-document.getElementById('game-menu-m1-quit').addEventListener('click', quitFunc);
-document.getElementById('game-menu-m2a-quit').addEventListener('click', quitFunc);
-document.getElementById('game-menu-m2b-quit').addEventListener('click', quitFunc);
-document.getElementById('game-menu-m3-quit').addEventListener('click', quitFunc);
-
-
-start.addEventListener('click', () => {
-    if (status === enu.gameMode.LOCAL) {
-        gameSocket.send(JSON.stringify({
-            'type': enu.EventLocal.PLAYERS,
-            'message':players,
-        }));
-    } else if (status === enu.gameMode.MATCH) {
-        gameSocket.send(JSON.stringify({'type': enu.EventGame.START}));
-        moveTo(enu.sceneIdx.MATCH);
-    } else if (status === enu.gameMode.TOURNAMENT) {
-        gameSocket.send(JSON.stringify({'type': enu.EventTournament.START}));
-    }
-})
 
 nextMatch.addEventListener('click', () => {
     if (status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}));

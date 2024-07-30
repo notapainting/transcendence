@@ -115,15 +115,19 @@ const remoteHandler = (e) => {
         case enu.EventLocal.END_TRN:
             moveTo(enu.sceneIdx.END)
             break;
-
+            
+            
 // match
         case enu.EventGame.INVITE:
-            console.log("invitation from: ", content.author);
+                console.log("invitation from: ", content.author);
             updateInvitationList(enu.EventGame.INVITE, content.author);
             break;
         case enu.EventGame.JOIN:
             // not used
             document.getElementById(content.author).innerHTML = 'accepted!';
+            break;
+        case enu.EventGame.SETTINGS:
+            console.log("SETTINGS : " + content.message);
             break;
         case enu.EventGame.ACCEPTED:
             // when accepted for a match
@@ -132,7 +136,8 @@ const remoteHandler = (e) => {
             announceMatch(content.players);
             break;
         case enu.EventGame.KICK:
-            document.getElementById('game-menu-ready-circle').style.background = '#0eee28';
+            moveTo(enu.sceneIdx.WELCOME);
+            console.error("KICKED")
             break;
         case enu.EventGame.READY:
             document.getElementById('game-menu-ready-circle').style.background = '#0eee28';
@@ -180,11 +185,14 @@ const remoteHandler = (e) => {
             moveTo(enu.sceneIdx.END);
             if (content.tournament) changeStatus(enu.gameMode.TOURNAMENT);
             break;
-        case enu.EventError.TYPE:
-            console.error(content.type)
+            case enu.EventError.TYPE:
+                console.error(content.type)
             break;
 
 // tournament
+        case enu.EventTournament.SETTINGS:
+            console.log("SETTINGS : " + content.message);
+            break ;
         case enu.EventTournament.INVITE:
             console.log("invitation from: ", content.author);
             updateInvitationList(enu.EventTournament.INVITE, content.author);
