@@ -463,3 +463,14 @@ function createInviteListElement () {
     else if (status === enu.gameMode.MATCH) createInviteListElementRemote();
 }
 */
+
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.querySelector('.video-background video');
+    if (video) {
+        console.log('VIDEO SET!!!!!!!!!!!!!!!!!!!!!!!!');
+        video.src = 'img/menu-bg.mp4'; 
+        video.load();
+    } else {
+        console.error('Video element not found');
+    }
+});
