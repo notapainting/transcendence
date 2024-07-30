@@ -124,13 +124,14 @@ const remoteHandler = (e) => {
             break;
         case enu.EventGame.JOIN:
             // not used
-            document.getElementById(content.author).innerHTML = 'accepted!';
+            document.getElementById('invite-status' + content.author).innerHTML = 'accepted!';
             break;
         case enu.EventGame.SETTINGS:
             console.log("SETTINGS : " + content.message);
             break;
         case enu.EventGame.ACCEPTED:
             // when accepted for a match
+            changeStatus(enu.gameMode.MATCH);
             game.gameRenderer(content.message);
             moveTo(enu.sceneIdx.PREMATCH);
             announceMatch(content.players);
@@ -177,7 +178,14 @@ const remoteHandler = (e) => {
         case enu.EventGame.BROKE:
             // connection lost
         case enu.EventGame.DENY:
+            // try to invite someone but get rejected
+            if (content.message === 'invitation' ) {
+                let target = 'invite-status' + content.author;
+                document.getElementById(target).innerHTML = 'REFUSED!';
+                setTimeout(() => {document.getElementById(target).parentElement.remove();}, 5000)
+            }
             // try to join a match but refused
+            break ;
         case enu.EventGame.QUIT:
             // a player has quit match
         case enu.EventGame.END:
@@ -206,6 +214,7 @@ const remoteHandler = (e) => {
         case enu.EventTournament.ACCEPTED:
             // received whe naccepted in trn
             moveTo(enu.sceneIdx.WAITING)
+            changeStatus(enu.gameMode.TOURNAMENT);
             break;
         case enu.EventTournament.READY:
             // players is ready 
@@ -282,6 +291,7 @@ function updateInvitationList(type, user) {
     svg.appendChild(path);
 
     acceptButton.addEventListener('click', () => {
+        e.target.parentElement.remove();
         gameSocket.send(JSON.stringify({
             'type': joinType,
             'message': user

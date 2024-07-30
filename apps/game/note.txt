@@ -49,15 +49,10 @@ SOLVED:
     - p2 can unpause pause from p1
 
 BUG:
-    - game_quit not implemented 
+    - quit when idle -> error 
+        => will be fix with code refacto 
 
 
-refactor ws
-
-put container game in none the nflex when game start 
-start all ws meme temps
 use is auth func 
 display logging in game
 
-
-doing : change settings tnr + game 

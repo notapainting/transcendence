@@ -95,9 +95,16 @@ class RemoteGamer(LocalConsumer):
 
     async def idle(self, data):
         match data['type']:
+
             case enu.Game.CREATE:
                 self.set_mode(enu.Game.HOST)
                 self.match = Match(self.username)
+            case enu.Game.DENY:
+                if data['message'] in self.invitations:
+                    self.invitations.discard(data['message'])
+                    target = data['message']
+                    data['message'] = 'invitation'
+                    await self.send_cs(target, data)
             case enu.Game.JOIN:
                 if data['message'] in self.invitations:
                     self.invitations.discard(data['message'])

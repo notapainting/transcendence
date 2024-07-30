@@ -1,6 +1,7 @@
 
 .containerGame {
     display: flex;
+    position: relative;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -38,6 +39,7 @@
 
 .menu-element {
     display: none;
+    position: relative;
 }
 
 .game-announce-base{
