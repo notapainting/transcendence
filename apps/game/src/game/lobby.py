@@ -111,7 +111,7 @@ class Match(Lobby):
 
     def changeSettings(self, data):
         if hasattr(self, "game_state"):
-            self.game_state.changeSettings(data)
+            return self.game_state.changeSettings(data)
 
     def compute(self):
         guest = [x for x in list(self._players) if x != self.host][0]
@@ -171,6 +171,7 @@ class Tournament(Lobby):
 
     def changeSettings(self, data):
         setattr(self, data['param'], data['value'])
+        return self.getSettings()
 
     def getSettings(self):
         return {
