@@ -226,47 +226,56 @@
             <div class="inner-container">
                 <!-- Ajout au tournoi -->
                 <div id="game-menu-list-tournament" class="containerTournament menu-element">
-                    <h1>Tournoi de Pong</h1>
-                    <form id="playerForm">
-                        <div id="game-menu-local-input" class="game-menu-form">
-                            <input id="game-menu-input-player" class="game-menu-input" placeholder="Ajouter un joueur" required="" type="text">
-                            <span class="game-menu-input-border"></span>
+                    <div class="containerTournament2">
+                        <h1>Tournoi de Pong</h1>
+                        <form id="playerForm">
+                            <div id="game-menu-local-input" class="game-menu-form">
+                                <input id="game-menu-input-player" class="game-menu-input" placeholder="Ajouter un joueur" required="" type="text">
+                                <span class="game-menu-input-border"></span>
+                            </div>
+                            <button type="button" id="game-menu-local-input-button">Ajouter</button>
+                        </form>
+                        <h1>Joueurs :</h1>
+                        <div class="player-box" id="playerBox">
+                            <ul id="game-menu-list"></ul>
                         </div>
-                        <button type="button" id="game-menu-local-input-button">Ajouter</button>
-                    </form>
-                    <h1>Joueurs :</h1>
-                    <div class="player-box" id="playerBox">
-                        <ul id="game-menu-list"></ul>
                     </div>
                 </div>
 
                 <!-- Settings tournoi -->
                 <div id="game-menu-settings" class="settings-box menu-element">
-                    <h1>Paramètres du jeu</h1>
-                    <ul class="settings-list">
-                        <li class="toggle-item">
-                            <label for="bonus">Activer les power-ups :</label>
-                            <div class="toggle-button">
-                                <input type="checkbox" id="bonusToggle" name="bonusToggle" class="toggle-input">
-                                <label for="bonusToggle" class="toggle-label"></label>
-                            </div>
-                        </li>
-                        <li class="score-item">
-                            <label for="score">Score maximum :</label>
-                            <input type="range" class="slider" id="scoreRange" name="scoreRange" min="1" max="15" value="5"
-                                oninput="this.nextElementSibling.value = this.value">
-                            <output>5</output>
-                        </li>
-                        <li class="score-item">
-                            <label for="players">Nombre joueurs max :</label>
-                            <input type="range" class="slider" id="playersRange" name="playersRange" min="2" max="24" step="2"
-                                value="4" oninput="this.nextElementSibling.value = this.value">
-                            <output>4</output>
-                        </li>
-                    </ul>
-                    <div class="center-button">
-                        <button type="button" class="settings-button">Réinitialiser</button>
-                        <button type="button" class="settings-button">Enregistrer</button>
+                    <div class="settings-box2">
+                        <h1>Paramètres du jeu</h1>
+                        <ul class="settings-list">
+                            <li class="toggle-item">
+                                <label for="bonus">Activer les power-ups :</label>
+                                <div class="toggle-button checkbox-wrapper-5">
+                                    <div class="check">
+                                      <input checked="" id="bonusToggle" type="checkbox" class="toggle-input">
+                                      <label for="bonusToggle" class="toggle-label"></label>
+                                    </div>
+                                  </div>
+                                <!-- <div class="toggle-button">
+                                    <input type="checkbox" id="bonusToggle" name="bonusToggle" class="toggle-input">
+                                    <label for="bonusToggle" class="toggle-label"></label>
+                                </div> -->
+                            </li>
+                            <li class="score-item">
+                                <label for="score">Score maximum :</label>
+                                <input type="range" class="slider" id="scoreRange" name="scoreRange" min="1" max="15" value="5"
+                                    oninput="this.nextElementSibling.value = this.value">
+                                <output>5</output>
+                            </li>
+                            <li class="score-item">
+                                <label for="players">Nombre joueurs max :</label>
+                                <input type="range" class="slider" id="playersRange" name="playersRange" min="2" max="24" step="2"
+                                    value="4" oninput="this.nextElementSibling.value = this.value">
+                                <output>4</output>
+                            </li>
+                        </ul>
+                        <div class="center-button">
+                            <button type="button" class="settings-button">Réinitialiser</button>
+                        </div>
                     </div>
                 </div>
             </div>

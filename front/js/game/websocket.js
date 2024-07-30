@@ -245,11 +245,13 @@ function updateInvitationList(type, user) {
         var joinType = enu.EventGame.JOIN;
         var denyType = enu.EventGame.DENY;
         var typeGame = "invitationTypeMatch";
+        var containerClass = "invitationTypeContainerMatch";
         var typeClass = "bi bi-controller";
     } else {
         var joinType = enu.EventTournament.JOIN;
         var denyType = enu.EventTournament.DENY;
         var typeGame = "invitationTypeTournament";
+        var containerClass = "invitationTypeContainerTournament";
         var typeClass = "bi bi-people";
     }
 
@@ -262,7 +264,7 @@ function updateInvitationList(type, user) {
 
     item.className = 'list-tournoi-element';
     item.id = "invited-by-" + user;
-    itemStatusContainer.className = "invitationTypeContainer " + typeGame;
+    itemStatusContainer.className = "invitationTypeContainer " + containerClass + " " + typeGame;
     itemStatus.className = typeClass;
     itemName.textContent = user;
     acceptButton.textContent = 'Accepter';
