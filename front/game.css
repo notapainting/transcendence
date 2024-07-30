@@ -14,15 +14,26 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* background-image: url('img/background.png'); 
+    /* background-image: url('img/menu-bg.gif'); 
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat; */
+}
+
+.video-background video {
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    transform: translate(-50%, -50%);
 }
 
 .menu-element {
@@ -114,6 +125,7 @@
 }
 
 .containerTournament {
+    position: relative;
     width: 500px;
     height: 500px;
     background-color: #024ba5;
@@ -264,6 +276,7 @@ ul {
 
 
 .settings-box {
+    position: relative;
     width: 500px;
     height: 500px;
     background-color: #024ba5;
@@ -526,22 +539,48 @@ ul {
 }
 
 #game-menu-invitationBox {
-    flex: 1; 
-    margin: 10px;
-}
-
-#game-menu-invitationBox {
+    position: relative;
     width: 500px;
     height: 500px;
-    background-color: #024ba5;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
     color: #ffffff;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    flex: 1; 
+    margin: 10px;
+    background-image: linear-gradient(163deg, #10173F 0%, #8346a5 100%);
+    transition: all .3s; 
 }
+  
+#game-menu-invitationBox2 {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    padding: 20px;
+    border-radius: 10px;
+    color: #A78FDB;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex: 1;
+    /* background-color: #131B3C; */
+    background-image: url('img/box-bg.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    transition: all .2s;
+  }
+  
+  #game-menu-invitationBox2:hover {
+    transform: scale(0.98);
+    border-radius: 20px;
+  }
+  
+  #game-menu-invitationBox:hover {
+    box-shadow: 0px 0px 30px 1px rgba(170, 0, 255, 0.3);
+  }
 
 /* logo match et tournoi pour invitations */
 
@@ -670,7 +709,7 @@ ul {
     overflow-y: auto; 
     padding: 10px;
     border-radius: 10px;
-    background-color: #0c58b4;
+    background-color: #1c23415d;
 }
 
 .list-invitation-box::-webkit-scrollbar {
@@ -777,25 +816,25 @@ ul {
     border: none;
     font-size: 13px;
     font-weight: bold;
-    color: #ddebf0;
+    color: #A78FDB;
   }
   
   #clip {
-    --color: #2761c3;
+    --color: #312964;
     position: absolute;
     top: 0;
     overflow: hidden;
     width: 100%;
     height: 100%;
     border: 5px double var(--color);
-    box-shadow: inset 0px 0px 15px #195480;
+    box-shadow: inset 0px 0px 15px #101426;
     -webkit-clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
   }
   
   .arrow {
     position: absolute;
     transition: 0.2s;
-    background-color: #2761c3;
+    background-color: #312964;
     top: 35%;
     width: 11%;
     height: 30%;
@@ -812,13 +851,13 @@ ul {
   }
   
   .stylized-button:hover #rightArrow {
-    background-color: #27c39f;
+    background-color: #7C63C2;
     left: -15%;
     animation: 0.6s ease-in-out both infinite alternate rightArrow8;
   }
   
   .stylized-button:hover #leftArrow {
-    background-color: #27c39f;
+    background-color: #7C63C2;
     left: 103%;
     animation: 0.6s ease-in-out both infinite alternate leftArrow8;
   }
@@ -827,8 +866,8 @@ ul {
     position: absolute;
     width: 4em;
     height: 4em;
-    background-color: #2761c3;
-    box-shadow: inset 1px 1px 8px #2781c3;
+    background-color: #312964;
+    box-shadow: inset 1px 1px 8px #312964;
     transform: scale(1) rotate(45deg);
     transition: 0.2s;
   }
@@ -879,26 +918,26 @@ ul {
   
   button:hover #clip {
     animation: 0.2s ease-in-out 0.55s both greenLight8;
-    --color: #27c39f;
+    --color: #7C63C2;
   }
   
   @keyframes changeColor8 {
     from {
-      background-color: #2781c3;
+      background-color: #312964;
     }
   
     to {
-      background-color: #27c39f;
+      background-color: #7C63C2;
     }
   }
   
   @keyframes lightEffect8 {
     from {
-      box-shadow: 1px 1px 5px #27c39f;
+      box-shadow: 1px 1px 5px #7C63C2;
     }
   
     to {
-      box-shadow: 0 0 2px #27c39f;
+      box-shadow: 0 0 2px #7C63C2;
     }
   }
   
@@ -907,7 +946,7 @@ ul {
     }
   
     to {
-      box-shadow: inset 0px 0px 32px #27c39f;
+      box-shadow: inset 0px 0px 32px #7C63C2;
     }
   }
   
