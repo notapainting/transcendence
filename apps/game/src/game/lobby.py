@@ -12,15 +12,15 @@ LOBBY_DEFAULT_PLAYERS = 2
 LOBBY_MINIMUM_PLAYERS = 2
 
 class Lobby:
-    def __init__(self, host, nPlayers=LOBBY_DEFAULT_PLAYERS, types=enu.Game) -> None:
+    def __init__(self, host, maxPlayer=LOBBY_DEFAULT_PLAYERS, types=enu.Game) -> None:
         self.host = host
-        self._nPlayers = None
+        self._maxPlayer = None
         self._test = set()
         self._invited = set()
         self._ready = set()
         self._players = set()
         self._players.add(host)
-        self.nPlayers = nPlayers
+        self.maxPlayer = maxPlayer
         self._chlayer = get_channel_layer()
         self.types = types
         self.bonused = True
@@ -36,14 +36,14 @@ class Lobby:
         self._players.add(self.host)
 
     @property
-    def nPlayers(self):
-        return self._nPlayers
+    def maxPlayer(self):
+        return self._maxPlayer
 
-    @nPlayers.setter
-    def nPlayers(self, value):
+    @maxPlayer.setter
+    def maxPlayer(self, value):
         if hasattr(self, "_players") and value < len(self._players):
             return
-        self._nPlayers = value
+        self._maxPlayer = value
 
 
     async def invite(self, user):
@@ -60,7 +60,7 @@ class Lobby:
         await self._chlayer.group_send(user, {"type":self.types.KICK, "author":self.host})
 
     def add(self, user):
-        if len(self._players) < self.nPlayers:
+        if len(self._players) < self.maxPlayer:
             self._players.add(user)
         else :
             print(f"cant add people")
@@ -71,12 +71,12 @@ class Lobby:
             await self.broadcast({"type":self.types.READY, "author":user, "r":True})
 
     def ready(self):
-        if len(self._ready) == self.nPlayers:
+        if len(self._ready) == self.maxPlayer:
             return True
         return False
 
     def full(self):
-        if len(self._players) == self.nPlayers:
+        if len(self._players) == self.maxPlayer:
             return True
         return False
 
@@ -144,8 +144,8 @@ class Match(Lobby):
 
 
 class Tournament(Lobby):
-    def __init__(self, host, nPlayers=LOBBY_MAXIMUM_PLAYERS) -> None:
-        super().__init__(host=host, nPlayers=nPlayers, types=enu.Tournament)
+    def __init__(self, host, maxPlayer=LOBBY_MAXIMUM_PLAYERS) -> None:
+        super().__init__(host=host, maxPlayer=maxPlayer, types=enu.Tournament)
         self.host = host
         self.losers = set()
         self.match_count = 0
@@ -158,15 +158,15 @@ class Tournament(Lobby):
         print(f"state {self.players_state()}")
 
 
-    @Lobby.nPlayers.setter
-    def nPlayers(self, value):
+    @Lobby.maxPlayer.setter
+    def maxPlayer(self, value):
         if value % 2 == 0:
             if hasattr(self, "_players") and value < len(self._players):
                 print(f"cant decrease max players")
                 return
             if value < LOBBY_MINIMUM_PLAYERS:
                 value = LOBBY_MINIMUM_PLAYERS
-            self._nPlayers = value
+            self._maxPlayer = value
 
 
     def changeSettings(self, data):
@@ -177,7 +177,7 @@ class Tournament(Lobby):
         return {
             "scoreToWin":self.scoreToWin,
             "bonused":self.bonused,
-            "nPlayers":self.nPlayers,
+            "maxPlayer":self.maxPlayer,
         }
 
     async def make_phase(self):
@@ -203,4 +203,4 @@ class Tournament(Lobby):
             await self.make_phase()
 
     def players_state(self):
-        return {"invited":list(self._invited), "players":list(self._players), "host":self.host, "size":self.nPlayers}
+        return {"invited":list(self._invited), "players":list(self._players), "host":self.host, "size":self.maxPlayer}

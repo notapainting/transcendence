@@ -18,7 +18,7 @@ class LocalConsumer(BaseConsumer):
         self.local_matchIdx = -2
         self.local_task = None
         self.local_game_state = None
-        self.nPlayers = LOBBY_DEFAULT_PLAYERS
+        self.maxPlayer = LOBBY_DEFAULT_PLAYERS
         self.bonused = True
         self.scoreToWin = DEFAULT_SCORE
 
