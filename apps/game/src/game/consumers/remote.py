@@ -6,7 +6,7 @@ import channels.exceptions as exchan
 from game.consumers.base import BaseConsumer
 from game.consumers.local import LocalConsumer
 from game.gamestate import GameState, remote_loop, local_loop
-from game.lobby import Match, Tournament
+from game.lobby import Match, Tournament, getDefault
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -42,6 +42,7 @@ class RemoteGamer(LocalConsumer):
             raise exchan.DenyConnection()
         await self.accept()
         await self.channel_layer.group_add(self.username, self.channel_name)
+        await self.send_json({"type":enu.Game.SETTINGS_DEF, "message":getDefault()})
         print(f"hello {self.username} ({self.status})!")
 
     async def disconnect(self, close_code):
@@ -95,7 +96,6 @@ class RemoteGamer(LocalConsumer):
 
     async def idle(self, data):
         match data['type']:
-
             case enu.Game.CREATE:
                 self.set_mode(enu.Game.HOST)
                 self.match = Match(self.username)
