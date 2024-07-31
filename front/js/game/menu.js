@@ -297,14 +297,11 @@ createLocal.addEventListener('click', () => {
     moveTo(enu.sceneIdx.CREATION);
 })
 
-function getBonused() { return bonused; };
+function getBonused() { return settingsSendBonus.checked; };
 function getScoreToWin() { return settingsSendScore.value; };
 function getMaxPlayer() { return settingsSendPlayer.value; };
 function setBonused() {
-    console.log("check is: " + settingsSendBonus.check)
-    console.log("checked is: " + settingsSendBonus.checked)
-    if (bonused) settingsSendBonus.checked = true; 
-    else settingsSendBonus.checked = false; 
+    settingsSendBonus.checked = gameSettings.bonused;
 };
 
 function setScoreToWin() {
@@ -317,7 +314,6 @@ function setMaxPlayer() {
     document.getElementById('playersRangeOut').value = gameSettings.maxPlayer;
 };
 
-let bonused = true;
 let updateRequested = [
     ["bonused", null, getBonused], 
     ["scoreToWin", null, getScoreToWin], 
@@ -326,7 +322,6 @@ let updateRequested = [
 
 settingsSendBonus.addEventListener('input', () => {
     prepRequest(0);
-    setBonused();
 });
 
 settingsSendScore.addEventListener('input', () => {
@@ -345,10 +340,10 @@ const prepRequest = (type) => {
 }
 
 const requestUpdateSettings = (type) => {
-    if (type === 0) {
-        if (bonused === true) bonused = false;
-        else bonused = true;
-    }
+    // if (type === 0) {
+        // if (bonused === true) bonused = false;
+        // else bonused = true;
+    // }
 
     gameSocket.send(JSON.stringify({
         'type': enu.EventGame.SETTINGS,
