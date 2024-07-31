@@ -33,26 +33,41 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* background-image: url('img/menu-bg.gif'); 
+    background-image: url('img/transition.png'); 
     background-size: cover; 
-    background-position: center; 
-    background-repeat: no-repeat; */
+    background-position: center top; 
+    background-repeat: no-repeat;
+}
+
+.video-background {
+    position: relative;
+    width: 100%;
+    height: 1080px; 
+    overflow: hidden; 
 }
 
 .video-background video {
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
     position: absolute;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 50%;
+    width: 100%;
+    height: auto;
+    transform: translateX(-50%);
+    object-fit: cover; 
+    object-position: top; 
+    opacity: 0;
+    animation: fadeIn 5s ease-in-out forwards; 
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1; 
+    }
 }
 
 .menu-element {
@@ -666,6 +681,7 @@ ul {
     flex-direction: row-reverse;
 }
 
+
 #game-menu-invitationBox {
     position: relative;
     width: 500px;
@@ -678,8 +694,10 @@ ul {
     margin: 10px;
     background-image: linear-gradient(163deg, #10173F 0%, #8346a5 100%);
     transition: all .3s; 
+    opacity: 0;
+    animation: fadeIn 2s ease-in-out forwards;
 }
-  
+
 #game-menu-invitationBox2 {
     position: relative;
     width: 500px;
@@ -690,13 +708,14 @@ ul {
     flex-direction: column;
     justify-content: flex-start;
     flex: 1;
-    /* background-color: #131B3C; */
     background-image: url('img/box-bg.png'); 
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat;
     border-radius: 10px;
     transition: all .2s;
+    opacity: 0;
+    animation: fadeIn 0.4s ease-in-out forwards;
   }
   
   #game-menu-invitationBox2:hover {
@@ -898,6 +917,8 @@ ul {
     justify-content: center;
     gap: 25px;
     margin-top: 5%;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
 }
 
 #menu-m2a-button {
