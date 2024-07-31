@@ -16,6 +16,7 @@ export const EventGame = Object.freeze({
     END: "game.end",
     BROKE: "game.broke",
     SETTINGS: "game.settings",
+    SETTINGS_DEF: "game.settings.default",
 })
 
 export const EventTournament = Object.freeze({

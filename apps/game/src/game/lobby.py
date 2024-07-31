@@ -1,15 +1,24 @@
 # game/lobby.py
 
 from channels.layers import get_channel_layer
-from game.gamestate import GameState, MAX_SCORE, DEFAULT_SCORE
+from game.gamestate import GameState, MAX_SCORE, DEFAULT_SCORE, BONUSED
 
 import game.enums as enu
 import random
 
 
-LOBBY_MAXIMUM_PLAYERS = 8
-LOBBY_DEFAULT_PLAYERS = 2
+LOBBY_MAXIMUM_PLAYERS = 24
+LOBBY_DEFAULT_MATCH_PLAYER = 2
+LOBBY_DEFAULT_PLAYERS = 8
 LOBBY_MINIMUM_PLAYERS = 2
+
+
+def getDefault():
+    return {
+        "bonused":BONUSED,
+        "scoreToWin":DEFAULT_SCORE,
+        "maxPlayer":LOBBY_DEFAULT_PLAYERS,
+    }
 
 class Lobby:
     def __init__(self, host, maxPlayer=LOBBY_DEFAULT_PLAYERS, types=enu.Game) -> None:
@@ -92,9 +101,8 @@ class Lobby:
 
 
 class Match(Lobby):
-
-    def __init__(self, host, tournament=None):
-        super().__init__(host)
+    def __init__(self, host, maxPlayer=LOBBY_DEFAULT_MATCH_PLAYER, tournament=None):
+        super().__init__(host=host, maxPlayer=maxPlayer)
         self._players.add(host)
         self.game_state = GameState()
         self.task = None

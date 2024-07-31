@@ -13,6 +13,7 @@ class Game(enum.StrEnum):
     HOST = "game.host"
     GUEST = "game.guest"
     SETTINGS = "game.settings"
+    SETTINGS_DEF = "game.settings.default"
 
     CREATE = "game.create"
     INVITE = "game.invite"

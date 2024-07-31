@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { changeStatus, announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearInvitationList } from './menu.js';
+import { updateSettings, changeStatus, announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearInvitationList } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
@@ -125,6 +125,10 @@ const remoteHandler = (e) => {
         case enu.EventGame.JOIN:
             // not used
             document.getElementById('invite-status' + content.author).innerHTML = 'accepted!';
+            break;
+        case enu.EventGame.SETTINGS_DEF:
+            console.log("DEFAULTS SETTINGS : " + content.message);
+            updateSettings(content.message);
             break;
         case enu.EventGame.SETTINGS:
             console.log("SETTINGS : " + content.message);

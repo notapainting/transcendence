@@ -212,6 +212,18 @@ export const togglePause = () => {
     console.log('paused : ' + paused);
 }
 
+let gameSettings = {
+    bonused:"True",
+    scoreToWin:"5",
+    maxPlayer:"8",
+}
+
+export const updateSettings = (data) => {
+    gameSettings.bonused = data.bonused;
+    gameSettings.scoreToWin = data.scoreToWin;
+    gameSettings.maxPlayer = data.maxPlayer;
+}
+
 /*** banner update ****/
 export const updateScore = (data) => {
     currentScore = data.score;
@@ -277,8 +289,11 @@ createLocal.addEventListener('click', () => {
 })
 
 function getBonused() { return bonused; };
+// function setBonused() { return bonused; };
 function getScoreToWin() { return settingsSendScore.value; };
+function setScoreToWin() { settingsSendScore.value = gameSettings.scoreToWin; };
 function getMaxPlayer() { return settingsSendPlayer.value; };
+function setMaxPlayer() { settingsSendPlayer.value = gameSettings.maxPlayer; };
 
 let bonused = true;
 let updateRequested = [
@@ -302,11 +317,11 @@ settingsSendPlayer.addEventListener('input', () => {
 const prepRequest = (type) => {
     if (updateRequested[type][1] === null) {
         console.log("request scoreToWin update")
-        updateRequested[type][1] = setTimeout(updateSettings, 700, type);
+        updateRequested[type][1] = setTimeout(requestUpdateSettings, 700, type);
     }
 }
 
-const updateSettings = (type) => {
+const requestUpdateSettings = (type) => {
     if (type === 0) {
         if (bonused === true) bonused = false;
         else bonused = true;
@@ -327,7 +342,7 @@ start.addEventListener('click', () => {
     updateRequested.forEach((req, index) => {
         if (req[1] !== null) {
             clearTimeout(updateRequested)
-            updateSettings(index)
+            requestUpdateSettings(index)
             req[1] = null;
         }
     } )
