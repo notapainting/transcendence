@@ -10,8 +10,8 @@ import { gameData } from './game.js';
 const   start = document.getElementById('game-menu-start');
 const   nextMatch = document.getElementById('game-menu-next');
 
+const   transition = document.getElementById('menu-transition')
 
-const   transition = document.getElementById('menu-transition');
 // <!-- div buttons -->
 const   menuM1 = document.getElementById('menu-m1-button');
 const   menuM2a = document.getElementById('menu-m2a-button');
@@ -85,7 +85,7 @@ let     locked = false;
 
 // scene
 const   scene = [
-    [transition],
+    // [transition],
     [menuBG, menuM1, invitationBox], // accueil du jeu
     [menuBG, menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
     [menuBG, menuM2b], // waiting room pour creation de tournoi (guest only)
@@ -160,6 +160,7 @@ export const initMenu = (path) => {
         anon = false;
         clearInvitationList();
         moveTo(enu.sceneIdx.WELCOME);
+        
     }
 }
 
@@ -266,6 +267,7 @@ export const moveTo = (i) => {
     if (idx === enu.sceneIdx.END) clearGame();
     clearMenu();
     scene[idx].forEach(div => {console.log(div);div.style.display = "flex";});
+    // if (idx === 0) setTimeout(moveTo, 2000, 1);
 }
 
 /*** event listener ****/
@@ -544,9 +546,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-window.onload = function() {
-    const menuTransition = document.getElementById('menu-transition');
-    setTimeout(() => {
-        menuTransition.style.backgroundPosition = 'center top'; /* Anime vers le haut de l'image */
-    }, 100); /* Délai avant de déclencher l'animation, ajustez si nécessaire */
-};
+// window.onload = function() {
+//     setTimeout(() => {
+//         transition.style.backgroundPosition = 'center top'; 
+//         }, 100); 
+// };

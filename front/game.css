@@ -15,7 +15,7 @@
     background-size: cover;
     background-position: center bottom; 
     background-repeat: no-repeat;
-    animation: slideUp 3s ease forwards; /* Animation de 5 secondes */
+    animation: slideUp 2s ease forwards; 
 }
 
 @keyframes slideUp {
@@ -47,8 +47,8 @@
 .video-background video {
     top: 50%;
     left: 50%;
-    min-width: 100%;
-    min-height: 100%;
+    /* min-width: 100%;
+    min-height: 100%; */
     width: auto;
     height: auto;
     position: absolute;
@@ -672,7 +672,6 @@ ul {
     height: 500px;
     border-radius: 20px;
     color: #ffffff;
-    display: flex;
     flex-direction: column;
     justify-content: flex-start;
     flex: 1; 
@@ -688,7 +687,6 @@ ul {
     padding: 20px;
     border-radius: 10px;
     color: #A78FDB;
-    display: flex;
     flex-direction: column;
     justify-content: flex-start;
     flex: 1;
@@ -896,7 +894,6 @@ ul {
 /* menus buttons */
 
 #menu-m1-button {
-    display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 25px;
@@ -904,28 +901,24 @@ ul {
 }
 
 #menu-m2a-button {
-    display: flex;
     justify-content: center;
     gap: 25%;
     margin-top: 5%;
 }
 
 #menu-m2b-button {
-    display: flex;
     justify-content: center;
     gap: 25%;
     margin-top: 5%;
 }
 
 #menu-m3-button {
-    display: flex;
     justify-content: center;
     gap: 25%;
     margin-top: 5%;
 }
 
 #menu-m5-button {
-    display: flex;
     justify-content: center;
     gap: 25%;
     margin-top: 5%;
