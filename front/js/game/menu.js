@@ -9,8 +9,8 @@ import { gameData } from './game.js';
 
 const   start = document.getElementById('game-menu-start');
 const   nextMatch = document.getElementById('game-menu-next');
+const   settingsReInit = document.getElementById('settings-button-reinit');
 
-const   transition = document.getElementById('menu-transition')
 
 // <!-- div buttons -->
 const   menuM1 = document.getElementById('menu-m1-button');
@@ -223,6 +223,13 @@ export const updateSettings = (data) => {
     gameSettings.bonused = data.bonused;
     gameSettings.scoreToWin = data.scoreToWin;
     gameSettings.maxPlayer = data.maxPlayer;
+    resetSettings();
+}
+
+const resetSettings = () => {
+    setBonused();
+    setScoreToWin();
+    setMaxPlayer();
 }
 
 /*** banner update ****/
@@ -266,8 +273,7 @@ export const moveTo = (i) => {
     console.log('move to: ' + i)
     if (idx === enu.sceneIdx.END) clearGame();
     clearMenu();
-    scene[idx].forEach(div => {console.log(div);div.style.display = "flex";});
-    // if (idx === 0) setTimeout(moveTo, 2000, 1);
+    scene[idx].forEach(div => {div.style.display = "flex";});
 }
 
 /*** event listener ****/
@@ -275,6 +281,7 @@ createMatch.addEventListener('click', () => {
     status = enu.gameMode.MATCH;
     gameSocket.send(JSON.stringify({'type': enu.EventGame.CREATE}));
     moveTo(enu.sceneIdx.CREATION);
+    resetSettings();
 });
 
 createTournament.addEventListener('click', () => {
@@ -291,11 +298,24 @@ createLocal.addEventListener('click', () => {
 })
 
 function getBonused() { return bonused; };
-// function setBonused() { return bonused; };
 function getScoreToWin() { return settingsSendScore.value; };
-function setScoreToWin() { settingsSendScore.value = gameSettings.scoreToWin; };
 function getMaxPlayer() { return settingsSendPlayer.value; };
-function setMaxPlayer() { settingsSendPlayer.value = gameSettings.maxPlayer; };
+function setBonused() {
+    console.log("check is: " + settingsSendBonus.check)
+    console.log("checked is: " + settingsSendBonus.checked)
+    if (bonused) settingsSendBonus.checked = true; 
+    else settingsSendBonus.checked = false; 
+};
+
+function setScoreToWin() {
+    settingsSendScore.value = gameSettings.scoreToWin;
+    document.getElementById('scoreRangeOut').value = gameSettings.scoreToWin;
+};
+
+function setMaxPlayer() { 
+    settingsSendPlayer.value = gameSettings.maxPlayer;
+    document.getElementById('playersRangeOut').value = gameSettings.maxPlayer;
+};
 
 let bonused = true;
 let updateRequested = [
@@ -306,6 +326,7 @@ let updateRequested = [
 
 settingsSendBonus.addEventListener('input', () => {
     prepRequest(0);
+    setBonused();
 });
 
 settingsSendScore.addEventListener('input', () => {
@@ -318,7 +339,7 @@ settingsSendPlayer.addEventListener('input', () => {
 
 const prepRequest = (type) => {
     if (updateRequested[type][1] === null) {
-        console.log("request scoreToWin update")
+        console.log("request update for: " + updateRequested[type][0])
         updateRequested[type][1] = setTimeout(requestUpdateSettings, 700, type);
     }
 }
@@ -339,6 +360,13 @@ const requestUpdateSettings = (type) => {
     updateRequested[type][1] = null;
     console.log("settings: " + updateRequested[type][0] + ", update to: " + updateRequested[type][2]());
 }
+
+settingsReInit.addEventListener('click', () => {
+    resetSettings();
+    prepRequest(0);
+    prepRequest(1);
+    prepRequest(2);
+})
 
 start.addEventListener('click', () => {
     updateRequested.forEach((req, index) => {
