@@ -43,6 +43,7 @@ export const EventLocal = Object.freeze({
     PLAYERS: "local.players",
     PHASE: "local.phase",
     MATCH: "local.match",
+    READY: EventGame.READY,
     UPDATE: EventGame.UPDATE,
     SCORE: EventGame.SCORE,
     NEXT: "local.next",

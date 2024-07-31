@@ -566,7 +566,7 @@ const showChatLeft = () => {
 }
 
 const sendMessageEnter = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "") {
         sendMessage();
     }
 }
