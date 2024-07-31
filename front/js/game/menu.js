@@ -390,6 +390,7 @@ const readyFunc = () => {
     else if (status === enu.gameMode.LOCAL) {
         moveTo(enu.sceneIdx.MATCH);
         announceScore();
+        gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
     }
 };
 
@@ -569,8 +570,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// window.onload = function() {
-//     setTimeout(() => {
-//         transition.style.backgroundPosition = 'center top'; 
-//         }, 100); 
-// };
