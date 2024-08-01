@@ -7,6 +7,7 @@ from game.consumers.base import BaseConsumer
 from game.consumers.local import LocalConsumer
 from game.gamestate import GameState, remote_loop, local_loop
 from game.lobby import Match, Tournament, getDefault
+from rest_framework.renderers import JSONRenderer
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -47,14 +48,12 @@ class RemoteGamer(LocalConsumer):
         await self.channel_layer.group_add(self.username, self.channel_name)
         await self.send_json({"type":enu.Game.SETTINGS_DEF, "message":getDefault()})
         print(f"hello {self.username} ({self.status})!")
-        print(f" connect: {RemoteGamer.connected}")
 
     async def disconnect(self, close_code):
         if self.username is not None:
             await self.channel_layer.group_discard(self.username, self.channel_name)
         RemoteGamer.connected.discard(self.username)
         print(f"bye {self.username} ({self.status})...")
-        print(f" connect: {RemoteGamer.connected}")
 
 
         if self.status == enu.Local.MODE:
@@ -143,21 +142,25 @@ class RemoteGamer(LocalConsumer):
                 self.set_mode(enu.CStatus.IDLE)
                 await self.match.broadcast(data)
             case enu.Game.INVITE:
-                if data['message'] in RemoteGamer.connected:
-                    await self.match.invite(data['message'])
-                    data['type'] = enu.Game.INV_ACC
-                else:
-                    data['type'] = enu.Game.INV_404
+                try :
+                    promise = await httpx.AsyncClient().post(
+                        url='http://chat:8000/api/v1/relations/blocked/', 
+                        data=JSONRenderer().render({
+                        "target":data['message'],
+                        "author":self.username,
+                    }))
+                    if promise.status_code == 404:
+                        data['type'] = enu.Game.INV_404
+                    elif promise.status_code == 403:
+                        data['type'] = enu.Game.INV_FOR
+                    elif data['message'] in RemoteGamer.connected:
+                        await self.match.invite(data['message'])
+                        data['type'] = enu.Game.INV_ACC
+                    else:
+                        data['type'] = enu.Game.INV_ABS
+                except httpx.HTTPError as error:
+                    print(f"er is : {error}")
                 await self.send_json(data)
-                """
-                if user exist
-                and 
-                if user has not blocked asker
-                and
-                -> request api chat
-                if user in connected
-                -> local list
-                """
             case enu.Game.KICK:
                 await self.match.kick(data['message'])
             case enu.Game.SETTINGS:
