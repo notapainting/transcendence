@@ -118,6 +118,12 @@ const remoteHandler = (e) => {
             
             
 // match
+        case enu.EventGame.INV_ACC:
+            createListRemote(content.message, enu.EventGame.KICK);
+            break;
+        case enu.EventGame.INV_404:
+            console.error("USER NOT FOUND/CONNECTED: " + content.message)
+            break;
         case enu.EventGame.INVITE:
                 console.log("invitation from: ", content.author);
             updateInvitationList(enu.EventGame.INVITE, content.author);
@@ -247,6 +253,62 @@ const remoteHandler = (e) => {
     }
 };
 
+const createListRemote = (user, kick) => {
+    const   item = document.createElement('li');
+    const   itemPicture = document.createElement('img');
+    const   itemName = document.createElement('div');
+    const   button = document.createElement('button');
+    const   itemStatus = document.createElement('span');
+
+    item.className = 'list-tournoi-element';
+    itemPicture.className = 'list-tournoi-user-pic';
+    itemPicture.src = '../../img/anon.jpg'; // a remplacer !!!! (par la vrai foto)
+    itemName.textContent = user;
+    itemName.className = 'list-tournoi-user-name';
+    itemStatus.id = 'invite-status' + user;
+    itemStatus.className = 'remote-list-element';
+    // itemStatus.textContent = '...waiting...';
+
+    button.className = 'remove-button';
+    button.addEventListener('click', (e) => {
+        const pos = players.indexOf(user);
+        players.splice(pos, 1);
+        e.target.parentElement.remove();
+        gameSocket.send(JSON.stringify({
+            'type': kick,
+            'message': user
+        }));
+    });
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 448 512');
+    svg.setAttribute('class', 'svgIcon'); 
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z');
+    path.setAttribute('fill', 'white'); 
+
+    svg.appendChild(path);
+    item.appendChild(itemPicture);
+    item.appendChild(itemName);
+    item.appendChild(itemStatus);
+
+    item.innerHTML += `
+        <div class="typing-indicator">
+            <div class="typing-circle"></div>
+            <div class="typing-circle"></div>
+            <div class="typing-circle"></div>
+            <div class="typing-shadow"></div>
+            <div class="typing-shadow"></div>
+            <div class="typing-shadow"></div>
+        </div>
+    `;
+
+    button.appendChild(svg);
+    item.appendChild(button);
+
+    document.getElementById('game-menu-list').appendChild(item);
+}
 
 export const clearInvList = () => {
     const local = document.getElementById('game-menu-invitationList');
@@ -294,7 +356,7 @@ function updateInvitationList(type, user) {
 
     svg.appendChild(path);
 
-    acceptButton.addEventListener('click', () => {
+    acceptButton.addEventListener('click', (e) => {
         e.target.parentElement.remove();
         gameSocket.send(JSON.stringify({
             'type': joinType,

@@ -56,3 +56,4 @@ BUG:
 use is auth func 
 display logging in game
 
+user clear all invite

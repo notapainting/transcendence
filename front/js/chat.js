@@ -544,11 +544,13 @@ const chatElement = document.querySelector(".chatbox");
 const bubbleElement = document.querySelector(".bubble");
 
 const displayChat = () => {
+    console.log("open chat")
     chatElement.style.display = "flex";
     bubbleElement.style.display = "none"
 }
 
 const closeChat = () => {
+    console.log("close chat")
     chatElement.style.display = "none";
     bubbleElement.style.display = "flex"
 }

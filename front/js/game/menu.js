@@ -444,14 +444,19 @@ nextMatch.addEventListener('click', () => {
 
 document.getElementById('game-menu-local-input-button').addEventListener('click', () => {
     const   user = document.getElementById('game-menu-input-player').value;
-    document.getElementById('game-menu-input-player').value = '';
     if (validate_name(user) === false) return ;
+    document.getElementById('game-menu-input-player').value = '';
+
     players.push(user);
 
     if (status === enu.gameMode.LOCAL) {
         createListLocal(user)
     } else if (status === enu.gameMode.MATCH) {
-        createListRemote(user, enu.EventGame.INVITE, enu.EventGame.KICK)
+        gameSocket.send(JSON.stringify({
+            'type': enu.EventGame.INVITE,
+            'message': user,
+        }));
+        // createListRemote(user, enu.EventGame.INVITE, enu.EventGame.KICK)
     } else if (status === enu.gameMode.TOURNAMENT) {
         createListRemote(user, enu.EventTournament.INVITE, enu.EventTournament.KICK)
     }
@@ -543,11 +548,6 @@ const createListRemote = (user, invite, kick) => {
     item.appendChild(button);
 
     document.getElementById('game-menu-list').appendChild(item);
-
-    gameSocket.send(JSON.stringify({
-        'type': invite,
-        'message': user,
-    }));
 }
 
 
