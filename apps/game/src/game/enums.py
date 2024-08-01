@@ -17,6 +17,8 @@ class Game(enum.StrEnum):
 
     CREATE = "game.create"
     INVITE = "game.invite"
+    INV_ACC = "invite.valid"
+    INV_404 = "invite.404"
     JOIN = "game.join"
     QUIT = "game.quit"
     READY = "game.ready"
