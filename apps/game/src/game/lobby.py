@@ -2,9 +2,9 @@
 
 from channels.layers import get_channel_layer
 from game.gamestate import GameState, MAX_SCORE, DEFAULT_SCORE, BONUSED
-
+from rest_framework.renderers import JSONRenderer
 import game.enums as enu
-import random
+import random, httpx
 
 
 LOBBY_MAXIMUM_PLAYERS = 24
@@ -138,8 +138,7 @@ class Match(Lobby):
             if hasattr(self, "result") is False:
                 self.result = self.compute()
             # send match history data to usermgt
-            import httpx
-            from rest_framework.renderers import JSONRenderer
+
             data = self.result
             data['score_w'] = self.result['scores'][data['winner']]
             data['score_l'] = self.result['scores'][data['loser']]

@@ -118,11 +118,17 @@ const remoteHandler = (e) => {
             
             
 // match
-        case enu.EventGame.INV_ACC:
-            createListRemote(content.message, enu.EventGame.KICK);
+        case enu.EventGame.INV_FOR:
+            console.warn("USER BLOCKED: " + content.message)
+            break;
+        case enu.EventGame.INV_ABS:
+            console.warn("USER NOT CONNECTED: " + content.message)
             break;
         case enu.EventGame.INV_404:
-            console.error("USER NOT FOUND/CONNECTED: " + content.message)
+            console.warn("USER NOT FOUND/CONNECTED: " + content.message)
+            break;
+        case enu.EventGame.INV_ACC:
+            createListRemote(content.message, enu.EventGame.KICK);
             break;
         case enu.EventGame.INVITE:
                 console.log("invitation from: ", content.author);

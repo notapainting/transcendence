@@ -3,6 +3,8 @@ export const EventGame = Object.freeze({
     INVITE: "game.invite",
     INV_ACC: "invite.valid",
     INV_404: "invite.404",
+    INV_FOR: "invite.forbidden",
+    INV_ABS: "invite.absent",
     JOIN: "game.join",
     QUIT: "game.quit",
     READY: "game.ready",
