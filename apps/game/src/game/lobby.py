@@ -1,7 +1,7 @@
 # game/lobby.py
 
 from channels.layers import get_channel_layer
-from game.gamestate import GameState, MAX_SCORE, DEFAULT_SCORE, BONUSED
+from game.gamestate import GameState, MIN_SCORE, MAX_SCORE, DEFAULT_SCORE, BONUSED
 from rest_framework.renderers import JSONRenderer
 import game.enums as enu
 import random, httpx
@@ -12,6 +12,14 @@ LOBBY_DEFAULT_MATCH_PLAYER = 2
 LOBBY_DEFAULT_PLAYERS = 8
 LOBBY_MINIMUM_PLAYERS = 2
 
+class LobbyException(BaseException):
+    pass
+
+class ScoreException(LobbyException):
+    pass
+
+class MaxPlayerException(LobbyException):
+    pass
 
 def getDefault():
     return {
@@ -19,6 +27,91 @@ def getDefault():
         "scoreToWin":DEFAULT_SCORE,
         "maxPlayer":LOBBY_DEFAULT_PLAYERS,
     }
+
+"""
+BqseLobby -> LOCAL LOBBY : matchmake/next, + send_json
+        -> REM LOBBY : + get chlayer
+                |-> MATCH : 
+                |-> TRN : 
+
+class BaseLobby:
+    def __init__(self, host=None, bonused=BONUSED, maxPlayer=LOBBY_DEFAULT_PLAYERS, scoreToWin=DEFAULT_SCORE) -> None:
+        self.bonused = bonused
+        self.scoreToWin = scoreToWin
+        self.maxPlayer = maxPlayer
+
+        self.task = None
+        self.gameState = None
+
+        self.host = host
+        self.invited = []
+        self.ready = []
+        self.players = []
+        self.players.append(host)
+
+    @property
+    def maxPlayer(self):
+        return self._maxPlayer
+
+    @maxPlayer.setter
+    def maxPlayer(self, value):
+        if value < len(self._players) or value > LOBBY_MAXIMUM_PLAYERS:
+            raise ScoreException()
+        self._maxPlayer = value
+
+    @property
+    def scoreToWin(self):
+        return self._scoreToWin
+
+    @scoreToWin.setter
+    def scoreToWin(self, value):
+        if value < MIN_SCORE or value > MAX_SCORE:
+            raise MaxPlayerException()
+        self._scoreToWin = value
+
+    def clear(self):
+        self.invitations = []
+        self.ready = []
+        self.players = []
+        self.players.add(host)
+
+
+    def invite(self, user):
+        if user not in self.invitations:
+            self.invitations.append(user)
+
+    def add(self, user):
+        if user not in self.players:
+            if len(self.players) == self.maxPlayer:
+                raise MaxPlayerException()
+            self.players.append(user)
+
+    def kick(self, user):
+        try :
+            self.invitations.remove(user)
+            self.players.remove(user)
+            self.ready.remove(user)
+        except ValueError:
+            pass
+
+    def check(self, user):
+        if user in self.player:
+            self.ready.append(user)
+
+    def invited(self, user):
+        return user in self.invitations
+
+    def full(self):
+        if len(self.players) == self.maxPlayer:
+            return True
+        return False
+
+    def checked(self):
+        if len(self.ready) == len(self.players):
+            return True
+        return False
+
+"""
 
 class Lobby:
     def __init__(self, host, maxPlayer=LOBBY_DEFAULT_PLAYERS, types=enu.Game) -> None:
