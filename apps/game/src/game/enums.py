@@ -1,11 +1,50 @@
 import enum
 
 class Errors(enum.StrEnum):
-    DECODE = "error.decode"
-    ENCODE = "error.encode"
-    TYPE = "error.type"
-    DATA = "error.data"
+    DECODE  = "error.decode"
+    ENCODE  = "error.encode"
+    TYPE    = "error.type"
+    DATA    = "error.data"
+    ABSENT  = "error.absent"
+    FBD_403 = "error.forbidden"
+    NF_404  = "error.not_found"
 
+class Game2(enum.StrEnum):
+    CREATE  = "game.create"
+    SETTING = "game.settings"
+    DEFAULT = "game.defaults"
+    KICK    = "game.kick"
+    QUIT    = "game.quit"
+    INVITE  = "game.invite"
+    READY   = "game.ready"
+    UNREADY = "game.unready"
+    START   = "game.start"
+    BROKE   = "game.broke"
+    NEXT    = "game.next"
+
+class Invitation(enum.StrEnum):
+    VALID   = "invitation.valid"
+    ACCEPT  = "invitation.accept"
+    REJECT  = "invitation.reject"
+    ERROR   = "invitation.error"
+
+
+class Match(enum.StrEnum):
+    HOST    = "match.host"
+    GUEST   = "match.guest"
+    UPDATE  = "match.update"
+    SCORE   = "match.score"
+    PAUSE   = "match.pause" 
+    RESUME  = "match.resume"
+    END     = "match.end"
+    RESULT  = "match.result"
+
+class Tournament2(enum.StrEnum):
+    HOST    = "tournament.host"
+    GUEST   = "tournament.guest"
+    PHASE   = "tournament.phase"
+    MATCH   = "tournament.match"
+    RESULT  = "tournament.result"
 
 
 

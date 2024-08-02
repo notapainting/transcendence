@@ -450,3 +450,139 @@ def format_paddle_key(status, key):
                 return 'upRelease'
             case '_':
                 return key
+"""
+# when game/trn start -> send cancel to all invite
+    async def mode_base(self, data):
+        pass
+        enu.Game2.QUIT: + cleanup/kick -> if lobby -> stop + clean, else send quit + set idle
+
+    async def mode_idle(self, data):
+        pass
+        enu.Game2.CREATE        : + match/trn/local -> set mode
+        enu.Invitation.ACCEPT   : -> relay to host -> wait for same
+        enu.Invitation.REJECT   : -> relay to host
+
+    async def mode_host(self, data):
+        pass
+        enu.Game2.NEXT      : -> only on local
+
+        enu.Game2.DEFAULT : -> get lobby.default
+        enu.Game2.SETTING   : lobby.changesettings + broadcast
+        enu.Game2.INVITE    : + target -> lobby.invite 
+        enu.Game2.KICK      : + target -> lobby.kick
+        enu.Game2.START     : lobby.start -> change to start task
+
+    async def mode_host_match(self, data):
+        pass
+
+        enu.Game2.READY     : lobby.ready
+        enu.Game2.UNREADY   : lobby.unready
+        enu.Game2.UPDATE    : gaemstate.game
+        enu.Game2.PAUSE     : gaemstate.game -> change to cnacel task
+        enu.Game2.RESUME    : gaemstate.game -> change to start task
+
+    async def mode_guest_match(self, data):
+        pass
+        enu.Game2.READY     : send to host
+        enu.Game2.UNREADY   : send to host
+        enu.Game2.UPDATE    : send to host + format paddle
+        enu.Game2.PAUSE     : send to host
+        enu.Game2.RESUME    : send to host
+
+
+
+
+# GENERAL (13)
+    async def invitation_accept(self, data):
+        # host : check if ok -> accept + relay or deny 
+        # guest : relay + set mode to guest/trn
+        pass
+
+    async def invitation_reject(self, data):
+        # host : relay + remove inv
+        # guest : relay + remove inv
+        pass
+
+    async def game_settings(self, data):
+        # host : change settings + broadcast
+        # guest : relay
+        pass
+
+
+    async def game_kick(self, data):
+        # guest : relay + kick (set to idle)
+        pass
+
+    async def game_quit(self, data):
+        # guest : relay 
+        # host : remove user from lobby + relay
+        pass
+
+    async def game_invite(self, data):
+        # idle/all : add to invitation + relay
+        pass
+
+    async def game_ready(self, data):
+        # guest : relay
+        pass
+
+    async def game_unready(self, data):
+        # host : apply to lobby
+        # guest : relay
+        pass
+
+    async def game_start(self, data):
+        # guest : relay
+        pass
+
+    async def game_broke(self, data):
+        # host : relay + broadcast + cleanup + set to idle
+        # guest : relay + set to idle
+        pass
+
+    async def game_next(self, data):
+        # local : ask next match
+        pass
+
+
+# MATCH (5)
+    async def match_update(self, data):
+        # guest: relay
+        pass
+
+    async def match_score(self, data):
+        #guest: relay
+        pass
+
+    async def match_pause(self, data):
+        #guest: relay
+        #host: apply to match
+        pass 
+
+    async def match_resume(self, data):
+        #guest: relay
+        #host: apply to match
+        pass
+
+    async def match_end(self, data):
+        #guest: relay
+        pass
+
+# TOURNAMENT (4)
+    async def match_result(self, data):
+        TRN -> #host: apply to trn
+        pass
+
+    async def tournament_phase(self, data):
+        TRN -> #guest: relay
+        pass
+
+    async def tournament_match(self, data):
+        TRN -> #guest: relay + prep for game
+        pass
+
+    async def tournament_result(self, data):
+        TRN -> #guest: relay
+        pass
+
+"""

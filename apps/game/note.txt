@@ -57,3 +57,5 @@ use is auth func
 display logging in game
 
 user clear all invite
+
+    !!!SOCKET ON CLOSE/OPEN -> MOVETO WELCOME!!!!

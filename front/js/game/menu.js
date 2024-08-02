@@ -458,6 +458,10 @@ document.getElementById('game-menu-local-input-button').addEventListener('click'
         }));
         // createListRemote(user, enu.EventGame.INVITE, enu.EventGame.KICK)
     } else if (status === enu.gameMode.TOURNAMENT) {
+        gameSocket.send(JSON.stringify({
+            'type': enu.EventTournament.INVITE,
+            'message': user,
+        }));
         createListRemote(user, enu.EventTournament.INVITE, enu.EventTournament.KICK)
     }
 })

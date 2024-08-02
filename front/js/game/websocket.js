@@ -131,7 +131,7 @@ const remoteHandler = (e) => {
             createListRemote(content.message, enu.EventGame.KICK);
             break;
         case enu.EventGame.INVITE:
-                console.log("invitation from: ", content.author);
+            console.log("invitation from: ", content.author);
             updateInvitationList(enu.EventGame.INVITE, content.author);
             break;
         case enu.EventGame.JOIN:
@@ -209,8 +209,8 @@ const remoteHandler = (e) => {
             moveTo(enu.sceneIdx.END);
             if (content.tournament) changeStatus(enu.gameMode.TOURNAMENT);
             break;
-            case enu.EventError.TYPE:
-                console.error(content.type)
+        case enu.EventError.TYPE:
+            console.error(content.type)
             break;
 
 // tournament
