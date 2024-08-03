@@ -199,9 +199,9 @@ export const loggedInStatus = (profile_picture, username) => {
     })
     playBtnElement.removeEventListener("click", playOfflineEvent);
     playBtnElement.addEventListener("click", playOnlineEvent);
-    setTimeout(() => {
-        playBtnElement.style.transform = "translateX(100%)";
-    }, 200)
+    // setTimeout(() => {
+    //     playBtnElement.style.transform = "translateX(100%)";
+    // }, 200)
     showChat();
     document.querySelector(".welcome-msg").innerHTML = `Welcome<br>${username}`;
     document.querySelector(".profile-picture-home").style.backgroundImage = `url('${profile_picture}')`
@@ -261,7 +261,12 @@ const loginRequest = (event) => {
         console.log("YOOO")
         console.log(data)
         loggedInStatus(data.profile_picture, data.username);
-        
+        var buttonLogout = document.querySelector('.menu-logout');
+        var buttonSettings = document.querySelector('.menu-settings');
+        buttonLogout.removeAttribute('disabled');
+        buttonSettings.removeAttribute('disabled');
+        buttonLogout.classList.add('clickable');
+        buttonSettings.classList.add('clickable');
     })  
     .catch(error => {
     })
@@ -416,7 +421,15 @@ export const showHome = async () => {
     homeElement.style.display = "block";
     const personData = await fetchUsers(whoIam);
     if (isAuthenticated)
+    {
         loggedInStatus(personData.profile_picture, personData.username);
+        var buttonLogout = document.querySelector('.menu-logout');
+        var buttonSettings = document.querySelector('.menu-settings');
+        buttonLogout.removeAttribute('disabled');
+        buttonSettings.removeAttribute('disabled');
+        buttonLogout.classList.add('clickable');
+        buttonSettings.classList.add('clickable');
+    }
     document.removeEventListener('mousemove', parallaxEffect);
     document.removeEventListener('wheel', scrollDownEffect);
     document.addEventListener('mousemove', parallaxEffect);
