@@ -115,7 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     const logoutButton = document.querySelector(".fa-right-from-bracket");
+    const logoutButtonMenu = document.querySelector(".menu-logout");
     logoutButton.addEventListener("click", logoutRequest);
+    logoutButtonMenu.addEventListener("click", logoutRequest);
     window.scrollTo({
         top: 0,
         behavior: "smooth",
