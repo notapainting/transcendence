@@ -15,14 +15,15 @@ const   settingsReInit = document.getElementById('settings-button-reinit');
 // <!-- div buttons -->
 const   menuM1 = document.getElementById('menu-m1-button');
 const   menuM2a = document.getElementById('menu-m2a-button');
-const   menuM2b = document.getElementById('menu-m2b-button');
+const   menuM2b = document.getElementById('menu-m2b');
 const   menuM3 = document.getElementById('menu-m3-button');
 const   menuM4 = document.getElementById('menu-m4-button');
 const   menuM5 = document.getElementById('menu-m5-button');
 const   menuM6 = document.getElementById('menu-m6-button');
 
 // <!-- animated background -->
-const   menuBG = document.getElementById('menu_bg_video');
+const   menuBgVid = document.getElementById('menu_bg_video');
+const   menuBg = document.getElementById('menu-background');
 
 // <!-- local  -->
 const   locContainerList = document.getElementById('game-menu-list-tournament');
@@ -85,14 +86,13 @@ let     locked = false;
 
 // scene
 const   scene = [
-    // [transition],
-    [menuBG, menuM1, invitationBox], // accueil du jeu
-    [menuBG, menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
-    [menuBG, menuM2b], // waiting room pour creation de tournoi (guest only)
-    [menuBG, menuM3, bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
-    [menuBG, menuM4, bannerMatch], // afk check
+    [menuBg, menuBgVid, menuM1, invitationBox], // accueil du jeu
+    [menuBgVid, menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
+    [menuBgVid, menuM2b], // waiting room pour creation de tournoi (guest only)
+    [menuBgVid, menuM3, bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
+    [menuM4, bannerMatch], // afk check
     [menuM5, bannerScore], // in game
-    [menuBG, menuM6, bannerEnd], // ecran de fin de match 
+    [menuM6, bannerEnd], // ecran de fin de match 
     [], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];

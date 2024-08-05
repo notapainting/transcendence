@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="./profile.css">
     <link rel="stylesheet" href="/chat.css">
     <link rel="stylesheet" href="./game.css">
+    <link rel="stylesheet" href="./tournament.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -100,7 +101,8 @@
                                 </svg>
                             </div>
                         </button>
-                        <button disabled class="play-offline-online-button menu-settings" data-link data-href="/profile">
+                        <button disabled class="play-offline-online-button menu-settings" data-link
+                            data-href="/profile">
                             Profile
                             <div class="icon-1">
                                 <svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 26.3 65.33"
@@ -396,6 +398,7 @@
 
 
         <div id="game-menu" class="video-background">
+            <div class="menu-element" id="menu-background"></div>
             <div class="menu-element" id="menu-transition"></div>
             <video autoplay muted loop class="menu-element" id="menu_bg_video"></video>
             <div class="inner-container">
@@ -541,55 +544,61 @@
                 </button>
             </div>
 
-            <div class="class-m2b-button menu-element" id="menu-m2b-button">
-                <button id="game-menu-ready" class="stylized-button"> <!-- A SUPPRIMER -->
-                    R E A D Y ?
-                    <div id="clip">
-                        <div id="leftTop" class="corner"></div>
-                        <div id="rightBottom" class="corner"></div>
-                        <div id="rightTop" class="corner"></div>
-                        <div id="leftBottom" class="corner"></div>
-                    </div>
-                    <span id="rightArrow" class="arrow"></span>
-                    <span id="leftArrow" class="arrow"></span>
-                </button>
-                <button id="game-menu-m2b-quit" class="stylized-button button-menu-quit">
-                    Q U I T
-                    <div id="clip">
-                        <div id="leftTop" class="corner"></div>
-                        <div id="rightBottom" class="corner"></div>
-                        <div id="rightTop" class="corner"></div>
-                        <div id="leftBottom" class="corner"></div>
-                    </div>
-                    <span id="rightArrow" class="arrow"></span>
-                    <span id="leftArrow" class="arrow"></span>
-                </button>
-                <div id="game-menu-ready-circle" class="menu-element"></div>
-            </div>
 
-            <div class="menu-m3-button menu-element" id="menu-m3-button">
-                <button id="game-menu-next" class="stylized-button">
-                    NEXT MATCH
-                    <div id="clip">
-                        <div id="leftTop" class="corner"></div>
-                        <div id="rightBottom" class="corner"></div>
-                        <div id="rightTop" class="corner"></div>
-                        <div id="leftBottom" class="corner"></div>
-                    </div>
-                    <span id="rightArrow" class="arrow"></span>
-                    <span id="leftArrow" class="arrow"></span>
-                </button>
-                <button id="game-menu-m3-quit" class="stylized-button button-menu-quit">
-                    Q U I T
-                    <div id="clip">
-                        <div id="leftTop" class="corner"></div>
-                        <div id="rightBottom" class="corner"></div>
-                        <div id="rightTop" class="corner"></div>
-                        <div id="leftBottom" class="corner"></div>
-                    </div>
-                    <span id="rightArrow" class="arrow"></span>
-                    <span id="leftArrow" class="arrow"></span>
-                </button>
+            <div class="menu-element" id="menu-m2b">
+                <div class="game-menu-waiting-title">
+                    <img src="img/waiting-title.png" />
+                </div>
+                <div class="class-m2b-button" id="menu-m2b-button">
+                    <button id="game-menu-ready" class="stylized-button"> <!-- A SUPPRIMER -->
+                        R E A D Y ?
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                    <button id="game-menu-m2b-quit" class="stylized-button button-menu-quit">
+                        Q U I T
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                    <div id="game-menu-ready-circle" class="menu-element"></div>
+                </div>
+
+                <div class="menu-m3-button menu-element" id="menu-m3-button">
+                    <button id="game-menu-next" class="stylized-button">
+                        NEXT MATCH
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                    <button id="game-menu-m3-quit" class="stylized-button button-menu-quit">
+                        Q U I T
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                </div>
             </div>
 
             <div class="menu-m4-button menu-element" id="menu-m4-button">
@@ -658,7 +667,6 @@
             <div id="game-menu-banner-end" class="menu-element game-announce-base"></div>
 
         </div>
-
         <!-- in game button -->
         <!-- <button id="game-pause" class="game-element game-button" type="button">Pause</button> -->
     </div>
@@ -670,6 +678,7 @@
     </div> -->
     <script src="https://kit.fontawesome.com/3db1c2f3ab.js" crossorigin="anonymous"></script>
     <script type="module" src="js/index.js"></script>
+    <script src="js/stars-animation.js"></script>
     <!-- <script type="module" src="js/home.js"></script> -->
 </body>
 
