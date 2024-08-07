@@ -24,7 +24,7 @@ class BaseConsumer(AsyncWebsocketConsumer):
             await super().dispatch(message)
         except ValueError as error:
             logger.warning(error)
-            await self.send_json({'type':enu.Event.Errors.TYPE})
+            await self.send_json({'type':enu.Event.Errors.HANDLER})
         except BaseException:
             raise
 
@@ -103,7 +103,6 @@ class ChatConsumer(BaseConsumer):
             await self.channel_layer.group_send(contact, {"type":enu.Event.Status.UPDATE, "data":{"author":self.user.name,"status":mod.User.Status.DISCONNECTED}})
         await self.channel_layer.group_discard(self.user.name, self.channel_name)
         logger.info("%s Quit...", self.user.name)
-
 
     async def receive_json(self, json_data, **kwargs):
         # logger.info(f'text : {json_data}')

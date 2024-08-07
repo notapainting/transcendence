@@ -413,6 +413,9 @@ async function handleMessage(message) {
         console.log(message);
         console.log(friendStatus);
     }
+    else if (message.type === "message.game"){
+        console.log("recu : game a annoncer")
+    }
     statusPromiseResolve();
 }
 

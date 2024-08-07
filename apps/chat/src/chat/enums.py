@@ -10,31 +10,33 @@ class Event():
 
     class Group(TextChoices):
         SUMMARY = 'group.summary'
-        CREATE = 'group.create'
-        UPDATE = 'group.update'
-        QUIT = 'group.quit'
-        DELETE = 'group.delete'
+        CREATE  = 'group.create'
+        UPDATE  = 'group.update'
+        QUIT    = 'group.quit'
+        DELETE  = 'group.delete'
 
     class Contact(TextChoices):
         SUMMARY = 'contact.summary'
-        UPDATE = 'contact.update'
+        UPDATE  = 'contact.update'
 
     class Status(TextChoices):
-        UPDATE = 'status.update'
-        FETCH = 'status.fetch'
+        UPDATE  = 'status.update'
+        FETCH   = 'status.fetch'
 
     class Message(TextChoices):
-        FIRST = 'message.first'
-        TEXT = 'message.text'
-        FETCH = 'message.fetch'
-        GAME = 'message.game'
-        READ = 'message.read'
+        FIRST   = 'message.first'
+        TEXT    = 'message.text'
+        FETCH   = 'message.fetch'
+        GAME    = 'message.game'
+        READ    = 'message.read'
 
     class Errors(TextChoices):
-        ENCODE = 'error.encode'
-        DECODE = 'error.decode'
-        TYPE = 'error.type'
-        DATA = 'error.data'
+        ENCODE  = 'error.encode'
+        DECODE  = 'error.decode'
+        TYPE    = 'error.type'
+        DATA    = 'error.data'
+        HANDLER = 'error.handler'
+
 
     CLIENT = [
                 Message.FIRST,
@@ -53,16 +55,16 @@ class Event():
 
 # change to Event.Contact.Operations
 class Operations(TextChoices):
-    INVIT = rel.Types.INVIT
-    BLOCK = rel.Types.BLOCK
+    INVIT   = rel.Types.INVIT
+    BLOCK   = rel.Types.BLOCK
     CONTACT = rel.Types.COMRADE
-    REMOVE = "remove"
-    DENY = "deny"
+    REMOVE  = "remove"
+    DENY    = "deny"
 
 class SpecialUser(TextChoices):
-    ADMIN = 'admin'
-    SYSTEM = 'system'
+    ADMIN   = 'admin'
+    SYSTEM  = 'system'
 
 class Self(TextChoices):
-    LOCAL = 'local'
+    LOCAL   = 'local'
 

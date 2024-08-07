@@ -59,3 +59,7 @@ display logging in game
 user clear all invite
 
     !!!SOCKET ON CLOSE/OPEN -> MOVETO WELCOME!!!!
+
+
+
+    CHECK ALL API EXCEPT FOR JSON DEODE ERROR

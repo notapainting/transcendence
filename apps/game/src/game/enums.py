@@ -5,6 +5,7 @@ class Errors(enum.StrEnum):
     ENCODE  = "error.encode"
     TYPE    = "error.type"
     DATA    = "error.data"
+    HANDLER = 'error.handler'
     ABSENT  = "error.absent"
     FBD_403 = "error.forbidden"
     NF_404  = "error.not_found"
