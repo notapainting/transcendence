@@ -19,7 +19,7 @@ class BaseConsumer(AsyncWebsocketConsumer):
             await super().dispatch(message)
         except ValueError as error:
             logger.warning(error)
-            await self.send_json({'type':enu.Errors.TYPE})
+            await self.send_json({'type':enu.Errors.HANDLER})
         except BaseException:
             raise
 

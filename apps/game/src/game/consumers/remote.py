@@ -54,7 +54,7 @@ class RemoteGamer(LocalConsumer):
             await self.channel_layer.group_discard(self.username, self.channel_name)
         RemoteGamer.connected.discard(self.username)
         print(f"bye {self.username} ({self.status})...")
-
+        # purge invitations
 
         if self.status == enu.Local.MODE:
             super().local_clear()

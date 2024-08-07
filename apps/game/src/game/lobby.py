@@ -293,6 +293,8 @@ class Tournament(Lobby):
             message = {"type":self.types.MATCH, "author":self.host, "message":{"host":match[0],"guest":match[1], "settings":self.getSettings()}}
             await self._chlayer.group_send(match[0], message)
             await self._chlayer.group_send(match[1], message)
+            await httpx.AsyncClient().post(url='http://chat:8000/api/v1/game/tournament/alert/', data=JSONRenderer().render(message['message']))
+
 
     async def update_result(self, data):
         loser = data['message']['loser']

@@ -6,7 +6,7 @@ from django.views.generic.base import RedirectView
 from chat.views.UserViews import UserApiView
 from chat.views.GroupView import GroupApiView
 from chat.views.MessageView import MessageApiView
-from chat.views.RelView import RelationApiView
+from chat.views.SpecialView import RelationApiView, TournamentAlertAPIView
 
 urls_user = [
     path("", UserApiView.as_view()),
@@ -27,11 +27,16 @@ urls_rel = [
     path("blocked/", RelationApiView.as_view()),
 ]
 
+urls_game = [
+    path("tournament/alert/", TournamentAlertAPIView.as_view()),
+]
+
 urlspatterns = [
     path('users/', include(urls_user)),
     path('groups/', include(urls_group)),
     path('messages/', include(urls_message)),
     path('relations/', include(urls_rel)),
+    path('game/', include(urls_game)),
 ]
 
 urls = [
