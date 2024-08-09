@@ -89,7 +89,7 @@ const   scene = [
     [menuBg, menuBgVid, menuM1, invitationBox], // accueil du jeu
     [menuBgVid, menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
     [menuBgVid, menuM2b], // waiting room pour creation de tournoi (guest only)
-    [menuBgVid, menuM3, bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
+    [menuM3, bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
     [menuM4, bannerMatch], // afk check
     [menuM5, bannerScore], // in game
     [menuM6, bannerEnd], // ecran de fin de match 

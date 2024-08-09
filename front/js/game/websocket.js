@@ -296,7 +296,7 @@ const createListRemote = (user, kick) => {
     path.setAttribute('fill', 'white'); 
 
     svg.appendChild(path);
-    item.appendChild(itemPicture);
+    item.appendChild(itemPicture);// Initial shooting star
     item.appendChild(itemName);
     item.appendChild(itemStatus);
 
