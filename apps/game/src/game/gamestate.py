@@ -12,7 +12,7 @@ MIN_SCORE = 1
 MAX_SCORE = 15
 
 
-TIME_REFRESH = 0.5
+TIME_REFRESH = 0.02
 width = 50
 height = 30
 paddleHeight = 80

@@ -12,7 +12,7 @@ function updateTimer() {
 
 export let gameSocket = null;
 
-
+function askNext() {gameSocket.send(JSON.stringify({'type':enu.EventLocal.NEXT}))}
 
 export const initGameWebSocket = (path) => {
     _initWebsocket(path, (path === enu.backendPath.LOCAL) ? localHandler : remoteHandler)
@@ -69,7 +69,7 @@ const localHandler = (e) => {
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content.message);
-            moveTo(enu.sceneIdx.END_GAME)
+            moveTo(enu.sceneIdx.END)
             setTimeout(askNext, 3000);
             break;
         case enu.EventLocal.END_TRN:
@@ -110,7 +110,7 @@ const remoteHandler = (e) => {
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content.message);
-            moveTo(enu.sceneIdx.END_GAME)
+            moveTo(enu.sceneIdx.END)
             setTimeout(askNext, 3000);
             break;
         case enu.EventLocal.END_TRN:

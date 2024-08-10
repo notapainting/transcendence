@@ -108,12 +108,12 @@ export function gameRenderer(data) {
 	{
 		utils.clearScene(); 
 		animationData.ballFall = true;
-		// scene.add(load.intro);
-		// scene.add(spotLight);
-		// scene.add(light);
-		// scene.add(lightWall);
-		// scene.add(spotLight1);
-		// scene.add(spotLight2);
+		scene.add(load.intro);
+		scene.add(spotLight);
+		scene.add(light);
+		scene.add(lightWall);
+		scene.add(spotLight1);
+		scene.add(spotLight2);
 	
 		gameData.width = data.width;
 		gameData.height = data.height;
