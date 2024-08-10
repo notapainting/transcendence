@@ -4,62 +4,75 @@ import game.power_up as pow
 import game.enums as enu
 import random, asyncio, time
 
+from channels.layers import get_channel_layer
+
+
 BONUSED=True
 DEFAULT_SCORE = 1
-
-
 MIN_SCORE = 1
 MAX_SCORE = 15
 
+TIME_REFRESH = 0.2
+WIDTH = 50
+HEIGHT = 30
 
-TIME_REFRESH = 0.5
-width = 50
-height = 30
-paddleHeight = 80
 paddleWidth = 10
-ballSpeedX = 0.8
-acceleration = 0.05
-reset = 0
-counter = 0
-max_speed = 2
+
+ballSpeedX = 3
+ACCELERATION = 0.05
+
+RESET = 0
+COUNTER = -1
+MAX_SPEED = 2
 
 class GameState:
-    def __init__(self, bonused=True, scoreToWin=DEFAULT_SCORE):
+    def __init__(self, group, bonused=True, scoreToWin=DEFAULT_SCORE):
+        self._chlayer = get_channel_layer()
+        self._group_id = group
+
+        self.reset  = RESET
+        self.counter  = COUNTER
         self.timer = utils.Timer(verbose=False)
         self.p = pow.PowerUpManager()
         self.scoreToWin = scoreToWin
         self.bonused = bonused
+        self._statused()
+
+    def _statused(self):
         self.status = {
-        'ballX': 0,
-        'ballY': 0,
-        'collisionX': 0,
-        'collisionY': 0,
-        'ballRadius': 1,
-        'ballSpeedX': ballSpeedX,
-        'ballSpeedY': 0.2,
-        'width' : 150,
-        'height' : 50,
-        'leftPaddleY' : 0,
-        'leftPaddleX' : -width,
-        'rightPaddleX' : width,
-        'rightPaddleY' : 0,
-        'paddleWidth' : 1,
-        'paddleHeightL' : 10, 
-        'paddleHeightR' : 10, 
-        'paddleSpeedR' : 1.2,
-        'paddleSpeedL' : 1.2,
-        'leftPlayerScore' : 0,
-        'rightPlayerScore' : 0,
-        'winner' : 'none',
-        'upPressed' : False, # change to host and guest paddles
-        'downPressed' : False,
-        'wPressed' : False,
-        'sPressed' : False,
-        'game_running' : False,
-        'playerBonus' : -1,
-        'startTime': 0,
-        'totalTime': 0
-    }
+            'ballX': 0,
+            'ballY': 0,
+            'collisionX': 0,
+            'collisionY': 0,
+            'ballRadius': 1,
+            'ballSpeedX': ballSpeedX,
+            'ballSpeedY': 0.2,
+            'width' : 150,
+            'height' : 50,
+            'leftPaddleY' : 0,
+            'leftPaddleX' : -WIDTH,
+            'rightPaddleX' : WIDTH,
+            'rightPaddleY' : 0,
+            'paddleWidth' : 1,
+            'paddleHeightL' : 10, 
+            'paddleHeightR' : 10, 
+            'paddleSpeedR' : 1.2,
+            'paddleSpeedL' : 1.2,
+            'leftPlayerScore' : 0,
+            'rightPlayerScore' : 0,
+            'winner' : 'none',
+            'upPressed' : False, # change to host and guest paddles
+            'downPressed' : False,
+            'wPressed' : False,
+            'sPressed' : False,
+            'game_running' : False,
+            'playerBonus' : -1,
+            'startTime': 0,
+            'totalTime': 0
+        }
+
+    async def _send(self, message):
+        await self._chlayer.group_send(self._group_id, message)
 
     async def update_player_position(self, message):
         if message == "stopButton":
@@ -84,31 +97,31 @@ class GameState:
 
     def to_dict(self, winner): #mise en forme
         return {
-        'x': self.status['ballX'],
-        'y': self.status['ballY'],
-        'speed': self.status['ballSpeedX'],
-        'collisionX': self.status['collisionX'],
-        'collisionY': self.status['collisionY'],
-        'radius': self.status['ballRadius'],
-        'width' : width,
-        'height' : height,
-        'leftPaddleY' : self.status['leftPaddleY'],
-        'leftPaddleX' : self.status['leftPaddleX'],
-        'rightPaddleY' : self.status['rightPaddleY'],
-        'rightPaddleX' : self.status['rightPaddleX'],
-        'paddleWidth' : self.status['paddleWidth'],
-        'paddleHeightL' : self.status['paddleHeightL'],
-        'paddleHeightR' : self.status['paddleHeightR'],
-        'leftPlayerScore' : self.status['leftPlayerScore'],
-        'rightPlayerScore' : self.status['rightPlayerScore'],
-        'winner' : self.status['winner'],
-        'randomPointB': self.p.random_point_b,
-        'randomPointM': self.p.random_point_m,
-        'randomPointE': self.p.random_point_e,
-        'bonus': self.p.randB,
-        'hitB': self.p.hitB,
-        'hitM': self.p.hitM
-    }
+            'x': self.status['ballX'],
+            'y': self.status['ballY'],
+            'speed': self.status['ballSpeedX'],
+            'collisionX': self.status['collisionX'],
+            'collisionY': self.status['collisionY'],
+            'radius': self.status['ballRadius'],
+            'width' : WIDTH,
+            'height' : HEIGHT,
+            'leftPaddleY' : self.status['leftPaddleY'],
+            'leftPaddleX' : self.status['leftPaddleX'],
+            'rightPaddleY' : self.status['rightPaddleY'],
+            'rightPaddleX' : self.status['rightPaddleX'],
+            'paddleWidth' : self.status['paddleWidth'],
+            'paddleHeightL' : self.status['paddleHeightL'],
+            'paddleHeightR' : self.status['paddleHeightR'],
+            'leftPlayerScore' : self.status['leftPlayerScore'],
+            'rightPlayerScore' : self.status['rightPlayerScore'],
+            'winner' : self.status['winner'],
+            'randomPointB': self.p.random_point_b,
+            'randomPointM': self.p.random_point_m,
+            'randomPointE': self.p.random_point_e,
+            'bonus': self.p.randB,
+            'hitB': self.p.hitB,
+            'hitM': self.p.hitM
+        }
 
     def changeSettings(self, data):
         setattr(self, data['param'], data['value'])
@@ -120,11 +133,7 @@ class GameState:
             "bonused":self.bonused,
         })
 
-    def update(self):
-        global reset, max_speed
-
-        if reset == 1:
-            reset = 2
+    def applyBonus(self):
         if self.bonused:
             self.p.addBonus(self.timer, self.status)
             self.p.addMalus(self.timer, self.status)
@@ -133,113 +142,150 @@ class GameState:
             self.p.slow(self.status)
             self.p.boost(self.status)
 
-        # paddle displacement
-        if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2 < height:
+    def computeMovementPaddle(self):
+        if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2 < HEIGHT:
             self.status['rightPaddleY'] += self.status['paddleSpeedR']
-        elif self.status['downPressed'] and self.status['rightPaddleY'] - self.status['paddleHeightR'] / 2 > -height:
+        elif self.status['downPressed'] and self.status['rightPaddleY'] - self.status['paddleHeightR'] / 2 > -HEIGHT:
             self.status['rightPaddleY'] -= self.status['paddleSpeedR']
 
-        if self.status['wPressed'] and self.status['leftPaddleY'] + self.status['paddleHeightL'] / 2 < height:
+        if self.status['wPressed'] and self.status['leftPaddleY'] + self.status['paddleHeightL'] / 2 < HEIGHT:
             self.status['leftPaddleY'] += self.status['paddleSpeedL']
-        elif self.status['sPressed'] and self.status['leftPaddleY'] - self.status['paddleHeightL'] / 2 > -height:
+        elif self.status['sPressed'] and self.status['leftPaddleY'] - self.status['paddleHeightL'] / 2 > -HEIGHT:
             self.status['leftPaddleY'] -= self.status['paddleSpeedL']
 
-        # ball displacement
+    def computeMovementBall(self):
         self.status['ballX'] += self.status['ballSpeedX']
         self.status['ballY'] += self.status['ballSpeedY']
 
-        # collision up and down
-        if self.status['ballY'] <= -height + self.status['ballRadius'] or self.status['ballY'] >= height - self.status['ballRadius']:
+    def computeCollisionBallWall(self):
+        if self.status['ballY'] <= -HEIGHT + self.status['ballRadius'] or self.status['ballY'] >= HEIGHT - self.status['ballRadius']:
             self.status['ballSpeedY'] *= -1
 
-        right_paddle_top = self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2
-        right_paddle_bottom = self.status['rightPaddleY'] - self.status['paddleHeightR'] / 2
+        self.right_paddle_top = self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2
+        self.right_paddle_bottom = self.status['rightPaddleY'] - self.status['paddleHeightR'] / 2
 
-        left_paddle_top = self.status['leftPaddleY'] + self.status['paddleHeightL'] / 2
-        left_paddle_bottom = self.status['leftPaddleY'] - self.status['paddleHeightL'] / 2
+        self.left_paddle_top = self.status['leftPaddleY'] + self.status['paddleHeightL'] / 2
+        self.left_paddle_bottom = self.status['leftPaddleY'] - self.status['paddleHeightL'] / 2
 
-        # collision with paddles
+    def computeCollisionPaddleBall(self):
         if (self.status['ballX'] + self.status['ballRadius'] > self.status['rightPaddleX'] - self.status['paddleWidth'] and
-                self.status['ballY'] >= right_paddle_bottom and
-                self.status['ballY'] <= right_paddle_top and 
+                self.status['ballY'] >= self.right_paddle_bottom and
+                self.status['ballY'] <= self.right_paddle_top and 
                 self.status['ballSpeedX'] > 0):
-            self.status['ballSpeedX'] *= -1 - acceleration
+            self.status['ballSpeedX'] *= -1 - ACCELERATION
             
             hit_pos = (self.status['rightPaddleY'] - self.status['ballY']) / self.status['paddleHeightR']
-            self.status['ballSpeedY'] = hit_pos * max_speed
+            self.status['ballSpeedY'] = hit_pos * MAX_SPEED
             self.status['playerBonus'] = 0
 
         if (self.status['ballX'] - self.status['ballRadius'] < self.status['leftPaddleX'] + self.status['paddleWidth'] and
-                self.status['ballY'] >= left_paddle_bottom and
-                self.status['ballY'] <= left_paddle_top and
+                self.status['ballY'] >= self.left_paddle_bottom and
+                self.status['ballY'] <= self.left_paddle_top and
                 self.status['ballSpeedX'] < 0):
-            self.status['ballSpeedX'] *= -1 - acceleration
+            self.status['ballSpeedX'] *= -1 - ACCELERATION
 
             hit_pos = (self.status['leftPaddleY'] - self.status['ballY']) / self.status['paddleHeightL']
-            self.status['ballSpeedY'] = hit_pos * max_speed
+            self.status['ballSpeedY'] = hit_pos * MAX_SPEED
             self.status['playerBonus'] = 1
 
-        # compute score
-        score = None
+    async def computeScore(self):
         if self.status['ballX'] <= self.status['leftPaddleX']:
             self.status['rightPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
-            self.reset()
-            score = {"score":[self.status['leftPlayerScore'], self.status['rightPlayerScore']]}
+            self.reseting()
+            await self._send({
+                "type":enu.Match.SCORE, 
+                "message":{
+                    "score":[
+                        self.status['leftPlayerScore'],
+                        self.status['rightPlayerScore']
+                ]}})
         elif self.status['ballX'] >= self.status['rightPaddleX']:
             self.status['leftPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
-            self.reset()
-            score = {"score":[self.status['leftPlayerScore'], self.status['rightPlayerScore']]}
+            self.reseting()
+            await self._send({
+                "type":enu.Match.SCORE, 
+                "message":{
+                    "score":[
+                        self.status['leftPlayerScore'],
+                        self.status['rightPlayerScore']
+                ]}})
 
-        # compute win
+    async def computeWin(self):
         if self.status['leftPlayerScore'] == self.scoreToWin:
-            self.reset()
+            self.reseting()
             self.status['winner'] = 'leftWin'
             self.status['game_running'] = False
-            return True, score
+            await self._send({"type":enu.Match.END})
+            return True
         elif self.status['rightPlayerScore'] == self.scoreToWin:
-            self.reset()
+            self.reseting()
             self.status['winner'] = 'rightWin'
             self.status['game_running'] = False
-            return False, score
+            await self._send({"type":enu.Match.END})
+            return True
+        return False
 
-        return None, score
+    async def update(self):
+        if self.reset == 1:
+            self.reset = 2
+        self.applyBonus()
+        self.computeMovementPaddle()
+        self.computeMovementBall()
+        self.computeCollisionBallWall()
+        self.computeCollisionPaddleBall()
+        await self.computeScore()
+        win = await self.computeWin()
+        return win
 
-    
-    def reset(self):
-        global reset, counter
-
+    def reseting(self):
         self.status['ballX'] = 0
         self.status['ballY'] = 0
         self.status['playerBonus'] = -1
-        if counter % 2 == 0:
-            self.status['ballSpeedX'] = -ballSpeedX 
-        else:
-            self.status['ballSpeedX'] = ballSpeedX 
-        counter += 1
+        self.status['ballSpeedX'] = self.counter * ballSpeedX 
+        self.counter *= -1
         self.status['ballSpeedY'] = random.uniform(-1, 1)
-        reset = 1
+        self.reset = 1
 
-async def local_loop(self):
-    global reset
-    try :
-        while self.local_game_state.status['game_running']:
-            end, score = self.local_game_state.update()
-            if score is not None:
-                score['players'] = self.local_current[self.local_matchIdx]
-                await self.send_json({"type":enu.Game.SCORE, "message":score})
-            if end is not None:
-                return await self.channel_layer.send(self.channel_name, {"type":enu.Game.END})
-            await self.send_json({"type": enu.Local.UPDATE, "message":self.local_game_state.to_dict('none')})
-            if reset ==  2:
-                time.sleep(0.5)
-                reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-            await asyncio.sleep(TIME_REFRESH)
-    except asyncio.CancelledError as error:
-        print(error)
+    async def loop(self):
+        try :
+            end = False
+            while self.status['game_running']:
+                end = await self.update()
+                if end is True:
+                    return
+
+                await self._send({"type": enu.Match.UPDATE, "message":self.to_dict('none')})
+                if self.reset ==  2:
+                    await asyncio.sleep(0.5)
+                    self.reset = 0
+                    print(f"THIS IS THE END")
+
+                await asyncio.sleep(TIME_REFRESH)
+        except asyncio.CancelledError as error:
+            print(f"error is {error}")
+        except BaseException as error:
+            print(f"error is {error}")
+
+
+    async def interface(self, message):
+        if message == "startButton":
+            self.status['game_running'] = True
+            self.task = asyncio.create_task(self.loop())
+        elif message == "stopButton":
+            self.status['game_running'] = False
+        elif message == "bonus":
+            self.status['randB'] = data["bonus"]
+        else :
+            asyncio.create_task(self.update_player_position(message))
+
+    async def end(self):
+        if self.task is not None:
+            self.task.cancel()
+
 
 
 async def remote_loop(self):

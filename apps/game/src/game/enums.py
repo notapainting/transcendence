@@ -8,9 +8,29 @@ class Errors(enum.StrEnum):
     HANDLER = 'error.handler'
     ABSENT  = "error.absent"
     FBD_403 = "error.forbidden"
-    NF_404  = "error.not_found"
+    NTF_404 = "error.not_found"
 
-class Game2(enum.StrEnum):
+class Invitation(enum.StrEnum):
+    VALID   = "invitation.valid"
+    ERROR   = "invitation.error"
+    ACCEPT  = "invitation.accept"
+    REJECT  = "invitation.reject"
+    MATCH   = "invitation.match"
+    TRN     = "invitation.tournament"
+
+"""
+class Game(enum.StrEnum):
+
+
+
+
+
+
+
+
+"""
+
+class Game(enum.StrEnum):
     CREATE  = "game.create"
     SETTING = "game.settings"
     DEFAULT = "game.defaults"
@@ -22,15 +42,31 @@ class Game2(enum.StrEnum):
     START   = "game.start"
     BROKE   = "game.broke"
     NEXT    = "game.next"
+    IDLE    = "game.idle"
+    LOCAL   = "game.local"
+    MATCH   = "game.match"
+    TRN     = "game.tournament"
 
-class Invitation(enum.StrEnum):
-    VALID   = "invitation.valid"
-    ACCEPT  = "invitation.accept"
-    REJECT  = "invitation.reject"
-    ERROR   = "invitation.error"
-
+# will be deprecated
+    HOST = "game.host"
+    GUEST = "game.guest"
+    SETTINGS = "game.settings"
+    SETTINGS_DEF = "game.settings.default"
+    INV_ACC = "invite.valid"
+    INV_404 = "invite.404"
+    INV_FOR = "invite.forbidden"
+    INV_ABS = "invite.absent"
+    JOIN = "game.join"
+    ACCEPTED = "game.accepted"
+    DENY = "game.deny"
+    UPDATE = "game.update"
+    SCORE = "game.score"
+    PAUSE = "game.pause" 
+    RESUME = "game.resume"
+    END = "game.end"
 
 class Match(enum.StrEnum):
+    ID      = "match.match"
     HOST    = "match.host"
     GUEST   = "match.guest"
     UPDATE  = "match.update"
@@ -40,48 +76,16 @@ class Match(enum.StrEnum):
     END     = "match.end"
     RESULT  = "match.result"
 
-class Tournament2(enum.StrEnum):
+class Tournament(enum.StrEnum):
+    ID      = "tournament.tournament"
     HOST    = "tournament.host"
     GUEST   = "tournament.guest"
     PHASE   = "tournament.phase"
     MATCH   = "tournament.match"
     RESULT  = "tournament.result"
 
-
-
-class Game(enum.StrEnum):
-    HOST = "game.host"
-    GUEST = "game.guest"
-    SETTINGS = "game.settings"
-    SETTINGS_DEF = "game.settings.default"
-
-    CREATE = "game.create"
-    INVITE = "game.invite"
-    INV_ACC = "invite.valid"
-    INV_404 = "invite.404"
-    INV_FOR = "invite.forbidden"
-    INV_ABS = "invite.absent"
-    JOIN = "game.join"
-    QUIT = "game.quit"
-    READY = "game.ready"
-    UNREADY = "game.unready"
-    KICK = "game.kick"
-    ACCEPTED = "game.accepted"
-    DENY = "game.deny"
-    BROKE = "game.broke"
-    UPDATE = "game.update"
-    SCORE = "game.score"
-
-    START = "game.start"
-    PAUSE = "game.pause" 
-    RESUME = "game.resume"
-    END = "game.end"
-
-class Tournament(enum.StrEnum):
-    HOST = "tournament.host"
-    GUEST = "tournament.guest"
+# will be deprecated
     SETTINGS = Game.SETTINGS
-
     CREATE = "tournament.create"
     INVITE = "tournament.invite"
     DENY = "tournament.deny"
@@ -91,12 +95,9 @@ class Tournament(enum.StrEnum):
     ACCEPTED = "tournament.accepted"
     READY = "tournament.ready"
     START = "tournament.start"
-    PHASE = "tournament.phase"
-    MATCH = "tournament.match"
-    RESULT = "tournament.result"
     BROKE = "tournament.broke"
 
-
+# will be deprecated
 class Local(enum.StrEnum):
     MODE = "local.mode"
     SETTINGS = Tournament.SETTINGS
@@ -104,13 +105,21 @@ class Local(enum.StrEnum):
     PHASE = "local.phase"
     MATCH = "local.match"
     READY = Game.READY
-    UPDATE = Game.UPDATE
-    SCORE = Game.SCORE
-    PAUSE = Game.PAUSE
+    # UPDATE = Game.UPDATE
+    # SCORE = Game.SCORE
+    # PAUSE = Game.PAUSE
     NEXT = "local.next"
     END_GAME = "local.end.game"
     END_TRN = "local.end.tournament"
     QUIT = Game.QUIT
+
+    UPDATE  = "match.update"
+    SCORE   = "match.score"
+    PAUSE   = "match.pause" 
+    RESUME  = "match.resume"
+    END     = "match.end"
+    RESULT  = "match.result"
+
 
 class CStatus(enum.StrEnum):
     IDLE = "status.idle"
