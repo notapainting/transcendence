@@ -33,17 +33,19 @@ const _initWebsocket = (path, handler) => {
         setTimeout(_initWebsocket, 5000, path, handler)
         gameSocket = null;
     };
+    document.removeEventListener('keydown', bindKeyPress)
+    document.removeEventListener('keyup', bindKeyRelease)
 }
 
 const localHandler = (e) => {
     const content = JSON.parse(e.data);
     console.log("message: ", content.type);
     switch (content.type) {
-        case enu.EventLocal.PHASE:
+        case enu.EventTournament.PHASE:
             moveTo(enu.sceneIdx.PHASE);
             announcePhase(content.message);
             break;
-        case enu.EventLocal.MATCH:
+        case enu.EventTournament.MATCH:
             moveTo(enu.sceneIdx.PREMATCH);
             announceMatch(content.message);
             document.addEventListener('keydown', bindKeyPress)
@@ -57,20 +59,20 @@ const localHandler = (e) => {
                 game.gameRenderer(null);
             }
             break;
-        case enu.EventLocal.UPDATE:
+        case enu.EventMatch.UPDATE:
             game.gameRenderer(content.message);
             break;
-        case enu.EventLocal.SCORE:
+        case enu.EventMatch.SCORE:
             updateScore(content.message);
             announceScore();
             break;
-        case enu.EventLocal.END_GAME:
+        case enu.EventMatch.END:
             clearGame();
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content.message);
             moveTo(enu.sceneIdx.END_GAME)
-            setTimeout(askNext, 3000);
+            if (content.end === false) setTimeout(askNext, 3000);
             break;
         case enu.EventLocal.END_TRN:
             moveTo(enu.sceneIdx.END)
@@ -392,7 +394,7 @@ function updateInvitationList(type, user) {
 
 
 const bindKeyPress = (event) => {
-    let data = {'type': 'game.update','message': ''};
+    let data = {'type': enu.EventMatch.UPDATE,'message': ''};
     switch (event.key) {
         case 'w':
             data.message = 'wPressed'
@@ -413,7 +415,7 @@ const bindKeyPress = (event) => {
 }
 
 const bindKeyRelease = (event) => {
-    let data = {'type': 'game.update','message': ''};
+    let data = {'type': enu.EventMatch.UPDATE,'message': ''};
     switch (event.key) {
         case 'w':
             data.message = 'wRelease'

@@ -4,12 +4,85 @@ import random, asyncio
 import game.enums as enu
 
 from game.consumers.base import BaseConsumer
-from game.gamestate import GameState, local_loop, MAX_SCORE, DEFAULT_SCORE
-from game.lobby import LOBBY_MAXIMUM_PLAYERS, LOBBY_MINIMUM_PLAYERS, LOBBY_DEFAULT_PLAYERS
+from game.gamestate import GameState, MAX_SCORE, DEFAULT_SCORE
+from game.lobby import LocalTournament, LOBBY_MAXIMUM_PLAYERS, LOBBY_MINIMUM_PLAYERS, LOBBY_DEFAULT_PLAYERS
 
+
+
+# finir interface gamestate : cs -> lobby -> gs
+finir loyal cons 
+
+class LoyalConsumer(BaseConsumer):
+
+    async def connect(self):
+        await self.accept()
+        self.lobby = LocalTournament(host=self.channel_name)
+        await self.lobby._init()
+        print(f"Hey loyal !")
+
+    async def disconnect(self, close_code):
+        await self.lobby.end()
+        print(f"bye loyal!")
+
+    async def receive_json(self, json_data):
+        await self.local(json_data)
+
+    async def local(self, data):
+        match data['type']:
+            case enu.Game.START:
+                await self.lobby.start(data['message'])
+            case enu.Game.SETTING:
+                self.lobby.changeSettings(data['message'])
+            case enu.Match.UPDATE :
+                await self.lobby.gaming(data['message'])
+            case enu.Game.READY :
+                await self.lobby.gaming("startButton")
+            case enu.Match.PAUSE :
+                if self.lobby.game_state.status['game_running'] == True:
+                    await self.lobby.gaming("stopButton")
+                else:
+                    await self.lobby.gaming("startButton")
+            case enu.Game.NEXT :
+                await self.lobby.next()
+            case enu.Game.QUIT :
+                await self.lobby.end()
+            case _:
+                print(f"error: bad type")
+
+
+    async def game_start(self, data):
+        await self.send_json(data)
+
+    async def tournament_phase(self, data):
+        await self.send_json(data)
+
+    async def tournament_match(self, data):
+        # self.local_game_state = GameState()
+        await self.send_json(data)
+
+    async def match_update(self, data):
+        await self.send_json(data)
+
+
+    async def match_score(self, data):
+        data['score'] = {'players':self.lobby.current[self.lobby.matchCount]}
+        await self.send_json(data)
+
+
+    async def match_end(self, data):
+        await self.send_json(data)
+        await self.lobby.reset()
+
+
+    async def match_resume(self, data):
+        await self.send_json(data)
+
+
+"""
+change gamestate
+"""
 
 class LocalConsumer(BaseConsumer):
-
     def __init__(self):
         super().__init__()
         self.local_players = []
@@ -67,10 +140,6 @@ class LocalConsumer(BaseConsumer):
         await self.send_json({"type":enu.Local.PHASE, "message":self.local_current})
 
     async def local_announce_next(self):
-        if self.local_matchIdx == -2:
-            return
-        if self.local_matchIdx == -3:
-            return await self.send_json({'type':enu.Local.END_TRN})
         self.local_matchIdx += 1
         if self.local_matchIdx == len(self.local_current):
             if len(self.local_current) == 1:
@@ -91,10 +160,13 @@ class LocalConsumer(BaseConsumer):
             loser = self.local_current[self.local_matchIdx][0]
         self.local_losers.append(loser)
         self.local_players.remove(loser)
-        await self.send_json({'type':enu.Local.END_GAME, "message":winner})
         if len(self.local_current) == 1:
+            await self.send_json({'type':enu.Local.END_GAME, "message":winner, "end":true})
             self.local_clear()
             self.local_matchIdx = -3
+            await self.send_json({'type':enu.Local.END_TRN})
+        else :
+            await self.send_json({'type':enu.Local.END_GAME, "message":winner, "end":false})
 
     def local_clear(self):
         self.local_players = []
@@ -104,7 +176,6 @@ class LocalConsumer(BaseConsumer):
             self.local_task.cancel()
         if hasattr(self, "local_game_state"):
             del self.local_game_state
-        self.local_matchIdx = -2
 
     async def local_gaming(self, data):
         message = data["message"]

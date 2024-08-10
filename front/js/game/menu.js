@@ -277,24 +277,26 @@ export const moveTo = (i) => {
 }
 
 /*** event listener ****/
-createMatch.addEventListener('click', () => {
-    status = enu.gameMode.MATCH;
-    gameSocket.send(JSON.stringify({'type': enu.EventGame.CREATE}));
+const sendCreate = (mode) => {
+    gameSocket.send(JSON.stringify({'type': enu.EventGame.CREATE, 'mode':mode}));
     moveTo(enu.sceneIdx.CREATION);
     resetSettings();
+} 
+
+createMatch.addEventListener('click', () => {
+    status = enu.gameMode.MATCH;
+    sendCreate(enu.EventGame.MATCH)
 });
 
 createTournament.addEventListener('click', () => {
     status = enu.gameMode.TOURNAMENT;
-    gameSocket.send(JSON.stringify({'type': enu.EventTournament.CREATE}));
-    moveTo(enu.sceneIdx.CREATION);
+    sendCreate(enu.EventGame.TRN)
 });
 
 
 createLocal.addEventListener('click', () => {
     status = enu.gameMode.LOCAL;
-    gameSocket.send(JSON.stringify({'type': enu.EventLocal.MODE}));
-    moveTo(enu.sceneIdx.CREATION);
+    sendCreate(enu.EventGame.LOCAL)
 })
 
 function getBonused() { return settingsSendBonus.checked; };
@@ -340,11 +342,6 @@ const prepRequest = (type) => {
 }
 
 const requestUpdateSettings = (type) => {
-    // if (type === 0) {
-        // if (bonused === true) bonused = false;
-        // else bonused = true;
-    // }
-
     gameSocket.send(JSON.stringify({
         'type': enu.EventGame.SETTINGS,
          'message':{
@@ -373,7 +370,7 @@ start.addEventListener('click', () => {
     } )
     if (status === enu.gameMode.LOCAL) {
         gameSocket.send(JSON.stringify({
-            'type': enu.EventLocal.PLAYERS,
+            'type': enu.EventGame.START,
             'message':players,
         }));
     } else if (status === enu.gameMode.MATCH) {
@@ -385,13 +382,12 @@ start.addEventListener('click', () => {
 })
 
 const readyFunc = () => {
-    if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.READY}));
-    else if (status === enu.gameMode.MATCH) gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
-    else if (status === enu.gameMode.LOCAL) {
+    if (status === enu.gameMode.LOCAL) {
         moveTo(enu.sceneIdx.MATCH);
         announceScore();
         gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
     }
+    else gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
 };
 
 readyP.addEventListener('click', readyFunc);
@@ -399,7 +395,7 @@ ready.addEventListener('click', readyFunc);
 
 pause.addEventListener('click', () => {
     if (locked === true) return ;
-    gameSocket.send(JSON.stringify({'type': enu.EventGame.PAUSE}));
+    gameSocket.send(JSON.stringify({'type': enu.EventMatch.PAUSE}));
     togglePause();
     if (status === enu.gameMode.LOCAL) {
         if (gameData.timerInterval) {
@@ -424,8 +420,7 @@ const quitFunc = () => {
         }
         var to = enu.sceneIdx.CREATION;
     } else var to = enu.sceneIdx.WELCOME;
-        if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.QUIT}));
-        else if (status === enu.gameMode.MATCH || status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
+        gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
         status = enu.gameMode.IDLE;
         if (idx === enu.sceneIdx.WELCOME) {
             fullClear()
@@ -438,7 +433,7 @@ document.querySelectorAll(".button-menu-quit").forEach(div => {div.addEventListe
 
 
 nextMatch.addEventListener('click', () => {
-    if (status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}));
+    if (status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventGame.NEXT}));
     else moveTo(enu.sceneIdx.PREMATCH)
 })
 
