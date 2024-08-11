@@ -40,7 +40,7 @@ class BaseLobby:
     def __init__(self, host, bonused=BONUSED, maxPlayer=LOBBY_DEFAULT_PLAYERS, scoreToWin=DEFAULT_SCORE) -> None:
         # lobby
         self.host = host
-        self.invited = []
+        self.invitations = []
         self.ready = []
         self.players = []
 
@@ -101,6 +101,12 @@ class BaseLobby:
     def invite(self, user):
         if user not in self.invitations and user not in self.players:
             self.invitations.append(user)
+            return True
+        return False
+
+    def uninvite(self, user):
+        if user in self.invitations:
+            self.invitations.remove(user)
             return True
         return False
 
@@ -224,7 +230,6 @@ class LocalTournament(BaseLobby, BaseMatch):
         self.matchCount = -2
         self.players = []
 
-
     async def tournament_result(self):
         print(f"match t oplay : {len(self.current)}")
         if len(self.current) == 1:
@@ -237,12 +242,6 @@ class LocalTournament(BaseLobby, BaseMatch):
         await super()._end()
 
 
-
-
-
-
-
-
 # substitute hostname to hsot id for group
 # pass groupID to  gamestate 
 class RemoteLobby(BaseLobby):
@@ -253,7 +252,7 @@ class RemoteLobby(BaseLobby):
     async def _send(self, target_name, message):
         message['author'] = self.host
         target = plaza.translate(target_name)
-        await self._chlayer._send(target_name, message)
+        await self._chlayer.send(target_name, message)
 
     async def broadcast(self, message):
         message['author'] = self.host
@@ -261,11 +260,11 @@ class RemoteLobby(BaseLobby):
 
 
     async def start(self, data):
-        await self.broadcast({"type":enu.Game.START})
+        await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Game.START}})
 
-    async def invite(self, user, type=enu.Invitation.TRN):
+    async def invite(self, user, mode=enu.Game.TRN):
         if super().invite(user):
-            await self._send({"type":type})
+            await self._send(user, {"type":enu.Game.INVITE, "mode":mode})
 
     async def add(self, user):
         if super().add(user):
@@ -273,7 +272,7 @@ class RemoteLobby(BaseLobby):
 
     async def check(self, user):
         if super().check(user):
-            await self.broadcast({"type":enu.Game.READY, "author":user, "r":True})
+            await self.broadcast({"type":enu.Game.READY, "player":user, "r":True})
 
     async def kick(self, user):
         if super().kick(user):
@@ -316,20 +315,24 @@ class Tournament(RemoteLobby):
             await self.make_phase()
 
     def players_state(self):
-        return {"invited":self.invited, "players":self.players, "host":self.host, "size":self.maxPlayer}
+        return {"invited":self.invitations, "players":self.players, "host":self.host, "size":self.maxPlayer}
 
 
 
-class Match(RemoteLobby):
+class Match(RemoteLobby, BaseMatch):
     def __init__(self, host, tournament=None):
         super().__init__(host=host, maxPlayer=LOBBY_DEFAULT_MATCH_PLAYER)
-        self.task = None
-        self.gameState = GameState()
+        self.game_state = GameState(group=self._id, bonused=self.bonused, scoreToWin=self.scoreToWin)
         self.tournament = tournament
+
+    async def start(self, data):
+        await super().start()
+        await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Match.START}})
+        await self.match_start()
 
     async def invite(self, user):
         if self.tournament is None:
-            await super().invite(user, type=enu.Invitation.MATCH)
+            await super().invite(user, mode=enu.Game.MATCH)
 
     async def kick(self, user):
         if self.tournament is None:
@@ -353,6 +356,7 @@ class Match(RemoteLobby):
         return self.result
 
     async def end(self, cancelled=False):
+        await self.match_stop()
         if cancelled == False:
             if hasattr(self, "result") is False:
                 self.result = self.compute()
@@ -365,8 +369,7 @@ class Match(RemoteLobby):
             await httpx.AsyncClient().post(url='http://user:8000/user/match_history/new/', data=JSONRenderer().render(data))
             if self.tournament is True:
                 await self._chlayer.send_group(self.tournament, {"type":enu.Tournament.RESULT, "message":self.result})
-        if self.task is not None:
-            self.task.cancel()
+        
 
 """
 class DEADLobby:
