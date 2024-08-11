@@ -65,7 +65,7 @@ const localHandler = (e) => {
             announceScore();
             break;
         case enu.EventLocal.END_GAME:
-            clearGame();
+            // clearGame();
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content.message);
@@ -106,7 +106,7 @@ const remoteHandler = (e) => {
             }
             break;
         case enu.EventLocal.END_GAME:
-            clearGame();
+            // clearGame();
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content.message);
@@ -206,7 +206,7 @@ const remoteHandler = (e) => {
         case enu.EventGame.QUIT:
             // a player has quit match
         case enu.EventGame.END:
-            fullClear();
+            // fullClear();
             moveTo(enu.sceneIdx.END);
             if (content.tournament) changeStatus(enu.gameMode.TOURNAMENT);
             break;
