@@ -91,7 +91,7 @@ const   scene = [
     [menuBgVid, menuM2b], // waiting room pour creation de tournoi (guest only)
     [menuBgVid, menuM3], // phases du tournoi : montre les prochain match de la phas eet leur etat
     [menuBgVid, menuM4], // afk check
-    [menuBgVid, menuM5, bannerScore], // in game
+    [menuM5, bannerScore], // in game
     [menuM6, bannerEnd], // ecran de fin de match 
     [menuM6], // ecran de fin de tournoi (recap)
     [menuM6], // ecran erreur
@@ -262,8 +262,7 @@ export const announcePhase = (data) => {
 }
 
 export const announceMatch = (data) => {
-    // const   banner = document.getElementById('game-menu-banner-match')
-    // banner.innerHTML = data[0] + " VS " + data[1];
+    document.getElementById('game-announce-next-match').innerHTML = '';
 
     const   itemPlayer1 = document.createElement('div');
     const   itemPlayer2 = document.createElement('div');
