@@ -77,10 +77,14 @@ const localHandler = (e) => {
         case enu.EventLocal.END_TRN:
             moveTo(enu.sceneIdx.END)
             break;
+        case enu.EventGame.SETTING:
+            console.log("DEFAULTS SETTINGS : " + content.message);
+            updateSettings(content.message);
+            break;
         default:
             console.log("unknow type");
             break;
-    }
+}
 }
 
 

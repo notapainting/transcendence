@@ -5,12 +5,12 @@ import game.enums as enu
 
 from game.consumers.base import BaseConsumer
 from game.gamestate import GameState, MAX_SCORE, DEFAULT_SCORE
-from game.lobby import LocalTournament, LOBBY_MAXIMUM_PLAYERS, LOBBY_MINIMUM_PLAYERS, LOBBY_DEFAULT_PLAYERS
+from game.lobby import getDefault, LocalTournament, LOBBY_MAXIMUM_PLAYERS, LOBBY_MINIMUM_PLAYERS, LOBBY_DEFAULT_PLAYERS
 
 
 
 # finir interface gamestate : cs -> lobby -> gs
-finir loyal cons 
+# finir loyal cons 
 
 class LoyalConsumer(BaseConsumer):
 
@@ -18,6 +18,7 @@ class LoyalConsumer(BaseConsumer):
         await self.accept()
         self.lobby = LocalTournament(host=self.channel_name)
         await self.lobby._init()
+        await self.send_json({"type":enu.Game.SETTING, "message":getDefault()})
         print(f"Hey loyal !")
 
     async def disconnect(self, close_code):
@@ -34,14 +35,11 @@ class LoyalConsumer(BaseConsumer):
             case enu.Game.SETTING:
                 self.lobby.changeSettings(data['message'])
             case enu.Match.UPDATE :
-                await self.lobby.gaming(data['message'])
+                await self.lobby.match_feed(data)
             case enu.Game.READY :
-                await self.lobby.gaming("startButton")
+                await self.lobby.match_start()
             case enu.Match.PAUSE :
-                if self.lobby.game_state.status['game_running'] == True:
-                    await self.lobby.gaming("stopButton")
-                else:
-                    await self.lobby.gaming("startButton")
+                await self.lobby.match_pause()
             case enu.Game.NEXT :
                 await self.lobby.next()
             case enu.Game.QUIT :
