@@ -171,8 +171,6 @@ class LocalTournament(BaseLobby):
         super().__init__(host=host)
         self.current = []
         self.matchCount = -2
-        self.task = None
-        self.game_state = None
 
     async def broadcast(self, message):
         message['author'] = self.host
@@ -201,25 +199,40 @@ class LocalTournament(BaseLobby):
             await self.broadcast({"type":enu.Tournament.MATCH, "message":match, "state":self.game_state.to_dict('none')})
 
     async def reset(self):
-        if self.task is not None:
-            await self.task.cancel()
+        await self.match_stop()
         self.current = []
         self.matchCount = -2
-        self.task = None
-        del self.game_state
         self.players = []
 
 
     async def end(self):
-        if hasattr(self, "game_state"):
-            await self.game_state.end()
-        # if self.task is not None:
-        #     self.task.cancel()
+        await self.match_stop()
         await super()._end()
 
-    async def gaming(self, message):
-        print(f"in lobgamin")
-        await self.game_state.interface(message)
+    async def match_start(self):
+        if hasattr(self, "game_state"):
+            await self.game_state.start()
+
+    async def match_stop(self):
+        if hasattr(self, "game_state"):
+            await self.game_state.stop()
+
+    async def match_pause(self):
+        if hasattr(self, "game_state"):
+            await self.game_state.pause()
+
+    async def match_feed(self, data):
+        if hasattr(self, "game_state"):
+            if data['message'] == "bonus":
+                await self.game_state.feed_bonus(data['bonus'])
+            else:
+                await self.game_state.feed(data['message'])
+
+
+
+
+
+
 
 
 
