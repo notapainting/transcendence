@@ -85,34 +85,6 @@
     position: relative;
 }
 
-.game-announce-base{
-    position:absolute;
-    display:none;
-    background-color:#61e8d8;
-    border-radius:10% 10% 10% 10% / 10% 10% 10% 10% ;
-    font-size:25px;
-}
-
-#game-menu-banner-phase{
-    top:10%;
-    left:45%;
-}
-
-#game-menu-banner-match{
-    top:50%;
-    left:40%;
-    font-size:60px;
-}
-
-#game-menu-banner-score{
-    top:5%;
-    left:40%;
-}
-
-#game-menu-banner-end{
-    top:5%;
-    left:40%;
-}
 
 .game-button{
     position:absolute;
@@ -314,7 +286,7 @@ ul {
     padding: 0;
 }
 
-.list-tournoi-element {
+/* .list-tournoi-element {
     padding: 10px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
@@ -323,7 +295,7 @@ ul {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
+} */
 
 .list-tournoi-user-name {
     margin-left: 10px;
@@ -941,13 +913,9 @@ ul {
     justify-content: center;
     gap: 25%;
     margin-top: 5%;
+    display: flex;
 }
 
-#menu-m3-button {
-    justify-content: center;
-    gap: 25%;
-    margin-top: 5%;
-}
 
 #menu-m5-button {
     justify-content: center;

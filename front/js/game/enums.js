@@ -67,6 +67,7 @@ export const EventTournament = Object.freeze({
     PHASE   : "tournament.phase",
     MATCH   : "tournament.match",
     RESULT  : "tournament.result",
+    END     : "tournament.end",
 
     // will be deprecated
     CREATE: "tournament.create",
@@ -79,7 +80,6 @@ export const EventTournament = Object.freeze({
     READY: "tournament.ready",
     START: "tournament.start",
     BROKE: "tournament.broke",
-    END: "tournament.end",
     SETTINGS: "tournament.settings",
 })
 

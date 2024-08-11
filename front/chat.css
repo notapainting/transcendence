@@ -19,6 +19,7 @@
 }
 
 .chatbox {
+    z-index: 5;
     width: 600px;
     height: 400px;
     display: none;

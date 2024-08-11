@@ -35,22 +35,6 @@ def getDefault():
         "maxPlayer":LOBBY_DEFAULT_PLAYERS,
     }
 
-"""
-BqseLobby -> LOCAL LOBBY : matchmake/next, + send_json
-        -> REM LOBBY : + get chlayer
-                |-> MATCH : 
-                |-> TRN : 
-"""
-"""
-gameing ? loop ? 
-"""
-
-
-"""
-!!! MOVE connected list in unique class singleton
-separate broadcast in remote vs local
-local should use gourp_send? _send? 
-"""
 
 class BaseLobby:
     def __init__(self, host, bonused=BONUSED, maxPlayer=LOBBY_DEFAULT_PLAYERS, scoreToWin=DEFAULT_SCORE) -> None:
@@ -165,50 +149,7 @@ class BaseLobby:
         pass
 
 
-
-class LocalTournament(BaseLobby):
-    def __init__(self, host):
-        super().__init__(host=host)
-        self.current = []
-        self.matchCount = -2
-
-    async def broadcast(self, message):
-        message['author'] = self.host
-        await self._chlayer.group_send(self._id, message)
-
-    async def start(self, players):
-        self.set_players(players)
-        await self.broadcast({"type":enu.Game.START})
-        await self.make_phase()
-
-    async def make_phase(self):
-        random.shuffle(self.players)
-        self.current = [(self.players[i],self.players[i + 1]) for i in range(0, len(self.players), 2)]
-        self.matchCount = -1
-        await self.broadcast({"type":enu.Tournament.PHASE, "message":self.current})
-
-    async def next(self):
-        self.matchCount += 1
-        if self.matchCount == len(self.current):
-            if len(self.current) == 1:
-                return
-            await self.make_phase()
-        else:
-            match = self.current[self.matchCount]
-            self.game_state = GameState(group=self._id, bonused=self.bonused, scoreToWin=self.scoreToWin)
-            await self.broadcast({"type":enu.Tournament.MATCH, "message":match, "state":self.game_state.to_dict('none')})
-
-    async def reset(self):
-        await self.match_stop()
-        self.current = []
-        self.matchCount = -2
-        self.players = []
-
-
-    async def end(self):
-        await self.match_stop()
-        await super()._end()
-
+class BaseMatch:
     async def match_start(self):
         if hasattr(self, "game_state"):
             await self.game_state.start()
@@ -228,6 +169,72 @@ class LocalTournament(BaseLobby):
             else:
                 await self.game_state.feed(data['message'])
 
+    def match_result(self):
+        if not hasattr(self, "game_state"):
+            return
+        winner = self.game_state.status['winner']
+        if winner == 'leftWin':
+            winner = self.current[self.matchCount][0]
+            loser = self.current[self.matchCount][1]
+        else:
+            winner = self.current[self.matchCount][1]
+            loser = self.current[self.matchCount][0]
+        if hasattr(self, "players"):
+            self.players.remove(loser)
+        return {"winner":winner, "loser":loser}
+
+
+class LocalTournament(BaseLobby, BaseMatch):
+    def __init__(self, host):
+        super().__init__(host=host)
+        self.current = []
+        self.matchCount = -2
+
+    async def broadcast(self, message):
+        message['author'] = self.host
+        await self._chlayer.group_send(self._id, message)
+
+    async def start(self, players):
+        self.set_players(players)
+        await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Game.START}})
+        await self.make_phase()
+
+    async def make_phase(self):
+        random.shuffle(self.players)
+        self.current = [(self.players[i],self.players[i + 1]) for i in range(0, len(self.players), 2)]
+        self.matchCount = -1
+        await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.PHASE, "new":True, "message":self.current}})
+
+    async def next(self):
+        if self.matchCount < -1:
+            return
+        self.matchCount += 1
+        if self.matchCount == len(self.current):
+            if len(self.current) == 1:
+                return
+            await self.make_phase()
+        else:
+            match = self.current[self.matchCount]
+            self.game_state = GameState(group=self._id, bonused=self.bonused, scoreToWin=self.scoreToWin)
+            await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.MATCH, "message":match, "state":self.game_state.to_dict('none')}})
+
+    async def reset(self):
+        await self.match_stop()
+        self.current = []
+        self.matchCount = -2
+        self.players = []
+
+
+    async def tournament_result(self):
+        print(f"match t oplay : {len(self.current)}")
+        if len(self.current) == 1:
+            self.reset()
+            self.matchCount = -2
+            await self.broadcast({"type":enu.Game.RELAY, "relay":{'type':enu.Tournament.END, "message":self.players[0]}})
+
+    async def end(self):
+        await self.match_stop()
+        await super()._end()
 
 
 

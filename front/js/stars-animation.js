@@ -1,20 +1,19 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const shootingStarInterval = 3000; // Interval between shooting stars in milliseconds
-  
+    const shootingStarInterval = 3000; 
+    const gameMenu = document.getElementById("game-menu"); 
     function createShootingStar() {
       const shootingStar = document.createElement("div");
       shootingStar.className = "shooting-star";
       shootingStar.style.top = `${Math.random() * 100}%`;
       shootingStar.style.left = `${Math.random() * 100}%`;
-      document.body.appendChild(shootingStar);
+      gameMenu.appendChild(shootingStar); 
       setTimeout(() => {
-        document.body.removeChild(shootingStar);
+        gameMenu.removeChild(shootingStar);
       }, 3000);
     }
   
-    setTimeout(createShootingStar, Math.random() * shootingStarInterval); // Initial shooting star
+    setTimeout(createShootingStar, Math.random() * shootingStarInterval); 
   
-    // Randomize shooting star interval
     function randomizeShootingStarInterval() {
       const interval = Math.random() * shootingStarInterval;
       setTimeout(function() {
@@ -24,5 +23,4 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   
     randomizeShootingStarInterval();
-  });
-  
+});
