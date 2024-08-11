@@ -12,7 +12,7 @@ function updateTimer() {
 
 export let gameSocket = null;
 
-
+function askNext() {gameSocket.send(JSON.stringify({'type':enu.EventLocal.NEXT}))}
 
 export const initGameWebSocket = (path) => {
     _initWebsocket(path, (path === enu.backendPath.LOCAL) ? localHandler : remoteHandler)
@@ -71,11 +71,11 @@ const localHandler = (e) => {
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content.message);
-            moveTo(enu.sceneIdx.END_GAME)
-            if (content.end === false) setTimeout(askNext, 3000);
-            break;
-        case enu.EventLocal.END_TRN:
             moveTo(enu.sceneIdx.END)
+            setTimeout(askNext, 3000);
+            break;
+        case enu.EventTournament.END:
+            moveTo(enu.sceneIdx.END_TR)
             break;
         case enu.EventGame.SETTING:
             console.log("DEFAULTS SETTINGS : " + content.message);
@@ -116,7 +116,7 @@ const remoteHandler = (e) => {
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content.message);
-            moveTo(enu.sceneIdx.END_GAME)
+            moveTo(enu.sceneIdx.END)
             setTimeout(askNext, 3000);
             break;
         case enu.EventLocal.END_TRN:
@@ -302,7 +302,7 @@ const createListRemote = (user, kick) => {
     path.setAttribute('fill', 'white'); 
 
     svg.appendChild(path);
-    item.appendChild(itemPicture);
+    item.appendChild(itemPicture);// Initial shooting star
     item.appendChild(itemName);
     item.appendChild(itemStatus);
 

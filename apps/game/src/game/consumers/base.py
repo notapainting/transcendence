@@ -10,7 +10,7 @@ logger = getLogger(__name__)
 
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
-        if message['type'] == enu.Match.UPDATE:
+        if message['type'] == enu.Game.RELAY:
             pass
         else:
             name = "Anon"

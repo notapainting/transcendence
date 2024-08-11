@@ -138,16 +138,12 @@ class GameState:
 
     def applyBonus(self):
         if self.bonused:
-            print(f"bonus actif !")
             self.p.addBonus(self.status)
             self.p.addMalus(self.status)
             self.p.longPaddle(self.status)
             self.p.shortPaddle(self.status)
             self.p.slow(self.status)
             self.p.boost(self.status)
-        else:
-            print(f"NO bonus..")
-
 
     def computeMovementPaddle(self):
         if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2 < HEIGHT:
@@ -264,7 +260,7 @@ class GameState:
                     await asyncio.sleep(0.5)
                     self.reset = 0
                 await asyncio.sleep(TIME_REFRESH)
-                await self._send({"type": enu.Match.UPDATE, "message":self.to_dict('none')})
+                await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict('none')}})
                 self.running = await self.update()
         except asyncio.CancelledError as error:
             print(f"task cancellation")

@@ -1,11 +1,14 @@
 import enum
 
 class Errors(enum.StrEnum):
-    DECODE  = "error.decode"
+    HANDLER = 'error.handler'
     ENCODE  = "error.encode"
+
     TYPE    = "error.type"
     DATA    = "error.data"
-    HANDLER = 'error.handler'
+    DECODE  = "error.decode"
+
+    LOBBY   = "error.lobby"
     ABSENT  = "error.absent"
     FBD_403 = "error.forbidden"
     NTF_404 = "error.not_found"
@@ -42,6 +45,7 @@ class Game(enum.StrEnum):
     START   = "game.start"
     BROKE   = "game.broke"
     NEXT    = "game.next"
+    RELAY   = "game.relay"
     IDLE    = "game.idle"
     LOCAL   = "game.local"
     MATCH   = "game.match"
@@ -83,6 +87,7 @@ class Tournament(enum.StrEnum):
     PHASE   = "tournament.phase"
     MATCH   = "tournament.match"
     RESULT  = "tournament.result"
+    END  = "tournament.end"
 
 # will be deprecated
     SETTINGS = Game.SETTINGS

@@ -32,6 +32,16 @@ async def authenticate(headers):
         logger.error(error)
     return user
 
+class PlazaException(Exception):
+    pass
+
+class PlazaNotFound(Exception):
+    pass
+
+class ErrorDecode(Exception):
+    pass
+
+
 class RemoyeGamer(LocalConsumer):
     def __init__(self):
         super().__init__()
@@ -43,22 +53,13 @@ class RemoyeGamer(LocalConsumer):
         # self.lobby = None
         # self.loopback_looby = None
 
-    def makelob(self):
-        self.lobby = "hey"
-    
-    def haslob(self):
-        print(f"lob ? : {hasattr(self, "lobby")}")
-
-    def dellob(self):
-        del self.lobby
-
     async def connect(self):
         self.username = await authenticate(dict(self.scope['headers'])) 
         if self.username is None:
             raise exchan.DenyConnection()
         await self.accept()
         plaza.join(self.username, self.channel_name)
-        await self.channel_layer.group_add(self.username, self.channel_name)
+        # await self.channel_layer.group_add(self.username, self.channel_name)
         await self.send_json({"type":enu.Game.SETTINGS_DEF, "message":getDefault()})
         print(f"hello {self.username} ({self.status})!")
 
@@ -77,7 +78,7 @@ class RemoyeGamer(LocalConsumer):
         if target != None:
             await self.channel_layer.group_send(target, data)
         else:
-            print(f"error cant find target to send")
+            raise PlazaNotFound()
 
     def set_mode(self, status=None):
         if status == None:
@@ -96,14 +97,23 @@ class RemoyeGamer(LocalConsumer):
             case enu.Tournament.GUEST : self.mode = self.mode_guest
 
     async def receive_json(self, json_data):
-        if json_data['type'] == enu.Errors.DECODE:
-            return await self.send_json({'type':enu.Errors.DECODE})
         json_data['author'] = self.username
-        print(f"{self.username} ({self.status}): type is {json_data['type']} ")
+        try :
+            if json_data['type'] == enu.Errors.DECODE:
+                return await self.send_json({'type':enu.Errors.DECODE})
+            print(f"{self.username} ({self.status}): type is {json_data['type']} ")
 
-        match json_data['type']:
-            case enu.Game.QUIT: await self.quit()
-            case _: await self.mode(json_data)
+            match json_data['type']:
+                case enu.Game.QUIT: await self.quit()
+                case _: await self.mode(json_data)
+    
+        except LobbyException as lob:
+            await self.send_json({"type":enu.Errors.LOBBY})
+        except PlazaException as e:
+            print(f"error: {e}")
+        except BaseException as e:
+            print(f"error: {e}")
+
 
     async def quit(self):
         if self.status == enu.Game.LOCAL:

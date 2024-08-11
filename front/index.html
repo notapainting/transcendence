@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="./profile.css">
     <link rel="stylesheet" href="/chat.css">
     <link rel="stylesheet" href="./game.css">
+    <link rel="stylesheet" href="./banner.css">
     <link rel="stylesheet" href="./tournament.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -405,16 +406,16 @@
                 <!-- Ajout au tournoi -->
                 <div id="game-menu-list-tournament" class="containerTournament menu-element">
                     <div class="containerTournament2">
-                        <h1>Tournoi de Pong</h1>
+                        <h1>Pong Tournament</h1>
                         <form id="playerForm">
                             <div id="game-menu-local-input" class="game-menu-form">
                                 <input id="game-menu-input-player" class="game-menu-input"
-                                    placeholder="Ajouter un joueur" required="" type="text">
+                                    placeholder="Add player" required="" type="text">
                                 <span class="game-menu-input-border"></span>
                             </div>
-                            <button type="button" id="game-menu-local-input-button">Ajouter</button>
+                            <button type="button" id="game-menu-local-input-button">Add</button>
                         </form>
-                        <h1>Joueurs :</h1>
+                        <h1>Players :</h1>
                         <div class="player-box" id="playerBox">
                             <ul id="game-menu-list"></ul>
                         </div>
@@ -424,10 +425,10 @@
                 <!-- Settings tournoi -->
                 <div id="game-menu-settings" class="settings-box menu-element">
                     <div class="settings-box2">
-                        <h1>Paramètres du jeu</h1>
+                        <h1>Game Settings</h1>
                         <ul class="settings-list">
                             <li class="toggle-item">
-                                <label for="bonus">Activer les power-ups :</label>
+                                <label for="bonus">Enable power-ups :</label>
                                 <div class="toggle-button checkbox-wrapper-5">
                                     <div class="check">
                                         <input checked id="bonusToggle" type="checkbox" class="toggle-input">
@@ -440,19 +441,19 @@
                                 </div> -->
                             </li>
                             <li class="score-item">
-                                <label for="score">Score maximum :</label>
+                                <label for="score">Maximum score :</label>
                                 <input type="range" class="slider" id="scoreRange" name="scoreRange" min="1" max="15"
                                     value="5" oninput="this.nextElementSibling.value = this.value">
                                 <output id="scoreRangeOut"></output>
                             </li>
                             <li class="score-item">
-                                <label for="players">Nombre joueurs max :</label>
+                                <label for="players">Max Players :</label>
                                 <input type="range" class="slider" id="playersRange" name="playersRange" min="2"
                                     max="24" step="2" value="4" oninput="this.nextElementSibling.value = this.value">
                                 <output id="playersRangeOut"></output>
                             </li>
                         </ul>
-                        <button type="button" id="settings-button-reinit" class="settings-button">Réinitialiser</button>
+                        <button type="button" id="settings-button-reinit" class="settings-button">Reset</button>
                     </div>
                 </div>
             </div>
@@ -462,7 +463,7 @@
                 <!-- invite player -->
                 <div id="game-menu-invitationBox" class="menu-element">
                     <div id="game-menu-invitationBox2">
-                        <h1>Invitations Reçues: </h1>
+                        <h1>Invitations received: </h1>
                         <div class="list-invitation-box">
                             <ul id="game-menu-invitationList"></ul>
                         </div>
@@ -472,7 +473,7 @@
                 <!-- deplacement menus 1 -->
                 <div class="class-m1-button menu-element" id="menu-m1-button">
                     <button id="game-menu-local" class="stylized-button">
-                        MODE LOCAL
+                        LOCAL MODE
                         <div id="clip">
                             <div id="leftTop" class="corner"></div>
                             <div id="rightBottom" class="corner"></div>
@@ -483,7 +484,7 @@
                         <span id="leftArrow" class="arrow"></span>
                     </button>
                     <button id="game-menu-fastGame" class="stylized-button">
-                        PARTIE RAPIDE
+                        SPEED GAME
                         <div id="clip">
                             <div id="leftTop" class="corner"></div>
                             <div id="rightBottom" class="corner"></div>
@@ -494,7 +495,7 @@
                         <span id="leftArrow" class="arrow"></span>
                     </button>
                     <button id="game-menu-tournament" class="stylized-button">
-                        T O U R N O I
+                        TOURNAMENT
                         <div id="clip">
                             <div id="leftTop" class="corner"></div>
                             <div id="rightBottom" class="corner"></div>
@@ -547,7 +548,7 @@
 
             <div class="menu-element" id="menu-m2b">
                 <div class="game-menu-waiting-title">
-                    <img src="img/waiting-title.png" />
+                    <img src="img/waiting-title.png">
                 </div>
                 <div class="class-m2b-button" id="menu-m2b-button">
                     <button id="game-menu-ready" class="stylized-button"> <!-- A SUPPRIMER -->
@@ -574,46 +575,6 @@
                     </button>
                     <div id="game-menu-ready-circle" class="menu-element"></div>
                 </div>
-            </div>
-
-            <div class="menu-m3-button menu-element" id="menu-m3-button">
-                <button id="game-menu-next" class="stylized-button">
-                    NEXT MATCH
-                    <div id="clip">
-                        <div id="leftTop" class="corner"></div>
-                        <div id="rightBottom" class="corner"></div>
-                        <div id="rightTop" class="corner"></div>
-                        <div id="leftBottom" class="corner"></div>
-                    </div>
-                    <span id="rightArrow" class="arrow"></span>
-                    <span id="leftArrow" class="arrow"></span>
-                </button>
-                <button id="game-menu-m3-quit" class="stylized-button button-menu-quit">
-                    Q U I T
-                    <div id="clip">
-                        <div id="leftTop" class="corner"></div>
-                        <div id="rightBottom" class="corner"></div>
-                        <div id="rightTop" class="corner"></div>
-                        <div id="leftBottom" class="corner"></div>
-                    </div>
-                    <span id="rightArrow" class="arrow"></span>
-                    <span id="leftArrow" class="arrow"></span>
-                </button>
-            </div>
-
-            <div class="menu-m4-button menu-element" id="menu-m4-button">
-                <button id="game-menu-ready-prematch" class="stylized-button">
-                    R E A D Y ?
-                    <div id="clip">
-                        <div id="leftTop" class="corner"></div>
-                        <div id="rightBottom" class="corner"></div>
-                        <div id="rightTop" class="corner"></div>
-                        <div id="leftBottom" class="corner"></div>
-                    </div>
-                    <span id="rightArrow" class="arrow"></span>
-                    <span id="leftArrow" class="arrow"></span>
-                </button>
-                <div id="game-menu-ready-circle" class="menu-element"></div>
             </div>
 
             <!-- in game menu -->
@@ -661,8 +622,58 @@
 
 
             <!-- in game banner -->
-            <div id="game-menu-banner-phase" class="menu-element game-announce-base"></div>
-            <div id="game-menu-banner-match" class="menu-element game-announce-base"></div>
+            <div id="menu-m3" class="menu-element">
+                <div id="game-menu-banner-phase" class="containerBannerPhase">
+                    <div class="containerBannerPhase2">
+                        <h1>Next Matchs: </h1>
+                        <div class="banner-phase-list-game">
+                            <ul id="banner-phase-text"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-m3-button" id="menu-m3-button">
+                    <button id="game-menu-next" class="stylized-button">
+                        NEXT MATCH
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                    <button id="game-menu-m3-quit" class="stylized-button button-menu-quit">
+                        Q U I T
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="menu-m4" class="menu-element">
+                <div id="game-announce-next-match" class="game-announce-next-match"></div>
+                <div class="menu-m4-button " id="menu-m4-button">
+                    <button id="game-menu-ready-prematch" class="stylized-button">
+                        R E A D Y ?
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                </div>
+            </div>
+
             <div id="game-menu-banner-score" class="menu-element game-announce-base"></div>
             <div id="game-menu-banner-end" class="menu-element game-announce-base"></div>
 

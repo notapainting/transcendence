@@ -16,8 +16,8 @@ const   settingsReInit = document.getElementById('settings-button-reinit');
 const   menuM1 = document.getElementById('menu-m1-button');
 const   menuM2a = document.getElementById('menu-m2a-button');
 const   menuM2b = document.getElementById('menu-m2b');
-const   menuM3 = document.getElementById('menu-m3-button');
-const   menuM4 = document.getElementById('menu-m4-button');
+const   menuM3 = document.getElementById('menu-m3');
+const   menuM4 = document.getElementById('menu-m4');
 const   menuM5 = document.getElementById('menu-m5-button');
 const   menuM6 = document.getElementById('menu-m6-button');
 
@@ -48,8 +48,8 @@ const   readyP = document.getElementById('game-menu-ready-prematch');
 const   circle = document.getElementById('game-menu-ready-circle');
 
 // <!-- in game banner -->
-const   bannerPhase = document.getElementById('game-menu-banner-phase');
-const   bannerMatch = document.getElementById('game-menu-banner-match');
+// const   bannerPhase = document.getElementById('game-menu-banner-phase');
+// const   bannerMatch = document.getElementById('game-menu-banner-match');
 const   bannerScore = document.getElementById('game-menu-banner-score');
 const   bannerEnd = document.getElementById('game-menu-banner-end');
 
@@ -89,12 +89,12 @@ const   scene = [
     [menuBg, menuBgVid, menuM1, invitationBox], // accueil du jeu
     [menuBgVid, menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
     [menuBgVid, menuM2b], // waiting room pour creation de tournoi (guest only)
-    [menuBgVid, menuM3, bannerPhase], // phases du tournoi : montre les prochain match de la phas eet leur etat
-    [menuM4, bannerMatch], // afk check
+    [menuBgVid, menuM3], // phases du tournoi : montre les prochain match de la phas eet leur etat
+    [menuBgVid, menuM4], // afk check
     [menuM5, bannerScore], // in game
     [menuM6, bannerEnd], // ecran de fin de match 
-    [], // ecran de fin de tournoi (recap)
-    [], // ecran erreur
+    [menuM6], // ecran de fin de tournoi (recap)
+    [menuM6], // ecran erreur
 ];
 
 
@@ -239,14 +239,46 @@ export const updateScore = (data) => {
 }
 
 export const announcePhase = (data) => {
-    const   banner = document.getElementById('game-menu-banner-phase')
-    banner.innerHTML = '';
-    data.forEach((matchData) => {banner.innerHTML += matchData[0] + " VS " + matchData[1] + "<br>";})
+    document.getElementById('banner-phase-text').innerHTML = '';
+    data.forEach((matchData) => {
+        const   item = document.createElement('li');
+        const   itemPlayer1 = document.createElement('div');
+        const   itemPlayer2 = document.createElement('div');
+        const   itemVS = document.createElement('div');
+    
+        item.className = 'list-banner-element';
+        itemPlayer1.textContent = matchData[0];
+        itemPlayer2.textContent = matchData[1];
+        itemVS.textContent = 'vs';
+        itemPlayer1.className = 'list-banner-user-name';
+        itemPlayer2.className = 'list-banner-user-name';
+        itemVS.className = 'list-banner-vs';
+    
+        item.appendChild(itemPlayer1);
+        item.appendChild(itemVS);
+        item.appendChild(itemPlayer2);
+        document.getElementById('banner-phase-text').appendChild(item);
+    })
 }
 
 export const announceMatch = (data) => {
-    const   banner = document.getElementById('game-menu-banner-match')
-    banner.innerHTML = data[0] + " VS " + data[1];
+    // const   banner = document.getElementById('game-menu-banner-match')
+    // banner.innerHTML = data[0] + " VS " + data[1];
+
+    const   itemPlayer1 = document.createElement('div');
+    const   itemPlayer2 = document.createElement('div');
+
+
+    itemPlayer1.textContent = data[0];
+    itemPlayer2.textContent = data[1];
+
+    itemPlayer1.className = 'banner-user-name1';
+    itemPlayer2.className = 'banner-user-name2';
+
+    document.getElementById('game-announce-next-match').appendChild(itemPlayer1);
+    document.getElementById('game-announce-next-match').innerHTML += '<img class="img-vs" src="img/vs.png" />';
+    document.getElementById('game-announce-next-match').appendChild(itemPlayer2);
+    
     currentPlayers = [data[0], data[1]];
     currentScore = [0, 0];
 }
@@ -266,7 +298,7 @@ export const clearMenu = () => {
     document.querySelectorAll(".menu-element").forEach(div => {div.style.display = "none";});
     circle.style.background = '#ee0e0e';
 }
-
+// si local et idx =END -> pas de menu
 export const moveTo = (i) => {
     if (i === scene.length || i < 0) return ;
     idx = i;
