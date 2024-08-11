@@ -918,9 +918,12 @@ ul {
 
 
 #menu-m5-button {
+    position: absolute;
     justify-content: center;
     gap: 25%;
     margin-top: 5%;
+    bottom: 0;
+    padding: 10%;
 }
 
 .button-menu {
