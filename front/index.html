@@ -409,8 +409,8 @@
                         <h1>Pong Tournament</h1>
                         <form id="playerForm">
                             <div id="game-menu-local-input" class="game-menu-form">
-                                <input id="game-menu-input-player" class="game-menu-input"
-                                    placeholder="Add player" required="" type="text">
+                                <input id="game-menu-input-player" class="game-menu-input" placeholder="Add player"
+                                    required="" type="text">
                                 <span class="game-menu-input-border"></span>
                             </div>
                             <button type="button" id="game-menu-local-input-button">Add</button>
@@ -577,34 +577,6 @@
                 </div>
             </div>
 
-            <!-- in game menu -->
-            <div class="menu-m5-button menu-element" id="menu-m5-button">
-                <button id="game-menu-pause" class="stylized-button">
-                    <span id="game-menu-pause-text">P A U S E</span>
-                    <div id="clip">
-                        <div id="leftTop" class="corner"></div>
-                        <div id="rightBottom" class="corner"></div>
-                        <div id="rightTop" class="corner"></div>
-                        <div id="leftBottom" class="corner"></div>
-                    </div>
-                    <span id="rightArrow" class="arrow"></span>
-                    <span id="leftArrow" class="arrow"></span>
-                </button>
-                <button id="game-menu-m5-quit" class="stylized-button button-menu-quit">
-                    Q U I T
-                    <div id="clip">
-                        <div id="leftTop" class="corner"></div>
-                        <div id="rightBottom" class="corner"></div>
-                        <div id="rightTop" class="corner"></div>
-                        <div id="leftBottom" class="corner"></div>
-                    </div>
-                    <span id="rightArrow" class="arrow"></span>
-                    <span id="leftArrow" class="arrow"></span>
-                </button>
-                <!-- <button id="game-menu-pause" class="button-menu" type="button">pause</button>
-                <button id="game-menu-m5-quit" class="button-menu button-menu-quit" type="button">Quit (abandon)</button> -->
-            </div>
-
             <div class="menu-m6-button menu-element" id="menu-m6-button">
                 <button id="game-menu-m6-quit" class="stylized-button button-menu-quit">
                     Q U I T
@@ -674,7 +646,55 @@
                 </div>
             </div>
 
-            <div id="game-menu-banner-score" class="menu-element game-announce-base"></div>
+            <div id="menu-m5" class="menu-element">
+                <div class="card">
+                    <div data-status="inprogress" class="teams">
+                        <span class="team-info team-home">
+                            <span id="team-info-container1" class="team-info-container"></span>
+                        </span>
+                        <span class="event-scoreboard">
+                            <span class="event-score-container">
+                                <span class="current-time-container">
+                                    <span class="progress-dots" data-progress="1S">
+                                        <span class="load"></span>
+                                    </span>
+                                </span>
+                                <span id="score-container" class="score-container"></span>
+                            </span>
+                        </span>
+                        <span class="team-info team-away">
+                            <span id="team-info-container2" class="team-info-container"></span>
+                        </span>
+                    </div>
+                </div>
+                <!-- in game menu -->
+                <div class="menu-m5-button" id="menu-m5-button">
+                    <button id="game-menu-pause" class="stylized-button">
+                        <span id="game-menu-pause-text">P A U S E</span>
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                    <button id="game-menu-m5-quit" class="stylized-button button-menu-quit">
+                        Q U I T
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                </div>
+            </div>
+
+
             <div id="game-menu-banner-end" class="menu-element game-announce-base"></div>
 
         </div>

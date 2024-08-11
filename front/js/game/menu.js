@@ -18,7 +18,7 @@ const   menuM2a = document.getElementById('menu-m2a-button');
 const   menuM2b = document.getElementById('menu-m2b');
 const   menuM3 = document.getElementById('menu-m3');
 const   menuM4 = document.getElementById('menu-m4');
-const   menuM5 = document.getElementById('menu-m5-button');
+const   menuM5 = document.getElementById('menu-m5');
 const   menuM6 = document.getElementById('menu-m6-button');
 
 // <!-- animated background -->
@@ -50,7 +50,7 @@ const   circle = document.getElementById('game-menu-ready-circle');
 // <!-- in game banner -->
 // const   bannerPhase = document.getElementById('game-menu-banner-phase');
 // const   bannerMatch = document.getElementById('game-menu-banner-match');
-const   bannerScore = document.getElementById('game-menu-banner-score');
+// const   bannerScore = document.getElementById('game-menu-banner-score');
 const   bannerEnd = document.getElementById('game-menu-banner-end');
 
 // <!-- in game button -->
@@ -91,7 +91,7 @@ const   scene = [
     [menuBgVid, menuM2b], // waiting room pour creation de tournoi (guest only)
     [menuBgVid, menuM3], // phases du tournoi : montre les prochain match de la phas eet leur etat
     [menuBgVid, menuM4], // afk check
-    [menuM5, bannerScore], // in game
+    [menuM5], // in game
     [menuM6, bannerEnd], // ecran de fin de match 
     [menuM6], // ecran de fin de tournoi (recap)
     [menuM6], // ecran erreur
@@ -262,8 +262,7 @@ export const announcePhase = (data) => {
 }
 
 export const announceMatch = (data) => {
-    // const   banner = document.getElementById('game-menu-banner-match')
-    // banner.innerHTML = data[0] + " VS " + data[1];
+    document.getElementById('game-announce-next-match').innerHTML = '';
 
     const   itemPlayer1 = document.createElement('div');
     const   itemPlayer2 = document.createElement('div');
@@ -284,8 +283,32 @@ export const announceMatch = (data) => {
 }
 
 export const announceScore = () => {
-    const   banner = document.getElementById('game-menu-banner-score')
-    banner.innerHTML = currentPlayers[0] + " : " + currentScore[0] + "                " + currentPlayers[1] + " : " + currentScore[1];
+    document.getElementById('score-container').innerHTML = '';
+    document.getElementById('team-info-container1').innerHTML = '';
+    document.getElementById('team-info-container2').innerHTML = '';
+   
+    const   score_home = document.createElement('span');
+    const   score_away = document.createElement('span');
+    const   player1 = document.createElement('span');
+    const   player2 = document.createElement('span');
+
+    score_home.textContent = currentScore[0] + ' ';
+    score_away.textContent = ' ' + currentScore[1];
+    player1.textContent = currentPlayers[0];
+    player2.textContent = currentPlayers[1];
+
+    score_home.className = 'score-home';
+    score_away.className = 'score-away';
+    player1.className = 'team-name-info';
+    player2.className = 'team-name-info';
+
+    document.getElementById('score-container').appendChild(score_home);
+    document.getElementById('score-container').innerHTML += '<span class="custom-sep">-</span>';
+    document.getElementById('score-container').appendChild(score_away);
+    
+    document.getElementById('team-info-container1').appendChild(player1);
+    document.getElementById('team-info-container2').innerHTML += '<span class="team-icon-container"></span>';
+    document.getElementById('team-info-container2').appendChild(player2);
 }
 
 export const announceWinner = (data) => {
