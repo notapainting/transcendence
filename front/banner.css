@@ -390,3 +390,35 @@
     margin-right: 10px;
   }
   
+
+
+#menu-m6 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: space-around;
+}
+
+#menu-m6-button {
+    position: relative;
+    justify-content: center;
+    margin-top: 500%;
+    display: flex;
+}
+
+.announce-winner {
+    position: absolute;
+    top: 28%;
+    width: 600px;
+    padding: 20px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(90deg, transparent, #111, transparent);
+  }
+
+  #game-menu-banner-end{
+    color: #a6e2f1;
+  }

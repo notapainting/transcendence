@@ -19,7 +19,7 @@ const   menuM2b = document.getElementById('menu-m2b');
 const   menuM3 = document.getElementById('menu-m3');
 const   menuM4 = document.getElementById('menu-m4');
 const   menuM5 = document.getElementById('menu-m5');
-const   menuM6 = document.getElementById('menu-m6-button');
+const   menuM6 = document.getElementById('menu-m6');
 
 // <!-- animated background -->
 const   menuBgVid = document.getElementById('menu_bg_video');
@@ -92,9 +92,9 @@ const   scene = [
     [menuBgVid, menuM3], // phases du tournoi : montre les prochain match de la phas eet leur etat
     [menuBgVid, menuM4], // afk check
     [menuM5], // in game
-    [menuM6, bannerEnd], // ecran de fin de match 
-    [menuM6], // ecran de fin de tournoi (recap)
-    [menuM6], // ecran erreur
+    [menuM6], // ecran de fin de match 
+    [], // ecran de fin de tournoi (recap)
+    [], // ecran erreur
 ];
 
 
@@ -313,7 +313,7 @@ export const announceScore = () => {
 
 export const announceWinner = (data) => {
     const   banner = document.getElementById('game-menu-banner-end')
-    banner.innerHTML = "WINNER IS " + data;
+    banner.innerHTML = "Congratulations! Winner is " + data;
 }
 
 /*** menu deplacement ****/
@@ -326,7 +326,7 @@ export const moveTo = (i) => {
     if (i === scene.length || i < 0) return ;
     idx = i;
     console.log('move to: ' + i)
-    if (idx === enu.sceneIdx.END) clearGame();
+    if (idx === enu.sceneIdx.CREATION) clearGame();
     clearMenu();
     scene[idx].forEach(div => {div.style.display = "flex";});
 }
