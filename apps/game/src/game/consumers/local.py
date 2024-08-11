@@ -32,14 +32,16 @@ class LocalConsumer(BaseConsumer):
 
     async def local(self, data):
         match data['type']:
-            case enu.Game.START:
-                await self.lobby.start(data['message'])
+            case enu.Game.DEFAULT:
+                await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault()})
             case enu.Game.SETTING:
                 self.lobby.changeSettings(data['message'])
-            case enu.Match.UPDATE :
-                await self.lobby.match_feed(data)
+            case enu.Game.START:
+                await self.lobby.start(data['players'])
             case enu.Game.READY :
                 await self.lobby.match_start()
+            case enu.Match.UPDATE :
+                await self.lobby.match_feed(data)
             case enu.Match.PAUSE :
                 await self.lobby.match_pause()
             case enu.Game.NEXT :
@@ -68,11 +70,13 @@ class LocalConsumer(BaseConsumer):
     #     await self.send_json(data)
 
     async def match_score(self, data):
+        print(f"score ")
         if self.lobby.matchCount > 0:
             data['score'] = {'players':self.lobby.current[self.lobby.matchCount]}
         await self.send_json(data)
 
     async def match_end(self, data):
+        print(f"end...")
         data['message'] = self.lobby.match_result()
         await self.send_json(data)
         await self.lobby.tournament_result()

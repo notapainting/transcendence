@@ -1,5 +1,5 @@
 import { navigateTo } from "../index.js"
-import { gameSocket, clearGame, clearInvList } from "./websocket.js"
+import { gameSocket, clearGame} from "./websocket.js"
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import { gameData } from './game.js';
@@ -63,11 +63,14 @@ const   pause = document.getElementById('game-menu-pause');
 let     status = enu.gameMode.IDLE;
 let     anon = true;
 
-export const changeStatus = (type) => {
+export const changeGameStatus = (type) => {
     console.log("change from " + status + " to " + type)
     status = type;
 }
 
+export const getGameStatus = () => {
+    return status;
+}
 
 // scene idx
 let     idx = enu.sceneIdx.WELCOME;
@@ -98,53 +101,6 @@ const   scene = [
 ];
 
 
-/*
-quit = home(C)/exit(A)
-
-m1 : local match tournoi exit
-m2 : start quit
-m2a : ready quit
-m3 : next quit
-m4 : ready
-m5 : pause quit (abandon)
-m6 : quit 
-m7 : quit 
-
-*/
-
-
-// status == idle/match/tournoi/local/anon
- // 0 (C) acceuil du jeu -> containerMenu (Local+Match+Tournament+quit), containerInvitedBy
- // 1 (C/A)(host) creation de partie/tournoi -> containerSettings, containerInvitations (simple/status+ready), containerMenu (start+((C)home/(A)exit))
- // 2 (C)(guest) waiting room -> containerSettingsFrozen, containerInvitationsFrozen, containerMenuGuest (ready+quit)
- // 3 (C/A) tounoi phase -> containerPhase, containerMenu (nextmatch+quit)
- // 4 (C/A) pre match, ready check -> ready, 
- // 5 (C/A) match -> conatinerScores, containerMenu (pause+abandon)
- // 6 (C/A) fin match -> containerWinner (5s)
- // 7 (C/A) fin tournoi -> containerClassement, containerMenu (home+quit)
- // 8 (C) broken/quit containerError, containerMenu (home+quit)
-
-// ANON : 1 -> 3 -> 4 -> 5 -> 6
-//             ^         |
-//             |<---  <---
-
-// CONNECTED : TOURNOI
-// (HOST)
-//  : 0 -> 1 -> 3 -> 4 -> 5 -> 6
-//              ^         |
-//              |<---  <---
-// (GUEST)
-//  : 0 -> 2 -> ...same as host
-
-// CONNECTED : MATCH
-// (HOST)
-//  : 0 -> 1 -> 4 -> 5 -> 6
-
-// (GUEST)
-//  : 0-> 4 -> 5 -> 6
-
-
-
 
 /*** initialisation ****/
 export const initMenu = (path) => {
@@ -170,67 +126,22 @@ export const clearInvitationList = () => {
     players = [];
 }
 
+/*** menu deplacement ****/
+export const clearMenu = () => {
+    document.querySelectorAll(".menu-element").forEach(div => {div.style.display = "none";});
+}
 
-/*** utils ***/
-function isAlphaNumeric(str) {
-    var code, i, len;
-
-    for (i = 0, len = str.length; i < len; i++) {
-      code = str.charCodeAt(i);
-      if (!(code > 47 && code < 58) && 
-          !(code > 64 && code < 91) && 
-          !(code > 96 && code < 123) &&
-          (code != 95) && (code != 45)) { 
-        return false;
-      }
+export const moveTo = (i) => {
+    if (i === scene.length || i < 0) return ;
+    idx = i;
+    clearMenu();
+    if (idx === enu.sceneIdx.CREATION) {
+        clearGame();
     }
-    return true;
-  };
-
-const validate_name = (name) => {
-    console.log("test value : " + name)
-    if (name.length > 20) return false;
-    if (name === "") return false;
-    if (isAlphaNumeric(name) === false) return false;
-    return true;
+    scene[idx].forEach(div => {div.style.display = "flex";});
+    if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6.style.display = "none";
 }
 
-// allow to lock pause in remote game if oponent has paused the game
-export const toggleLock = () => {
-    if (locked == false) locked = true;
-    else if (locked == true) locked = false;
-    console.log('locked : ' + locked);
-}
-
-export const togglePause = () => {
-    if (paused === false) {
-        paused = true;
-        document.getElementById('game-menu-pause-text').innerHTML = "R E S U M E";
-    } else {
-        paused = false;
-        document.getElementById('game-menu-pause-text').innerHTML = "P A U S E";
-    }
-    console.log('paused : ' + paused);
-}
-
-let gameSettings = {
-    bonused:"True",
-    scoreToWin:"5",
-    maxPlayer:"8",
-}
-
-export const updateSettings = (data) => {
-    gameSettings.bonused = data.bonused;
-    gameSettings.scoreToWin = data.scoreToWin;
-    gameSettings.maxPlayer = data.maxPlayer;
-    resetSettings();
-}
-
-const resetSettings = () => {
-    setBonused();
-    setScoreToWin();
-    setMaxPlayer();
-}
 
 /*** banner update ****/
 export const updateScore = (data) => {
@@ -316,42 +227,89 @@ export const announceWinner = (data) => {
     banner.innerHTML = "WINNER IS " + data;
 }
 
-/*** menu deplacement ****/
-export const clearMenu = () => {
-    document.querySelectorAll(".menu-element").forEach(div => {div.style.display = "none";});
-    circle.style.background = '#ee0e0e';
+
+/*** utils ***/
+function isAlphaNumeric(str) {
+    var code, i, len;
+
+    for (i = 0, len = str.length; i < len; i++) {
+      code = str.charCodeAt(i);
+      if (!(code > 47 && code < 58) && 
+          !(code > 64 && code < 91) && 
+          !(code > 96 && code < 123) &&
+          (code != 95) && (code != 45)) { 
+        return false;
+      }
+    }
+    return true;
+  };
+
+const validate_name = (name) => {
+    if (name.length > 20) return false;
+    if (name === "") return false;
+    if (isAlphaNumeric(name) === false) return false;
+    return true;
 }
-// si local et idx =END -> pas de menu
-export const moveTo = (i) => {
-    if (i === scene.length || i < 0) return ;
-    idx = i;
-    console.log('move to: ' + i)
-    if (idx === enu.sceneIdx.END) clearGame();
-    clearMenu();
-    scene[idx].forEach(div => {div.style.display = "flex";});
+
+// allow to lock pause in remote game if oponent has paused the game
+export const toggleLock = () => {
+    if (locked == false) locked = true;
+    else if (locked == true) locked = false;
+    console.log('locked : ' + locked);
+}
+
+export const togglePause = () => {
+    if (paused === false) {
+        paused = true;
+        document.getElementById('game-menu-pause-text').innerHTML = "R E S U M E";
+    } else {
+        paused = false;
+        document.getElementById('game-menu-pause-text').innerHTML = "P A U S E";
+    }
+    console.log('paused : ' + paused);
+}
+
+// game settings
+let gameSettings = {
+    bonused:"True",
+    scoreToWin:"5",
+    maxPlayer:"8",
+}
+
+export const updateSettings = (data) => {
+    gameSettings.bonused = data.bonused;
+    gameSettings.scoreToWin = data.scoreToWin;
+    gameSettings.maxPlayer = data.maxPlayer;
+    resetSettings();
+}
+
+const resetSettings = () => {
+    setBonused();
+    setScoreToWin();
+    setMaxPlayer();
 }
 
 /*** event listener ****/
 const sendCreate = (mode) => {
-    gameSocket.send(JSON.stringify({'type': enu.EventGame.CREATE, 'mode':mode}));
+    console.log(status)
+    gameSocket.send(JSON.stringify({'type': enu.Game.CREATE, 'mode':mode}));
     moveTo(enu.sceneIdx.CREATION);
     resetSettings();
 } 
 
 createMatch.addEventListener('click', () => {
     status = enu.gameMode.MATCH;
-    sendCreate(enu.EventGame.MATCH)
+    sendCreate(enu.Game.MATCH)
 });
 
 createTournament.addEventListener('click', () => {
     status = enu.gameMode.TOURNAMENT;
-    sendCreate(enu.EventGame.TRN)
+    sendCreate(enu.Game.TRN)
 });
-
 
 createLocal.addEventListener('click', () => {
     status = enu.gameMode.LOCAL;
-    sendCreate(enu.EventGame.LOCAL)
+    sendCreate(enu.Game.LOCAL)
 })
 
 function getBonused() { return settingsSendBonus.checked; };
@@ -391,14 +349,13 @@ settingsSendPlayer.addEventListener('input', () => {
 
 const prepRequest = (type) => {
     if (updateRequested[type][1] === null) {
-        console.log("request update for: " + updateRequested[type][0])
         updateRequested[type][1] = setTimeout(requestUpdateSettings, 700, type);
     }
 }
 
 const requestUpdateSettings = (type) => {
     gameSocket.send(JSON.stringify({
-        'type': enu.EventGame.SETTINGS,
+        'type': enu.Game.SETTING,
          'message':{
             'param':updateRequested[type][0],
             'value':updateRequested[type][2](),
@@ -423,26 +380,19 @@ start.addEventListener('click', () => {
             req[1] = null;
         }
     } )
-    if (status === enu.gameMode.LOCAL) {
-        gameSocket.send(JSON.stringify({
-            'type': enu.EventGame.START,
-            'message':players,
-        }));
-    } else if (status === enu.gameMode.MATCH) {
-        gameSocket.send(JSON.stringify({'type': enu.EventGame.START}));
-        moveTo(enu.sceneIdx.MATCH);
-    } else if (status === enu.gameMode.TOURNAMENT) {
-        gameSocket.send(JSON.stringify({'type': enu.EventTournament.START}));
-    }
+    var message = {'type': enu.Game.START}
+    if (status === enu.gameMode.LOCAL) message['players'] = players; 
+    // if (status === enu.gameMode.MATCH) moveTo(enu.sceneIdx.MATCH);
+    gameSocket.send(JSON.stringify(message));
+
 })
 
 const readyFunc = () => {
     if (status === enu.gameMode.LOCAL) {
         moveTo(enu.sceneIdx.MATCH);
         announceScore();
-        gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
-    }
-    else gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
+    };
+    gameSocket.send(JSON.stringify({'type': enu.Game.READY}));
 };
 
 readyP.addEventListener('click', readyFunc);
@@ -450,7 +400,7 @@ ready.addEventListener('click', readyFunc);
 
 pause.addEventListener('click', () => {
     if (locked === true) return ;
-    gameSocket.send(JSON.stringify({'type': enu.EventMatch.PAUSE}));
+    gameSocket.send(JSON.stringify({'type': enu.Match.PAUSE}));
     togglePause();
     if (status === enu.gameMode.LOCAL) {
         if (gameData.timerInterval) {
@@ -475,12 +425,12 @@ const quitFunc = () => {
         }
         var to = enu.sceneIdx.CREATION;
     } else var to = enu.sceneIdx.WELCOME;
-        gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
-        status = enu.gameMode.IDLE;
-        if (idx === enu.sceneIdx.WELCOME) {
-            fullClear()
-            navigateTo("/");
-        }
+    gameSocket.send(JSON.stringify({'type': enu.Game.QUIT}));
+    status = enu.gameMode.IDLE;
+    if (idx === enu.sceneIdx.WELCOME) {
+        fullClear()
+        navigateTo("/");
+    }
     moveTo(to);
 };
 
@@ -488,31 +438,28 @@ document.querySelectorAll(".button-menu-quit").forEach(div => {div.addEventListe
 
 
 nextMatch.addEventListener('click', () => {
-    if (status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventGame.NEXT}));
+    if (status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.Game.NEXT}));
     else moveTo(enu.sceneIdx.PREMATCH)
 })
 
 document.getElementById('game-menu-local-input-button').addEventListener('click', () => {
     const   user = document.getElementById('game-menu-input-player').value;
-    if (validate_name(user) === false) return ;
+    if (validate_name(user) === false) {
+        console.warn("bad input: " + user);
+        return ;
+    }
     document.getElementById('game-menu-input-player').value = '';
 
     players.push(user);
-
+    console.log(status)
     if (status === enu.gameMode.LOCAL) {
         createListLocal(user)
-    } else if (status === enu.gameMode.MATCH) {
+    } else {
         gameSocket.send(JSON.stringify({
-            'type': enu.EventGame.INVITE,
-            'message': user,
+            'type': enu.Game.INVITE,
+            'user': user,
+            'mode': (status === enu.gameMode.MATCH ? enu.Game.MATCH: enu.Game.TOURNAMENT),
         }));
-        // createListRemote(user, enu.EventGame.INVITE, enu.EventGame.KICK)
-    } else if (status === enu.gameMode.TOURNAMENT) {
-        gameSocket.send(JSON.stringify({
-            'type': enu.EventTournament.INVITE,
-            'message': user,
-        }));
-        createListRemote(user, enu.EventTournament.INVITE, enu.EventTournament.KICK)
     }
 })
 
@@ -547,72 +494,6 @@ const createListLocal = (user) => {
     document.getElementById('game-menu-list').appendChild(item);
 }
 
-const createListRemote = (user, invite, kick) => {
-    const   item = document.createElement('li');
-    const   itemPicture = document.createElement('img');
-    const   itemName = document.createElement('div');
-    const   button = document.createElement('button');
-    const   itemStatus = document.createElement('span');
-
-    item.className = 'list-tournoi-element';
-    itemPicture.className = 'list-tournoi-user-pic';
-    itemPicture.src = '../../img/anon.jpg'; // a remplacer !!!! (par la vrai foto)
-    itemName.textContent = user;
-    itemName.className = 'list-tournoi-user-name';
-    itemStatus.id = 'invite-status' + user;
-    itemStatus.className = 'remote-list-element';
-    // itemStatus.textContent = '...waiting...';
-
-    button.className = 'remove-button';
-    button.addEventListener('click', (e) => {
-        const pos = players.indexOf(user);
-        players.splice(pos, 1);
-        e.target.parentElement.remove();
-        gameSocket.send(JSON.stringify({
-            'type': kick,
-            'message': user
-        }));
-    });
-
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 448 512');
-    svg.setAttribute('class', 'svgIcon'); 
-
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', 'M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z');
-    path.setAttribute('fill', 'white'); 
-
-    svg.appendChild(path);
-    item.appendChild(itemPicture);
-    item.appendChild(itemName);
-    item.appendChild(itemStatus);
-
-    item.innerHTML += `
-        <div class="typing-indicator">
-            <div class="typing-circle"></div>
-            <div class="typing-circle"></div>
-            <div class="typing-circle"></div>
-            <div class="typing-shadow"></div>
-            <div class="typing-shadow"></div>
-            <div class="typing-shadow"></div>
-        </div>
-    `;
-
-    button.appendChild(svg);
-    item.appendChild(button);
-
-    document.getElementById('game-menu-list').appendChild(item);
-}
-
-
-
-/*
-function createInviteListElement () {
-    if (status === enu.gameMode.ANON || status === enu.gameMode.LOCAL) createInviteListElementLocal();
-    else if (status === enu.gameMode.MATCH) createInviteListElementRemote();
-}
-*/
-
 document.addEventListener('DOMContentLoaded', function() {
     const video = document.querySelector('.video-background video');
     if (video) {
@@ -622,4 +503,3 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Video element not found');
     }
 });
-

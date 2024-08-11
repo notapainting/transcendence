@@ -9,7 +9,7 @@ from game.gamestate import GameState, remote_loop
 import game.enums as enu
 
 
-from game.lobby import Match, Tournament, LocalTournament, getDefault
+from game.lobby import Match, Tournament, LocalTournament, getDefault, LobbyException
 from game.plaza import plaza
 
 from logging import getLogger
@@ -41,12 +41,13 @@ class PlazaNotFound(Exception):
 class ErrorDecode(Exception):
     pass
 
-
-class RemoyeGamer(LocalConsumer):
+# add delay after trn end
+# invitation match , guest dont receive
+class RemoteGamer(LocalConsumer):
     def __init__(self):
         super().__init__()
         self.username = "Anon"
-        self.invitations = set()
+        self.invited_by = {}
         self.status = enu.Game.IDLE
         self.mode = self.idle
         self.loopback = self.status
@@ -60,7 +61,7 @@ class RemoyeGamer(LocalConsumer):
         await self.accept()
         plaza.join(self.username, self.channel_name)
         # await self.channel_layer.group_add(self.username, self.channel_name)
-        await self.send_json({"type":enu.Game.SETTINGS_DEF, "message":getDefault()})
+        await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault()})
         print(f"hello {self.username} ({self.status})!")
 
     async def disconnect(self, close_code):
@@ -68,7 +69,7 @@ class RemoyeGamer(LocalConsumer):
             await self.channel_layer.group_discard(self.username, self.channel_name)
         plaza.leave(self.username)
         print(f"bye {self.username} ({self.status})...")
-        # purge invitations
+        # purge invited_by
 
         #cleanup/broke action
 
@@ -91,6 +92,12 @@ class RemoyeGamer(LocalConsumer):
         match self.status:
             case enu.Game.IDLE : self.mode = self.idle
             case enu.Game.LOCAL : self.mode = self.local
+            case enu.CStatus.HOST : self.mode = self.mode_host
+            case enu.CStatus.GUEST : self.mode = self.mode_guest
+
+            case enu.Game.MATCH : self.mode = self.mode_host
+            case enu.Game.TRN : self.mode = self.mode_host
+
             case enu.Match.HOST : self.mode = self.mode_host
             case enu.Tournament.HOST : self.mode = self.mode_host
             case enu.Match.GUEST : self.mode = self.mode_guest
@@ -102,19 +109,46 @@ class RemoyeGamer(LocalConsumer):
             if json_data['type'] == enu.Errors.DECODE:
                 return await self.send_json({'type':enu.Errors.DECODE})
             print(f"{self.username} ({self.status}): type is {json_data['type']} ")
-
             match json_data['type']:
                 case enu.Game.QUIT: await self.quit()
+                case enu.Game.DEFAULT: await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault()})
                 case _: await self.mode(json_data)
-    
         except LobbyException as lob:
             await self.send_json({"type":enu.Errors.LOBBY})
         except PlazaException as e:
-            print(f"error: {e}")
-        except BaseException as e:
-            print(f"error: {e}")
+            print(f"plerror: {e}")
+        # except BaseException as e:
+        #     print(f"berror: {e}")
 
 
+    async def getInviteAuth(self, user):
+        try :
+            promise = await httpx.AsyncClient().post(
+                        url='http://chat:8000/api/v1/relations/blocked/', 
+                        data=JSONRenderer().render({
+                        "target":user,
+                        "author":self.username}))
+            if promise.status_code == 200:
+                if plaza.found(user):
+                    return {"type":enu.Invitation.VALID}
+                else:
+                    return {"type":enu.Invitation.ERROR, "error":enu.Errors.ABSENT}
+            elif promise.status_code == 403:
+                return {"type":enu.Invitation.ERROR, "error":enu.Errors.FBD_403}
+            elif promise.status_code == 404:
+                return {"type":enu.Invitation.ERROR, "error":enu.Errors.NTF_404} 
+            else:
+                return {"type":enu.Invitation.ERROR, "error":enu.Errors.INTERN} 
+        except httpx.HTTPError as error:
+            print(f"er is : {error}")
+            return {"type":enu.Invitation.ERROR, "error":enu.Errors.INTERN}
+
+
+    # when game/trn start -> send_cs cancel to all invite
+
+
+    # general
+    # idle  //  host //hmatch//gmatch
     async def quit(self):
         if self.status == enu.Game.LOCAL:
             await self.lobby.end()
@@ -131,17 +165,6 @@ class RemoyeGamer(LocalConsumer):
                 await self.lobby.end()
         self.set_mode(enu.Game.IDLE)
 
-# has lob
-#   end()
-#   del
-#   set
-# again
-
-# when game/trn start -> send_cs cancel to all invite
-
-
-# general
-# idle  //  host //hmatch//gmatch
     async def idle(self, data):
         match data['type']:
             case enu.Game.CREATE:
@@ -154,19 +177,26 @@ class RemoyeGamer(LocalConsumer):
                 await self.lobby._init()
                 self.set_mode(data['mode'])
             case enu.Invitation.ACCEPT | enu.Invitation.REJECT:
-                await self.send_cs(data['message'], data)
+                if data['message'] in self.invitation:
+                    await self.send_cs(data['message'], data)
+                    
 
 
     async def mode_host(self, data):
         match data['type']:
             case enu.Game.NEXT:
                 await self.lobby.next()
-            case enu.Game.DEFAULT:
-                await self.send_json({"type":enu.Game.SETTINGS_DEF, "message":getDefault()})
             case enu.Game.SETTING:
-                await self.lobby.broadcast(self.lobby.changeSettings())
+                await self.lobby.broadcast({"type":enu.Game.RELAY, "relay":self.lobby.changeSettings()})
             case enu.Game.INVITE:
-                await self.lobby.invite(data['message'])
+                print(f"hey")
+                to = data['user']
+                response = await self.getInviteAuth(to)
+                if response['type'] == enu.Invitation.VALID:
+                    await self.lobby.invite(to)
+                response['user'] = to
+                response['mode'] = data['mode']
+                await self.send_json(response)
             case enu.Game.KICK:
                 await self.lobby.kick(data['message'])
             case enu.Game.START:
@@ -201,103 +231,137 @@ class RemoyeGamer(LocalConsumer):
                 await self.send_cs(self.host, data)
 
 # GENERAL (13)
+    async def game_invite(self, data):
+        self.invited_by[data['author']] = data['mode']
+        await self.send_json(data)
+
     async def invitation_accept(self, data):
-        # host : check if ok -> accept + relay or deny 
-        # guest : relay + set mode to guest/trn
-        pass
+        author = data['author']
+        if self.status == enu.CStatus.IDLE:
+            data['mode'] = self.invited_by[author]
+            await self.send_json(data)
+            self.set_mode(enu.CStatus.GUEST)
+            del self.invited_by[author]
+        else :
+            if self.lobby.invited(author):
+                if await self.lobby.add(author):
+                    data['players'] = self.lobby.players
+                    if hasattr(self.lobby, "game_state"):
+                        data['message'] = self.lobby.game_state.to_dict('none')
+                    await self.lobby.broadcast(data)
+            else :
+                await self.send_cs(data['author'], {"type":enu.Invitation.REJECT})
 
     async def invitation_reject(self, data):
-        # host : relay + remove inv
-        # guest : relay + remove inv
-        pass
+        author = data['author']
+        if author in self.invited_by:
+            del self.invited_by[author]
+        else :
+            self.lobby.uninvite(author)
+        await self.send_json(data)
 
-    async def game_settings(self, data):
-        # host : change settings + broadcast
-        # guest : relay
-        pass
+
 
 
     async def game_kick(self, data):
-        # guest : relay + kick (set to idle)
-        pass
+        if self.status == enu.CStatus.IDLE:
+            del self.invited_by[data['author']]
+        elif data['author'] == self.host:
+            self.host = None
+            self.set_mode(enu.CStatus.IDLE)
+        await self.send_json(data)
+
 
     async def game_quit(self, data):
         # guest : relay 
         # host : remove user from lobby + relay
-        pass
-
-    async def game_invite(self, data):
-        # idle/all : add to invitation + relay
-        pass
+        await self.send_json(data)
 
     async def game_ready(self, data):
-        # guest : relay
-        pass
+        if data['player'] == self.username:
+            return 
+        if self.status == enu.Match.HOST and 'r' not in data:
+            await self.lobby.check(data['author'])
+            if self.lobby.checked():
+                await self.lobby.start()
+        await self.send_json(data)
 
-    async def game_unready(self, data):
-        # host : apply to lobby
-        # guest : relay
-        pass
-
-    async def game_start(self, data):
-        # guest : relay
-        pass
 
     async def game_broke(self, data):
         # host : relay + broadcast + cleanup + set to idle
         # guest : relay + set to idle
-        pass
+        await self.send_json(data)
+
 
     async def game_next(self, data):
         # local : ask next match
-        pass
+        await self.send_json(data)
+
 
 
 # MATCH (5)
-    async def match_update(self, data):
-        # guest: relay
-        # host format + apply 
-        # data['message'] = format_paddle_key(self.status, data['message'])
 
-        pass
-
-    async def match_score(self, data):
-        #guest: relay
-        pass
 
     async def match_pause(self, data):
         #guest: relay
         #host: apply to match
-        pass 
+        await self.send_json(data)
 
     async def match_resume(self, data):
         #guest: relay
         #host: apply to match
-        pass
+        await self.send_json(data)
 
-    async def match_end(self, data):
-        #guest: relay
-        pass
+
 
 # TOURNAMENT (4)
     async def match_result(self, data):
         # TRN -> #host: apply to trn
-        pass
+        await self.send_json(data)
 
     async def tournament_phase(self, data):
         # TRN -> #guest: relay
-        pass
+        await self.send_json(data)
 
     async def tournament_match(self, data):
         # TRN -> #guest: relay + prep for game
-        pass
+        await self.send_json(data)
 
     async def tournament_result(self, data):
         # TRN -> #guest: relay
-        pass
+        await self.send_json(data)
+
+def format_paddle_key(status, key):
+    if status == enu.Game.HOST:
+        match key:
+            case 'downPressed' | 'sPressed':
+                return 'sPressed'
+            case 'downRelease' | 'sRelease':
+                return 'sRelease'
+            case 'upPressed' | 'wPressed':
+                return 'wPressed'
+            case 'upRelease' | 'wRelease':
+                return 'wRelease'
+            case '_':
+                return key
+    else:
+        match key:
+            case 'downPressed' | 'sPressed':
+                return 'downPressed'
+            case 'downRelease' | 'sRelease':
+                return 'downRelease'
+            case 'upPressed' | 'wPressed':
+                return 'upPressed'
+            case 'upRelease' | 'wRelease':
+                return 'upRelease'
+            case '_':
+                return key
 
 
-class RemoteGamer(LocalConsumer):
+
+
+"""
+class DEADRemoteGamer(LocalConsumer):
     connected = {}
 
     def __init__(self):
@@ -400,28 +464,6 @@ class RemoteGamer(LocalConsumer):
         if data['type'] == enu.Local.QUIT:
             self.set_mode(enu.CStatus.IDLE)
 
-    async def getInviteAuth(self, user):
-        try :
-            promise = await httpx.AsyncClient().post(
-                        url='http://chat:8000/api/v1/relations/blocked/', 
-                        data=JSONRenderer().render({
-                        "target":user,
-                        "author":self.username}))
-            if promise.status_code == 200:
-                if plaza.found(user):
-                    await self.match.invite(user)
-                    return {"type":enu.Game.INV_ACC}
-                else:
-                    return {"type":enu.Game.INV_ABS}
-            elif promise.status_code == 403:
-                return {"type":enu.Game.INV_FOR}
-            elif promise.status_code == 404:
-                return {"type":enu.Game.INV_404} 
-            else:
-                return {"type":enu.Invitation.ERROR} 
-        except httpx.HTTPError as error:
-            print(f"er is : {error}")
-            return {"type":enu.Invitation.ERROR}
 
 # MATCH
     async def game_host(self, data):
@@ -432,6 +474,7 @@ class RemoteGamer(LocalConsumer):
                 await self.match.broadcast(data)
             case enu.Game.INVITE:
                 response = await self.getInviteAuth(data['message'])
+                response['message'] = data['message']
                 await self.send_json(response)
             case enu.Game.KICK:
                 await self.match.kick(data['message'])
@@ -460,7 +503,7 @@ class RemoteGamer(LocalConsumer):
                     data['type'] = enu.Game.RESUME
                     await self.match.broadcast(data)
                     await self.gaming({"message":"startButton"})
-            case _: 
+            case _:
                 print(f"unknow : {data['type']}")
                 await self.send_json({'type':enu.Errors.TYPE})
 
@@ -591,8 +634,6 @@ class RemoteGamer(LocalConsumer):
     async def game_score(self, data):
         await self.send_json(data)
 
-
-
 # TOURNAMENT
     async def tournament_host(self, data):
         match data['type']:
@@ -695,32 +736,4 @@ class RemoteGamer(LocalConsumer):
     async def tournament_quit(self, data):
         await self.tournament.kick(data['message'])
 
-
-
-def format_paddle_key(status, key):
-    if status == enu.Game.HOST:
-        match key:
-            case 'downPressed' | 'sPressed':
-                return 'sPressed'
-            case 'downRelease' | 'sRelease':
-                return 'sRelease'
-            case 'upPressed' | 'wPressed':
-                return 'wPressed'
-            case 'upRelease' | 'wRelease':
-                return 'wRelease'
-            case '_':
-                return key
-    else:
-        match key:
-            case 'downPressed' | 'sPressed':
-                return 'downPressed'
-            case 'downRelease' | 'sRelease':
-                return 'downRelease'
-            case 'upPressed' | 'wPressed':
-                return 'upPressed'
-            case 'upRelease' | 'wRelease':
-                return 'upRelease'
-            case '_':
-                return key
-
-
+ """
