@@ -1,5 +1,12 @@
 # game/plaza.py
 
+class PlazaException(Exception):
+    pass
+
+class PlazaNotFound(Exception):
+    pass
+
+
 class Singleton(type):
     _instances = {}
 
@@ -12,7 +19,7 @@ class Plaza(metaclass=Singleton):
     _users = {}
 
     def join(self, username, channel_name):
-        Plaza._users[username] = channel_name
+        Plaza._users[username] = str(channel_name)
 
     def leave(self, username):
         if username in Plaza._users:
@@ -21,8 +28,14 @@ class Plaza(metaclass=Singleton):
     def listing(self):
         return Plaza._users
 
-    def translate(self, user):
-        return Plaza._users.get(user)
+    def translate(self, user, raise_exception=False):
+        if raise_exception is False:
+            return Plaza._users.get(user)
+        else:
+            if self.found(user):
+                return Plaza._users.get(user)
+            else:
+                raise PlazaNotFound()
 
     def found(self, user):
         return user in Plaza._users

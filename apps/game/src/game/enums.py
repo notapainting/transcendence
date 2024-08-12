@@ -35,6 +35,8 @@ class Game(enum.StrEnum):
     NEXT    = "game.next"
     RELAY   = "game.relay"
     IDLE    = "game.idle"
+    HOST    = "game.host"
+    GUEST   = "game.guest"
     LOCAL   = "game.local"
     MATCH   = "game.match"
     TRN     = "game.tournament"

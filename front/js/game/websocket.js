@@ -32,6 +32,7 @@ const _initWebsocket = (path) => {
         moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
         setTimeout(_initWebsocket, 5000, path)
         gameSocket = null;
+        clearListInvitation();
     };
     document.removeEventListener('keydown', bindKeyPress)
     document.removeEventListener('keyup', bindKeyRelease)
@@ -150,7 +151,9 @@ const _invitations = (content) => {
             warnErrorInvitation(content.error);
             return true;
         case enu.Invitation.ACCEPT:
-            if (content.mode === enu.Game.Match) {
+            console.log(content)
+            if (content.mode === enu.Game.MATCH) {
+                console.log("match")
                 changeGameStatus(enu.gameMode.MATCH);
                 moveTo(enu.sceneIdx.PREMATCH);
                 announceMatch(content.players);
@@ -196,6 +199,7 @@ const _match = (content) => {
             game.gameRenderer(content.message);
             return true;
         case enu.Match.SCORE:
+            console.log(content)
             updateScore(content.message);
             announceScore();
             return true;
