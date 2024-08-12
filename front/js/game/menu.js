@@ -64,7 +64,6 @@ let     status = enu.gameMode.IDLE;
 let     anon = true;
 
 export const changeGameStatus = (type) => {
-    console.log("change from " + status + " to " + type)
     status = type;
 }
 
