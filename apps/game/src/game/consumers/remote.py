@@ -185,6 +185,8 @@ class RemoteGamer(LocalConsumer):
         match data['type']:
             case enu.Game.READY:
                 await self.send_cs(self.host, data)
+            case enu.Game.NEXT:
+                pass
 
 
     async def mode_playing_match_host(self, data):
@@ -279,9 +281,12 @@ class RemoteGamer(LocalConsumer):
             await self.lobby.go()
 
     async def match_end(self, data):
-        if hasattr(self, "lobby"):
-            await self.lobby.end()
-        self.set_mode()
+        if self.status == enu.Game.LOCAL:
+            await self.lobby.update_result(data)
+        else:
+            if hasattr(self, "lobby"):
+                    await self.lobby.end()
+            self.set_mode()
         await self.send_json(data)
 
     async def match_update(self, data):
@@ -308,8 +313,16 @@ class RemoteGamer(LocalConsumer):
         await self.send_json(data)
 
     async def tournament_result(self, data):
-        # TRN -> #guest: relay
-        await self.send_json(data)
+        if data['author'] != self.username:
+            await self.lobby.broadcast(data)
+            await self.lobby.update_result(data['message'])
+        else:
+            await self.send_json(data)
+
+    # async def tournament_end(self, data):
+    #     if self.status == enu.Game.HOST:
+    #         await self.lobby.end()
+    #     await self.send_json(data)
 
 async def getInviteAuth(author, user):
     try :

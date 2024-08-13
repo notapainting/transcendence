@@ -96,7 +96,7 @@ const   scene = [
     [menuBgVid, menuM4], // afk check
     [menuM5], // in game
     [menuM6], // ecran de fin de match 
-    [], // ecran de fin de tournoi (recap)
+    [menuM6], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
 
