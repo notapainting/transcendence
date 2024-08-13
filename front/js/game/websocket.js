@@ -164,8 +164,6 @@ const _match = (content) => {
             document.addEventListener('keyup', bindKeyRelease)
             game.gameRenderer(content.message);
             startMatch();
-            console.log("motoe : " + enu.sceneIdx.MATCH)
-
             return true;
         case enu.Match.UPDATE:
             game.gameRenderer(content.message);

@@ -63,7 +63,7 @@ class LocalConsumer(BaseConsumer):
 
     async def match_end(self, data):
         if hasattr(self, "lobby"):
-            await self.lobby.tournament_result()
+            await self.lobby.update_result()
         await self.send_json(data)
 
 
