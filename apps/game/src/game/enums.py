@@ -50,6 +50,7 @@ class Match(enum.StrEnum):
     END     = "match.end"
     RESULT  = "match.result"
     START   = "match.start"
+    GO      = "match.go"
 
 class Tournament(enum.StrEnum):
     PHASE   = "tournament.phase"

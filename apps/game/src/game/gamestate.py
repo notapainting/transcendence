@@ -305,7 +305,7 @@ class GameState:
             await self._send({"type":enu.Match.PAUSE})
         else:
             await self.start()
-            await self._send({"type":enu.Match.RESUME})
+            await self._send({"type":enu.Game.RELAY, "relay":{"type":enu.Match.RESUME}})
 
     async def feed(self, key):
         if self.running:
