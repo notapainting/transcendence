@@ -213,20 +213,24 @@ class GameState:
             self.status['collisionY'] = self.status['ballY']
             self.reseting()
             await self._send({
-                "type":enu.Match.SCORE, 
-                "players":[self.leftPlayer,self.rightPlayer],
-                "score":[self.status['leftPlayerScore'],self.status['rightPlayerScore']]
-                })
+                "type":enu.Game.RELAY,
+                "relay":{
+                    "type":enu.Match.SCORE, 
+                    "players":[self.leftPlayer,self.rightPlayer],
+                    "score":[self.status['leftPlayerScore'],self.status['rightPlayerScore']]
+                    }})
         elif self.status['ballX'] >= self.status['rightPaddleX']:
             self.status['leftPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
             self.status['collisionY'] = self.status['ballY']
             self.reseting()
             await self._send({
-                "type":enu.Match.SCORE, 
-                "players":[self.leftPlayer,self.rightPlayer],
-                "score":[self.status['leftPlayerScore'],self.status['rightPlayerScore']]
-                })
+                "type":enu.Game.RELAY,
+                "relay":{
+                    "type":enu.Match.SCORE, 
+                    "players":[self.leftPlayer,self.rightPlayer],
+                    "score":[self.status['leftPlayerScore'],self.status['rightPlayerScore']]
+                    }})
 
     async def computeWin(self):
         if self.status['leftPlayerScore'] == self.scoreToWin:

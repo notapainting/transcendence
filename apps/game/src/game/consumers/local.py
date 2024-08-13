@@ -55,15 +55,9 @@ class LocalConsumer(BaseConsumer):
     async def game_relay(self, data):
         await self.send_json(data["relay"])
 
-    async def match_score(self, data):
-        if hasattr(self, "lobby") and hasattr(self.lobby, "match_count"):
-            if self.lobby.match_count > 0:
-                data['score'] = {'players':self.lobby.current[self.lobby.match_count]}
-        await self.send_json(data)
-
     async def match_end(self, data):
         if hasattr(self, "lobby"):
-            await self.lobby.update_result()
+            await self.lobby.update_result(data)
         await self.send_json(data)
 
 
