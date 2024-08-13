@@ -120,7 +120,7 @@ const _invitations = (content) => {
                 changeGameStatus(enu.gameMode.MATCH);
                 moveTo(enu.sceneIdx.PREMATCH);
                 announceMatch(content.players);
-                // game.gameRenderer(content.message);
+                // game.gameRenderer(content);
             } else if (getGameStatus() === enu.gameMode.TOURNAMENT) {
                 updateStatusInvitation(content.author)
             } else {
@@ -370,7 +370,8 @@ function updateListInvitedBy(mode, user) {
         e.target.parentElement.remove();
         gameSocket.send(JSON.stringify({
             'type': enu.Invitation.ACCEPT,
-            'message': user
+            'message': user,
+            'mode':mode,
         }));
     });
 
