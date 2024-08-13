@@ -16,6 +16,7 @@ class LocalConsumer(BaseConsumer):
         await self.lobby._init()
         await self.send_json({"type":enu.Game.SETTING, "message":getDefault()})
         print(f"Hey loyal !")
+        self.status = enu.Game.LOCAL
 
     async def disconnect(self, close_code):
         await self.lobby.end()
@@ -54,21 +55,6 @@ class LocalConsumer(BaseConsumer):
     async def game_relay(self, data):
         await self.send_json(data["relay"])
 
-    # async def game_start(self, data):
-    #     await self.send_json(data)
-
-    # async def tournament_phase(self, data):
-    #     await self.send_json(data)
-
-    # async def tournament_match(self, data):
-    #     await self.send_json(data)
-
-    # async def tournament_end(self, data):
-    #     await self.send_json(data)
-
-    # async def match_update(self, data):
-    #     await self.send_json(data)
-
     async def match_score(self, data):
         if hasattr(self, "lobby") and hasattr(self.lobby, "match_count"):
             if self.lobby.match_count > 0:
@@ -77,7 +63,6 @@ class LocalConsumer(BaseConsumer):
 
     async def match_end(self, data):
         if hasattr(self, "lobby"):
-            data['message'] = self.lobby.match_result()
             await self.lobby.tournament_result()
         await self.send_json(data)
 

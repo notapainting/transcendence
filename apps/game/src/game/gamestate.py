@@ -9,35 +9,48 @@ from channels.layers import get_channel_layer
 
 
 BONUSED=True
-DEFAULT_SCORE = 1
+DEFAULT_SCORE = 5
 MIN_SCORE = 1
 MAX_SCORE = 15
 
-TIME_REFRESH = 0.08
+TIME_REFRESH = 0.02
 WIDTH = 50
 HEIGHT = 30
 
 paddleWidth = 10
 
-ballSpeedX = 3
+ballSpeedX = 0.8
 ACCELERATION = 0.05
 
 RESET = 0
 COUNTER = -1
 MAX_SPEED = 2
 
+
+# host == left
+# guest == right
 class GameState:
-    def __init__(self, group, bonused=True, scoreToWin=DEFAULT_SCORE):
+    def __init__(self, group, leftPlayer, rightPlayer, bonused=True, scoreToWin=DEFAULT_SCORE):
         self._chlayer = get_channel_layer()
         self._group_id = group
+
+        self.scoreToWin = scoreToWin
+        self.bonused = bonused
+
+        self.leftPlayer = leftPlayer
+        self.rightPlayer = rightPlayer
+        self.result = {
+                "winner":self.rightPlayer,
+                "loser":self.rightPlayer,
+                "score_w":0,
+                "score_l":0,
+            }
 
         self.reset  = RESET
         self.counter  = COUNTER
         self.running = False
         self.timer = tim.ATimer(verbose=False)
         self.p = pow.PowerUpManager(self.timer)
-        self.scoreToWin = scoreToWin
-        self.bonused = bonused
         self._statused()
 
     def _statused(self):
@@ -78,6 +91,7 @@ class GameState:
         self.left_paddle_bottom = self.status['leftPaddleY'] - self.status['paddleHeightL'] / 2
 
     async def _send(self, message):
+        message['author'] = "system"
         await self._chlayer.group_send(self._group_id, message)
 
     async def update_player_position(self, message):
@@ -98,7 +112,7 @@ class GameState:
         elif message == "downRelease":
             self.status['downPressed'] = False
 
-    def to_dict(self, winner): #mise en forme
+    def to_dict(self): #mise en forme
         return {
             'x': self.status['ballX'],
             'y': self.status['ballY'],
@@ -117,7 +131,6 @@ class GameState:
             'paddleHeightR' : self.status['paddleHeightR'],
             'leftPlayerScore' : self.status['leftPlayerScore'],
             'rightPlayerScore' : self.status['rightPlayerScore'],
-            'winner' : self.status['winner'],
             'randomPointB': self.p.random_point_b,
             'randomPointM': self.p.random_point_m,
             'randomPointE': self.p.random_point_e,
@@ -201,11 +214,9 @@ class GameState:
             self.reseting()
             await self._send({
                 "type":enu.Match.SCORE, 
-                "message":{
-                    "score":[
-                        self.status['leftPlayerScore'],
-                        self.status['rightPlayerScore']
-                ]}})
+                "players":[self.leftPlayer,self.rightPlayer],
+                "score":[self.status['leftPlayerScore'],self.status['rightPlayerScore']]
+                })
         elif self.status['ballX'] >= self.status['rightPaddleX']:
             self.status['leftPlayerScore'] += 1
             self.status['collisionX'] = self.status['ballX']
@@ -213,22 +224,30 @@ class GameState:
             self.reseting()
             await self._send({
                 "type":enu.Match.SCORE, 
-                "message":{
-                    "score":[
-                        self.status['leftPlayerScore'],
-                        self.status['rightPlayerScore']
-                ]}})
+                "players":[self.leftPlayer,self.rightPlayer],
+                "score":[self.status['leftPlayerScore'],self.status['rightPlayerScore']]
+                })
 
     async def computeWin(self):
         if self.status['leftPlayerScore'] == self.scoreToWin:
             self.reseting()
-            self.status['winner'] = 'leftWin'
-            await self._send({"type":enu.Match.END})
+            self.result = {
+                "winner":self.leftPlayer,
+                "loser":self.rightPlayer,
+                "score_w":self.status['leftPlayerScore'],
+                "score_l":self.status['rightPlayerScore'],
+            }
+            await self._send({"type":enu.Match.END, "winner":self.leftPlayer, "loser":self.leftPlayer})
             return False
         elif self.status['rightPlayerScore'] == self.scoreToWin:
             self.reseting()
-            self.status['winner'] = 'rightWin'
-            await self._send({"type":enu.Match.END})
+            self.result = {
+                "winner":self.rightPlayer,
+                "loser":self.leftPlayer,
+                "score_w":self.status['rightPlayerScore'],
+                "score_l":self.status['leftPlayerScore'],
+            }
+            await self._send({"type":enu.Match.END, "winner":self.leftPlayer, "loser":self.rightPlayer})
             return False
         return True
 
@@ -260,7 +279,7 @@ class GameState:
                     await asyncio.sleep(0.5)
                     self.reset = 0
                 await asyncio.sleep(TIME_REFRESH)
-                await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict('none')}})
+                await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict()}})
                 self.running = await self.update()
         except asyncio.CancelledError as error:
             print(f"task cancellation")
@@ -283,8 +302,10 @@ class GameState:
     async def pause(self):
         if self.running:
             await self.stop()
+            await self._send({"type":enu.Match.PAUSE})
         else:
             await self.start()
+            await self._send({"type":enu.Match.RESUME})
 
     async def feed(self, key):
         if self.running:
@@ -316,7 +337,7 @@ async def remote_loop(self):
             if end is not None:
                 message = {"type":enu.Game.END, "author":self.username, "message":self.match.compute()}
                 return await self.match.broadcast(message)
-            await self.match.broadcast({'type':enu.Game.UPDATE, 'author': self.username, 'message':self.match.game_state.to_dict('none')})
+            await self.match.broadcast({'type':enu.Game.UPDATE, 'author': self.username, 'message':self.match.game_state.to_dict()})
             if reset==  2:
                 time.sleep(0.5)
                 reset= 0 

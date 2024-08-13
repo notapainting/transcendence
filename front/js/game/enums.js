@@ -27,7 +27,7 @@ export const Game = Object.freeze({
     READY   : "game.ready",
     START   : "game.start",
     BROKE   : "game.broke",
-    DEFAULT : "game.defaults",
+    DEFAULT : "game.default",
     NEXT    : "game.next",
     IDLE    : "game.idle",
     LOCAL   : "game.local",

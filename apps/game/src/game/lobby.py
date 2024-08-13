@@ -27,7 +27,6 @@ class InvalidPlayersException(LobbyException):
     pass
 
 
-
 def getDefault():
     return {
         "bonused":BONUSED,
@@ -60,7 +59,6 @@ class BaseLobby:
     async def _end(self):
         await self._chlayer.group_discard(self._id, self.host)
 
-# settings
     @property
     def maxPlayer(self):
         return self._maxPlayer
@@ -93,7 +91,7 @@ class BaseLobby:
             "bonused":self.bonused,
             "maxPlayer":self.maxPlayer,
         }
-# user mgt
+
     def set_players(self, players):
         if len(players) % 2 != 0 or len(players) == 0:
             raise InvalidPlayersException()
@@ -121,11 +119,8 @@ class BaseLobby:
         return False
 
     def kick(self, user):
-        kicked = False
-        if user in self.invitations:
-            self.invitations.remove(user)
-            kicked = True
-        else:
+        kicked = self.uninvite(user)
+        if kicked is False:
             if user in self.players:
                 self.players.remove(user)
                 kicked = True
@@ -148,13 +143,12 @@ class BaseLobby:
         return False
 
     def checked(self):
-        if len(self.ready) == len(self.players):
+        if len(self.ready) == len(self.players) and len(self.ready) == self.maxPlayer:
             return True
         return False
 
     async def next(self):
         pass
-
 
 class BaseMatch:
     async def match_start(self):
@@ -165,9 +159,17 @@ class BaseMatch:
         if hasattr(self, "game_state"):
             await self.game_state.stop()
 
-    async def match_pause(self):
+    async def match_pause(self, requester=None):
         if hasattr(self, "game_state"):
-            await self.game_state.pause()
+            if requester is not None:
+                if self.requester is None:
+                    self.requester = requester
+                    await self.game_state.pause()
+                elif self.requester == requester:
+                    self.requester = None
+                    await self.game_state.pause()
+            else:
+                await self.game_state.pause()
 
     async def match_feed(self, data):
         if hasattr(self, "game_state"):
@@ -175,20 +177,6 @@ class BaseMatch:
                 await self.game_state.feed_bonus(data['bonus'])
             else:
                 await self.game_state.feed(data['message'])
-
-    def match_result(self):
-        if not hasattr(self, "game_state"):
-            return
-        winner = self.game_state.status['winner']
-        if winner == 'leftWin':
-            winner = self.current[self.match_count][0]
-            loser = self.current[self.match_count][1]
-        else:
-            winner = self.current[self.match_count][1]
-            loser = self.current[self.match_count][0]
-        if hasattr(self, "players"):
-            self.players.remove(loser)
-        return {"winner":winner, "loser":loser}
 
 
 class LocalTournament(BaseLobby, BaseMatch):
@@ -222,8 +210,8 @@ class LocalTournament(BaseLobby, BaseMatch):
             await self.make_phase()
         else:
             match = self.current[self.match_count]
-            self.game_state = GameState(group=self._id, bonused=self.bonused, scoreToWin=self.scoreToWin)
-            await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.MATCH, "message":match, "state":self.game_state.to_dict('none')}})
+            self.game_state = GameState(group=self._id, leftPlayer=match[0], rightPlayer=match[1], bonused=self.bonused, scoreToWin=self.scoreToWin)
+            await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.MATCH, "message":match, "state":self.game_state.to_dict()}})
 
     async def reset(self):
         await self.match_stop()
@@ -231,20 +219,17 @@ class LocalTournament(BaseLobby, BaseMatch):
         self.match_count = -2
         self.players = []
 
-    async def tournament_result(self):
-        print(f"match t oplay : {len(self.current)}")
+    async def tournament_result(self, data):
+        self.players.remove(data['loser'])
         if len(self.current) == 1:
             self.reset()
             self.match_count = -2
-            await self.broadcast({"type":enu.Game.RELAY, "relay":{'type':enu.Tournament.END, "message":self.players[0]}})
+            await self.broadcast({"type":enu.Game.RELAY, "relay":{'type':enu.Tournament.END, "winner":data['winner']}})
 
     async def end(self):
         await self.match_stop()
         await super()._end()
 
-
-# substitute hostname to hsot id for group
-# pass groupID to  gamestate 
 class RemoteLobby(BaseLobby):
     def __init__(self, host, host_channel_name, maxPlayer=LOBBY_DEFAULT_PLAYERS):
         super().__init__(host=host, host_channel_name=host_channel_name, maxPlayer=maxPlayer)
@@ -260,11 +245,24 @@ class RemoteLobby(BaseLobby):
         await self._chlayer.group_send(self._id, message)
 
     async def start(self, data=None):
+        await self.clear_invitations()
         await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Game.START}})
 
     async def invite(self, user, mode=enu.Game.TRN):
         if super().invite(user):
             await self._send(user, {"type":enu.Game.INVITE, "mode":mode})
+            return True
+        return False
+
+    async def uninvite(self, user):
+        if super().uninvite(user):
+            await self._send(user, {"type":enu.Invitation.REJECT})
+            return True
+        return False
+
+    async def clear_invitations(self):
+        for user in self.invitations:
+            await self.uninvite(user)
 
     async def add(self, user):
         if super().add(user):
@@ -273,26 +271,38 @@ class RemoteLobby(BaseLobby):
             return True
         return False
 
+    async def remove(self, user):
+        if super().kick(user):
+            await self._chlayer.group_discard(self._id, plaza.translate(user, raise_exception=True))
+            return True
+        return False
+
     async def check(self, user):
         if super().check(user):
-            await self.broadcast({"type":enu.Game.READY, "player":user, "r":True})
+            await self.broadcast({"type":enu.Game.READY, "player":user})
             return True
         return False
 
     async def kick(self, user):
-        if super().kick(user):
-            await self._send({"type":enu.Game.KICK})
-            await self._chlayer.group_discard(self._id, user)
+        if user in self.invitations:
+            await self.uninvite(user)
+        elif super().kick(user):
+            await self._send(user, {"type":enu.Game.KICK})
+            await self._chlayer.group_discard(self._id, plaza.translate(user, raise_exception=True))
             return True
         return False
 
-    async def end(self):
+    async def end(self, smooth=True):
         await super()._end()
-        if self.task is not None:
-            await self.task.cancel()
-        await self.broadcast({"type":enu.Game.KICK})
-        for player in players:
-            await self._chlayer.group_discard(self._id, player)
+        await self.clear_invitations()
+        if smooth is False:
+            await self.broadcast({"type":enu.Game.KICK})
+        for player in self.players:
+            await self._chlayer.group_discard(self._id, plaza.translate(player, raise_exception=True))
+
+    async def quit(self):
+        await self.broadcast({"type":enu.Game.QUIT})
+        await self.end()
 
 
 class Tournament(RemoteLobby):
@@ -325,21 +335,18 @@ class Tournament(RemoteLobby):
     def players_state(self):
         return {"invited":self.invitations, "players":self.players, "host":self.host, "size":self.maxPlayer}
 
-from django.utils import timezone
 class Match(RemoteLobby, BaseMatch):
     def __init__(self, host, tournament=None):
         host_channel_name = plaza.translate(host)
         super().__init__(host=host, host_channel_name=host_channel_name, maxPlayer=LOBBY_DEFAULT_MATCH_PLAYER)
-        self.game_state = GameState(group=self._id, bonused=self.bonused, scoreToWin=self.scoreToWin)
         self.tournament = tournament
+        self.requester = None
 
     async def start(self, data=None):
         await super().start()
-        print(f"start send  {timezone.now()}")
-        await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Match.START}})
-        print(f"start sleep {timezone.now()}")
-        await asyncio.sleep(2)
-        print(f"end sleep {timezone.now()}")
+        self.game_state = GameState(group=self._id, leftPlayer=self.host, rightPlayer=self.players[0], bonused=self.bonused, scoreToWin=self.scoreToWin)
+        await self.broadcast({"type":enu.Match.START, "message":self.game_state.to_dict()})
+        # await asyncio.sleep(2)
         await self.match_start()
 
     async def invite(self, user):
@@ -352,34 +359,17 @@ class Match(RemoteLobby, BaseMatch):
 
     def changeSettings(self, settings):
         if self.tournament is None:
-            super().changeSettings()
-            return self.gameState.changeSettings(settings)
+            return super().changeSettings(settings)
 
-    def compute(self):
-        guest = [x for x in list(self._players) if x != self.host][0]
-        scores = {self.host:self.game_state.status['leftPlayerScore'], guest:self.game_state.status['rightPlayerScore']}
-        winner = self.game_state.status['winner']
-        loser = [x for x in list(self._players) if x != winner][0]
-        if winner == 'leftWin':
-            winner = self.host
-        else:
-            winner = guest
-        self.result = {"scores":scores,"winner":winner, "loser":loser}
-        return self.result
-
-    async def end(self, cancelled=False):
+    async def end(self, smooth=True, cancelled=False):
         await self.match_stop()
-        if cancelled == False:
-            if hasattr(self, "result") is False:
-                self.result = self.compute()
-            data = self.result
-            data['score_w'] = self.result['scores'][data['winner']]
-            data['score_l'] = self.result['scores'][data['loser']]
-            del data['scores']
-            await httpx.AsyncClient().post(url='http://user:8000/user/match_history/new/', data=JSONRenderer().render(data))
+        if hasattr(self, "game_state"):
+            result = self.game_state.result
+            await httpx.AsyncClient().post(url='http://user:8000/user/match_history/new/', data=JSONRenderer().render(result))
             if self.tournament is not None:
-                await self._chlayer._send(self.tournament, {"type":enu.Tournament.RESULT, "message":self.result})
-        
+                await self._chlayer._send(self.tournament, {"type":enu.Tournament.RESULT, "message":result})
+        await super().end(smooth=smooth)
+
 
 """
 class DEADLobby:
@@ -462,56 +452,7 @@ class DEADLobby:
             await self._chlayer.group_send(player, message)
 
 
-class DEADMatch(Lobby):
-    def __init__(self, host, maxPlayer=LOBBY_DEFAULT_MATCH_PLAYER, tournament=None):
-        super().__init__(host=host, maxPlayer=maxPlayer)
-        self._players.add(host)
-        self.game_state = GameState()
-        self.task = None
-        self.host = host
-        self.tournament = tournament
-
-    async def invite(self, user):
-        if self.tournament is None:
-            await super().invite(user)
-
-    async def kick(self, user):
-        if self.tournament is None:
-            await super().kick(user)
-
-    def changeSettings(self, data):
-        if hasattr(self, "game_state"):
-            return self.game_state.changeSettings(data)
-
-    def compute(self):
-        guest = [x for x in list(self._players) if x != self.host][0]
-        scores = {self.host:self.game_state.status['leftPlayerScore'], guest:self.game_state.status['rightPlayerScore']}
-        winner = self.game_state.status['winner']
-        loser = [x for x in list(self._players) if x != winner][0]
-        if winner == 'leftWin':
-            winner = self.host
-        else:
-            winner = guest
-        self.result = {"scores":scores,"winner":winner, "loser":loser}
-        return self.result
-
-    async def end(self, cancelled=False):
-        if cancelled == False:
-            if hasattr(self, "result") is False:
-                self.result = self.compute()
-            # send match history data to usermgt
-
-            data = self.result
-            data['score_w'] = self.result['scores'][data['winner']]
-            data['score_l'] = self.result['scores'][data['loser']]
-            del data['scores']
-            await httpx.AsyncClient().post(url='http://user:8000/user/match_history/new/', data=JSONRenderer().render(data))
-            if self.tournament is True:
-                await self._chlayer.send_group(self.tournament, {"type":enu.Tournament.RESULT, "message":self.result})
-        if self.task is not None:
-            self.task.cancel()
-
-
+c
 class DEADTournament(Lobby):
     def __init__(self, host, maxPlayer=LOBBY_MAXIMUM_PLAYERS) -> None:
         super().__init__(host=host, maxPlayer=maxPlayer, types=enu.Tournament)
