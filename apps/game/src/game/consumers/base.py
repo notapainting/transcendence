@@ -13,10 +13,8 @@ class BaseConsumer(AsyncWebsocketConsumer):
         if message['type'] == enu.Game.RELAY:
             pass
         else:
-            name = "Anon"
-            if hasattr(self, "username"):
-                name = self.username
-            print(f"{name} received : {message}")
+            if hasattr(self, "username") and hasattr(self, "status"):
+                print(f"{self.username} ({self.status}) received : {message}")
         try :
             await super().dispatch(message)
         except ValueError as error:

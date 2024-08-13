@@ -104,7 +104,6 @@ class RemoteGamer(LocalConsumer):
         try :
             if json_data['type'] == enu.Errors.DECODE:
                 return await self.send_json({'type':enu.Errors.DECODE})
-            print(f"{self.username} ({self.status}): type is {json_data['type']} ")
             match json_data['type']:
                 case enu.Game.QUIT: await self.quit()
                 case enu.Game.DEFAULT: await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault()})
@@ -269,7 +268,7 @@ class RemoteGamer(LocalConsumer):
 
 # MATCH (3)
     async def match_start(self, data):
-        if hasattr(self, "lobby"):
+        if self.status == enu.Game.HOST:
             self.set_mode(enu.Match.HOST)
         else:
             self.set_mode(enu.Match.GUEST)
@@ -335,28 +334,18 @@ async def getInviteAuth(author, user):
 def format_paddle_key(host, key):
     if host is True:
         match key:
-            case 'downPressed' | 'sPressed':
-                return 'sPressed'
-            case 'downRelease' | 'sRelease':
-                return 'sRelease'
-            case 'upPressed' | 'wPressed':
-                return 'wPressed'
-            case 'upRelease' | 'wRelease':
-                return 'wRelease'
-            case '_':
-                return key
+            case 'downPressed' | 'sPressed': return 'sPressed'
+            case 'downRelease' | 'sRelease': return 'sRelease'
+            case 'upPressed' | 'wPressed': return 'wPressed'
+            case 'upRelease' | 'wRelease': return 'wRelease'
+            case '_': return key
     else:
         match key:
-            case 'downPressed' | 'sPressed':
-                return 'downPressed'
-            case 'downRelease' | 'sRelease':
-                return 'downRelease'
-            case 'upPressed' | 'wPressed':
-                return 'upPressed'
-            case 'upRelease' | 'wRelease':
-                return 'upRelease'
-            case '_':
-                return key
+            case 'downPressed' | 'sPressed': return 'downPressed'
+            case 'downRelease' | 'sRelease': return 'downRelease'
+            case 'upPressed' | 'wPressed': return 'upPressed'
+            case 'upRelease' | 'wRelease': return 'upRelease'
+            case '_': return key
 
 
 
