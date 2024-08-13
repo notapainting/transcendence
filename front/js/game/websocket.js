@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { updateSettings, changeGameStatus, getGameStatus, announcePhase, announceMatch, moveTo, invitations, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearInvitationList } from './menu.js';
+import { updateSettings, changeGameStatus, getGameStatus, getSceneIdx, announcePhase, announceMatch, moveTo, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearInvitationList } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
@@ -39,37 +39,6 @@ const _initWebsocket = (path) => {
 }
 
 /*
-        // LOCAL
-                case enu.EventLocal.PHASE:
-                    moveTo(enu.sceneIdx.PHASE);
-                    announcePhase(content.message);
-                    break;
-                case enu.EventLocal.MATCH:
-                    moveTo(enu.sceneIdx.PREMATCH);
-                    announceMatch(content.message);
-                    document.addEventListener('keydown', bindKeyPress)
-                    document.addEventListener('keyup', bindKeyRelease)
-                    game.gameRenderer(content.state);
-                    if (gameData.start) {
-                        if (!gameData.timerInterval)
-                            gameData.timerInterval = setInterval(updateTimer, 1000);
-                    } else {
-                        gameData.sceneHandler = 1;
-                        game.gameRenderer(null);
-                    }
-                    break;
-                case enu.EventLocal.END_GAME:
-                    clearGame();
-                    document.removeEventListener('keydown', bindKeyPress)
-                    document.removeEventListener('keyup', bindKeyRelease)
-                    announceWinner(content.message);
-                    moveTo(enu.sceneIdx.END)
-                    setTimeout(askNext, 3000);
-                    break;
-                case enu.EventLocal.END_TRN:
-                    moveTo(enu.sceneIdx.END)
-                    break;
-                    
 
 const _remote = (content) => {
 //     switch (content.type) {
@@ -96,14 +65,6 @@ const _remote = (content) => {
 //             console.error(content.type)
 //             break;
 
-
-
-
-//         default:
-//             console.log("unknow type : ", content.type)
-//     }
-// }
-
 */
 
 const startMatch = () => {
@@ -121,8 +82,12 @@ const _game = (content) => {
         case enu.Game.QUIT:
             // ?
             return true;
+        case enu.Game.START:
+            // ?
+            return true;
         case enu.Game.BROKE:
         case enu.Game.KICK:
+            if (getSceneIdx() === enu.sceneIdx.END || getSceneIdx() === enu.sceneIdx.END_TR) return;
             clearGame()
             moveTo(enu.sceneIdx.WELCOME);
             // warn kicked
@@ -153,7 +118,6 @@ const _invitations = (content) => {
         case enu.Invitation.ACCEPT:
             console.log(content)
             if (content.mode === enu.Game.MATCH) {
-                console.log("match")
                 changeGameStatus(enu.gameMode.MATCH);
                 moveTo(enu.sceneIdx.PREMATCH);
                 announceMatch(content.players);
@@ -167,8 +131,13 @@ const _invitations = (content) => {
             return true;
         case enu.Invitation.REJECT:
             warnErrorInvitation(enu.Invitation.REJECT)
-            let target = 'invite-status' + content.author;
-            document.getElementById(target).parentElement.remove();
+            if (content.by === false) {
+                let target = 'invite-status-' + content.author;
+                document.getElementById(target).parentElement.remove();
+            } else {
+                var target = 'invited-by-' + content.author;
+                document.getElementById(target).remove();
+            }
             return true;
     };
     return false;
@@ -181,9 +150,10 @@ const _match = (content) => {
                 clearInterval(gameData.timerInterval);
                 gameData.timerInterval = null;
             };
+            togglePause(true);
+            return true;
         case enu.Match.RESUME:
-            togglePause();
-            toggleLock();
+            togglePause(false);
             return true;
         case enu.Match.RESULT:
             // contain result for a match (used in trn)
@@ -193,14 +163,17 @@ const _match = (content) => {
             announceScore();
             document.addEventListener('keydown', bindKeyPress)
             document.addEventListener('keyup', bindKeyRelease)
+            game.gameRenderer(content.message);
             startMatch();
+            console.log("motoe : " + enu.sceneIdx.MATCH)
+
             return true;
         case enu.Match.UPDATE:
             game.gameRenderer(content.message);
             return true;
         case enu.Match.SCORE:
             console.log(content)
-            updateScore(content.message);
+            updateScore(content);
             announceScore();
             return true;
         case enu.Match.END:
@@ -310,14 +283,11 @@ const updateListInvitation = (user) => {
     itemPicture.src = '../../img/anon.jpg'; // a remplacer !!!! (par la vrai foto)
     itemName.textContent = user;
     itemName.className = 'list-tournoi-user-name';
-    itemStatus.id = 'invite-status' + user;
+    itemStatus.id = 'invite-status-' + user;
     itemStatus.className = 'remote-list-element';
-    // itemStatus.textContent = '...waiting...';
 
     button.className = 'remove-button';
     button.addEventListener('click', (e) => {
-        const pos = players.indexOf(user);
-        players.splice(pos, 1);
         e.target.parentElement.remove();
         gameSocket.send(JSON.stringify({
             'type': enu.Game.KICK,
@@ -369,7 +339,7 @@ function updateListInvitedBy(mode, user) {
         var typeGame = "invitationTypeTournament";
         var containerClass = "invitationTypeContainerTournament";
         var typeClass = "bi bi-people";
-    }
+    };
 
     const item = document.createElement('li');
     const itemName = document.createElement('span');
@@ -437,7 +407,7 @@ const warnErrorInvitation = (error) => {
     if (error === enu.Error.FBD_403) console.warn("FORBIDDEN")
     else if (error === enu.Error.NTF_404) console.warn("USER NOT FOUND")
     else if (error === enu.Error.ABSENT) console.warn("USER ABSENT")
-        else if (error === enu.Invitation.REJECT) console.warn("REJECTED")
+    else if (error === enu.Invitation.REJECT) console.warn("REJECTED")
 }
 
 

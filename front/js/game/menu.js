@@ -74,8 +74,10 @@ export const getGameStatus = () => {
 // scene idx
 let     idx = enu.sceneIdx.WELCOME;
 
-// invitations received in remote mode
-export let invitations = [];
+export const getSceneIdx = () => {
+    return idx;
+}
+
 
 // list of players invited
 let     players = [];
@@ -83,7 +85,6 @@ let     players = [];
 // current match data
 let     currentPlayers = [];
 let     currentScore = [0, 0];
-let     paused = false;
 let     locked = false;
 
 // scene
@@ -254,18 +255,11 @@ const validate_name = (name) => {
 export const toggleLock = () => {
     if (locked == false) locked = true;
     else if (locked == true) locked = false;
-    console.log('locked : ' + locked);
 }
 
-export const togglePause = () => {
-    if (paused === false) {
-        paused = true;
-        document.getElementById('game-menu-pause-text').innerHTML = "R E S U M E";
-    } else {
-        paused = false;
-        document.getElementById('game-menu-pause-text').innerHTML = "P A U S E";
-    }
-    console.log('paused : ' + paused);
+export const togglePause = (pause) => {
+    if (pause === true) document.getElementById('game-menu-pause-text').innerHTML = "R E S U M E";
+    else document.getElementById('game-menu-pause-text').innerHTML = "P A U S E";
 }
 
 // game settings
@@ -290,7 +284,6 @@ const resetSettings = () => {
 
 /*** event listener ****/
 const sendCreate = (mode) => {
-    console.log(status)
     gameSocket.send(JSON.stringify({'type': enu.Game.CREATE, 'mode':mode}));
     moveTo(enu.sceneIdx.CREATION);
     resetSettings();
@@ -400,7 +393,6 @@ ready.addEventListener('click', readyFunc);
 pause.addEventListener('click', () => {
     if (locked === true) return ;
     gameSocket.send(JSON.stringify({'type': enu.Match.PAUSE}));
-    togglePause();
     if (status === enu.gameMode.LOCAL) {
         if (gameData.timerInterval) {
             clearInterval(gameData.timerInterval);
@@ -416,7 +408,6 @@ const quitFunc = () => {
     clearInvitationList();
     if (anon === true) {
         if (idx == enu.sceneIdx.CREATION) {
-            console.log("ANON exit")
             if (gameSocket !== null) gameSocket.close();
             fullClear()
             navigateTo("/");
@@ -450,7 +441,6 @@ document.getElementById('game-menu-local-input-button').addEventListener('click'
     document.getElementById('game-menu-input-player').value = '';
 
     players.push(user);
-    console.log(status)
     if (status === enu.gameMode.LOCAL) {
         createListLocal(user)
     } else {

@@ -24,14 +24,12 @@ class Invitation(enum.StrEnum):
 class Game(enum.StrEnum):
     CREATE  = "game.create"
     SETTING = "game.settings"
-    DEFAULT = "game.defaults"
+    DEFAULT = "game.default"
     KICK    = "game.kick"
     QUIT    = "game.quit"
     INVITE  = "game.invite"
     READY   = "game.ready"
-    UNREADY = "game.unready"
     START   = "game.start"
-    BROKE   = "game.broke"
     NEXT    = "game.next"
     RELAY   = "game.relay"
     IDLE    = "game.idle"
@@ -54,8 +52,6 @@ class Match(enum.StrEnum):
     START   = "match.start"
 
 class Tournament(enum.StrEnum):
-    HOST    = "tournament.host"
-    GUEST   = "tournament.guest"
     PHASE   = "tournament.phase"
     MATCH   = "tournament.match"
     RESULT  = "tournament.result"
