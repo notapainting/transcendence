@@ -88,7 +88,6 @@ const _game = (content) => {
         case enu.Game.BROKE:
         case enu.Game.KICK:
             if (getSceneIdx() === enu.sceneIdx.END || getSceneIdx() === enu.sceneIdx.END_TR) return;
-            clearGame()
             moveTo(enu.sceneIdx.WELCOME);
             // warn kicked
             // clear 
@@ -180,7 +179,7 @@ const _match = (content) => {
             moveTo(enu.sceneIdx.END)
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
-            announceWinner(content.message);
+            announceWinner(content);
             if (getGameStatus() === enu.gameMode.LOCAL) setTimeout(askNext, 3000);
             else if (getGameStatus() === enu.gameMode.TOURNAMENT) setTimeout(moveTo, 3000, enu.sceneIdx.END);
             return true;

@@ -40,7 +40,6 @@ class ErrorDecode(Exception):
 # add delay after trn end
 
 # idle -> game.host -> match.host
-# idle -> game.guest -> match.guest 
 
 class RemoteGamer(LocalConsumer):
     def __init__(self):
@@ -164,11 +163,11 @@ class RemoteGamer(LocalConsumer):
                 settings = self.lobby.changeSettings(settings=data['message'])
                 await self.lobby.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Game.SETTING, "message":settings}})
             case enu.Game.INVITE:
-                to = data['user']
-                response = await getInviteAuth(to)
+                to_user = data['user']
+                response = await getInviteAuth(self.username, to_user)
                 if response['type'] == enu.Invitation.VALID:
-                    await self.lobby.invite(to)
-                response['user'] = to
+                    await self.lobby.invite(to_user)
+                response['user'] = to_user
                 response['mode'] = data['mode']
                 await self.send_json(response) 
             case enu.Game.KICK:
@@ -311,13 +310,13 @@ class RemoteGamer(LocalConsumer):
         # TRN -> #guest: relay
         await self.send_json(data)
 
-async def getInviteAuth(user):
+async def getInviteAuth(author, user):
     try :
         promise = await httpx.AsyncClient().post(
                     url='http://chat:8000/api/v1/relations/blocked/', 
                     data=JSONRenderer().render({
                     "target":user,
-                    "author":self.username}))
+                    "author":author}))
         if promise.status_code == 200:
             if plaza.found(user):
                 return {"type":enu.Invitation.VALID}
