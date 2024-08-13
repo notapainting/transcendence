@@ -108,12 +108,12 @@ services:
    labels:
      co.elastic.logs/module: kibana
    volumes:
-     - certs:/usr/share/kibana/config/certs
+     - certs:/usr/share/kibana/config/certs:ro
      - kibanadata:/usr/share/kibana/data
    ports:
-     - ${KIBANA_PORT}:5601
+     - 5601:5601
    environment:
-     - SERVERNAME=kibana
+     - SERVERNAME=kibana-server
      - ELASTICSEARCH_HOSTS=https://es01:9200
      - ELASTICSEARCH_USERNAME=kibana_system
      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
@@ -123,16 +123,20 @@ services:
      - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
      - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+     - SERVER_PUBLICBASEURL=https://localhost:5601
+     - SERVER_SSL_CERTIFICATE=config/certs/kibana-server/kibana-server.crt
+     - SERVER_SSL_KEY=config/certs/kibana-server/kibana-server.key
+     - SERVER_SSL_ENABLED=true
    mem_limit: ${KB_MEM_LIMIT}
    healthcheck:
-     test:
-       [
-         "CMD-SHELL",
-         "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
-       ]
-     interval: 10s
-     timeout: 10s
-     retries: 120
+      test:
+        [
+          "CMD-SHELL",
+          "curl -k -s -I https://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
    networks:
     - app_network
     - elk_log
@@ -156,7 +160,7 @@ services:
      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
      - "/var/run/docker.sock:/var/run/docker.sock:ro"
    environment:
-     - ELASTIC_USER=elastic
+     - ELASTIC_USER=${ELASTIC_PASSWORD}
      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
      - ELASTIC_HOSTS=https://es01:9200
      - KIBANA_HOSTS=http://kibana:5601
@@ -263,9 +267,3 @@ services:
     volumes:
         - "/var/run/docker.sock:/var/run/docker.sock:ro"
     entrypoint: /bin/sh -c "docker exec kibana sh -c '/usr/share/kibana/scripts/dashboards.sh'"
-    healthcheck:
-      test: ["CMD-SHELL", "docker logs dashboards | grep -q 'All Dashboards creation completed.'"]
-      interval: 1s
-      timeout: 5s
-      retries: 120
-    restart: on-failure

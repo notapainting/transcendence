@@ -4,7 +4,7 @@ COLOR_RED='\e[1;31m'
 COLOR_RESET='\e[0m'
 
 # Define the URL for Elasticsearch
-KIBANA_URL="localhost:5601"
+KIBANA_URL="https://localhost:5601"
 
 # Define the path to the CA certificate
 CA_CERT="/usr/share/kibana/config/certs/ca/ca.crt"

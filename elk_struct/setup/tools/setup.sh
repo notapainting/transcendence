@@ -38,6 +38,12 @@ if [ ! -f config/certs/certs.zip ]; then
     "      - localhost\n"\
     "    ip:\n"\
     "      - 127.0.0.1\n"\
+    "  - name: kibana-server\n"\
+    "    dns:\n"\
+    "      - kibana-server\n"\
+    "      - localhost\n"\
+    "    ip:\n"\
+    "      - 127.0.0.1\n"\
     > config/certs/instances.yml;
     bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
     unzip config/certs/certs.zip -d config/certs;
@@ -65,10 +71,10 @@ chown -R root:root config/certs;
 find . -type d -exec chmod 750 {} \;
 find . -type f -exec chmod 640 {} \;
 
-# if [ ! -f config/certs/logstash/logstash.key ]; then
+if [ ! -f config/certs/logstash/logstash.pkcs8.key ]; then
     echo -e "/////////////////////////////////////////////////////////////////Convert the Logstash key to pkcs8/////////////////////////////////////////////////////////////////"
     openssl pkcs8 -inform PEM -in config/certs/logstash/logstash.key -topk8 -nocrypt -outform PEM -out config/certs/logstash/logstash.pkcs8.key
-# fi;
+fi;
 
 echo "Waiting for Elasticsearch availability";
 until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
