@@ -9,7 +9,6 @@ from game.lobby import getDefault, LocalTournament, LobbyException
 
 
 class LocalConsumer(BaseConsumer):
-
     async def connect(self):
         await self.accept()
         self.lobby = LocalTournament(host="Loyal", host_channel_name=self.channel_name)
@@ -29,7 +28,6 @@ class LocalConsumer(BaseConsumer):
             await self.send_json({"type":enu.Errors.LOBBY})
         except BaseException as e:
             print(f"error: {e}")
-
 
     async def local(self, data):
         match data['type']:
