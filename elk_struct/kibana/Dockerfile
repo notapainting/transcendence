@@ -5,3 +5,4 @@ RUN     mkdir -p /usr/share/kibana/scripts
 
 COPY    scripts/data_views.sh /usr/share/kibana/scripts/
 COPY    scripts/dashboards.sh /usr/share/kibana/scripts/
+COPY    scripts/dash.json /usr/share/kibana/scripts/
