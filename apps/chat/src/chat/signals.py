@@ -1,7 +1,7 @@
 from django.db.models.signals import post_migrate
 from django.conf import settings
 from django.dispatch import receiver
-from chat.models import User  # Assurez-vous que le chemin d'importation est correct
+from chat.models import User 
 
 
 @receiver(post_migrate)
@@ -26,8 +26,8 @@ def create_admin_user(sender, **kwargs):
             name='loulou',
         )
         print("Loulou user created")
-    if not User.objects.filter(username='bilel').exists():
+    if not User.objects.filter(name='bilel').exists():
         user = User.objects.create(
             name='bilel',
         )
-        print("bilel user created")
+        print("Bilel user created")

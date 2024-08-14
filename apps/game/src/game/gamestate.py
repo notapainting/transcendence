@@ -9,7 +9,7 @@ from channels.layers import get_channel_layer
 
 
 BONUSED=True
-DEFAULT_SCORE = 5
+DEFAULT_SCORE = 1
 MIN_SCORE = 1
 MAX_SCORE = 15
 

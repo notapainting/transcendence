@@ -1,6 +1,6 @@
 import * as game from './game.js';
 import { gameData } from './game.js';
-import { updateSettings, changeGameStatus, getGameStatus, getSceneIdx, announcePhase, announceMatch, moveTo, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearInvitationList } from './menu.js';
+import { updateSettings, changeGameStatus, getGameStatus, getSceneIdx, announcePhase, announceMatch, moveTo, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearInvitationList, clearScore } from './menu.js';
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
@@ -90,7 +90,9 @@ const _game = (content) => {
             if (getSceneIdx() === enu.sceneIdx.END || getSceneIdx() === enu.sceneIdx.END_TR) return;
             moveTo(enu.sceneIdx.WELCOME);
             // warn kicked
-            // clear 
+            return true;
+        case enu.Game.NEXT:
+            moveTo(enu.sceneIdx.PREMATCH);
             return true;
         case enu.Game.READY:
             // set users status to ready
@@ -123,7 +125,9 @@ const _invitations = (content) => {
                 // game.gameRenderer(content);
             } else if (getGameStatus() === enu.gameMode.TOURNAMENT) {
                 updateStatusInvitation(content.author)
-            } else {
+                console.log("bad: " + getGameStatus())
+            } else if (content.mode === enu.Game.TRN){
+                console.log("good")
                 moveTo(enu.sceneIdx.WAITING)
                 changeGameStatus(enu.gameMode.TOURNAMENT);
             }
@@ -159,6 +163,7 @@ const _match = (content) => {
             return true;
         case enu.Match.START:
             moveTo(enu.sceneIdx.MATCH);
+            clearScore();
             announceScore();
             document.addEventListener('keydown', bindKeyPress)
             document.addEventListener('keyup', bindKeyRelease)
@@ -179,7 +184,6 @@ const _match = (content) => {
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content);
             if (getGameStatus() === enu.gameMode.LOCAL) setTimeout(askNext, 3000);
-            else if (getGameStatus() === enu.gameMode.TOURNAMENT) setTimeout(moveTo, 3000, enu.sceneIdx.END);
             return true;
     };
     return false;
@@ -189,7 +193,8 @@ const _tournament = (content) => {
     switch (content.type) {
         case enu.Tournament.PHASE:
             moveTo(enu.sceneIdx.PHASE);
-            announcePhase(content.message);
+            console.log(content)
+            if (content.new === true) announcePhase(content.phase);
             return true;
         case enu.Tournament.MATCH:
             // if local -> go to prematck, if rem wait user to go to prematch
@@ -369,7 +374,7 @@ function updateListInvitedBy(mode, user) {
         gameSocket.send(JSON.stringify({
             'type': enu.Invitation.ACCEPT,
             'message': user,
-            'mode':mode,
+            'mode': mode,
         }));
     });
 

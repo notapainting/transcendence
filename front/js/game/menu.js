@@ -60,7 +60,7 @@ const   pause = document.getElementById('game-menu-pause');
 /*** variable ****/
 
 // client's status
-let     status = enu.gameMode.IDLE;
+let     status = enu.gameMode.LOCAL;
 let     anon = true;
 
 export const changeGameStatus = (type) => {
@@ -99,24 +99,24 @@ const   scene = [
     [menuM6], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
-
-
+// menu 2b -> enlever ready
+// add menu m7
+// better transition fin de match /tournoi
+// 
 
 /*** initialisation ****/
 export const initMenu = (path) => {
+    status = enu.gameMode.LOCAL;
     if (path === enu.backendPath.LOCAL) {
-        status = enu.gameMode.LOCAL;
         anon = true;
         players = [];
         clearInvitationList();
         moveTo(enu.sceneIdx.CREATION);
         console.log("init : local");
     } else {
-        status = enu.gameMode.IDLE;
         anon = false;
         clearInvitationList();
         moveTo(enu.sceneIdx.WELCOME);
-        
     }
 }
 
@@ -135,18 +135,24 @@ export const moveTo = (i) => {
     if (i === scene.length || i < 0) return ;
     idx = i;
     clearMenu();
-    if (idx === enu.sceneIdx.CREATION) {
-        clearGame();
-    }
+    if (idx === enu.sceneIdx.WELCOME) status = enu.gameMode.LOCAL;
+    else if (idx === enu.sceneIdx.CREATION) {
+        players = [];
+        clearGame()
+    };
     scene[idx].forEach(div => {div.style.display = "flex";});
     if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6.style.display = "none";
+    console.log("status: " + status);
 }
-
 
 /*** banner update ****/
 export const updateScore = (data) => {
     currentScore = data.score;
     currentPlayers = data.players;
+}
+
+export const clearScore = () => {
+    currentScore =[0,0]
 }
 
 export const announcePhase = (data) => {
@@ -158,8 +164,8 @@ export const announcePhase = (data) => {
         const   itemVS = document.createElement('div');
     
         item.className = 'list-banner-element';
-        itemPlayer1.textContent = matchData[0];
-        itemPlayer2.textContent = matchData[1];
+        itemPlayer1.textContent = matchData.host;
+        itemPlayer2.textContent = matchData.guest;
         itemVS.textContent = 'vs';
         itemPlayer1.className = 'list-banner-user-name';
         itemPlayer2.className = 'list-banner-user-name';
@@ -179,8 +185,8 @@ export const announceMatch = (data) => {
     const   itemPlayer2 = document.createElement('div');
 
 
-    itemPlayer1.textContent = data[0];
-    itemPlayer2.textContent = data[1];
+    itemPlayer1.textContent = data.host;
+    itemPlayer2.textContent = data.guest;
 
     itemPlayer1.className = 'banner-user-name1';
     itemPlayer2.className = 'banner-user-name2';
@@ -189,7 +195,7 @@ export const announceMatch = (data) => {
     document.getElementById('game-announce-next-match').innerHTML += '<img class="img-vs" src="img/vs.png" />';
     document.getElementById('game-announce-next-match').appendChild(itemPlayer2);
     
-    currentPlayers = [data[0], data[1]];
+    currentPlayers = [data.host, data.guest];
     currentScore = [0, 0];
 }
 
@@ -226,7 +232,6 @@ export const announceWinner = (data) => {
     const   banner = document.getElementById('game-menu-banner-end')
     banner.innerHTML = "Congratulations! Winner is " + data.winner;
 }
-
 
 /*** utils ***/
 function isAlphaNumeric(str) {
@@ -400,8 +405,6 @@ pause.addEventListener('click', () => {
     }
 });
 
-
-
 const quitFunc = () => {
     updateRequested.forEach(req => {clearTimeout(req[1]);});
     clearInvitationList();
@@ -415,7 +418,7 @@ const quitFunc = () => {
         var to = enu.sceneIdx.CREATION;
     } else var to = enu.sceneIdx.WELCOME;
     gameSocket.send(JSON.stringify({'type': enu.Game.QUIT}));
-    status = enu.gameMode.IDLE;
+    status == enu.gameMode.LOCAL
     if (idx === enu.sceneIdx.WELCOME) {
         fullClear()
         navigateTo("/");
@@ -425,10 +428,8 @@ const quitFunc = () => {
 
 document.querySelectorAll(".button-menu-quit").forEach(div => {div.addEventListener('click', quitFunc)});
 
-
 nextMatch.addEventListener('click', () => {
-    if (status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.Game.NEXT}));
-    else moveTo(enu.sceneIdx.PREMATCH)
+    gameSocket.send(JSON.stringify({'type': enu.Game.NEXT}));
 })
 
 document.getElementById('game-menu-local-input-button').addEventListener('click', () => {
@@ -446,7 +447,7 @@ document.getElementById('game-menu-local-input-button').addEventListener('click'
         gameSocket.send(JSON.stringify({
             'type': enu.Game.INVITE,
             'user': user,
-            'mode': (status === enu.gameMode.MATCH ? enu.Game.MATCH: enu.Game.TOURNAMENT),
+            'mode': (status === enu.gameMode.MATCH ? enu.Game.MATCH: enu.Game.TRN),
         }));
     }
 })
@@ -459,7 +460,6 @@ const createListLocal = (user) => {
     item.className = 'list-tournoi-element';
     itemName.textContent = user;
     itemName.className = 'list-tournoi-user-name';
-    // button.textContent = 'Remove';
     button.className = 'remove-button';
     button.addEventListener('click', (e) => {
         const pos = players.indexOf(user);
