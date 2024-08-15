@@ -1,5 +1,5 @@
 import { navigateTo } from "../index.js"
-import { gameSocket, clearGame} from "./websocket.js"
+import { gameSocket, clearGame, startMatch} from "./websocket.js"
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import { gameData } from './game.js';
@@ -385,6 +385,9 @@ const readyFunc = () => {
     if (status === enu.gameMode.LOCAL) {
         moveTo(enu.sceneIdx.MATCH);
         announceScore();
+        
+        
+        startMatch();
     };
     gameSocket.send(JSON.stringify({'type': enu.Game.READY}));
 };

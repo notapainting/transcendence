@@ -1,7 +1,7 @@
 
 
 from pathlib import Path
-from os import getenv
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -80,15 +80,15 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": getenv("DJANGO_LOG_LEVEL", "DEBUG"),
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
             "class": "logging.StreamHandler",
-            "formatter": getenv("DJANGO_LOG_FORMAT", "MID"),
+            "formatter": os.getenv("DJANGO_LOG_FORMAT", "MID"),
         },
     },
     "loggers": {
         "base": {
             "handlers": ["console"],
-            "level": getenv("DJANGO_LOG_LEVEL", "DEBUG"),
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
             "propagate": False,
         },
     }

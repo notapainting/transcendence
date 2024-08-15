@@ -10,11 +10,14 @@ from logging import getLogger
 logger = getLogger('base')
 
 BONUSED=True
-DEFAULT_SCORE = 1
+DEFAULT_SCORE = 5
 MIN_SCORE = 1
 MAX_SCORE = 15
 
+TIME_PAUSE_START = 2
+TIME_PAUSE = 0.5
 TIME_REFRESH = 0.02
+
 WIDTH = 50
 HEIGHT = 30
 
@@ -279,10 +282,10 @@ class GameState:
 
     async def _loop(self):
         try :
+            await asyncio.sleep(TIME_PAUSE_START)
             while self.running:
                 if self.reset ==  2:
-                    await asyncio.sleep(3)
-                    logger.debug("sleep")
+                    await asyncio.sleep(TIME_PAUSE)
                     self.reset = 0
                 await asyncio.sleep(TIME_REFRESH)
                 await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict()}})

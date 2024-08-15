@@ -223,7 +223,7 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
         if self.match_count > 0:
             match = self.current[len(self.current) - self.match_count]
             self.game_state = GameState(group=self._id, leftPlayer=match['host'], rightPlayer=match['guest'], bonused=self.bonused, scoreToWin=self.scoreToWin)
-            await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.MATCH, "message":match, "state":self.game_state.to_dict()}})
+            await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.MATCH, "match":match, "state":self.game_state.to_dict()}})
 
     async def update_result(self, data):
         if await super().update_result(data):

@@ -67,7 +67,7 @@ const _remote = (content) => {
 
 */
 
-const startMatch = () => {
+export const startMatch = () => {
     if (gameData.start) {
         if (!gameData.timerInterval)
             gameData.timerInterval = setInterval(updateTimer, 1000);
@@ -200,13 +200,11 @@ const _tournament = (content) => {
             console.log(content)
             if (getGameStatus() === enu.gameMode.LOCAL) {
                 moveTo(enu.sceneIdx.PREMATCH);
-                announceMatch(content.message);
                 document.addEventListener('keydown', bindKeyPress)
                 document.addEventListener('keyup', bindKeyRelease)
                 game.gameRenderer(content.state);
-                startMatch()
             }
-            else announceMatch(content.match);
+            announceMatch(content.match);
             return true;
         case enu.Tournament.END:
             moveTo(enu.sceneIdx.END_TR)
