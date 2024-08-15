@@ -394,7 +394,6 @@ class Match(RemoteLobby, BaseMatch):
 
     async def start(self, data=None):
         await super().start()
-        print(f"pl: {self.players}")
         self.game_state = GameState(group=self._id, leftPlayer=self.players[0], rightPlayer=self.players[1], bonused=self.bonused, scoreToWin=self.scoreToWin)
         await self.broadcast({"type":enu.Match.START, "message":self.game_state.to_dict()})
         await self.match_start()
