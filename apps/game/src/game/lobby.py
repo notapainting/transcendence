@@ -329,13 +329,22 @@ class Tournament(RemoteLobby, BaseTournament):
 
     async def start(self, data=None):
         await super().start()
-        # creaet chat group
-        # await httpx.AsyncClient().post(url='http://chat:8000/api/v1/game/tournament/alert/', data=JSONRenderer().render(message))
+        message = {
+            'author':'tournament',
+            'name': f'{self.host} tournament',
+            'admins':[],
+            'members':self.players,
+            'restricts':[],
+        }
+        promise = await httpx.AsyncClient().post(url='http://chat:8000/api/v1/groups/', data=JSONRenderer().render(message))
+        if promise.status_code == 201:
+            self.chat_group_id = promise.json()['id']
         await self.make_phase()
 
     async def end(self, smooth=True):
-        # delete chatgroup
-        # await httpx.AsyncClient().post(url='http://chat:8000/api/v1/game/tournament/alert/', data=JSONRenderer().render(message))
+        if hasattr(self, "chat_group_id"):
+            url = f'http://chat:8000/api/v1/groups/{self.chat_group_id}/'
+            await httpx.AsyncClient().delete(url=url)
         await super().end()
 
     async def make_phase(self):
@@ -347,8 +356,13 @@ class Tournament(RemoteLobby, BaseTournament):
             message = {"type":enu.Tournament.MATCH, "match":match, "settings":self.getSettings()}
             await self._send(match['host'], message)
             await self._send(match['guest'], message)
-            # send update chat group
-            # await httpx.AsyncClient().post(url='http://chat:8000/api/v1/game/tournament/alert/', data=JSONRenderer().render(message))
+            if hasattr(self, "chat_group_id"):
+                message = {
+                    'author':'tournament',
+                    'group':self.chat_group_id,
+                    'body': f"Waiting for {match['host']} VS {match['guest']}",
+                }
+                await httpx.AsyncClient().post(url='http://chat:8000/api/v1/messages/', data=JSONRenderer().render(message))
 
     async def next(self, user):
         pass

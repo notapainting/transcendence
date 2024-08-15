@@ -1,23 +1,24 @@
 from django.http import HttpResponse
-from chat.models import Group
 from django.views import View
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 from rest_framework.serializers import ValidationError as DrfValidationError
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from rest_framework.exceptions import ParseError
 
-from django.db.utils import IntegrityError
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 from django.views.decorators.csrf import csrf_exempt
 
 import chat.serializers.db as ser
 import chat.serializers.events as event
+import chat.models as mod
+import chat.enums as enu
 import chat.utils as uti
 
 from logging import getLogger
-logger = getLogger('django')
-
+logger = getLogger()
+_channel_layer = get_channel_layer()
 
 class GroupApiView(View):
 
@@ -31,7 +32,10 @@ class GroupApiView(View):
             s = event.GroupCreate(data=data)
             s.is_valid(raise_exception=True)
             s.create(s.validated_data)
-            return HttpResponse(status=201)
+            response = {'id':s.data['id']}
+            for user in s.data['members']:
+                async_to_sync(_channel_layer.group_send)(user, {'type':enu.Event.Group.UPDATE, 'data':s.data})
+            return HttpResponse(status=201, content=uti.render_json(response))
         except (DrfValidationError, ParseError) as error:
             logger.error(error)
             return HttpResponse(status=400)
@@ -48,11 +52,11 @@ class GroupApiView(View):
             safe = True
             id = kwargs.get('id')
             if id == None:
-                qset = Group.objects.all()
+                qset = mod.Group.objects.all()
                 many = True
                 safe = False
             else:
-                qset = Group.objects.get(id=id)
+                qset = mod.Group.objects.get(id=id)
             data = ser.Group(qset, many=many, fields=fields).data
             data = uti.render_json(data)
             return HttpResponse(status=200, content=data)
@@ -81,7 +85,11 @@ class GroupApiView(View):
     def delete(self, request, *args, **kwargs):
         try :
             id = kwargs.get('id')
-            Group.objects.get(id=id).delete()
+            group = mod.Group.objects.get(id=id)
+            group_data = ser.Group(group).data
+            for user in group_data['members']:
+                async_to_sync(_channel_layer.group_send)(user, {'type':enu.Event.Group.DELETE, 'data':str(id)})
+            group.delete()
             logger.info("group %s, deleted", id)
             return HttpResponse(status=200)
         except (ValidationError, ObjectDoesNotExist):
@@ -89,5 +97,4 @@ class GroupApiView(View):
         except BaseException as error:
             logger.critical(f"{type(error).__name__} : {error})")
             return HttpResponse(status=500)
-
 

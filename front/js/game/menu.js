@@ -278,20 +278,21 @@ export const updateSettings = (data) => {
     gameSettings.bonused = data.bonused;
     gameSettings.scoreToWin = data.scoreToWin;
     gameSettings.maxPlayer = data.maxPlayer;
-    resetSettings();
-}
-
-const resetSettings = () => {
-    setBonused();
     setScoreToWin();
     setMaxPlayer();
+    setBonused();
+}
+
+
+const resetSettings = () => {
+    gameSocket.send(JSON.stringify({'type':enu.Game.DEFAULT}))
 }
 
 /*** event listener ****/
 const sendCreate = (mode) => {
+    resetSettings();
     gameSocket.send(JSON.stringify({'type': enu.Game.CREATE, 'mode':mode}));
     moveTo(enu.sceneIdx.CREATION);
-    resetSettings();
 } 
 
 createMatch.addEventListener('click', () => {
@@ -364,9 +365,6 @@ const requestUpdateSettings = (type) => {
 
 settingsReInit.addEventListener('click', () => {
     resetSettings();
-    prepRequest(0);
-    prepRequest(1);
-    prepRequest(2);
 })
 
 start.addEventListener('click', () => {
