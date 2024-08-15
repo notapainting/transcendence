@@ -42,15 +42,15 @@ class LocalConsumer(BaseConsumer):
                 self.lobby.changeSettings(data['message'])
             case enu.Game.START:
                 await self.lobby.start(data['players'])
-            case enu.Game.READY :
+            case enu.Game.READY:
                 await self.lobby.match_start()
-            case enu.Match.UPDATE :
+            case enu.Match.UPDATE:
                 await self.lobby.match_feed(data)
-            case enu.Match.PAUSE :
+            case enu.Match.PAUSE:
                 await self.lobby.match_pause()
-            case enu.Game.NEXT :
+            case enu.Game.NEXT:
                 await self.lobby.next()
-            case enu.Game.QUIT :
+            case enu.Game.QUIT:
                 await self.lobby.end()
             case _:
                 logger.warn(f"local bad type")
