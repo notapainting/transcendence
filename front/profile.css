@@ -138,7 +138,7 @@
 
 
 .profile-picture {
-    width: 70%; /* Utilisation de % pour rendre la largeur de l'image adaptable */
+    width: 50%; /* Utilisation de % pour rendre la largeur de l'image adaptable */
     max-width: 300px; /* Taille maximale pour éviter un agrandissement excessif sur les grands écrans */
     aspect-ratio: 1/1; /* Garde le rapport hauteur/largeur pour maintenir la forme carrée */
     background-position: center;
@@ -146,6 +146,7 @@
     background-size: cover;
     border-radius: 50%;
     border: 5px solid #ff7675;
+    margin-top: 20px;
 }
 
 .upload-remove {

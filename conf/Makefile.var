@@ -1,15 +1,16 @@
 #========#    general    #========#
 MAKEFLAGS    +=   -sj
 
-#========#    compose    #========#
-APP_DIR        =    compose/
-APP_FILE    =   compose.auth.yml \
+#========#	compose	#========#
+APP_DIR		=	compose/
+APP_FILE	=	compose.proxy.yml \
+                compose.auth.yml \
+                compose.user.yml \
                 compose.chat.yml \
-                compose.elk.yml \
-                compose.proxy.yml \
-                compose.user.yml
-                
-FILE    =    ${addprefix --file , ${addprefix ${APP_DIR}, ${APP_FILE}}}
+                compose.game.yml \
+                compose.elk.yml
+
+FILE	=	${addprefix --file , ${addprefix ${APP_DIR}, ${APP_FILE}}}
 
 
 BASE    =    docker compose \
