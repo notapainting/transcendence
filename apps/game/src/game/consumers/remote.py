@@ -10,7 +10,7 @@ from game.lobby import Match, Tournament, LocalTournament, getDefault, LobbyExce
 from game.plaza import plaza, PlazaException
 
 from logging import getLogger
-logger = getLogger(__name__)
+logger = getLogger('django')
 
 async def authenticate(headers):
     try :
@@ -48,10 +48,8 @@ class RemoteGamer(LocalConsumer):
             await super().dispatch(message)
         except PlazaException:
             await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.NTF_404})
-        except LobbyException as error:
-            await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.LOBBY})
-        except BaseException as e:
-            raise e
+        except BaseException:
+            raise 
 
     async def connect(self):
         self.username = await authenticate(dict(self.scope['headers'])) 

@@ -6,28 +6,33 @@ import game.enums as enu
 from game.consumers.base import BaseConsumer
 from game.lobby import getDefault, LocalTournament, LobbyException
 
-
+from logging import getLogger
+logger = getLogger('django')
 
 class LocalConsumer(BaseConsumer):
+    async def dispatch(self, message):
+        try :
+            await super().dispatch(message)
+        except LobbyException as error:
+            await self.send_json({'error':enu.Errors.LOBBY})
+        except BaseException:
+            raise 
+    
     async def connect(self):
         await self.accept()
+        self.username = 'Loyal'
         self.lobby = LocalTournament(host="Loyal", host_channel_name=self.channel_name)
         await self.lobby._init()
         await self.send_json({"type":enu.Game.SETTING, "message":getDefault()})
-        print(f"Hey loyal !")
         self.status = enu.Game.LOCAL
+        logger.info(f"JOIN: {self.username} ({self.status})")
 
     async def disconnect(self, close_code):
         await self.lobby.end()
-        print(f"bye loyal!")
+        logger.info(f"QUIT: {self.username} ({self.status})")
 
     async def receive_json(self, json_data):
-        try :
-            await self.local(json_data)
-        except LobbyException as lob:
-            await self.send_json({"type":enu.Errors.LOBBY})
-        except BaseException as e:
-            print(f"error: {e}")
+        await self.local(json_data)
 
     async def local(self, data):
         match data['type']:
@@ -48,7 +53,7 @@ class LocalConsumer(BaseConsumer):
             case enu.Game.QUIT :
                 await self.lobby.end()
             case _:
-                print(f"error: bad type")
+                logger.warn(f"local bad type")
 
     async def game_relay(self, data):
         await self.send_json(data["relay"])

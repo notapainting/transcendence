@@ -7,7 +7,7 @@ import random, asyncio, time
 
 from channels.layers import get_channel_layer
 from logging import getLogger
-logger = getLogger()
+logger = getLogger('django')
 
 BONUSED=True
 DEFAULT_SCORE = 1

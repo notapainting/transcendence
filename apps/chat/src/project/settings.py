@@ -64,3 +64,35 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),
     }
 }
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "VERBOSE": {
+            "format": "{levelname} {asctime} ({module}) p:{process:d} t:{thread:d} l:{lineno} => {message}",
+            "style": "{",
+        },
+        "DEBUG": {
+            "format": "{levelname} {asctime} file:{filename} line:{lineno:d} => {message}",
+            "style": "{",
+        },
+        "SIMPLE": {
+            "format": "{levelname} => {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "class": "logging.StreamHandler",
+            "formatter": os.getenv("DJANGO_LOG_FORMAT", "SIMPLE"),
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "propagate": True,
+        },
+    }
+}

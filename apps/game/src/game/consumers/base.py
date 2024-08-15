@@ -6,7 +6,7 @@ import game.enums as enu
 import json
 
 from logging import getLogger
-logger = getLogger()
+logger = getLogger('django')
 
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
