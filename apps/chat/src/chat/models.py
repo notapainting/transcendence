@@ -9,7 +9,7 @@ from django.utils.timezone import now
 from django.db.models import Q
 
 import logging
-logger = logging.getLogger('django')
+logger = logging.getLogger('base')
 
 
 class Relation(models.Model):

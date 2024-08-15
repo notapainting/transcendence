@@ -15,7 +15,7 @@ import chat.models as mod
 import chat.utils as uti
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 
 class UserApiView(View):

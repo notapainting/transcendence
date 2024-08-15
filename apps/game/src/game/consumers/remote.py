@@ -10,7 +10,7 @@ from game.lobby import Match, Tournament, LocalTournament, getDefault, LobbyExce
 from game.plaza import plaza, PlazaException
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 async def authenticate(headers):
     try :
@@ -210,10 +210,12 @@ class RemoteGamer(LocalConsumer):
         else :
             if self.lobby.invited(author) and await self.lobby.add(author):
                 data['players'] = self.lobby.players
-                if hasattr(self.lobby, "game_state"):
-                    data['message'] = self.lobby.game_state.to_dict()
-                return await self.send_cs(author, data)
-            await self.send_cs(author, {"type":enu.Invitation.REJECT})
+                if hasattr(self.lobby, "tournament"):
+                    data['players'] = {'host':self.lobby.players[0], 'guest':self.lobby.players[1]}
+                await self.send_cs(author, data)
+                await self.send_json(data)
+            else:
+                await self.send_cs(author, {"type":enu.Invitation.REJECT})
 
     async def invitation_reject(self, data):
         author = data['author']

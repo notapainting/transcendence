@@ -15,7 +15,7 @@ import chat.utils as uti
 import chat.enums as enu
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 channel_layer = get_channel_layer()
 
 

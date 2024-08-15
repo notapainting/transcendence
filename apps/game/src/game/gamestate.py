@@ -7,7 +7,7 @@ import random, asyncio, time
 
 from channels.layers import get_channel_layer
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 BONUSED=True
 DEFAULT_SCORE = 1
@@ -23,7 +23,7 @@ paddleWidth = 10
 ballSpeedX = 0.8
 ACCELERATION = 0.05
 
-RESET = 0
+RESET = 2
 COUNTER = -1
 MAX_SPEED = 2
 
@@ -257,8 +257,8 @@ class GameState:
         return True
 
     async def update(self):
-        if self.reset == 1:
-            self.reset = 2
+        # if self.reset == 1:
+        #     self.reset = 2
 
         self.applyBonus()
         self.computeMovementPaddle()
@@ -275,13 +275,14 @@ class GameState:
         self.status['ballSpeedX'] = self.counter * ballSpeedX 
         self.counter *= -1
         self.status['ballSpeedY'] = random.uniform(-1, 1)
-        self.reset = 1
+        self.reset = 2
 
     async def _loop(self):
         try :
             while self.running:
                 if self.reset ==  2:
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(3)
+                    logger.debug("sleep")
                     self.reset = 0
                 await asyncio.sleep(TIME_REFRESH)
                 await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict()}})
