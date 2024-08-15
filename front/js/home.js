@@ -1,6 +1,20 @@
-import { navigateTo } from "./index.js";
+import { navigateTo, whoIam } from "./index.js";
 import { clearView, isUserAuthenticated } from "./index.js";
-import { showChat } from "./chat.js";
+import { fetchUsers, initializeWebSocket, showChat } from "./chat.js";
+
+export const getPersInfo = () => {
+    return fetch('/auth/get_pers_infos/', {
+        method: 'GET',
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok)
+            return response.json();
+        else {
+            throw new Error("Unauthorized");
+        }
+    })
+}
 
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
@@ -30,9 +44,7 @@ function authenticateWith42() {
         return response.json();
     })
     .then(data => {
-        // Récupérer l'URL d'autorisation de l'école 42 depuis les données JSON
         const authorizationUrl = data.authorization_url;
-        // Rediriger l'utilisateur vers l'URL d'autorisation de l'école 42
         window.location.href = authorizationUrl;
     })
     .catch(error => {
@@ -41,7 +53,9 @@ function authenticateWith42() {
 
 let isScrolling = false;
 
-const scrollUpEffect = (event) => {
+
+
+const scrollUpEffect = (event, path) => {
     document.removeEventListener('wheel', scrollDownEffect);
     event.preventDefault();
     window.scrollTo({
@@ -85,6 +99,10 @@ const scrollUpEffect = (event) => {
                         backThrees.style.transform = `scale(${zoomFactor * 3})`;
                         backgroundThrees.style.filter = 'blur(0px)';
                         backThrees.style.opacity = "0";
+                        setTimeout(() => {
+                            navigateTo(path);
+                         }, 800);
+
                 }
             }, i * 180);
         }
@@ -154,16 +172,40 @@ const switchForm = (event) => {
     }
 }
 
+const playBtnElement = document.querySelector(".play-btn");
+
+const playOfflineEvent = (event) => {
+    scrollUpEffect(event, "/local");
+}
+
+const playOnlineEvent = (event) => {
+    scrollUpEffect(event, "/play");
+}
+
+playBtnElement.addEventListener("click", playOfflineEvent);
+
 const messageBox = document.querySelector(".message-box");
 
-export const loggedInStatus = () => {
+export const loggedInStatus = (profile_picture, username) => {
     document.querySelector(".login-signin-form").style.display = "none"
-    document.querySelector(".play-online-btn").style.display = "block"
+    const notificationContainer = document.querySelector(".notification-container");
+    document.querySelector(".fa-bell").addEventListener('click', () => {
+        const currentDisplay = window.getComputedStyle(notificationContainer).display;
+        if (currentDisplay === 'none') {
+            notificationContainer.style.display = "flex";
+        } else {
+            notificationContainer.style.display = "none";
+        }
+    })
+    playBtnElement.removeEventListener("click", playOfflineEvent);
+    playBtnElement.addEventListener("click", playOnlineEvent);
+    // setTimeout(() => {
+    //     playBtnElement.style.transform = "translateX(100%)";
+    // }, 200)
     showChat();
+    document.querySelector(".welcome-msg").innerHTML = `Welcome<br>${username}`;
+    document.querySelector(".profile-picture-home").style.backgroundImage = `url('${profile_picture}')`
     document.querySelector(".navbar").style.display= "flex"
-    setTimeout(()=> {
-        document.querySelector(".play-online-btn").style.transform = "scale(1)"
-    }, 100)
 }
 
 const twoFactorDisplay = document.querySelector(".two-factor-display");
@@ -196,7 +238,6 @@ const loginRequest = (event) => {
     })
     .then(response => {
         if (response.ok){
-            loggedInStatus();
             closeTwoFactorLogin();
             return response.json();
         } else if (response.status === 403) {
@@ -217,6 +258,15 @@ const loginRequest = (event) => {
         }
     })
     .then(data => {
+        console.log("YOOO")
+        console.log(data)
+        loggedInStatus(data.profile_picture, data.username);
+        var buttonLogout = document.querySelector('.menu-logout');
+        var buttonSettings = document.querySelector('.menu-settings');
+        buttonLogout.removeAttribute('disabled');
+        buttonSettings.removeAttribute('disabled');
+        buttonLogout.classList.add('clickable');
+        buttonSettings.classList.add('clickable');
     })  
     .catch(error => {
     })
@@ -227,6 +277,7 @@ const displayTwoFactorLogin = async ()  => {
     setTimeout(()=> {
         twoFactorContainerLogin.style.transform = "scale(1)"
     }, 200)
+    login2faButton.removeEventListener("click", loginRequest);
     login2faButton.addEventListener("click", loginRequest);
 }
 
@@ -323,14 +374,17 @@ const adjustZoom = (event) => {
             setTimeout(() => {
                document.querySelectorAll(".parallax-items").forEach(x => x.style.display = "none")
             }, 800);
+
     }
     indexZoom++;
     setTimeout(() => {
         isZooming = false; // Réinitialiser l'indicateur après 2 secondes
     }, 400); // Attendre 2 secondes avant de permettre un autre événement wheel
+    
 };
 
 export let logoutRequest = (event) => {
+    event.preventDefault();
     fetch('/auth/logout/', {
         method: 'POST',
         headers: {
@@ -350,31 +404,47 @@ export let logoutRequest = (event) => {
     });
 }
 
+const smoothSroll = (event) => {
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    });
+    document.removeEventListener('wheel', scrollDownEffect);
+    document.addEventListener('wheel', adjustZoom);
+}
 
 export const showHome = async () => {
     clearView();
     let isAuthenticated = await isUserAuthenticated();
     const homeElement = document.querySelector("#home");
     homeElement.style.display = "block";
+    const personData = await fetchUsers(whoIam);
     if (isAuthenticated)
-        loggedInStatus();
-    const playOfflineBtnElement = document.querySelector(".play-offline-btn");
-    const playOnlineBtnElement = document.querySelector(".play-online-btn");
+    {
+        loggedInStatus(personData.profile_picture, personData.username);
+        var buttonLogout = document.querySelector('.menu-logout');
+        var buttonSettings = document.querySelector('.menu-settings');
+        buttonLogout.removeAttribute('disabled');
+        buttonSettings.removeAttribute('disabled');
+        buttonLogout.classList.add('clickable');
+        buttonSettings.classList.add('clickable');
+    }
+    document.removeEventListener('mousemove', parallaxEffect);
+    document.removeEventListener('wheel', scrollDownEffect);
     document.addEventListener('mousemove', parallaxEffect);
     document.addEventListener('wheel', scrollDownEffect);
-    playOfflineBtnElement.addEventListener("click", scrollUpEffect)
-    playOnlineBtnElement.addEventListener("click", event => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-        document.removeEventListener('wheel', scrollDownEffect);
-        document.addEventListener('wheel', adjustZoom);
-    })
+//     playOfflineBtnElement.removeEventListener("click", scrollUpEffect)
+//     playOnlineBtnElement.removeEventListener("click", smoothSroll)
+//     playOfflineBtnElement.addEventListener("click", scrollUpEffect)
+//     playOnlineBtnElement.addEventListener("click", smoothSroll)
+    document.removeEventListener("click", switchForm);
+
     document.addEventListener("click", switchForm);
+    document.querySelector(".close-two-factor-login").removeEventListener("click", closeTwoFactorLogin)
+    homeFormButton.removeEventListener("click", loginOrRegisterRequest)
+    document.querySelector(".login-42").removeEventListener('click', authenticateWith42);
     document.querySelector(".close-two-factor-login").addEventListener("click", closeTwoFactorLogin)
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
-    const logoutButton = document.querySelector(".fa-right-from-bracket");
-    logoutButton.addEventListener("click", logoutRequest);
     document.querySelector(".login-42").addEventListener('click', authenticateWith42);
 } 

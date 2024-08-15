@@ -9,6 +9,8 @@ yarn-debug.log*
 yarn-error.log*
 .env
 
+# Temp file
+*#*#
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

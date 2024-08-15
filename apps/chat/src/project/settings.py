@@ -11,7 +11,7 @@ ROOT_URLCONF = 'project.urls'
 USE_I18N = True
 LANGUAGE_CODE = 'en-us'
 
-USE_TZ = False
+USE_TZ = True
 TIME_ZONE = 'CET'
 
 ADMIN_USERNAME = 'admin'
@@ -62,5 +62,38 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_NAME'),
         'PORT': os.getenv('DB_PORT'),
+    }
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "VERBOSE": {
+            "format": "{levelname} {asctime} ({module}) p:{process:d} t:{thread:d} l:{lineno} => {message}",
+            "style": "{",
+        },
+        "MID": {
+            "format": "{levelname} {asctime} => {message}   (f:{filename} l:{lineno:d})",
+            "style": "{",
+        },
+        "SIMPLE": {
+            "format": "{levelname} => {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "class": "logging.StreamHandler",
+            "formatter": os.getenv("DJANGO_LOG_FORMAT", "MID"),
+        },
+    },
+    "loggers": {
+        "base": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
+        },
     }
 }
