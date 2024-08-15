@@ -18,7 +18,7 @@ logger = getLogger('django')
 
 
 class BaseSerializer(serializers.Serializer):
-    author = ser.UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
+    author = ser.UserRelatedField(queryset=mod.User.objects.all())
 
     def create(self, data):
         logger.info(f"EVENT {__name__}")

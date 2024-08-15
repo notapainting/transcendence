@@ -158,4 +158,7 @@ class ChatConsumer(BaseConsumer):
             await self.channel_layer.group_add(id, self.channel_name)
         await self.send_json(event)
 
-
+    async def group_delete(self, event):
+        self.group_list = await cuti.get_group_list(self.user)
+        await self.channel_layer.group_discard(event['data'], self.channel_name)
+        await self.send_json(event)

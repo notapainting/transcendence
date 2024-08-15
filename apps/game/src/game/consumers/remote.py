@@ -4,14 +4,13 @@ import channels.exceptions as exchan
 from rest_framework.renderers import JSONRenderer
 
 from game.consumers.local import LocalConsumer
-from game.gamestate import GameState
 import game.enums as enu
 
 from game.lobby import Match, Tournament, LocalTournament, getDefault, LobbyException
 from game.plaza import plaza, PlazaException
 
 from logging import getLogger
-logger = getLogger()
+logger = getLogger(__name__)
 
 async def authenticate(headers):
     try :
@@ -51,8 +50,8 @@ class RemoteGamer(LocalConsumer):
             await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.NTF_404})
         except LobbyException as error:
             await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.LOBBY})
-        except BaseException:
-            logger.critical(f"internal error: {e}")
+        except BaseException as e:
+            raise e
 
     async def connect(self):
         self.username = await authenticate(dict(self.scope['headers'])) 

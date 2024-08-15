@@ -99,6 +99,7 @@ const _game = (content) => {
             return true;
         case enu.Game.DEFAULT:
         case enu.Game.SETTING:
+            console.log(content.message)
             updateSettings(content.message);
             return true;
     }

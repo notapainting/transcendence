@@ -1,22 +1,23 @@
 from django.http import HttpResponse
 from django.views import View
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 from rest_framework.serializers import ValidationError as DrfValidationError
-
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from rest_framework.exceptions import ParseError
 
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 from django.views.decorators.csrf import csrf_exempt
-from logging import getLogger
 
 import chat.serializers.db as ser
 import chat.models as mod
 import chat.utils as uti
+import chat.enums as enu
 
+from logging import getLogger
 logger = getLogger('django')
-
+_channel_layer = get_channel_layer()
  
 class MessageApiView(View):
 
@@ -30,6 +31,7 @@ class MessageApiView(View):
             s = ser.Message(data=data)
             s.is_valid(raise_exception=True)
             s.create(s.validated_data)
+            async_to_sync(_channel_layer.group_send)(s.data['group'], {'type':enu.Event.Message.TEXT, 'data':s.data})
             return HttpResponse(status=201)
         except (DrfValidationError, ParseError) as error:
             logger.error(error)
