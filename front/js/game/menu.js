@@ -385,8 +385,6 @@ const readyFunc = () => {
     if (status === enu.gameMode.LOCAL) {
         moveTo(enu.sceneIdx.MATCH);
         announceScore();
-        
-        
         startMatch();
     };
     gameSocket.send(JSON.stringify({'type': enu.Game.READY}));
