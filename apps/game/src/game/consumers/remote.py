@@ -203,13 +203,16 @@ class RemoteGamer(LocalConsumer):
             return await self.send_json(data)
         if self.status == enu.Game.IDLE:
             data['mode'] = self.invited_by[author]
+            data['by'] = True
             await self.send_json(data)
             self.host = author
             self.set_mode(status=enu.Game.GUEST)
             del self.invited_by[author]
-        else :
+        else:
             if self.lobby.invited(author) and await self.lobby.add(author):
                 data['players'] = self.lobby.players
+                data['by'] = False
+                data['message'] = author
                 if hasattr(self.lobby, "tournament"):
                     data['players'] = {'host':self.lobby.players[0], 'guest':self.lobby.players[1]}
                 await self.send_cs(author, data)
@@ -230,11 +233,21 @@ class RemoteGamer(LocalConsumer):
     async def game_kick(self, data):
         if data['author'] != self.username and hasattr(self, "host") and data['author'] == self.host:
             self.set_mode()
+            if self.status != enu.Game.IDLE:
+                data = {'type':enu.Tournament.PHASE, "new":False, "kicked":True}
             await self.send_json(data)
 
     async def game_quit(self, data):
         if hasattr(self, "lobby"):
-            await self.lobby.remove(data['author'])
+            logger.debug("before test")
+            if isinstance(self.lobby, Tournament):
+                await self.lobby.cheat(user)
+            else:
+                logger.debug("match to rem")
+                await self.lobby.remove(data['author'])
+                if not hasattr(self.lobby, "game_state"):
+                    self.set_mode()
+            await self.send_json({"type":enu.Game.KICK})    
         await self.send_json(data)
 
     async def game_ready(self, data):

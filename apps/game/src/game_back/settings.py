@@ -85,6 +85,11 @@ LOGGING = {
             "formatter": os.getenv("DJANGO_LOG_FORMAT", "MID"),
         },
     },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+        "propagate": False,
+    },
     "loggers": {
         "base": {
             "handlers": ["console"],

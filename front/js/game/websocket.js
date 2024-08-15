@@ -38,34 +38,6 @@ const _initWebsocket = (path) => {
     document.removeEventListener('keyup', bindKeyRelease)
 }
 
-/*
-
-const _remote = (content) => {
-//     switch (content.type) {
-//         // match
-//         case enu.Game.ACCEPTED:
-//             // when accepted for a match
-//             changeGameStatus(enu.gameMode.MATCH);
-//             game.gameRenderer(content.message);
-//             moveTo(enu.sceneIdx.PREMATCH);
-//             announceMatch(content.players);
-//             break;
-
-//         case enu.Game.READY:
-//             document.getElementById('game-menu-ready-circle').style.background = '#0eee28';
-//             break;
-
-
-//         case enu.Game.END:
-//             fullClear();
-//             moveTo(enu.sceneIdx.END);
-            
-//             break;
-//         case enu.EventError.TYPE:
-//             console.error(content.type)
-//             break;
-
-*/
 
 export const startMatch = () => {
     if (gameData.start) {
@@ -80,7 +52,7 @@ export const startMatch = () => {
 const _game = (content) => {
     switch (content.type) {
         case enu.Game.QUIT:
-            // ?
+            // if (getSceneIdx() === enu.sceneIdx.PREMATCH) moveTo(enu.WELCOME);
             return true;
         case enu.Game.START:
             // ?
@@ -119,10 +91,14 @@ const _invitations = (content) => {
         case enu.Invitation.ACCEPT:
             console.log(content)
             if (content.mode === enu.Game.MATCH) {
+                if (content.by === false) {
+                    let target = 'invite-status-' + content.message;
+                    console.log(target)
+                    document.getElementById(target).parentElement.remove();
+                } 
                 changeGameStatus(enu.gameMode.MATCH);
                 moveTo(enu.sceneIdx.PREMATCH);
                 announceMatch(content.players);
-                // game.gameRenderer(content);
             } else if (getGameStatus() === enu.gameMode.TOURNAMENT) {
                 updateStatusInvitation(content.author)
                 console.log("bad: " + getGameStatus())
