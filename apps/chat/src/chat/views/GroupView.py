@@ -17,7 +17,7 @@ import chat.enums as enu
 import chat.utils as uti
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 _channel_layer = get_channel_layer()
 
 class GroupApiView(View):

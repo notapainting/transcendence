@@ -8,7 +8,7 @@ services:
     environment:
       - TZ=${TZ}
       - DJANGO_LOG_LEVEL=DEBUG
-      - DJANGO_LOG_FORMAT=DEBUG
+      - DJANGO_LOG_FORMAT=MID
     volumes:
       - game_volume:/app
     networks:

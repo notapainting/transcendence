@@ -69,8 +69,8 @@ LOGGING = {
             "format": "{levelname} {asctime} ({module}) p:{process:d} t:{thread:d} l:{lineno} => {message}",
             "style": "{",
         },
-        "DEBUG": {
-            "format": "{levelname} {asctime} file:{filename} line:{lineno:d} => {message}",
+        "MID": {
+            "format": "{levelname} {asctime} => {message}   (f:{filename} l:{lineno:d})",
             "style": "{",
         },
         "SIMPLE": {
@@ -80,15 +80,16 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "level": getenv("DJANGO_LOG_LEVEL", "DEBUG"),
             "class": "logging.StreamHandler",
-            "formatter": getenv("DJANGO_LOG_FORMAT", "SIMPLE"),
+            "formatter": getenv("DJANGO_LOG_FORMAT", "MID"),
         },
     },
     "loggers": {
-        "django": {
+        "base": {
             "handlers": ["console"],
-            "propagate": True,
+            "level": getenv("DJANGO_LOG_LEVEL", "DEBUG"),
+            "propagate": False,
         },
     }
 }

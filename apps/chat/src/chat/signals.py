@@ -5,7 +5,7 @@ from chat.models import User
 import chat.enums as enu
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 
 @receiver(post_migrate)

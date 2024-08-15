@@ -12,7 +12,7 @@ import chat.consumers.utils as cuti
 import json
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
 

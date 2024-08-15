@@ -14,7 +14,7 @@ import chat.validators as val
 
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 
 class BaseSerializer(serializers.Serializer):

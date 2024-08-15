@@ -7,7 +7,7 @@ from game.consumers.base import BaseConsumer
 from game.lobby import getDefault, LocalTournament, LobbyException
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 class LocalConsumer(BaseConsumer):
     async def dispatch(self, message):

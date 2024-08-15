@@ -16,7 +16,7 @@ import chat.utils as uti
 import chat.enums as enu
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 _channel_layer = get_channel_layer()
  
 class MessageApiView(View):
