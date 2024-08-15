@@ -6,7 +6,8 @@ import game.enums as enu
 import random, asyncio, time
 
 from channels.layers import get_channel_layer
-
+from logging import getLogger
+logger = getLogger()
 
 BONUSED=True
 DEFAULT_SCORE = 1
@@ -241,7 +242,7 @@ class GameState:
                 "score_w":self.status['leftPlayerScore'],
                 "score_l":self.status['rightPlayerScore'],
             }
-            await self._send({"type":enu.Match.END, "winner":self.leftPlayer, "loser":self.leftPlayer})
+            await self._send({"type":enu.Match.END, "winner":self.result['winner'], "loser":self.result['loser']})
             return False
         elif self.status['rightPlayerScore'] == self.scoreToWin:
             self.reseting()
@@ -251,7 +252,7 @@ class GameState:
                 "score_w":self.status['rightPlayerScore'],
                 "score_l":self.status['leftPlayerScore'],
             }
-            await self._send({"type":enu.Match.END, "winner":self.leftPlayer, "loser":self.rightPlayer})
+            await self._send({"type":enu.Match.END, "winner":self.result['winner'], "loser":self.result['loser']})
             return False
         return True
 
@@ -285,11 +286,10 @@ class GameState:
                 await asyncio.sleep(TIME_REFRESH)
                 await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict()}})
                 self.running = await self.update()
-        except asyncio.CancelledError as error:
-            print(f"task cancellation")
-            print(f"error is {error}")
+        except asyncio.CancelledError:
+            pass
         except BaseException as error:
-            print(f"error is {error}")
+            logger.critical(f"internal : {error}")
 
     async def start(self):
         self.running = True
@@ -324,39 +324,3 @@ class GameState:
             self.task.cancel()
             await self.task
 
-
-
-
-
-
-async def remote_loop(self):
-    global reset
-    try :
-        while self.match.game_state.status['game_running']:
-            end, score = self.match.game_state.update()
-            if score is not None:
-                score['players'] = list(self.match._players)
-                print(f"score is {score}")
-                await self.match.broadcast({"type":enu.Game.SCORE, "message":score})
-            if end is not None:
-                message = {"type":enu.Game.END, "author":self.username, "message":self.match.compute()}
-                return await self.match.broadcast(message)
-            await self.match.broadcast({'type':enu.Game.UPDATE, 'author': self.username, 'message':self.match.game_state.to_dict()})
-            if reset==  2:
-                time.sleep(0.5)
-                reset= 0 
-            await asyncio.sleep(TIME_REFRESH)
-    except asyncio.CancelledError as error:
-        print(error)
-
-"""
-    global reset
-    while self.local_game_state.status['game_running']:
-        message = self.local_game_state.update()
-        await asyncio.sleep(0.02)
-        asyncio.create_task(self.local_game_state.update_player_position(message))
-        await self.send(json.dumps(self.local_game_state.to_dict('none')))
-        if reset ==  2:
-            time.sleep(0.5)
-            reset = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-"""

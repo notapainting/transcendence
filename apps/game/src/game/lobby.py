@@ -11,7 +11,7 @@ from game.plaza import plaza
 
 LOBBY_MAXIMUM_PLAYERS = 24
 LOBBY_DEFAULT_MATCH_PLAYER = 2
-LOBBY_DEFAULT_PLAYERS = 2
+LOBBY_DEFAULT_PLAYERS = 8
 LOBBY_MINIMUM_PLAYERS = 2
 
 class LobbyException(Exception):
@@ -112,7 +112,7 @@ class BaseLobby:
     def add(self, user):
         if user not in self.players:
             if len(self.players) == self.maxPlayer:
-                raise MaxPlayerException()
+                raise MaxPlayerException("Too much players")
             self.players.append(user)
             if user in self.invitations:
                 self.invitations.remove(user)
@@ -121,12 +121,11 @@ class BaseLobby:
 
     def kick(self, user):
         kicked = self.uninvite(user)
-        if kicked is False:
-            if user in self.players:
-                self.players.remove(user)
-                kicked = True
-                if user in self.ready:
-                    self.ready.remove(user)
+        if user in self.players:
+            self.players.remove(user)
+            kicked = True
+            if user in self.ready:
+                self.ready.remove(user)
         return kicked
 
     def check(self, user):

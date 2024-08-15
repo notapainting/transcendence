@@ -197,8 +197,7 @@ const _tournament = (content) => {
             if (content.new === true) announcePhase(content.phase);
             return true;
         case enu.Tournament.MATCH:
-            // if local -> go to prematck, if rem wait user to go to prematch
-            //  changeGameStatus(enu.gameMode.MATCH);
+            console.log(content)
             if (getGameStatus() === enu.gameMode.LOCAL) {
                 moveTo(enu.sceneIdx.PREMATCH);
                 announceMatch(content.message);
@@ -206,7 +205,8 @@ const _tournament = (content) => {
                 document.addEventListener('keyup', bindKeyRelease)
                 game.gameRenderer(content.state);
                 startMatch()
-            };
+            }
+            else announceMatch(content.match);
             return true;
         case enu.Tournament.END:
             moveTo(enu.sceneIdx.END_TR)
