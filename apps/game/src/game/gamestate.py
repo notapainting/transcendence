@@ -26,7 +26,7 @@ paddleWidth = 10
 ballSpeedX = 0.8
 ACCELERATION = 0.05
 
-RESET = 2
+RESET = 0
 COUNTER = -1
 MAX_SPEED = 2
 
@@ -80,7 +80,7 @@ class GameState:
             'leftPlayerScore' : 0,
             'rightPlayerScore' : 0,
             'winner' : 'none',
-            'upPressed' : False, # change to host and guest paddles
+            'upPressed' : False,
             'downPressed' : False,
             'wPressed' : False,
             'sPressed' : False,
@@ -284,12 +284,12 @@ class GameState:
         try :
             await asyncio.sleep(TIME_PAUSE_START)
             while self.running:
+                await asyncio.sleep(TIME_REFRESH)
+                self.running = await self.update()
+                await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict()}})
                 if self.reset ==  2:
                     await asyncio.sleep(TIME_PAUSE)
                     self.reset = 0
-                await asyncio.sleep(TIME_REFRESH)
-                await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict()}})
-                self.running = await self.update()
         except asyncio.CancelledError:
             pass
         except BaseException as error:
