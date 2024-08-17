@@ -365,6 +365,7 @@ class Tournament(RemoteLobby, BaseTournament):
                 await httpx.AsyncClient().post(url='http://chat:8000/api/v1/messages/', data=JSONRenderer().render(message))
 
     async def cheat(self, user):
+        data = {}
         for match in self.current:
             if match['host'] == user:
                 data['winner'] = match['guest']
@@ -375,7 +376,7 @@ class Tournament(RemoteLobby, BaseTournament):
                 data['loser'] = match['guest']
                 break
         data['score_w'] = 99
-        data['score_l'] = 99
+        data['score_l'] = 0
         await self.update_result(data)
 
     async def next(self, user):
