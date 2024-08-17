@@ -92,7 +92,7 @@ const   scene = [
     [menuBgVid, menuM3], // phases du tournoi : montre les prochain match de la phas eet leur etat
     [menuBgVid, menuM4], // afk check
     [menuM5], // in game
-    [menuM6], // ecran de fin de match 
+    [], // ecran de fin de match 
     [], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
