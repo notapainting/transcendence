@@ -1,45 +1,5 @@
 
-import random, time
-
-class Timer:
-    _startTime = None
-    _pauseTime = None
-    _pause = True
-
-    def __init__(self, verbose=False) -> None:
-        self.verbose = verbose
-
-    def paused(self):
-        return self._pause
-
-    def get_running_time(self):
-        if self._startTime is None:
-            value = 0.0
-        elif self._pause is True:
-            value = self._pauseTime - self._startTime
-        else:
-            value = time.time() - self._startTime
-        if self.verbose is True:
-            print(f"time is : {value:.3f}")
-        return value
-
-    def pause(self):
-        if self._pause is False:
-            self._pauseTime = time.time()
-            self._pause = True
-            if self.verbose is True:
-                self.get_running_time()
-
-    def resume(self):
-        if self._startTime is None:
-            self._startTime = time.time()
-            self._pause = False
-            if self.verbose is True:
-                print(f"start timer")
-        else:
-            if self._pause is True:
-                self._startTime += (time.time() - self._pauseTime)
-                self._pause = False
+import random
 
 def is_clockwise(points):
     p1, p2, p3, p4 = points

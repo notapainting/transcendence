@@ -12,6 +12,9 @@ class BaseTimer:
         self.verbose = verbose
         self._e = e
 
+    def time(self):
+        return time.time()
+
     def paused(self):
         return self._pause
 
@@ -96,7 +99,10 @@ class ATimer(BaseTimer):
         super().__init__(verbose, e)
         self._loop = asyncio.get_event_loop()
 
-    async def get_running_time(self):
+    def time(self):
+        return self._loop.time()
+
+    def get_running_time(self):
         if self._start is None:
             value = 0.0
         elif self._pause is True:
@@ -107,7 +113,7 @@ class ATimer(BaseTimer):
             print(f"timer: {value:.{self._e}f}")
         return value
 
-    async def resume(self):
+    def resume(self):
         if self._start is None:
             self._start = self._loop.time()
             self._pause = False
@@ -119,22 +125,22 @@ class ATimer(BaseTimer):
                 self._pause = False
         return self.paused()
 
-    async def pause(self):
+    def pause(self):
         if self._pause is False:
             self._middle = self._loop.time()
             self._pause = True
             if self.verbose is True:
-                await self.get_running_time()
+                self.get_running_time()
         return self.paused()
 
-    async def restart(self):
+    def restart(self):
         self._pause = False
         self._middle = None
         self._start = self._loop.time()
         if self.verbose is True:
                 print(f"atimer: restart")
 
-    async def reset(self):
+    def reset(self):
         self._pause = True
         self._middle = None
         self._start = None

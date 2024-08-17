@@ -7,6 +7,8 @@ services:
     image: game_image
     environment:
       - TZ=${TZ}
+      - DJANGO_LOG_LEVEL=DEBUG
+      - DJANGO_LOG_FORMAT=MID
     volumes:
       - game_volume:/app
     networks:

@@ -14,11 +14,11 @@ import chat.validators as val
 
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 
 class BaseSerializer(serializers.Serializer):
-    author = ser.UserRelatedField(queryset=mod.User.objects.exclude(name__in=enu.SpecialUser))
+    author = ser.UserRelatedField(queryset=mod.User.objects.all())
 
     def create(self, data):
         logger.info(f"EVENT {__name__}")
