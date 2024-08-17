@@ -6,15 +6,12 @@ import game.enums as enu
 import json
 
 from logging import getLogger
-logger = getLogger(__name__)
+logger = getLogger('base')
 
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
-        if message['type'] == enu.Game.UPDATE:
-            pass
-            # print(f"msg : {message['type']}")
-        else:
-            print(f"msg : {message}")
+        if hasattr(self, "username") and hasattr(self, "status") and message['type'] != enu.Game.RELAY:
+            logger.debug(f"{self.username} ({self.status}) received : {message}")
         try :
             await super().dispatch(message)
         except ValueError as error:
@@ -35,6 +32,7 @@ class BaseConsumer(AsyncWebsocketConsumer):
         try:
             return json.dumps(content)
         except:
+            logger.critical(error)
             return json.dumps({'type':enu.Errors.ENCODE})
 
     async def send_json(self, content, close=False):

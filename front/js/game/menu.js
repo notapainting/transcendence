@@ -1,5 +1,5 @@
 import { navigateTo } from "../index.js"
-import { gameSocket, clearGame, clearInvList } from "./websocket.js"
+import { gameSocket, clearGame, startMatch} from "./websocket.js"
 import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import { gameData } from './game.js';
@@ -60,20 +60,24 @@ const   pause = document.getElementById('game-menu-pause');
 /*** variable ****/
 
 // client's status
-let     status = enu.gameMode.IDLE;
+let     status = enu.gameMode.LOCAL;
 let     anon = true;
 
-export const changeStatus = (type) => {
-    console.log("change from " + status + " to " + type)
+export const changeGameStatus = (type) => {
     status = type;
 }
 
+export const getGameStatus = () => {
+    return status;
+}
 
 // scene idx
 let     idx = enu.sceneIdx.WELCOME;
 
-// invitations received in remote mode
-export let invitations = [];
+export const getSceneIdx = () => {
+    return idx;
+}
+
 
 // list of players invited
 let     players = [];
@@ -81,7 +85,6 @@ let     players = [];
 // current match data
 let     currentPlayers = [];
 let     currentScore = [0, 0];
-let     paused = false;
 let     locked = false;
 
 // scene
@@ -96,71 +99,24 @@ const   scene = [
     [], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
-
-
-/*
-quit = home(C)/exit(A)
-
-m1 : local match tournoi exit
-m2 : start quit
-m2a : ready quit
-m3 : next quit
-m4 : ready
-m5 : pause quit (abandon)
-m6 : quit 
-m7 : quit 
-
-*/
-
-
-// status == idle/match/tournoi/local/anon
- // 0 (C) acceuil du jeu -> containerMenu (Local+Match+Tournament+quit), containerInvitedBy
- // 1 (C/A)(host) creation de partie/tournoi -> containerSettings, containerInvitations (simple/status+ready), containerMenu (start+((C)home/(A)exit))
- // 2 (C)(guest) waiting room -> containerSettingsFrozen, containerInvitationsFrozen, containerMenuGuest (ready+quit)
- // 3 (C/A) tounoi phase -> containerPhase, containerMenu (nextmatch+quit)
- // 4 (C/A) pre match, ready check -> ready, 
- // 5 (C/A) match -> conatinerScores, containerMenu (pause+abandon)
- // 6 (C/A) fin match -> containerWinner (5s)
- // 7 (C/A) fin tournoi -> containerClassement, containerMenu (home+quit)
- // 8 (C) broken/quit containerError, containerMenu (home+quit)
-
-// ANON : 1 -> 3 -> 4 -> 5 -> 6
-//             ^         |
-//             |<---  <---
-
-// CONNECTED : TOURNOI
-// (HOST)
-//  : 0 -> 1 -> 3 -> 4 -> 5 -> 6
-//              ^         |
-//              |<---  <---
-// (GUEST)
-//  : 0 -> 2 -> ...same as host
-
-// CONNECTED : MATCH
-// (HOST)
-//  : 0 -> 1 -> 4 -> 5 -> 6
-
-// (GUEST)
-//  : 0-> 4 -> 5 -> 6
-
-
-
+// menu 2b -> enlever ready
+// add menu m7
+// better transition fin de match /tournoi
+// 
 
 /*** initialisation ****/
 export const initMenu = (path) => {
+    status = enu.gameMode.LOCAL;
     if (path === enu.backendPath.LOCAL) {
-        status = enu.gameMode.LOCAL;
         anon = true;
         players = [];
         clearInvitationList();
         moveTo(enu.sceneIdx.CREATION);
         console.log("init : local");
     } else {
-        status = enu.gameMode.IDLE;
         anon = false;
         clearInvitationList();
         moveTo(enu.sceneIdx.WELCOME);
-        
     }
 }
 
@@ -170,72 +126,33 @@ export const clearInvitationList = () => {
     players = [];
 }
 
-
-/*** utils ***/
-function isAlphaNumeric(str) {
-    var code, i, len;
-
-    for (i = 0, len = str.length; i < len; i++) {
-      code = str.charCodeAt(i);
-      if (!(code > 47 && code < 58) && 
-          !(code > 64 && code < 91) && 
-          !(code > 96 && code < 123) &&
-          (code != 95) && (code != 45)) { 
-        return false;
-      }
-    }
-    return true;
-  };
-
-const validate_name = (name) => {
-    console.log("test value : " + name)
-    if (name.length > 20) return false;
-    if (name === "") return false;
-    if (isAlphaNumeric(name) === false) return false;
-    return true;
+/*** menu deplacement ****/
+export const clearMenu = () => {
+    document.querySelectorAll(".menu-element").forEach(div => {div.style.display = "none";});
 }
 
-// allow to lock pause in remote game if oponent has paused the game
-export const toggleLock = () => {
-    if (locked == false) locked = true;
-    else if (locked == true) locked = false;
-    console.log('locked : ' + locked);
-}
-
-export const togglePause = () => {
-    if (paused === false) {
-        paused = true;
-        document.getElementById('game-menu-pause-text').innerHTML = "R E S U M E";
-    } else {
-        paused = false;
-        document.getElementById('game-menu-pause-text').innerHTML = "P A U S E";
-    }
-    console.log('paused : ' + paused);
-}
-
-let gameSettings = {
-    bonused:"True",
-    scoreToWin:"5",
-    maxPlayer:"8",
-}
-
-export const updateSettings = (data) => {
-    gameSettings.bonused = data.bonused;
-    gameSettings.scoreToWin = data.scoreToWin;
-    gameSettings.maxPlayer = data.maxPlayer;
-    resetSettings();
-}
-
-const resetSettings = () => {
-    setBonused();
-    setScoreToWin();
-    setMaxPlayer();
+export const moveTo = (i) => {
+    if (i === scene.length || i < 0) return ;
+    idx = i;
+    clearMenu();
+    if (idx === enu.sceneIdx.WELCOME) status = enu.gameMode.LOCAL;
+    else if (idx === enu.sceneIdx.CREATION) {
+        players = [];
+        clearGame()
+    };
+    scene[idx].forEach(div => {div.style.display = "flex";});
+    if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6.style.display = "none";
+    console.log("status: " + status);
 }
 
 /*** banner update ****/
 export const updateScore = (data) => {
     currentScore = data.score;
     currentPlayers = data.players;
+}
+
+export const clearScore = () => {
+    currentScore =[0,0]
 }
 
 export const announcePhase = (data) => {
@@ -247,8 +164,8 @@ export const announcePhase = (data) => {
         const   itemVS = document.createElement('div');
     
         item.className = 'list-banner-element';
-        itemPlayer1.textContent = matchData[0];
-        itemPlayer2.textContent = matchData[1];
+        itemPlayer1.textContent = matchData.host;
+        itemPlayer2.textContent = matchData.guest;
         itemVS.textContent = 'vs';
         itemPlayer1.className = 'list-banner-user-name';
         itemPlayer2.className = 'list-banner-user-name';
@@ -268,8 +185,8 @@ export const announceMatch = (data) => {
     const   itemPlayer2 = document.createElement('div');
 
 
-    itemPlayer1.textContent = data[0];
-    itemPlayer2.textContent = data[1];
+    itemPlayer1.textContent = data.host;
+    itemPlayer2.textContent = data.guest;
 
     itemPlayer1.className = 'banner-user-name1';
     itemPlayer2.className = 'banner-user-name2';
@@ -278,7 +195,7 @@ export const announceMatch = (data) => {
     document.getElementById('game-announce-next-match').innerHTML += '<img class="img-vs" src="img/vs.png" />';
     document.getElementById('game-announce-next-match').appendChild(itemPlayer2);
     
-    currentPlayers = [data[0], data[1]];
+    currentPlayers = [data.host, data.guest];
     currentScore = [0, 0];
 }
 
@@ -313,43 +230,84 @@ export const announceScore = () => {
 
 export const announceWinner = (data) => {
     const   banner = document.getElementById('game-menu-banner-end')
-    banner.innerHTML = "Congratulations! Winner is " + data;
+    banner.innerHTML = "Congratulations! Winner is " + data.winner;
 }
 
-/*** menu deplacement ****/
-export const clearMenu = () => {
-    document.querySelectorAll(".menu-element").forEach(div => {div.style.display = "none";});
-    circle.style.background = '#ee0e0e';
+/*** utils ***/
+function isAlphaNumeric(str) {
+    var code, i, len;
+
+    for (i = 0, len = str.length; i < len; i++) {
+      code = str.charCodeAt(i);
+      if (!(code > 47 && code < 58) && 
+          !(code > 64 && code < 91) && 
+          !(code > 96 && code < 123) &&
+          (code != 95) && (code != 45)) { 
+        return false;
+      }
+    }
+    return true;
+  };
+
+const validate_name = (name) => {
+    if (name.length > 20) return false;
+    if (name === "") return false;
+    if (isAlphaNumeric(name) === false) return false;
+    return true;
 }
 
-export const moveTo = (i) => {
-    if (i === scene.length || i < 0) return ;
-    idx = i;
-    console.log('move to: ' + i)
-    if (idx === enu.sceneIdx.CREATION) clearGame();
-    clearMenu();
-    scene[idx].forEach(div => {div.style.display = "flex";});
+// allow to lock pause in remote game if oponent has paused the game
+export const toggleLock = () => {
+    if (locked == false) locked = true;
+    else if (locked == true) locked = false;
+}
+
+export const togglePause = (pause) => {
+    if (pause === true) document.getElementById('game-menu-pause-text').innerHTML = "R E S U M E";
+    else document.getElementById('game-menu-pause-text').innerHTML = "P A U S E";
+}
+
+// game settings
+let gameSettings = {
+    bonused:"True",
+    scoreToWin:"5",
+    maxPlayer:"8",
+}
+
+export const updateSettings = (data) => {
+    gameSettings.bonused = data.bonused;
+    gameSettings.scoreToWin = data.scoreToWin;
+    gameSettings.maxPlayer = data.maxPlayer;
+    setScoreToWin();
+    setMaxPlayer();
+    setBonused();
+}
+
+
+const resetSettings = () => {
+    gameSocket.send(JSON.stringify({'type':enu.Game.DEFAULT}))
 }
 
 /*** event listener ****/
+const sendCreate = (mode) => {
+    resetSettings();
+    gameSocket.send(JSON.stringify({'type': enu.Game.CREATE, 'mode':mode}));
+    moveTo(enu.sceneIdx.CREATION);
+} 
+
 createMatch.addEventListener('click', () => {
     status = enu.gameMode.MATCH;
-    gameSocket.send(JSON.stringify({'type': enu.EventGame.CREATE}));
-    moveTo(enu.sceneIdx.CREATION);
-    resetSettings();
+    sendCreate(enu.Game.MATCH)
 });
 
 createTournament.addEventListener('click', () => {
     status = enu.gameMode.TOURNAMENT;
-    gameSocket.send(JSON.stringify({'type': enu.EventTournament.CREATE}));
-    moveTo(enu.sceneIdx.CREATION);
+    sendCreate(enu.Game.TRN)
 });
-
 
 createLocal.addEventListener('click', () => {
     status = enu.gameMode.LOCAL;
-    gameSocket.send(JSON.stringify({'type': enu.EventLocal.MODE}));
-    moveTo(enu.sceneIdx.CREATION);
+    sendCreate(enu.Game.LOCAL)
 })
 
 function getBonused() { return settingsSendBonus.checked; };
@@ -389,19 +347,13 @@ settingsSendPlayer.addEventListener('input', () => {
 
 const prepRequest = (type) => {
     if (updateRequested[type][1] === null) {
-        console.log("request update for: " + updateRequested[type][0])
         updateRequested[type][1] = setTimeout(requestUpdateSettings, 700, type);
     }
 }
 
 const requestUpdateSettings = (type) => {
-    // if (type === 0) {
-        // if (bonused === true) bonused = false;
-        // else bonused = true;
-    // }
-
     gameSocket.send(JSON.stringify({
-        'type': enu.EventGame.SETTINGS,
+        'type': enu.Game.SETTING,
          'message':{
             'param':updateRequested[type][0],
             'value':updateRequested[type][2](),
@@ -413,9 +365,6 @@ const requestUpdateSettings = (type) => {
 
 settingsReInit.addEventListener('click', () => {
     resetSettings();
-    prepRequest(0);
-    prepRequest(1);
-    prepRequest(2);
 })
 
 start.addEventListener('click', () => {
@@ -426,27 +375,19 @@ start.addEventListener('click', () => {
             req[1] = null;
         }
     } )
-    if (status === enu.gameMode.LOCAL) {
-        gameSocket.send(JSON.stringify({
-            'type': enu.EventLocal.PLAYERS,
-            'message':players,
-        }));
-    } else if (status === enu.gameMode.MATCH) {
-        gameSocket.send(JSON.stringify({'type': enu.EventGame.START}));
-        moveTo(enu.sceneIdx.MATCH);
-    } else if (status === enu.gameMode.TOURNAMENT) {
-        gameSocket.send(JSON.stringify({'type': enu.EventTournament.START}));
-    }
+    var message = {'type': enu.Game.START}
+    if (status === enu.gameMode.LOCAL) message['players'] = players; 
+    // if (status === enu.gameMode.MATCH) moveTo(enu.sceneIdx.MATCH);
+    gameSocket.send(JSON.stringify(message));
 })
 
 const readyFunc = () => {
-    if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.READY}));
-    else if (status === enu.gameMode.MATCH) gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
-    else if (status === enu.gameMode.LOCAL) {
+    if (status === enu.gameMode.LOCAL) {
         moveTo(enu.sceneIdx.MATCH);
         announceScore();
-        gameSocket.send(JSON.stringify({'type': enu.EventGame.READY}));
-    }
+        startMatch();
+    };
+    gameSocket.send(JSON.stringify({'type': enu.Game.READY}));
 };
 
 readyP.addEventListener('click', readyFunc);
@@ -454,8 +395,7 @@ ready.addEventListener('click', readyFunc);
 
 pause.addEventListener('click', () => {
     if (locked === true) return ;
-    gameSocket.send(JSON.stringify({'type': enu.EventGame.PAUSE}));
-    togglePause();
+    gameSocket.send(JSON.stringify({'type': enu.Match.PAUSE}));
     if (status === enu.gameMode.LOCAL) {
         if (gameData.timerInterval) {
             clearInterval(gameData.timerInterval);
@@ -464,14 +404,11 @@ pause.addEventListener('click', () => {
     }
 });
 
-
-
 const quitFunc = () => {
     updateRequested.forEach(req => {clearTimeout(req[1]);});
     clearInvitationList();
     if (anon === true) {
         if (idx == enu.sceneIdx.CREATION) {
-            console.log("ANON exit")
             if (gameSocket !== null) gameSocket.close();
             fullClear()
             navigateTo("/");
@@ -479,45 +416,38 @@ const quitFunc = () => {
         }
         var to = enu.sceneIdx.CREATION;
     } else var to = enu.sceneIdx.WELCOME;
-        if (status === enu.gameMode.TOURNAMENT) gameSocket.send(JSON.stringify({'type': enu.EventTournament.QUIT}));
-        else if (status === enu.gameMode.MATCH || status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventGame.QUIT}));
-        status = enu.gameMode.IDLE;
-        if (idx === enu.sceneIdx.WELCOME) {
-            fullClear()
-            navigateTo("/");
-        }
+    gameSocket.send(JSON.stringify({'type': enu.Game.QUIT}));
+    status == enu.gameMode.LOCAL
+    if (idx === enu.sceneIdx.WELCOME) {
+        fullClear()
+        navigateTo("/");
+    }
     moveTo(to);
 };
 
 document.querySelectorAll(".button-menu-quit").forEach(div => {div.addEventListener('click', quitFunc)});
 
-
 nextMatch.addEventListener('click', () => {
-    if (status === enu.gameMode.LOCAL) gameSocket.send(JSON.stringify({'type': enu.EventLocal.NEXT}));
-    else moveTo(enu.sceneIdx.PREMATCH)
+    gameSocket.send(JSON.stringify({'type': enu.Game.NEXT}));
 })
 
 document.getElementById('game-menu-local-input-button').addEventListener('click', () => {
     const   user = document.getElementById('game-menu-input-player').value;
-    if (validate_name(user) === false) return ;
+    if (validate_name(user) === false) {
+        console.warn("bad input: " + user);
+        return ;
+    }
     document.getElementById('game-menu-input-player').value = '';
 
     players.push(user);
-
     if (status === enu.gameMode.LOCAL) {
         createListLocal(user)
-    } else if (status === enu.gameMode.MATCH) {
+    } else {
         gameSocket.send(JSON.stringify({
-            'type': enu.EventGame.INVITE,
-            'message': user,
+            'type': enu.Game.INVITE,
+            'user': user,
+            'mode': (status === enu.gameMode.MATCH ? enu.Game.MATCH: enu.Game.TRN),
         }));
-        // createListRemote(user, enu.EventGame.INVITE, enu.EventGame.KICK)
-    } else if (status === enu.gameMode.TOURNAMENT) {
-        gameSocket.send(JSON.stringify({
-            'type': enu.EventTournament.INVITE,
-            'message': user,
-        }));
-        createListRemote(user, enu.EventTournament.INVITE, enu.EventTournament.KICK)
     }
 })
 
@@ -529,7 +459,6 @@ const createListLocal = (user) => {
     item.className = 'list-tournoi-element';
     itemName.textContent = user;
     itemName.className = 'list-tournoi-user-name';
-    // button.textContent = 'Remove';
     button.className = 'remove-button';
     button.addEventListener('click', (e) => {
         const pos = players.indexOf(user);
@@ -551,72 +480,6 @@ const createListLocal = (user) => {
     item.appendChild(button);
     document.getElementById('game-menu-list').appendChild(item);
 }
-
-const createListRemote = (user, invite, kick) => {
-    const   item = document.createElement('li');
-    const   itemPicture = document.createElement('img');
-    const   itemName = document.createElement('div');
-    const   button = document.createElement('button');
-    const   itemStatus = document.createElement('span');
-
-    item.className = 'list-tournoi-element';
-    itemPicture.className = 'list-tournoi-user-pic';
-    itemPicture.src = '../../img/anon.jpg'; // a remplacer !!!! (par la vrai foto)
-    itemName.textContent = user;
-    itemName.className = 'list-tournoi-user-name';
-    itemStatus.id = 'invite-status' + user;
-    itemStatus.className = 'remote-list-element';
-    // itemStatus.textContent = '...waiting...';
-
-    button.className = 'remove-button';
-    button.addEventListener('click', (e) => {
-        const pos = players.indexOf(user);
-        players.splice(pos, 1);
-        e.target.parentElement.remove();
-        gameSocket.send(JSON.stringify({
-            'type': kick,
-            'message': user
-        }));
-    });
-
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 448 512');
-    svg.setAttribute('class', 'svgIcon'); 
-
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', 'M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z');
-    path.setAttribute('fill', 'white'); 
-
-    svg.appendChild(path);
-    item.appendChild(itemPicture);
-    item.appendChild(itemName);
-    item.appendChild(itemStatus);
-
-    item.innerHTML += `
-        <div class="typing-indicator">
-            <div class="typing-circle"></div>
-            <div class="typing-circle"></div>
-            <div class="typing-circle"></div>
-            <div class="typing-shadow"></div>
-            <div class="typing-shadow"></div>
-            <div class="typing-shadow"></div>
-        </div>
-    `;
-
-    button.appendChild(svg);
-    item.appendChild(button);
-
-    document.getElementById('game-menu-list').appendChild(item);
-}
-
-
-
-/*
-function createInviteListElement () {
-    if (status === enu.gameMode.ANON || status === enu.gameMode.LOCAL) createInviteListElementLocal();
-    else if (status === enu.gameMode.MATCH) createInviteListElementRemote();
-}
-*/
 
 document.addEventListener('DOMContentLoaded', function() {
     const video = document.querySelector('.video-background video');
@@ -627,4 +490,3 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Video element not found');
     }
 });
-

@@ -1,7 +1,11 @@
 from django.db.models.signals import post_migrate
 from django.conf import settings
 from django.dispatch import receiver
-from chat.models import User  # Assurez-vous que le chemin d'importation est correct
+from chat.models import User 
+import chat.enums as enu
+
+from logging import getLogger
+logger = getLogger('base')
 
 
 @receiver(post_migrate)
@@ -10,24 +14,29 @@ def create_admin_user(sender, **kwargs):
         user = User.objects.create(
             name=settings.ADMIN_USERNAME,
         )
-        print("Admin user created")
+        logger.info("Admin user created")
+    for user in enu.SpecialUser.values:
+        if not User.objects.filter(name=user).exists():
+            user = User.objects.create(name=user)
+            logger.info("Special user: {user} created")
+    
     if not User.objects.filter(name='islem').exists():
         user = User.objects.create(
             name='islem',
         )
-        print("islem user created")
+        logger.info("islem user created")
     if not User.objects.filter(name='lael').exists():
         user = User.objects.create(
             name='lael',
         )
-        print("Laël user created")
+        logger.info("Laël user created")
     if not User.objects.filter(name='loulou').exists():
         user = User.objects.create(
             name='loulou',
         )
-        print("Loulou user created")
-    if not User.objects.filter(username='bilel').exists():
+        logger.info("Loulou user created")
+    if not User.objects.filter(name='bilel').exists():
         user = User.objects.create(
             name='bilel',
         )
-        print("bilel user created")
+        logger.info("Bilel user created")

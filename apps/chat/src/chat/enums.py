@@ -64,6 +64,7 @@ class Operations(TextChoices):
 class SpecialUser(TextChoices):
     ADMIN   = 'admin'
     SYSTEM  = 'system'
+    TOURNAMENT = 'tournament'
 
 class Self(TextChoices):
     LOCAL   = 'local'

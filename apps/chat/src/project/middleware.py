@@ -12,7 +12,7 @@ from channels.db import database_sync_to_async
 from django.http import HttpResponseForbidden
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 import httpx
 import chat.models as mod
