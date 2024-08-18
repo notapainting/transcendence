@@ -6,7 +6,7 @@
 #    By: tlegrand <tlegrand@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/10 21:52:05 by tlegrand          #+#    #+#              #
-#    Updated: 2024/05/13 20:14:09 by tlegrand         ###   ########.fr        #
+#    Updated: 2024/08/18 19:59:47 by tlegrand         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -55,6 +55,12 @@ logs:
 
 reload:
 	docker container restart proxy
+
+dev:
+	sed -i 's/MODE=prod/MODE=dev/g' conf/env.dev
+
+prod:
+	sed -i 's/MODE=dev/MODE=prod/g' conf/env.dev
 
 proxy:
 	docker exec -it proxy sh

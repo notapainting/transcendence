@@ -3,8 +3,8 @@ services:
     container_name: user
     build:
       context: apps/user/
-      dockerfile: Dockerfile.dev
-    image: user_image
+      dockerfile: Dockerfile.${MODE}
+    image: user_image_${MODE}
     environment:
       - TZ=${TZ}
     env_file:
@@ -17,8 +17,6 @@ services:
     depends_on:
       user-db:
        condition: service_healthy
-    init: true
-    entrypoint: ["bash", "/conf/init.sh"]
 
   user-db:
     container_name: user-db
