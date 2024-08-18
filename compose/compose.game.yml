@@ -3,8 +3,8 @@ services:
     container_name: game
     build:
       context: apps/game/
-      dockerfile: Dockerfile.dev
-    image: game_image
+      dockerfile: Dockerfile.${MODE}
+    image: game_image_${MODE}
     environment:
       - TZ=${TZ}
     env_file:
@@ -17,8 +17,6 @@ services:
     restart: unless-stopped
     depends_on:
       - game-redis
-    init: true
-    entrypoint: ["daphne", "-b", "0.0.0.0", "-p", "8000", "game_back.asgi:application"]
 
   game-redis:
     container_name: game-redis
