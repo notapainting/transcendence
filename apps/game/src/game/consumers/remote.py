@@ -241,13 +241,14 @@ class RemoteGamer(LocalConsumer):
         if hasattr(self, "lobby"):
             logger.debug("before test")
             if isinstance(self.lobby, Tournament):
-                await self.lobby.cheat(user)
+                await self.lobby.cheat(data['author'])
             else:
                 logger.debug("match to rem")
                 await self.lobby.remove(data['author'])
-                if not hasattr(self.lobby, "game_state"):
-                    self.set_mode()
-            await self.send_json({"type":enu.Game.KICK})    
+                if hasattr(self.lobby, "game_state"):
+                    await self.lobby.end(cancelled=True)
+                self.set_mode()
+            await self.send_json({"type":enu.Game.KICK})
         await self.send_json(data)
 
     async def game_ready(self, data):
