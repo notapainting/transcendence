@@ -2,6 +2,20 @@ import { navigateTo, whoIam } from "./index.js";
 import { clearView, isUserAuthenticated } from "./index.js";
 import { fetchUsers, initializeWebSocket, showChat } from "./chat.js";
 
+export const getPersInfo = () => {
+    return fetch('/auth/get_pers_infos/', {
+        method: 'GET',
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok)
+            return response.json();
+        else {
+            throw new Error("Unauthorized");
+        }
+    })
+}
+
 const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
     const middleThrees = document.querySelector('.middle-threes');
@@ -39,7 +53,9 @@ function authenticateWith42() {
 
 let isScrolling = false;
 
-const scrollUpEffect = (event) => {
+
+
+const scrollUpEffect = (event, path) => {
     document.removeEventListener('wheel', scrollDownEffect);
     event.preventDefault();
     window.scrollTo({
@@ -83,6 +99,10 @@ const scrollUpEffect = (event) => {
                         backThrees.style.transform = `scale(${zoomFactor * 3})`;
                         backgroundThrees.style.filter = 'blur(0px)';
                         backThrees.style.opacity = "0";
+                        setTimeout(() => {
+                            navigateTo(path);
+                         }, 800);
+
                 }
             }, i * 180);
         }
@@ -152,6 +172,18 @@ const switchForm = (event) => {
     }
 }
 
+const playBtnElement = document.querySelector(".play-btn");
+
+const playOfflineEvent = (event) => {
+    scrollUpEffect(event, "/local");
+}
+
+const playOnlineEvent = (event) => {
+    scrollUpEffect(event, "/play");
+}
+
+playBtnElement.addEventListener("click", playOfflineEvent);
+
 const messageBox = document.querySelector(".message-box");
 
 export const loggedInStatus = (profile_picture, username) => {
@@ -165,14 +197,15 @@ export const loggedInStatus = (profile_picture, username) => {
             notificationContainer.style.display = "none";
         }
     })
-    document.querySelector(".play-online-btn").style.display = "block"
+    playBtnElement.removeEventListener("click", playOfflineEvent);
+    playBtnElement.addEventListener("click", playOnlineEvent);
+    // setTimeout(() => {
+    //     playBtnElement.style.transform = "translateX(100%)";
+    // }, 200)
     showChat();
     document.querySelector(".welcome-msg").innerHTML = `Welcome<br>${username}`;
     document.querySelector(".profile-picture-home").style.backgroundImage = `url('${profile_picture}')`
     document.querySelector(".navbar").style.display= "flex"
-    setTimeout(()=> {
-        document.querySelector(".play-online-btn").style.transform = "scale(1)"
-    }, 100)
 }
 
 const twoFactorDisplay = document.querySelector(".two-factor-display");
@@ -228,6 +261,12 @@ const loginRequest = (event) => {
         console.log("YOOO")
         console.log(data)
         loggedInStatus(data.profile_picture, data.username);
+        var buttonLogout = document.querySelector('.menu-logout');
+        var buttonSettings = document.querySelector('.menu-settings');
+        buttonLogout.removeAttribute('disabled');
+        buttonSettings.removeAttribute('disabled');
+        buttonLogout.classList.add('clickable');
+        buttonSettings.classList.add('clickable');
     })  
     .catch(error => {
     })
@@ -335,6 +374,7 @@ const adjustZoom = (event) => {
             setTimeout(() => {
                document.querySelectorAll(".parallax-items").forEach(x => x.style.display = "none")
             }, 800);
+
     }
     indexZoom++;
     setTimeout(() => {
@@ -374,23 +414,6 @@ const smoothSroll = (event) => {
     document.addEventListener('wheel', adjustZoom);
 }
 
-
-const playOfflineBtnElement = document.querySelector(".play-offline-btn");
-const playOnlineBtnElement = document.querySelector(".play-online-btn");
-
-playOfflineBtnElement.addEventListener("click", event => {
-    navigateTo("/play/local");
-})
-
-playOnlineBtnElement.addEventListener("click", event => {
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-    });
-    navigateTo("/play");
-})
-
-
 export const showHome = async () => {
     clearView();
     let isAuthenticated = await isUserAuthenticated();
@@ -398,7 +421,15 @@ export const showHome = async () => {
     homeElement.style.display = "block";
     const personData = await fetchUsers(whoIam);
     if (isAuthenticated)
+    {
         loggedInStatus(personData.profile_picture, personData.username);
+        var buttonLogout = document.querySelector('.menu-logout');
+        var buttonSettings = document.querySelector('.menu-settings');
+        buttonLogout.removeAttribute('disabled');
+        buttonSettings.removeAttribute('disabled');
+        buttonLogout.classList.add('clickable');
+        buttonSettings.classList.add('clickable');
+    }
     document.removeEventListener('mousemove', parallaxEffect);
     document.removeEventListener('wheel', scrollDownEffect);
     document.addEventListener('mousemove', parallaxEffect);

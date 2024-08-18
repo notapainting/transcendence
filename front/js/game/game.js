@@ -108,12 +108,12 @@ export function gameRenderer(data) {
 	{
 		utils.clearScene(); 
 		animationData.ballFall = true;
-		// scene.add(load.intro);
-		// scene.add(spotLight);
-		// scene.add(light);
-		// scene.add(lightWall);
-		// scene.add(spotLight1);
-		// scene.add(spotLight2);
+		scene.add(load.intro);
+		scene.add(spotLight);
+		scene.add(light);
+		scene.add(lightWall);
+		scene.add(spotLight1);
+		scene.add(spotLight2);
 	
 		gameData.width = data.width;
 		gameData.height = data.height;
@@ -180,33 +180,7 @@ export function gameRenderer(data) {
 			materialTrail.opacity = 0.5;
 			scene.add(trailSphere);
 		});
-	
-		if (gameData.explosion) {
-			scene.children
-				.filter(obj => obj.userData.isTrailSphere)
-				.forEach(obj => scene.remove(obj));
-		} else {
-			trailPositions.push(sphere.position.clone());
-			if (trailPositions.length > 15) {
-				trailPositions.shift();
-			}
-		
-			scene.children
-				.filter(obj => obj.userData.isTrailSphere)
-				.forEach(obj => scene.remove(obj));
-		
-			var size = 0.1;
-			trailPositions.forEach(position => {
-				const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
-				trailSphere.position.copy(position);
-				trailSphere.scale.multiplyScalar(size);
-				if (size < 1)
-					size += 0.08;
-				trailSphere.userData.isTrailSphere = true;
-				materialTrail.opacity = 0.5;
-				scene.add(trailSphere);
-			});
-		}
+
 	
 		// Lights
 		const lightColor = utils.interpolateColor(customData.colorBall); 
@@ -242,6 +216,34 @@ export function gameRenderer(data) {
 		{
 			gameData.collisionPaddle = true;
 			initialSpeed = data.speed;
+		}
+
+	
+		if (gameData.explosion) {
+			scene.children
+				.filter(obj => obj.userData.isTrailSphere)
+				.forEach(obj => scene.remove(obj));
+		} else {
+			trailPositions.push(sphere.position.clone());
+			if (trailPositions.length > 15) {
+				trailPositions.shift();
+			}
+		
+			scene.children
+				.filter(obj => obj.userData.isTrailSphere)
+				.forEach(obj => scene.remove(obj));
+		
+			var size = 0.1;
+			trailPositions.forEach(position => {
+				const trailSphere = new THREE.Mesh(geometryBall, materialTrail);
+				trailSphere.position.copy(position);
+				trailSphere.scale.multiplyScalar(size);
+				if (size < 1)
+					size += 0.08;
+				trailSphere.userData.isTrailSphere = true;
+				materialTrail.opacity = 0.5;
+				scene.add(trailSphere);
+			});
 		}
 
 		if (data.randomPointB && load.bonus){

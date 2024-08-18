@@ -38,4 +38,11 @@ def create_admin_user(sender, **kwargs):
             isVerified=True
         )
         print("Loulou user created")
-
+    if not CustomUser.objects.filter(username='bilel').exists():
+        user = CustomUser.objects.create_superuser(
+            username='bilel',
+            email='bilel@bilel.com',
+            password='123',
+            isVerified=True
+        )
+        print("bilel user created")

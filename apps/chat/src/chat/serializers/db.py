@@ -12,7 +12,7 @@ import chat.enums as enu
 import chat.utils as uti
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
