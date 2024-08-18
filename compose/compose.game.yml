@@ -17,9 +17,9 @@ services:
     restart: unless-stopped
     depends_on:
       - game-redis
-    # entrypoint: ["bash", "/conf/init.sh"]
-    stdin_open: true 
-    tty: true
+    entrypoint: ["bash", "/conf/init.sh"]
+    # stdin_open: true 
+    # tty: true
 
 
   game-redis:
