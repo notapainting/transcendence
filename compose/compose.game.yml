@@ -17,7 +17,8 @@ services:
     restart: unless-stopped
     depends_on:
       - game-redis
-    entrypoint: ["bash", "/conf/init.sh"]
+    init: true
+    entrypoint: ["daphne", "-b", "0.0.0.0", "-p", "8000", "game_back.asgi:application"]
 
   game-redis:
     container_name: game-redis

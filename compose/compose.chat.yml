@@ -3,7 +3,7 @@ services:
     container_name: chat
     build:
       context: apps/chat
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.dev
     image: chat_image
     environment:
       - TZ=${TZ}
