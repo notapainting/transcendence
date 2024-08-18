@@ -117,4 +117,70 @@ BONUS:
 	- access control : user roles and permissions, or IP-based access restrictions
 
 
+GAAAME
 
+tips: 
+host -> left player + ws
+guest -> right player + arrowkey
+
+sPressed + downPressed => sPressed
+
+
+test score game 
+
+DONE:
+    - setup key binding
+    - abandon button
+    - use naviguateTo
+    - clear threeJS scene at start/end
+    - change game-button pause to resume 
+    - display score + username display
+    LOCAL
+    - merge match and tournament consumer
+    - in game score + alias
+    - copy front
+
+
+TODO:
+    MATCH
+    - clear ThreeJS stuff after match 
+    - add a end screen :
+        ==> handle game broke/game quit
+        - back : send game data
+        - front: nice display
+        - button to quit, relance, etc
+
+
+    TOURNAMENT
+    - waiting screen : current players ? invited ? waiting ???
+    - phase screen -> all mathch with current status + option to start match
+    - end screen 
+        BACK -> trn kick 
+            -> start match
+            -> new phase auto
+
+    LOCAL
+        - end matc hscreen, 
+        - end tournament screen
+
+
+
+SOLVED:
+    - double connection
+    - p2 can unpause pause from p1
+
+BUG:
+    - quit when idle -> error 
+        => will be fix with code refacto 
+
+
+use is auth func 
+display logging in game
+
+user clear all invite
+
+    !!!SOCKET ON CLOSE/OPEN -> MOVETO WELCOME!!!!
+
+
+
+    CHECK ALL API EXCEPT FOR JSON DEODE ERROR
