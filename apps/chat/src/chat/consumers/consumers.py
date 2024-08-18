@@ -12,7 +12,7 @@ import chat.consumers.utils as cuti
 import json
 
 from logging import getLogger
-logger = getLogger('django')
+logger = getLogger('base')
 
 CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
 
@@ -24,7 +24,7 @@ class BaseConsumer(AsyncWebsocketConsumer):
             await super().dispatch(message)
         except ValueError as error:
             logger.warning(error)
-            await self.send_json({'type':enu.Event.Errors.TYPE})
+            await self.send_json({'type':enu.Event.Errors.HANDLER})
         except BaseException:
             raise
 
@@ -104,7 +104,6 @@ class ChatConsumer(BaseConsumer):
         await self.channel_layer.group_discard(self.user.name, self.channel_name)
         logger.info("%s Quit...", self.user.name)
 
-
     async def receive_json(self, json_data, **kwargs):
         # logger.info(f'text : {json_data}')
         if json_data['type'] == enu.Event.Errors.DECODE:
@@ -159,4 +158,7 @@ class ChatConsumer(BaseConsumer):
             await self.channel_layer.group_add(id, self.channel_name)
         await self.send_json(event)
 
-
+    async def group_delete(self, event):
+        self.group_list = await cuti.get_group_list(self.user)
+        await self.channel_layer.group_discard(event['data'], self.channel_name)
+        await self.send_json(event)

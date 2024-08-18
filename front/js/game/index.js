@@ -1,21 +1,45 @@
-import { initMenu } from './menu.js';
-import { initWebSocket, clearGame } from './websocket.js';
+import { clearMenu, initMenu } from './menu.js';
+import { initGameWebSocket, clearGame } from './websocket.js';
 import { clearScene } from './utils.js';
 import { clearThree } from './game.js';
-import { clearView } from "../index.js";
+import { clearView, isUserAuthenticated, navigateTo } from "../index.js";
+import { loggedInStatus, getPersInfo } from '../home.js';
 import * as enu from './enums.js'
 
+const   transition = document.getElementById('menu-transition')
 
-export const showGame = () => {initGame(enu.backendPath.REMOTE);}
 
-export const showGameLocal = () => {initGame(enu.backendPath.LOCAL);}
+export const showGame = async () => {
+    console.log("in show : rem")
+    await isUserAuthenticated();
+    const data = await getPersInfo();
+    loggedInStatus(data.profile_picture, data.username);
+    transitionToGame(enu.backendPath.REMOTE);
+}
 
-const initGame = (path) => {
+export const showGameLocal  = async () => {
+    console.log("in show : loc")
+    if (await isUserAuthenticated()){
+        navigateTo("/");
+        return ;
+    }
+    transitionToGame(enu.backendPath.LOCAL);
+}
+
+const transitionToGame = (path) => {
+    console.log("show game with path: " + path)
     clearView();
     fullClear();
-    initWebSocket(path);
-    document.querySelector("#game").style.display = "block";
-    initMenu(path);
+    initGameWebSocket(path);
+    document.querySelector("body").style.backgroundColor = "#34A0A4"
+    document.querySelector("#game").style.display = " block"
+    setTimeout(()=> {
+        document.querySelector("#game").style.opacity = "1";
+    }, 200)
+    clearMenu();
+    transition.style.display = 'flex';
+    transition.style.backgroundPosition = 'center top';
+    setTimeout(initMenu, 2000, path);
 }
 
 export const fullClear = () => {

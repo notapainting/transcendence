@@ -1,7 +1,8 @@
 import { clearView } from "./index.js";
 import { isUserAuthenticated } from "./index.js";
 import { whoIam } from "./index.js";
-
+import {initGameWebSocket} from "./game/websocket.js"
+import * as enu from './game/enums.js'
 // enlever le bouton + lorsque la demande damis a ete accepte
 // enlever la notif lorsque lautre personne accepte
 
@@ -412,6 +413,9 @@ async function handleMessage(message) {
         console.log(message);
         console.log(friendStatus);
     }
+    else if (message.type === "message.game"){
+        console.log("recu : game a annoncer")
+    }
     statusPromiseResolve();
 }
 
@@ -543,11 +547,13 @@ const chatElement = document.querySelector(".chatbox");
 const bubbleElement = document.querySelector(".bubble");
 
 const displayChat = () => {
+    console.log("open chat")
     chatElement.style.display = "flex";
     bubbleElement.style.display = "none"
 }
 
 const closeChat = () => {
+    console.log("close chat")
     chatElement.style.display = "none";
     bubbleElement.style.display = "flex"
 }
@@ -565,10 +571,11 @@ const showChatLeft = () => {
 }
 
 const sendMessageEnter = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "") {
         sendMessage();
     }
 }
+
 
 export const showChat = async () => {
     await isUserAuthenticated();
@@ -584,6 +591,7 @@ export const showChat = async () => {
     document.querySelector(".left-display").addEventListener("click", showChatLeft)
     if (!flg)
         initializeWebSocket();
+    initGameWebSocket(enu.backendPath.REMOTE);
     searchbar.addEventListener('input', searchUsers);
     const sendButton = document.querySelector(".chat-send");
     sendButton.addEventListener("click", sendMessage);

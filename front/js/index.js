@@ -7,6 +7,8 @@ import { showGame, showGameLocal } from "./game/index.js"
 export let whoIam;
 
 
+
+
 export const navigateTo = url => {
     history.pushState(null, null, url)
     router()
@@ -51,15 +53,38 @@ export const isUserAuthenticated = () => {
         return false;
     });
 };
+function resetHomePage() {
+    const backThrees = document.querySelector('.back-threes');
+    const backgroundThrees = document.querySelector('.background-threes');
+    const middleThrees = document.querySelector('.middle-threes');
+    const frontThrees = document.querySelector('.front-threes');
+    
+    backThrees.style.transform = 'scale(1)';
+    backgroundThrees.style.filter = 'blur(0px)';
+    middleThrees.style.transform = 'scale(1)';
+    frontThrees.style.transform = 'scale(1)';
+    
+    document.querySelectorAll(".banner").forEach(x => x.style.opacity = "1");
+    frontThrees.style.opacity = "1";
+    middleThrees.style.opacity = "1";
+    backThrees.style.opacity = "1";
+
+    document.querySelector("#game").style.display = " none"
+    document.querySelector("#game").style.opacity = "0";
+}
+
 
 const router = async () => {
     console.log("Appel Router")
+    if (window.location.pathname === '/') { 
+        resetHomePage();
+    }
     const routes = [
         {path: "/", view:() => showHome() },
         {path: "/profile", view:() => showProfile()},
         {path: "/settings", view:() => showSettings()},
         {path: "/play", view:() => showGame()},
-        {path: "/play/local", view:() => showGameLocal()},
+        {path: "/local", view:() => showGameLocal()},
     ];
     const potentialMatches = routes.map(route => {
         return {
@@ -77,6 +102,8 @@ const router = async () => {
     match.route.view()
 };
 
+
+
 window.addEventListener("popstate", router);
 
 
@@ -88,7 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     const logoutButton = document.querySelector(".fa-right-from-bracket");
+    const logoutButtonMenu = document.querySelector(".menu-logout");
     logoutButton.addEventListener("click", logoutRequest);
+    logoutButtonMenu.addEventListener("click", logoutRequest);
     window.scrollTo({
         top: 0,
         behavior: "smooth",

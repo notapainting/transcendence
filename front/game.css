@@ -1,61 +1,90 @@
 
 .containerGame {
     display: flex;
+    position: relative;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background-color: #0066CC;
   }
 
-#scoreMessage {
-    position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+#menu-transition {
+    width: 100%;
+    height: 100%;
+    background-image: url('img/transition.png');
+    background-size: cover;
+    background-position: center bottom; 
+    background-repeat: no-repeat;
+    animation: slideUp 2s ease forwards; 
 }
 
+@keyframes slideUp {
+    from {
+        background-position: center bottom;
+    }
+    to {
+        background-position: center top;
+    }
+}
+
+
 #game-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    /* background-image: url('img/transition.png'); 
+    background-size: cover; 
+    background-position: center top; 
+    background-repeat: no-repeat; */
+}
+
+#menu-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url('img/transition.png'); 
+    background-size: cover; 
+    background-position: center top; 
+    background-repeat: no-repeat;
+}
+
+.video-background {
+    position: relative;
+    width: 100%;
+    height: 1080px; 
+    overflow: hidden; 
+}
+
+.video-background video {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100%;
+    height: auto;
+    transform: translateX(-50%);
+    object-fit: cover; 
+    object-position: top; 
+    opacity: 0;
+    animation: fadeIn 5s ease-in-out forwards; 
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1; 
+    }
 }
 
 .menu-element {
-    position:absolute;
     display: none;
-}
-.game-element {
-}
-
-.game-announce-base{
-    position:absolute;
-    display:none;
-    background-color:#61e8d8;
-    border-radius:10% 10% 10% 10% / 10% 10% 10% 10% ;
-    font-size:25px;
+    position: relative;
 }
 
-#game-menu-banner-phase{
-    top:10%;
-    left:45%;
-}
-
-#game-menu-banner-match{
-    top:50%;
-    left:40%;
-    font-size:60px;
-}
-
-#game-menu-banner-score{
-    top:5%;
-    left:40%;
-}
-
-#game-menu-banner-end{
-    top:5%;
-    left:40%;
-}
 
 .game-button{
     position:absolute;
@@ -90,221 +119,7 @@
     border: solid 2px #0066cc;
 }
 
-#game-menu-players {
-    top: 20%;
-    left: 20%;
-}
 
-.list-tournoi{
-    position:absolute;
-}
-
-#list-tournoi-element{
-    left:60%;
-}
-
-#game-menu-local-input {
-    top: 50%;
-    left: 40%;
-}
-#game-menu-local-input-button {
-    top:51%;
-    left:30%;
-}
-
-/* #game-menu-banner {
-    top:30%;
-    left:25%;
-} */
-#game-menu-next {
-    top:70%;
-
-}
-.remote-list{
-    position:absolute;
-
-}
-
-#remote-list-element{
-    left:60%;
-}
-
-#game-menu-invite-sent-list {
-    top:20%;
-    left:60%;
-}
-
-#game-menu-list {
-    top:20%;
-    left:60%;
-}
-
-#game-menu-start {
-    top:70%;
-}
-
-#game-pause {
-    left:40%;
-    display: none;
-}
-
-#game-abandon {
-    left:60%;
-    display: none;
-}
-
-
-
-#game-menu-invitationBox {
-  position: absolute;
-  display: flex;
-  left:70%;
-  top: 60%;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: #fafafa;
-}
-
-#game-menu-invitationBox h3 {
-  top: 0;
-  color: black;
-}
-
-#game-menu-invitationList {
-  list-style-type: none;
-  color: black;
-  padding: 0;
-}
-
-#game-menu-invitationList li {
-  padding: 8px;
-  color: black;
-  border-bottom: 1px solid #ddd;
-}
-
-#game-menu-invitationList li:last-child {
-  border-bottom: none;
-}
-
-.accept-button {
-  padding: 5px 10px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.accept-button:hover {
-  background-color: #0056b3;
-}
-
-.remove-button {
-    padding: 5px 10px;
-    border: none;
-    background-color: #ce0a31;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .remove-button:hover {
-    background-color: #ff008c;
-  }
-
-#game-menu-inviteInput {
-  position: absolute;
-  display: none;
-  top: 60%;
-}
-
-#game-menu-inviteButton {
-    display: none;
-    top: 70%;
-}
-
-#game-menu-fastGame {
-  /* display: none; */
-    top: 60%;
-}
-
-#game-menu-tournament {
-    display: none;
-    top: 70%;
-}
-
-#game-menu-local{
-    top:90%;
-}
-
-#game-menu-exit {
-    display: none;
-    top: 80%;
-}
-
-#game-menu-create {
-    display: none;
-    top: 60%;
-}
-
-#game-menu-join {
-    display: none;
-    top: 70%;
-}
-
-#game-menu-home {
-    display: none;
-    top: 80%;
-}
-
-#game-menu-back {
-    display: none;
-    top: 80%;
-}
-
-#game-menu-ready {
-    display: none;
-    top: 40%;
-}
-
-.button-menu {
-    perspective: 40vw;
-    position: absolute;
-    left: 30%;
-    transform: translate(-50%, -50%);
-    padding: .8em 2.2em;
-    width: 300px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 0 0 #e76f51;
-    line-height: 1;
-    text-decoration: none;
-    color: #dc5406;
-    font-size: 18px;
-    border-radius: 20px;
-    width: 200px;
-    height: 50px;
-    font-weight: bold;
-    border-bottom: 5px solid #b46436;
-    transition: 0.3s;
-    background-color: #f4a261;
-    animation: glow 3s linear infinite;
-  }
-
-.button-menu:hover {
-	border-bottom-width: 0;
-  }
-
-@keyframes glow {
-  0% {
-      box-shadow: 0 0 0 0 #e76f51;
-  }
-  
-  50% {
-      box-shadow: 0 0 30px 0 #e76f51;
-  }
-  }
 
 #game-menu-ready-circle{
     position:absolute;
@@ -317,33 +132,55 @@
     border:2px solid #d826cf; 
   }
 
-  /* #0eee28 vert
-  #ee0e0e red
-  
-  */
-
 
 
 /* TOURNAMENT */
 
-.containerTournament {
-    position: absolute;
-    top:50px;
-    width: 500px;
-    height: 500px;
-    background-color: #024ba5;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    overflow: hidden;
+.inner-container {
+    display: flex;
+    gap: 100px; 
 }
 
-/* .form-container {
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ccc;
-} */
+.containerTournament {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    background-image: linear-gradient(163deg, #10173F 0%, #8346a5 100%);
+    transition: all .3s; 
+}
+
+.containerTournament2 {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    color: #A78FDB;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    background-image: url('img/box-bg.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    transition: all .2s;
+}
+
+.containerTournament2:hover {
+    transform: scale(0.98);
+    border-radius: 20px;
+  }
+  
+.containerTournament:hover {
+    box-shadow: 0px 0px 30px 1px rgba(170, 0, 255, 0.3);
+  }
 
 h1 {
     margin-bottom: 20px;
@@ -353,38 +190,72 @@ form {
     margin-bottom: 20px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
 }
 
-input[type="text"] {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #000000;
-    border-radius: 4px;
-    width: calc(100% - 22px);
-    margin-right: 10px;
+.game-menu-form {
+    --width-of-input: 350px;
+    --border-height: 1px;
+    --border-before-color: rgba(255, 190, 250, 0.718);
+    --border-after-color: #822ea4;
+    --input-hovered-color: #a9a9a91f;
+    position: relative;
+    width: var(--width-of-input);
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
+.game-menu-input {
     color: #fff;
-    background-color: #007bff;
+    font-size: 0.9rem;
+    background-color: transparent;
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: 0.5em;
+    padding-block: 0.7em;
     border: none;
-    border-radius: 4px;
+    border-bottom: var(--border-height) solid var(--border-before-color);
+}
+
+.game-menu-input-border {
+    position: absolute;
+    background: var(--border-after-color);
+    width: 0%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    transition: 0.3s;
+}
+
+.game-menu-input:focus {
+    outline: none;
+}
+
+.game-menu-input:focus + .game-menu-input-border {
+    width: 100%;
+}
+
+
+
+#game-menu-local-input-button {
+    padding: 8px 15px;
+    font-size: 16px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 50px; 
+    background-color: #72ddf7;
+    color: #1C2341;
     cursor: pointer;
 }
 
-button:hover {
-    background-color: #0056b3;
+#game-menu-local-input-button:hover {
+    background-color: #8093f1;
 }
 
 .player-box {
     height: 300px; 
     overflow-y: auto; 
     padding: 10px;
-    border-radius: 4px;
-    background-color: #024ba5;
+    border-radius: 10px;
+    background-color: #0c11265d;
 }
 
 .player-box::-webkit-scrollbar {
@@ -415,10 +286,611 @@ ul {
     padding: 0;
 }
 
-.list-tournoi-element {
+/* .list-tournoi-element {
     padding: 10px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+} */
+
+.list-tournoi-user-name {
+    margin-left: 10px;
+    color: #000;
+}
+
+.list-tournoi-user-pic {
+    margin-left: 5px;
+    width: 25px;               
+    height: 25px;             
+    border-radius: 50%;        
+    object-fit: cover;         
+    display: block;            
+    overflow: hidden;          
+}
+
+
+
+/*  SETTINGS TOURNOI */
+
+.settings-box {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #A78FDB;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-image: linear-gradient(163deg, #10173F 0%, #8346a5 100%);
+    transition: all .3s; 
+}
+
+.settings-box2 {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #A78FDB;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-image: url('img/box-bg.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    transition: all .2s;
+}
+
+.settings-box2:hover {
+    transform: scale(0.98);
+    border-radius: 20px;
+  }
+  
+.settings-box:hover {
+    box-shadow: 0px 0px 30px 1px rgba(170, 0, 255, 0.3);
+  }
+
+.settings-box h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.settings-list {
+    list-style-type: none; 
+    padding: 0;
+}
+
+.settings-list li {
+    margin-bottom: 15px;
+}
+
+.toggle-item, .score-item {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-item label, .score-item label {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.toggle-button {
+    position: relative;
+    display: inline-block;
+}
+
+.checkbox-wrapper-5 .check {
+    margin-right: 10px;
+    position: relative;
+    display: inline-block;
+    --size: 30px;
+    background: linear-gradient(90deg, #f19af3, #f099b5);
+    line-height: 0;
+    perspective: 400px;
+    font-size: var(--size);
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"],
+    .checkbox-wrapper-5 .check label,
+    .checkbox-wrapper-5 .check label::before,
+    .checkbox-wrapper-5 .check label::after,
+    .checkbox-wrapper-5 .check {
+    appearance: none;
+    display: inline-block;
+    border-radius: var(--size);
+    border: 0;
+    transition: .35s ease-in-out;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+  
+  .checkbox-wrapper-5 .check label {
+    width: calc(2.2 * var(--size));
+    height: var(--size);
+    background: #d7d7d7;
+    overflow: hidden;
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"] {
+    position: absolute;
+    z-index: 1;
+    width: calc(.8 * var(--size));
+    height: calc(.8 * var(--size));
+    top: calc(.1 * var(--size));
+    left: calc(.1 * var(--size));
+    background: linear-gradient(45deg, #dedede, #ffffff);
+    box-shadow: 0 6px 7px rgba(0,0,0,0.3);
+    outline: none;
+    margin: 0;
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"]:checked {
+    left: calc(1.3 * var(--size));
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"]:checked + label {
+    background: transparent;
+  }
+  
+  .checkbox-wrapper-5 .check label::before,
+    .checkbox-wrapper-5 .check label::after {
+    content: "· ·";
+    position: absolute;
+    overflow: hidden;
+    left: calc(.15 * var(--size));
+    top: calc(.5 * var(--size));
+    height: var(--size);
+    letter-spacing: calc(-0.04 * var(--size));
+    color: #9b9b9b;
+    font-family: "Times New Roman", serif;
+    z-index: 2;
+    font-size: calc(.6 * var(--size));
+    border-radius: 0;
+    transform-origin: 0 0 calc(-0.5 * var(--size));
+    backface-visibility: hidden;
+  }
+  
+  .checkbox-wrapper-5 .check label::after {
+    content: "●";
+    top: calc(.65 * var(--size));
+    left: calc(.2 * var(--size));
+    height: calc(.1 * var(--size));
+    width: calc(.35 * var(--size));
+    font-size: calc(.2 * var(--size));
+    transform-origin: 0 0 calc(-0.4 * var(--size));
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"]:checked + label::before,
+    .checkbox-wrapper-5 .check input[type="checkbox"]:checked + label::after {
+    left: calc(1.55 * var(--size));
+    top: calc(.4 * var(--size));
+    line-height: calc(.1 * var(--size));
+    transform: rotateY(360deg);
+  }
+  
+  .checkbox-wrapper-5 .check input[type="checkbox"]:checked + label::after {
+    height: calc(.16 * var(--size));
+    top: calc(.55 * var(--size));
+    left: calc(1.6 * var(--size));
+    font-size: calc(.6 * var(--size));
+    line-height: 0;
+  }
+  
+
+.score-item input[type="range"] {
+    flex: 1;
+    margin-left: 10px;
+}
+
+.score-item output {
+    margin-left: 10px; 
+    font-size: 16px;
+    color: #ffffff;
+    width: 25px; 
+    text-align: center;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 7px;
+    border-radius: 5px;
+    background-color: #4158D0;
+    background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #4c00ff;
+    background-image: linear-gradient(160deg, #4900f5 0%, #80D0C7 100%);
+    cursor: pointer;
+  }
+  
+  .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #0093E9;
+    background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+    cursor: pointer;
+  }
+  
+
+.settings-box .settings-list {
+    flex-grow: 1; 
+}
+
+
+.center-button {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+
+/* animation waiting */
+
+.typing-indicator {
+    width: 60px;
+    height: 30px;
+    margin-right: 10px;
+    position: relative;
+    z-index: 4;
+  }
+  
+  .typing-circle {
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    border-radius: 50%;
+    background-color: #000;
+    left: 15%;
+    transform-origin: 50%;
+    animation: typing-circle7124 0.5s alternate infinite ease;
+  }
+  
+  @keyframes typing-circle7124 {
+    0% {
+      top: 20px;
+      height: 5px;
+      border-radius: 50px 50px 25px 25px;
+      transform: scaleX(1.7);
+    }
+  
+    40% {
+      height: 8px;
+      border-radius: 50%;
+      transform: scaleX(1);
+    }
+  
+    100% {
+      top: 0%;
+    }
+  }
+  
+  .typing-circle:nth-child(2) {
+    left: 45%;
+    animation-delay: 0.2s;
+  }
+  
+  .typing-circle:nth-child(3) {
+    left: auto;
+    right: 15%;
+    animation-delay: 0.3s;
+  }
+  
+  .typing-shadow {
+    width: 5px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 30px;
+    transform-origin: 50%;
+    z-index: 3;
+    left: 15%;
+    filter: blur(1px);
+    animation: typing-shadow046 0.5s alternate infinite ease;
+  }
+  
+  @keyframes typing-shadow046 {
+    0% {
+      transform: scaleX(1.5);
+    }
+  
+    40% {
+      transform: scaleX(1);
+      opacity: 0.7;
+    }
+  
+    100% {
+      transform: scaleX(0.2);
+      opacity: 0.4;
+    }
+  }
+  
+  .typing-shadow:nth-child(4) {
+    left: 45%;
+    animation-delay: 0.2s;
+  }
+  
+  .typing-shadow:nth-child(5) {
+    left: auto;
+    right: 15%;
+    animation-delay: 0.3s;
+  }
+
+  :root {
+    --borderWidth: 5px;
+    --height: 20px;
+    --width: 10px;
+    --borderColor: #50bacc;
+  }
+
+  .check-mark-accept-game {
+    display: inline-block;
+    margin-left: 40px;
+    margin-top: 3px;
+    transform: rotate(45deg);
+    height: var(--height);
+    width: var(--width);
+    border-bottom: var(--borderWidth) solid var(--borderColor);
+    border-right: var(--borderWidth) solid var(--borderColor);
+  }
+
+/* Settings Button */
+.settings-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 50px; 
+    background-color: #72ddf7;
+    color: #1C2341;
+    border: none;
+    cursor: pointer;
+}
+
+.settings-button:hover {
+    background-color: #8093f1;
+}
+
+/*  invitation box */
+
+.main-menu-online {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 10%; 
+    flex-direction: row-reverse;
+}
+
+
+#game-menu-invitationBox {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    border-radius: 20px;
+    color: #ffffff;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex: 1; 
+    margin: 10px;
+    background-image: linear-gradient(163deg, #10173F 0%, #8346a5 100%);
+    transition: all .3s; 
+    opacity: 0;
+    animation: fadeIn 2s ease-in-out forwards;
+}
+
+#game-menu-invitationBox2 {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    padding: 20px;
+    border-radius: 10px;
+    color: #A78FDB;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex: 1;
+    background-image: url('img/box-bg.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    transition: all .2s;
+    opacity: 0;
+    animation: fadeIn 0.4s ease-in-out forwards;
+  }
+  
+  #game-menu-invitationBox2:hover {
+    transform: scale(0.98);
+    border-radius: 20px;
+  }
+  
+  #game-menu-invitationBox:hover {
+    box-shadow: 0px 0px 30px 1px rgba(170, 0, 255, 0.3);
+  }
+
+/* logo match et tournoi pour invitations */
+
+.invitationTypeContainer {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-right: 10px;
+    border-radius: 30px;
+}
+
+.invitationTypeContainerMatch {
+    background-color: #c951a4;
+}
+
+.invitationTypeContainerTournament{
+    background-color: #b5179e;
+}
+
+.invitationTypeContainer {
+    color: #f9c3f1; 
+}
+
+.invitationTypeContainer::after {
+    content: ""; 
+    visibility: hidden; 
+    background-color: #6c6c6c; 
+    color: #fff;
+    font-size: 15px;
+    text-align: center; 
+    border-radius: 15px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 1;
+    left: 110%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s; 
+    white-space: nowrap;
+}
+
+.invitationTypeContainer.invitationTypeMatch::after {
+    content: "Match"; 
+}
+
+.invitationTypeContainer.invitationTypeTournament::after {
+    content: "Tournament"; 
+}
+
+.invitationTypeContainer:hover::after {
+    visibility: visible; 
+    opacity: 1; 
+}
+
+.accept-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 50px; 
+    background-color: #72ddf7;
+    color: #1C2341;
+    cursor: pointer;
+    margin-right: 5px;
+    display: inline-block; 
+}
+  
+.accept-button:hover {
+    background-color: #8093f1;
+}
+
+.remove-button {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #c1121f;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+    cursor: pointer;
+    transition-duration: .3s;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .svgIcon {
+    width: 12px;
+    transition-duration: .3s;
+  }
+  
+  .svgIcon path {
+    fill: white;
+  }
+  
+  .remove-button:hover {
+    width: 80px;
+    border-radius: 30px;
+    transition-duration: .3s;
+    background-color: rgb(193, 50, 50);
+    align-items: center;
+  }
+  
+  .remove-button:hover .svgIcon {
+    width: 50px;
+    transition-duration: .3s;
+    transform: translateY(80%);
+  }
+  
+  .remove-button::before {
+    position: absolute;
+    top: -23px;
+    content: "Delete";
+    color: white;
+    transition-duration: .3s;
+    font-size: 8px;
+  }
+  
+  .remove-button:hover::before {
+    font-size: 13px;
+    opacity: 1;
+    transform: translateY(30px);
+    transition-duration: .3s;
+  }
+
+
+.list-invitation-box {
+    height: 400px; 
+    overflow-y: auto; 
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #0c11265d;
+}
+
+.list-invitation-box::-webkit-scrollbar {
+    width: 8px; 
+}
+
+.list-invitation-box::-webkit-scrollbar-thumb {
+    background-color: #003369;
+    border-radius: 10px; 
+}
+
+.list-invitation-box::-webkit-scrollbar-track {
+    background-color: #2b5f97; 
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+}
+
+.list-invitation-box h2 {
+    margin-top: 0;
+    height: 200px;
+    overflow-y: auto; 
+    border: 1px solid #ddd;
+}
+
+
+.list-tournoi-element {
+    padding: 10px;
+    background-color: #c08fdb92;
+    border: 1px solid #c08fdbda;
     border-radius: 4px;
     margin-bottom: 10px;
     display: flex;
@@ -428,19 +900,221 @@ ul {
 
 .list-tournoi-element span {
     flex-grow: 1;
-    color: #000;
+    color: #ceb1de;
 }
 
-.accept-button {
-    padding: 5px 10px;
-    font-size: 14px;
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+  
+
+/* menus buttons */
+
+#menu-m1-button {
+    flex-direction: column;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 5%;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+#menu-m2a-button {
+    justify-content: center;
+    gap: 25%;
+    margin-top: 5%;
+}
+
+#menu-m2b-button {
+    justify-content: center;
+    gap: 25%;
+    margin-top: 5%;
+    display: flex;
+}
+
+
+.button-menu {
+    padding: 10px 20px;
+    font-size: 16px;
     color: #fff;
-    background-color: #dc3545;
+    background-color: #007bff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 
-.accept-button:hover {
-    background-color: #c82333;
+.button-menu:hover {
+    background-color: #0056b3;
 }
+
+
+/* stylized button */
+
+.stylized-button {
+    position: relative;
+    width: 12em;
+    height: 4em;
+    outline: none;
+    transition: 0.1s;
+    background-color: transparent;
+    border: none;
+    font-size: 13px;
+    font-weight: bold;
+    color: #A78FDB;
+  }
+  
+  #clip {
+    --color: #312964;
+    position: absolute;
+    top: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    border: 5px double var(--color);
+    box-shadow: inset 0px 0px 15px #101426;
+    -webkit-clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  }
+  
+  .arrow {
+    position: absolute;
+    transition: 0.2s;
+    background-color: #312964;
+    top: 35%;
+    width: 11%;
+    height: 30%;
+  }
+  
+  #leftArrow {
+    left: -13.5%;
+    -webkit-clip-path: polygon(100% 0, 100% 100%, 0 50%);
+  }
+  
+  #rightArrow {
+    -webkit-clip-path: polygon(100% 49%, 0 0, 0 100%);
+    left: 102%;
+  }
+  
+  .stylized-button:hover #rightArrow {
+    background-color: #8346a5;
+    left: -15%;
+    animation: 0.6s ease-in-out both infinite alternate rightArrow8;
+  }
+  
+  .stylized-button:hover #leftArrow {
+    background-color: #8346a5;
+    left: 103%;
+    animation: 0.6s ease-in-out both infinite alternate leftArrow8;
+  }
+  
+  .corner {
+    position: absolute;
+    width: 4em;
+    height: 4em;
+    background-color: #312964;
+    box-shadow: inset 1px 1px 8px #312964;
+    transform: scale(1) rotate(45deg);
+    transition: 0.2s;
+  }
+  
+  #rightTop {
+    top: -1.98em;
+    left: 91%;
+  }
+  
+  #leftTop {
+    top: -1.96em;
+    left: -3.0em;
+  }
+  
+  #leftBottom {
+    top: 2.10em;
+    left: -2.15em;
+  }
+  
+  #rightBottom {
+    top: 45%;
+    left: 88%;
+  }
+  
+  .stylized-button:hover #leftTop {
+    animation: 0.1s ease-in-out 0.05s both changeColor8,
+    0.2s linear 0.4s both lightEffect8;
+  }
+  
+  .stylized-button:hover #rightTop {
+    animation: 0.1s ease-in-out 0.15s both changeColor8,
+    0.2s linear 0.4s both lightEffect8;
+  }
+  
+  .stylized-button:hover #rightBottom {
+    animation: 0.1s ease-in-out 0.25s both changeColor8,
+    0.2s linear 0.4s both lightEffect8;
+  }
+  
+  .stylized-button:hover #leftBottom {
+    animation: 0.1s ease-in-out 0.35s both changeColor8,
+    0.2s linear 0.4s both lightEffect8;
+  }
+  
+  .stylized-button:hover .corner {
+    transform: scale(1.25) rotate(45deg);
+  }
+  
+  button:hover #clip {
+    animation: 0.2s ease-in-out 0.55s both greenLight8;
+    --color: #8346a5;
+  }
+  
+  @keyframes changeColor8 {
+    from {
+      background-color: #312964;
+    }
+  
+    to {
+      background-color: #8346a5;
+    }
+  }
+  
+  @keyframes lightEffect8 {
+    from {
+      box-shadow: 1px 1px 5px #8346a5;
+    }
+  
+    to {
+      box-shadow: 0 0 2px #8346a5;
+    }
+  }
+  
+  @keyframes greenLight8 {
+    from {
+    }
+  
+    to {
+      box-shadow: inset 0px 0px 32px #8346a5;
+    }
+  }
+  
+  @keyframes leftArrow8 {
+    from {
+      transform: translate(0px);
+    }
+  
+    to {
+      transform: translateX(10px);
+    }
+  }
+  
+  @keyframes rightArrow8 {
+    from {
+      transform: translate(0px);
+    }
+  
+    to {
+      transform: translateX(-10px);
+    }
+  }
+  
+  
+  

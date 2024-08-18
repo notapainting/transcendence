@@ -49,4 +49,17 @@ SOLVED:
     - p2 can unpause pause from p1
 
 BUG:
-    - game_quit not implemented 
+    - quit when idle -> error 
+        => will be fix with code refacto 
+
+
+use is auth func 
+display logging in game
+
+user clear all invite
+
+    !!!SOCKET ON CLOSE/OPEN -> MOVETO WELCOME!!!!
+
+
+
+    CHECK ALL API EXCEPT FOR JSON DEODE ERROR

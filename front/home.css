@@ -68,7 +68,9 @@ input:focus::placeholder {
 }
 
 #game {
-    display: none;
+    display: block;
+    opacity: 0;
+    transition: opacity 2s ease;
 }
 
 /* parallax-threes */
@@ -217,7 +219,7 @@ input:focus::placeholder {
 }
 
 .background-threes {
-    background-image: url("img/screnshot-game.png");
+    background-color: #34A0A4;
 }
 
 .back-threes {
@@ -250,30 +252,37 @@ input:focus::placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* background-color: #34A0A4; */
+
+    background-image: url("img/game-header-bg3.png");
+    background-size: cover;
+    background-position: center;
+    border-radius: 2px; 
 }
 .play-offline-online h2 {
-    margin-top: 0px;
+    margin-top: 60px;
 }
 
 .home-sep {
-    height: 200px;
+    /* height: 100%;
     width: 100%;
-    background-image: url("img/game-header-bg.png");
+    background-image: url("img/game-header-bg3.png");
     background-size: cover;
     background-position: center;
-    border-radius: 2px;
+    border-radius: 2px; */
 }
 
 .form-container {
     display: flex;
-    width: 50%;
+    width: 100%;
     height: 100%;
-    display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 .login-signin-form {
+    margin-top: 300px;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -446,20 +455,6 @@ input:focus::placeholder {
 
 
 
-  .btn-div {
-    width: 300px;
-    height: 300px;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    cursor: pointer;
-}
-
-.play-offline-btn {
-    background-image: url("img/play-offline.png");
-}
-
-
 .two-factor-container-login {
     width: 700px;
     height: 500px;
@@ -499,3 +494,201 @@ input:focus::placeholder {
     background-color: #947ADA;
     color: white;
   }
+
+/* Buttons  */
+
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+ .btn-div { /* A enlever? */
+    width: 50%;
+    height: 100%;
+}
+
+.btn-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    gap:20px;
+}
+
+/* .play-btn{
+    transition: transform 0.5s ease;
+} */
+
+.play-offline-online-title {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px; 
+}
+
+.play-offline-online-title img {
+    width: 100%; 
+    height: auto; 
+}
+
+.play-offline-online-buttons-container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+button[disabled]::after {
+    content: "You must login first"; 
+    visibility: hidden; 
+    background-color: #999999; 
+    color: #fff;
+    font-size: 15px;
+    text-align: center; 
+    border-radius: 15px;
+    padding: 10px 20px;
+    position: absolute;
+    z-index: 1;
+    left: 103%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s; 
+    white-space: nowrap;
+}
+
+ button[disabled]:hover::after {
+    visibility: visible;
+    opacity: 1;
+}
+
+.clickable{
+    cursor: pointer;
+}
+
+    .play-offline-online-button {
+    position: relative;
+    padding: 15px 65px;
+    background: #01497C;
+    font-size: 17px;
+    font-weight: 500;
+    color: #ffffff84;
+    border: 1px solid #01497C;
+    border-radius: 30px;
+    filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.2));
+  }
+  
+  .clickable:hover {
+    border: 1px solid #1A759F;
+    background: #1A759F;
+    animation: wind 2s ease-in-out infinite;
+  }
+  
+  @keyframes wind {
+    0% {
+      background-position: 0% 50%;
+    }
+  
+    0% {
+      background-position: 50% 100%;
+    }
+  
+    0% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  .icon-1 {
+    position: absolute;
+    top: 0;
+    right: 0;
+    fill:#10173F;
+    width: 25px;
+    transform-origin: 0 0;
+    transform: rotate(10deg);
+    transition: all 0.5s ease-in-out;
+    filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.3));
+  }
+  
+  .clickable:hover .icon-1 {
+    animation: slay-1 3s cubic-bezier(0.52, 0, 0.58, 1) infinite;
+    transform: rotate(10deg);
+  }
+  
+  @keyframes slay-1 {
+    0% {
+      transform: rotate(10deg);
+    }
+  
+    50% {
+      transform: rotate(-5deg);
+    }
+  
+    100% {
+      transform: rotate(10deg);
+    }
+  }
+  
+  .icon-2 {
+    position: absolute;
+    top: 0;
+    fill:#10173F;
+    left: 25px;
+    width: 12px;
+    transform-origin: 50% 0;
+    transform: rotate(10deg);
+    transition: all 1s ease-in-out;
+    filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.5));
+  }
+  
+  .clickable:hover .icon-2 {
+    animation: slay-2 3s cubic-bezier(0.52, 0, 0.58, 1) 1s infinite;
+    transform: rotate(0);
+  }
+  
+  @keyframes slay-2 {
+    0% {
+      transform: rotate(0deg);
+    }
+  
+    50% {
+      transform: rotate(15deg);
+    }
+  
+    100% {
+      transform: rotate(0);
+    }
+  }
+  
+  .icon-3 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    fill: #10173F;
+    width: 18px;
+    transform-origin: 50% 0;
+    transform: rotate(-5deg);
+    transition: all 1s ease-in-out;
+    filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.5));
+  }
+  
+  .clickable:hover .icon-3 {
+    animation: slay-3 2s cubic-bezier(0.52, 0, 0.58, 1) 1s infinite;
+    transform: rotate(0);
+  }
+  
+  @keyframes slay-3 {
+    0% {
+      transform: rotate(0deg);
+    }
+  
+    50% {
+      transform: rotate(-5deg);
+    }
+  
+    100% {
+      transform: rotate(0);
+    }
+  }
+  
