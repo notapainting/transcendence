@@ -89,7 +89,21 @@ const _invitations = (content) => {
             warnErrorInvitation(content.error);
             return true;
         case enu.Invitation.ACCEPT:
-            console.log(content)
+            console.log(content);
+            const message = content.message;  
+            const listItems = document.querySelectorAll('.list-tournoi-element');
+        
+            listItems.forEach(li => {
+                const userNameDiv = li.querySelector('.list-tournoi-user-name');
+                
+                if (userNameDiv && userNameDiv.textContent.trim() === message) {
+                    const typingIndicator = li.querySelector('.typing-indicator');
+                    if (typingIndicator) {
+                        typingIndicator.innerHTML = '';
+                        typingIndicator.innerHTML = '<div class="check-mark-accept-game"></div>';
+                    }
+                }
+            });
             if (content.mode === enu.Game.MATCH) {
                 if (content.by === false) {
                     let target = 'invite-status-' + content.message;

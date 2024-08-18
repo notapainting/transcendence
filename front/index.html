@@ -447,10 +447,17 @@
                                 <output id="scoreRangeOut"></output>
                             </li>
                             <li class="score-item">
-                                <label for="players">Max Players :</label>
-                                <input type="range" class="slider" id="playersRange" name="playersRange" min="2"
-                                    max="24" step="1" value="4" oninput="this.nextElementSibling.value = this.value">
+                                <label for="players">Number of Players :</label>
+                                <input type="range" class="slider" id="playersRange" name="playersRange" min="2" max="32" step="2" value="4" oninput="adjustSlider(this)">
                                 <output id="playersRangeOut"></output>
+                                <script>
+                                    function adjustSlider(slider) {
+                                        const values = [2, 4, 8, 16, 32];
+                                        let closestValue = values.reduce((prev, curr) => Math.abs(curr - slider.value) < Math.abs(prev - slider.value) ? curr : prev);
+                                        slider.value = closestValue;
+                                        slider.nextElementSibling.value = closestValue;
+                                    }
+                                </script>
                             </li>
                         </ul>
                         <button type="button" id="settings-button-reinit" class="settings-button">Reset</button>
@@ -696,6 +703,10 @@
                         <span id="leftArrow" class="arrow"></span>
                     </button>
                 </div>
+            </div>
+
+            <div id="menu-m7" class="menu-element">
+
             </div>
             
         </div>
