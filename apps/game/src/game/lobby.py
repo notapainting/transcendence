@@ -4,10 +4,13 @@ from channels.layers import get_channel_layer
 from game.gamestate import GameState, MIN_SCORE, MAX_SCORE, DEFAULT_SCORE, BONUSED
 from rest_framework.renderers import JSONRenderer
 import game.enums as enu
-import random, httpx, asyncio
+import random, httpx
 from uuid import uuid4
 
 from game.plaza import plaza
+
+from logging import getLogger
+logger = getLogger('base')
 
 LOBBY_MAXIMUM_PLAYERS = 24
 LOBBY_DEFAULT_MATCH_PLAYER = 2
@@ -93,7 +96,7 @@ class BaseLobby:
         }
 
     def set_players(self, players):
-        if len(players) % 2 != 0 or len(players) == 0:
+        if len(players) < 2:
             raise InvalidPlayersException()
         self.players = players
 
@@ -180,9 +183,9 @@ class BaseMatch:
 
 class BaseTournament:
     def is_end(self):
-        if len(self.current) != 1:
-                return False
-        return True
+        if len(self.current) == 1 and not hasattr(self, "odd"):
+            return True
+        return False
 
     async def update_result(self, data):
         self.players.remove(data['loser'])
@@ -192,7 +195,15 @@ class BaseTournament:
         return False
 
     async def make_phase(self):
-        random.shuffle(self.players)
+        if len(self.players) % 2 != 0:
+            if hasattr(self, "odd"):
+                self.players.append(self.odd)
+                logger.debug(f"add odd : {self.odd}, rest: {self.players}")
+                del self.odd
+            else:
+                self.odd = self.players.pop()
+                logger.debug(f"pop odd : {self.odd}, rest: {self.players}")
+        random.shuffle(self.players)    
         self.current = [{"id":i, "host":self.players[i],"guest":self.players[i + 1]} for i in range(0, len(self.players), 2)]
         self.match_count = len(self.current)
         await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.PHASE, "new":True, "phase":self.current}})

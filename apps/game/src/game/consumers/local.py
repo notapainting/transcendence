@@ -59,8 +59,8 @@ class LocalConsumer(BaseConsumer):
         await self.send_json(data["relay"])
 
     async def match_end(self, data):
+        await self.send_json(data)
         if hasattr(self, "lobby"):
             await self.lobby.update_result(data)
-        await self.send_json(data)
 
 

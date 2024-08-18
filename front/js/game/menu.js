@@ -297,16 +297,19 @@ const sendCreate = (mode) => {
 
 createMatch.addEventListener('click', () => {
     status = enu.gameMode.MATCH;
+    document.getElementById('playersRange').min = 2;
     sendCreate(enu.Game.MATCH)
 });
 
 createTournament.addEventListener('click', () => {
     status = enu.gameMode.TOURNAMENT;
+    document.getElementById('playersRange').min = 4;
     sendCreate(enu.Game.TRN)
 });
 
 createLocal.addEventListener('click', () => {
     status = enu.gameMode.LOCAL;
+    document.getElementById('playersRange').min = 2;
     sendCreate(enu.Game.LOCAL)
 })
 
@@ -326,6 +329,7 @@ function setMaxPlayer() {
     settingsSendPlayer.value = gameSettings.maxPlayer;
     document.getElementById('playersRangeOut').value = gameSettings.maxPlayer;
 };
+
 
 let updateRequested = [
     ["bonused", null, getBonused], 
