@@ -9,7 +9,6 @@ services:
       - TZ=${TZ}
     env_file:
       - conf/auth.env.example
-      - conf/auth-common.env.example
     volumes:
       - auth_volume:/app
     networks:
@@ -18,8 +17,8 @@ services:
     depends_on:
       auth-db:
        condition: service_healthy
+    init: true
     entrypoint: ["bash", "/conf/init.sh"]
-
 
   auth-db:
     container_name: auth-db
@@ -28,8 +27,7 @@ services:
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/auth-db.env.example
-      - conf/auth-common.env.example
+      - conf/auth.env.example
     volumes:
       - auth-db_volume:${PGDATA}
     networks: 

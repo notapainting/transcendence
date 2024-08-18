@@ -8,7 +8,7 @@ services:
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/user-common.env.example
+      - conf/user.env.example
     volumes:
       - user_volume:/app
     networks:
@@ -17,6 +17,7 @@ services:
     depends_on:
       user-db:
        condition: service_healthy
+    init: true
     entrypoint: ["bash", "/conf/init.sh"]
 
   user-db:
@@ -26,8 +27,7 @@ services:
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/user-db.env.example
-      - conf/user-common.env.example
+      - conf/user.env.example
     volumes:
       - user-db_volume:${PGDATA}
     networks: 
