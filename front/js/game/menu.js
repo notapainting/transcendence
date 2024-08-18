@@ -90,7 +90,7 @@ const   scene = [
     [menuBgVid, menuM4], // afk check
     [menuM5], // in game
     [menuM6], // ecran de fin de match 
-    [menuM7], // ecran de fin de tournoi (recap)
+    [menuM6], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
 // menu 2b -> enlever ready
