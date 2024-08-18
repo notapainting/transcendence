@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import os
-from socket import SOCK_STREAM
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,21 +17,20 @@ TIME_ZONE = 'CET'
 ADMIN_USERNAME = 'admin'
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0#_lx+w5u%tmt2kl*9li+!(3jdtc3re@ihht6#hn2!p8-90j_v'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://localhost:8443']
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+
+
 APPEND_SLASH = False
 
-DEBUG = True
+DEBUG = False
 
 ASGI_APPLICATION = "project.asgi.application"
 
 INSTALLED_APPS = [
     'daphne',
     'chat',
-    'djangoviz',
 ]
 
 
@@ -46,7 +45,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("chat-redis", 6379)],
+            "hosts": [(os.getenv('REDIS_HOSTNAME', 'redis'), os.getenv('REDIS_PORT', 6379))],
         },
     },
 }

@@ -1,5 +1,4 @@
 import ssl
-import sys
 from daphne.cli import CommandLineInterface
 
 if __name__ == "__main__":

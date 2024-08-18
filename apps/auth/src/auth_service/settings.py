@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1nyh3mrd0y28m&^yw2+0j&p_7e^w9mr5cvf@1rxqa11*jk1gaa'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -210,3 +210,42 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ADMIN_USERNAME = 'admin'
 ADMIN_EMAIL = 'admin@admin.com'
 ADMIN_PASSWORD = 'adminpassword'
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "VERBOSE": {
+            "format": "{levelname} {asctime} ({module}) p:{process:d} t:{thread:d} l:{lineno} => {message}",
+            "style": "{",
+        },
+        "MID": {
+            "format": "{levelname} {asctime} => {message}   (f:{filename} l:{lineno:d})",
+            "style": "{",
+        },
+        "SIMPLE": {
+            "format": "{levelname} => {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "class": "logging.StreamHandler",
+            "formatter": os.getenv("DJANGO_LOG_FORMAT", "MID"),
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+        "propagate": False,
+    },
+    "loggers": {
+        "base": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
+        },
+    }
+}
+

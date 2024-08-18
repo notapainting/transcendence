@@ -3,12 +3,12 @@ services:
     container_name: chat
     build:
       context: apps/chat
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     image: chat_image
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/chat-common.env.example
+      - conf/chat.env.example
     volumes:
       - chat_volume:/app
     networks:
@@ -27,8 +27,7 @@ services:
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/chat-common.env.example
-      - conf/chat-db.env.example
+      - conf/chat.env.example
     volumes:
       - chat-db_volume:${PGDATA}
     networks: 
