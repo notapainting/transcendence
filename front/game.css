@@ -638,6 +638,24 @@ ul {
     animation-delay: 0.3s;
   }
 
+  :root {
+    --borderWidth: 5px;
+    --height: 20px;
+    --width: 10px;
+    --borderColor: #50bacc;
+  }
+
+  .check-mark-accept-game {
+    display: inline-block;
+    margin-left: 40px;
+    margin-top: 3px;
+    transform: rotate(45deg);
+    height: var(--height);
+    width: var(--width);
+    border-bottom: var(--borderWidth) solid var(--borderColor);
+    border-right: var(--borderWidth) solid var(--borderColor);
+  }
+
 /* Settings Button */
 .settings-button {
     padding: 10px 20px;
