@@ -11,7 +11,6 @@ const   start = document.getElementById('game-menu-start');
 const   nextMatch = document.getElementById('game-menu-next');
 const   settingsReInit = document.getElementById('settings-button-reinit');
 
-
 // <!-- div buttons -->
 const   menuM1 = document.getElementById('menu-m1-button');
 const   menuM2a = document.getElementById('menu-m2a-button');
@@ -20,6 +19,7 @@ const   menuM3 = document.getElementById('menu-m3');
 const   menuM4 = document.getElementById('menu-m4');
 const   menuM5 = document.getElementById('menu-m5');
 const   menuM6 = document.getElementById('menu-m6');
+const   menuM7 = document.getElementById('menu-m7');
 
 // <!-- animated background -->
 const   menuBgVid = document.getElementById('menu_bg_video');
@@ -46,12 +46,6 @@ const   invitationBox = document.getElementById('game-menu-invitationBox');
 const   ready = document.getElementById('game-menu-ready');
 const   readyP = document.getElementById('game-menu-ready-prematch');
 const   circle = document.getElementById('game-menu-ready-circle');
-
-// <!-- in game banner -->
-// const   bannerPhase = document.getElementById('game-menu-banner-phase');
-// const   bannerMatch = document.getElementById('game-menu-banner-match');
-// const   bannerScore = document.getElementById('game-menu-banner-score');
-const   bannerEnd = document.getElementById('game-menu-banner-end');
 
 // <!-- in game button -->
 const   pause = document.getElementById('game-menu-pause');
