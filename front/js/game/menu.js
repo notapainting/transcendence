@@ -154,6 +154,7 @@ export const clearScore = () => {
 
 export const announcePhase = (data) => {
     document.getElementById('banner-phase-text').innerHTML = '';
+    let odd = 0;
     const column = document.createElement('div');
     column.className = "column";
     data.forEach((matchData) => {
@@ -163,6 +164,7 @@ export const announcePhase = (data) => {
         const   itemVS = document.createElement('div');
 
         const winnerTop = document.createElement('div');
+        const winnerBottom = document.createElement('div');
         const matchTop = document.createElement('div');
         const matchBottom = document.createElement('div');
         const columnUserTop = document.createElement('span');
@@ -179,27 +181,48 @@ export const announcePhase = (data) => {
         columnUserTop.textContent = matchData.host;
         columnUserBottom.textContent = matchData.guest;
         columnUserTop.className = "name";
-        columnUserTop.className = "name";
+        columnUserBottom.className = "name";
         winnerTop.className = "match winner-top";
+        winnerBottom.className = "match winner-bottom";
         matchTop.className = "match-top team";
         matchBottom.className = "match-bottom team";
 
-        winnerTop.appendChild(matchTop);
-        winnerTop.appendChild(matchBottom);
-        matchTop.appendChild(columnUserTop);
-        matchBottom.appendChild(columnUserBottom);
-        column.appendChild(winnerTop);
+        if (odd === 0)
+        {
+            winnerTop.appendChild(matchTop);
+            winnerTop.appendChild(matchBottom);
+            matchTop.appendChild(columnUserTop);
+            matchBottom.appendChild(columnUserBottom);
+            winnerTop.innerHTML += `
+            </div>
+            <div class="match-lines">
+              <div class="line one"></div>
+              <div class="line two"></div>
+            </div>
+            <div class="match-lines alt">
+              <div class="line one"></div>
+            </div> `;
+            column.appendChild(winnerTop);
+            odd = 1;
+        }
+        else {
+            winnerBottom.appendChild(matchTop);
+            winnerBottom.appendChild(matchBottom);
+            matchTop.appendChild(columnUserTop);
+            matchBottom.appendChild(columnUserBottom);
+            winnerBottom.innerHTML += `
+            </div>
+            <div class="match-lines">
+              <div class="line one"></div>
+              <div class="line two"></div>
+            </div>
+            <div class="match-lines alt">
+              <div class="line one"></div>
+            </div> `;
+            column.appendChild(winnerBottom);
+            odd = 0;
+        }
 
-        column.innerHTML += `
-        </div>
-        <div class="match-lines">
-          <div class="line one"></div>
-          <div class="line two"></div>
-        </div>
-        <div class="match-lines alt">
-          <div class="line one"></div>
-        </div>
-        `;
 
         
         item.appendChild(itemPlayer1);
