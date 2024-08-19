@@ -2,6 +2,7 @@ import * as game from './game.js';
 import { gameData } from './game.js';
 import { updateSettings, changeGameStatus, getGameStatus, getSceneIdx, announcePhase, announceMatch, moveTo, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearInvitationList, clearScore } from './menu.js';
 import { fullClear } from './index.js';
+import { scene } from './game.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
 import { composer } from './game.js';

@@ -423,10 +423,31 @@
     color: #a6e2f1;
   }
 
+  #menu-m7 {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
 
 #menu-m7-button {
     position: relative;
     justify-content: center;
-    margin-top: 500%;
+    /* margin-top: 500%; */
     display: flex;
+}
+
+.blurry-background {
+    width: 300px;
+    height: 200px;
+    background: rgba(0, 102, 143, 0.131);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    color: black;
+    border-radius: 10px;
+    text-align: center;
 }

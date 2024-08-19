@@ -103,10 +103,18 @@ export const gameData = {
 	sceneHandler: 0
 };
 
+function clearTrail() {
+    scene.children
+        .filter(obj => obj.userData.isTrailSphere)
+        .forEach(obj => scene.remove(obj));
+
+    trailPositions = []; 
+}
+
 export function gameRenderer(data) {
-	if (data)
-	{
-		utils.clearScene(); 
+    if (data)
+    {
+        utils.clearScene(); 
 		animationData.ballFall = true;
 		scene.add(load.intro);
 		scene.add(spotLight);
@@ -264,18 +272,12 @@ export function gameRenderer(data) {
 		if (data.hitM === true)
 			gameData.catchMalus = true;
 
-		// if (data.bonus && (data.bonus === 'boostL' || data.bonus === 'boostR')){
-		// 	console.log(data.bonus);
-		// 	if (load.boost){
-		// 		load.boost.position.set(sphere.position.x, sphere.position.y, sphere.position.z)
-		// 		scene.add(load.boost);
-		// 		updateBallPosition(sphere.position);
-		// 		applyRotationToObject(load.boost, direction) 
-		// 	}
-		// }
+        if (data.x === 0 && data.y === 0)
+            clearTrail();
 	}
 
-	if (gameData.sceneHandler === 1){
+	if (gameData.sceneHandler === 1)
+    {
 		if (data) {
 			if (gameData.start) {
 				sphere.position.set(data.x, data.y, 0);
