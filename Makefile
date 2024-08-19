@@ -14,7 +14,7 @@
 
 
 #========#	general rule	#========#
-.PHONY: all re build start up down clear top ps config logs reload proxy chat game auth user
+.PHONY: all re build start up down clear top ps config logs reload proxy chat game auth user dev prod
 
 all:	start
 
@@ -39,8 +39,20 @@ up:
 down:
 	${CMP} down 
 
-
+msg:
+	echo ${ENV_FILE}
 #========#	tools rule	#========#
+env-create: ${ENV_FILE}
+	echo "Generate new .env files!"
+
+env-clear:
+	rm ${ENV_FILE}
+	echo "Delete old .env files.."
+
+
+${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
+	cp $< $@
+
 config:
 	${CMP} config
 

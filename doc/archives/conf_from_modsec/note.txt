@@ -1,7 +1,0 @@
-
-finish api location + add webscoket ?
-
--v /tmp/host-fs-auditlog.log:/var/log/modsec_audit.log \
-   -v /tmp/host-fs-errorlog.log:/var/log/modsec_error.log 
-
-/etc/nginx/templates/conf.d/default.conf.template
