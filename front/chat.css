@@ -298,6 +298,15 @@
     margin-left: 70px;
 }
 
+.block-button {
+    font-size: 18px;
+    right: 0;
+}
+
+.block-button:hover {
+    color: red;
+}
+
 .username-status {
     display: flex;
     align-items: center;
