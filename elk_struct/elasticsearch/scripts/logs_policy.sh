@@ -13,74 +13,11 @@ CA_CERT="/usr/share/elasticsearch/config/certs/ca/ca.crt"
 
 set -e
 
-if [ -z "$ELASTIC_USER" ]; then
-  echo -e "${COLOR_RED}Set the ELASTIC_USER environment variable in the .env file${COLOR_RESET}"
-  exit 1
-elif [ -z "$ELASTIC_PASSWORD" ]; then
-  echo -e "${COLOR_RED}Set the ELASTIC_PASSWORD environment variable in the .env file${COLOR_RESET}"
-  exit 1
-fi
-
 # ILM policy JSON
-ilm_policy_json='{
-  "policy": {
-    "phases": {
-      "hot": {
-        "actions": {
-          "rollover": {
-            "max_primary_shard_size": "50GB",
-            "max_age": "30d"
-          },
-          "set_priority": {
-            "priority": 50
-          }
-        }
-      },
-      "warm": {
-        "min_age": "7d",
-        "actions": {
-          "forcemerge": {
-            "max_num_segments": 1
-          },
-          "shrink": {
-            "number_of_shards": 1
-          },
-          "allocate": {
-            "require": {
-              "data": "warm"
-            }
-          },
-          "set_priority": {
-            "priority": 25
-          }
-        }
-      },
-      "cold": {
-        "min_age": "30d",
-        "actions": {
-          "set_priority": {
-            "priority": 0
-          },
-          "freeze": {},
-          "allocate": {
-            "require": {
-              "data": "cold"
-            }
-          }
-        }
-      },
-      "delete": {
-        "min_age": "60d",
-        "actions": {
-          "delete": {}
-        }
-      }
-    }
-  }
-}'
+ILM_JSON=$(cat /usr/share/elasticsearch/scripts/ilm.json)
 
 # List of policy names
-policy_names=("nginx_policy" "logstash_policy" "filebeat_policy")
+policy_names=("nginx_policy" "filebeat_policy")
 
 for policy_name in "${policy_names[@]}"; do
   echo -e "${COLOR_GREEN}Configuring ILM policy for ${policy_name}...${COLOR_RESET}"
@@ -89,7 +26,7 @@ for policy_name in "${policy_names[@]}"; do
     "$ELASTICSEARCH_URL/_ilm/policy/${policy_name}?pretty" \
     -H 'Content-Type: application/json' \
     --cacert "$CA_CERT" \
-    -d "$ilm_policy_json")
+    -d "$ILM_JSON")
 
   if [[ "$response" != *'"acknowledged" : true'* ]]; then
     echo -e "${COLOR_RED}Issue with ${policy_name} policy configuration.${COLOR_RESET}"

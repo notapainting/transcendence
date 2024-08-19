@@ -1,0 +1,18 @@
+{
+    "data_view": {
+      "title": "filebeat-index-*",
+      "name": "My Filebeat Data View",
+      "id": "filebeat-data",
+      "fieldAttrs": {
+        "timestamp": {
+          "customLabel": "Timestamp"
+        },
+        "program": {
+          "customLabel": "Program"
+        },
+        "syslog_message": {
+          "customLabel": "Message"
+        }
+      }
+    }
+}

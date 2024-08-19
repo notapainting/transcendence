@@ -7,3 +7,4 @@ FROM    docker.elastic.co/elasticsearch/elasticsearch:8.14.1
 RUN     mkdir -p /usr/share/elasticsearch/scripts
 
 COPY    scripts/logs_policy.sh /usr/share/elasticsearch/scripts/
+COPY    scripts/ilm.json /usr/share/elasticsearch/scripts/
