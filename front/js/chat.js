@@ -116,17 +116,24 @@ function addUserToMenu(target, profile_picture) {
             <div class="last-message">Last message</div>
         `;
         personDiv.append(picturePersonDiv, descriptionPersonDiv);
+        const addOrBlockDiv = document.createElement("div");
+        addOrBlockDiv.classList.add("add-or-block")
         if (!contactSummary.data.contacts.find(elem => elem === target) && !contactSummary.data.invited_by.find(elem => elem === target) && !contactSummary.data.invitations.find(elem => elem === target)){
             console.log("salut");
             const addFriend = document.createElement('i');
             addFriend.classList.add("fa-solid", "fa-plus", "add-button");
             addFriend.addEventListener("click", event => addToFriend(target));
-            personDiv.appendChild(addFriend);
+            // personDiv.appendChild(addFriend);
+            addOrBlockDiv.appendChild(addFriend);
         }
-        const blockButton = document.createElement('i');
-        blockButton.classList.add("fa-solid", "fa-ban", "block-button");
-        blockButton.addEventListener("click", event => blockUser(target));
-        personDiv.appendChild(blockButton);
+        if (!contactSummary.data.blockeds.find(elem => elem === target)){
+            const blockButton = document.createElement('i');
+            blockButton.classList.add("fa-solid", "fa-ban", "block-button");
+            blockButton.addEventListener("click", event => blockUser(target));
+            // personDiv.appendChild(blockButton);
+            addOrBlockDiv.appendChild(blockButton);
+        }
+        personDiv.appendChild(addOrBlockDiv);
         displayMenu.insertBefore(personDiv, displayMenu.children[1]);
         personDiv.removeEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
         personDiv.addEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
@@ -346,6 +353,17 @@ const deleteNotif = (target) => {
     incrDecrNotifNumber("decrement");
 }
 
+const deleteBlockButton = (target) => {
+    const personElem = document.querySelector(`.person[data-username="${target}"]`);
+    if (personElem){
+        const blockButton = personElem.querySelector(".block-button");
+        if (blockButton)
+            blockButton.remove();
+    }
+
+
+}
+
 const deletePlusIcon = (target) => {
     const personElem = document.querySelector(`.person[data-username="${target}"]`);
     if (personElem){
@@ -422,6 +440,8 @@ async function handleMessage(message) {
         }
         if (message.data.author === whoIam && message.data.operation === "contact") //si je suis celui qui accepte
             deleteNotif(message.data.name);
+        if (message.data.author === whoIam && message.data.operation === "block") // si je susi celui qui bloque
+            deleteBlockButton(message.data.name);
         console.log(message);
     }
     else if (message.type === "status.update"){

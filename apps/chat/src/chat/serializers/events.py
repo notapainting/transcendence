@@ -129,7 +129,7 @@ class ContactUpdate(BaseSerializer):
                 self.alter_pgroup_if_exist(data['author'], data['name'], mod.GroupShip.Roles.WRITER)
 
         elif data['operation'] == enu.Operations.BLOCK:
-            self.alter_pgroup_if(data['author'], data['name'], mod.GroupShip.Roles.READER)
+            self.alter_pgroup_if_exist(data['author'], data['name'], mod.GroupShip.Roles.READER)
             data['author'].update_relation(data['name'], mod.Relation.Types.BLOCK)
             if data['name'].get_relation(data['author']) != mod.Relation.Types.BLOCK:
                 data['name'].delete_relation(data['author'])
