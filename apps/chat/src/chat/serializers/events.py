@@ -21,7 +21,7 @@ class BaseSerializer(serializers.Serializer):
     author = ser.UserRelatedField(queryset=mod.User.objects.all())
 
     def create(self, data):
-        logger.info(f"EVENT {__name__}")
+        logger.debug(f"EVENT {__name__}")
 
 class Status(BaseSerializer):
     status = serializers.ChoiceField(choices=mod.User.Status)
