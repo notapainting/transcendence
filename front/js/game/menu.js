@@ -90,7 +90,7 @@ const   scene = [
     [menuBgVid, menuM4], // afk check
     [menuM5], // in game
     [menuM6], // ecran de fin de match 
-    [menuM6], // ecran de fin de tournoi (recap)
+    [menuM7], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
 // menu 2b -> enlever ready
@@ -132,7 +132,8 @@ export const moveTo = (i) => {
     if (idx === enu.sceneIdx.WELCOME) status = enu.gameMode.LOCAL;
     else if (idx === enu.sceneIdx.CREATION) {
         players = [];
-        clearGame()
+        clearGame();
+        document.getElementById('bracket-disable-image').innerHTML = '';
     };
     scene[idx].forEach(div => {div.style.display = "flex";});
     if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6.style.display = "none";
@@ -151,11 +152,19 @@ export const clearScore = () => {
 
 export const announcePhase = (data) => {
     document.getElementById('banner-phase-text').innerHTML = '';
+    const column = document.createElement('div');
+    column.className = "column";
     data.forEach((matchData) => {
         const   item = document.createElement('li');
         const   itemPlayer1 = document.createElement('div');
         const   itemPlayer2 = document.createElement('div');
         const   itemVS = document.createElement('div');
+
+        const winnerTop = document.createElement('div');
+        const matchTop = document.createElement('div');
+        const matchBottom = document.createElement('div');
+        const columnUserTop = document.createElement('span');
+        const columnUserBottom = document.createElement('span');
     
         item.className = 'list-banner-element';
         itemPlayer1.textContent = matchData.host;
@@ -164,12 +173,39 @@ export const announcePhase = (data) => {
         itemPlayer1.className = 'list-banner-user-name';
         itemPlayer2.className = 'list-banner-user-name';
         itemVS.className = 'list-banner-vs';
-    
+
+        columnUserTop.textContent = matchData.host;
+        columnUserBottom.textContent = matchData.guest;
+        columnUserTop.className = "name";
+        columnUserTop.className = "name";
+        winnerTop.className = "match winner-top";
+        matchTop.className = "match-top team";
+        matchBottom.className = "match-bottom team";
+
+        winnerTop.appendChild(matchTop);
+        winnerTop.appendChild(matchBottom);
+        matchTop.appendChild(columnUserTop);
+        matchBottom.appendChild(columnUserBottom);
+        column.appendChild(winnerTop);
+
+        column.innerHTML += `
+        </div>
+        <div class="match-lines">
+          <div class="line one"></div>
+          <div class="line two"></div>
+        </div>
+        <div class="match-lines alt">
+          <div class="line one"></div>
+        </div>
+        `;
+
+        
         item.appendChild(itemPlayer1);
         item.appendChild(itemVS);
         item.appendChild(itemPlayer2);
         document.getElementById('banner-phase-text').appendChild(item);
     })
+    document.getElementById('bracket-disable-image').appendChild(column);
 }
 
 export const announceMatch = (data) => {

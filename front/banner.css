@@ -422,3 +422,11 @@
   #game-menu-banner-end{
     color: #a6e2f1;
   }
+
+
+#menu-m7-button {
+    position: relative;
+    justify-content: center;
+    margin-top: 500%;
+    display: flex;
+}
