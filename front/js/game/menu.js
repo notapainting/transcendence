@@ -20,6 +20,7 @@ const   menuM4 = document.getElementById('menu-m4');
 const   menuM5 = document.getElementById('menu-m5');
 const   menuM6 = document.getElementById('menu-m6');
 const   menuM7 = document.getElementById('menu-m7');
+const   menuM6_button = document.getElementById('menu-m6-button');
 
 // <!-- animated background -->
 const   menuBgVid = document.getElementById('menu_bg_video');
@@ -45,7 +46,6 @@ const   invitationBox = document.getElementById('game-menu-invitationBox');
 // <!-- set ready -->
 const   ready = document.getElementById('game-menu-ready');
 const   readyP = document.getElementById('game-menu-ready-prematch');
-const   circle = document.getElementById('game-menu-ready-circle');
 
 // <!-- in game button -->
 const   pause = document.getElementById('game-menu-pause');
@@ -80,6 +80,8 @@ let     players = [];
 let     currentPlayers = [];
 let     currentScore = [0, 0];
 let     locked = false;
+let     is_match = false;
+
 
 // scene
 const   scene = [
@@ -135,8 +137,7 @@ export const moveTo = (i) => {
         clearGame()
     };
     scene[idx].forEach(div => {div.style.display = "flex";});
-    if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6.style.display = "none";
-    console.log("status: " + status);
+    if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6_button.style.display = "none";
 }
 
 /*** banner update ****/
@@ -271,9 +272,14 @@ let gameSettings = {
 export const updateSettings = (data) => {
     gameSettings.bonused = data.bonused;
     gameSettings.scoreToWin = data.scoreToWin;
-    gameSettings.maxPlayer = data.maxPlayer;
+    if (is_match === true) {
+        gameSettings.maxPlayer = 2;
+        setMaxPlayer(); 
+    } else {
+        gameSettings.maxPlayer = data.maxPlayer;
+        setMaxPlayer();
+    }
     setScoreToWin();
-    setMaxPlayer();
     setBonused();
 }
 
@@ -292,18 +298,27 @@ const sendCreate = (mode) => {
 createMatch.addEventListener('click', () => {
     status = enu.gameMode.MATCH;
     document.getElementById('playersRange').min = 2;
+    document.getElementById('playersRange').disabled = true;
+    is_match = true;
+    document.getElementById('game-menu-list-players-title').innerText = "Fast Match";
     sendCreate(enu.Game.MATCH)
 });
 
 createTournament.addEventListener('click', () => {
     status = enu.gameMode.TOURNAMENT;
     document.getElementById('playersRange').min = 4;
+    document.getElementById('playersRange').disabled = false;
+    document.getElementById('game-menu-list-players-title').innerText = "Pong Tournament";
+    is_match = false;
     sendCreate(enu.Game.TRN)
 });
 
 createLocal.addEventListener('click', () => {
     status = enu.gameMode.LOCAL;
     document.getElementById('playersRange').min = 2;
+    document.getElementById('playersRange').disabled = false;
+    document.getElementById('game-menu-list-players-title').innerText = "Local Tournament";
+    is_match = false;
     sendCreate(enu.Game.LOCAL)
 })
 
