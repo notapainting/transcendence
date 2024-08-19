@@ -12,7 +12,7 @@ from game.plaza import plaza
 from logging import getLogger
 logger = getLogger('base')
 
-LOBBY_MAXIMUM_PLAYERS = 24
+LOBBY_MAXIMUM_PLAYERS = 36
 LOBBY_DEFAULT_MATCH_PLAYER = 2
 LOBBY_DEFAULT_PLAYERS = 8
 LOBBY_MINIMUM_PLAYERS = 2
@@ -70,7 +70,7 @@ class BaseLobby:
     def maxPlayer(self, value):
         value = int(value)
         if value < len(self.players) or value > LOBBY_MAXIMUM_PLAYERS:
-            raise MaxPlayerException()
+            raise MaxPlayerException("Cant have less max players than current count of players")
         self._maxPlayer = value
 
     @property
@@ -97,7 +97,7 @@ class BaseLobby:
 
     def set_players(self, players):
         if len(players) < 2:
-            raise InvalidPlayersException()
+            MaxPlayerException("Need more players")
         self.players = players
 
     def invite(self, user):
@@ -220,6 +220,8 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
         await self._chlayer.group_send(self._id, message)
 
     async def start(self, players):
+        if len(players) != self.maxPlayer:
+            return
         self.set_players(players)
         await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Game.START}})
         await self.make_phase()
@@ -403,7 +405,6 @@ class Tournament(RemoteLobby, BaseTournament):
         else:
             await self._send(data['winner'], {"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.PHASE, "new":False}})
             await self._send(data['loser'], {"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.PHASE, "new":False}})
-
 
     def players_state(self):
         return {"invited":self.invitations, "players":self.players, "host":self.host, "size":self.maxPlayer}

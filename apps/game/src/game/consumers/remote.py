@@ -30,9 +30,6 @@ async def authenticate(headers):
 class ErrorDecode(Exception):
     pass
 
-# add delay start match
-# add delay after trn end
-
 
 class RemoteGamer(LocalConsumer):
     def __init__(self):
