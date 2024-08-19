@@ -44,7 +44,6 @@ const   createLocal = document.getElementById('game-menu-local');
 const   invitationBox = document.getElementById('game-menu-invitationBox');
 
 // <!-- set ready -->
-const   ready = document.getElementById('game-menu-ready');
 const   readyP = document.getElementById('game-menu-ready-prematch');
 
 // <!-- in game button -->
@@ -103,17 +102,19 @@ const   scene = [
 /*** initialisation ****/
 export const initMenu = (path) => {
     status = enu.gameMode.LOCAL;
+    activateAniM1()
     if (path === enu.backendPath.LOCAL) {
         anon = true;
         players = [];
         clearInvitationList();
         moveTo(enu.sceneIdx.CREATION);
-        console.log("init : local");
     } else {
         anon = false;
         clearInvitationList();
         moveTo(enu.sceneIdx.WELCOME);
     }
+    setTimeout(desactivateAniM1, 700);
+
 }
 
 export const clearInvitationList = () => {
@@ -404,7 +405,6 @@ const readyFunc = () => {
 };
 
 readyP.addEventListener('click', readyFunc);
-ready.addEventListener('click', readyFunc);
 
 pause.addEventListener('click', () => {
     if (locked === true) return ;
@@ -424,6 +424,7 @@ const quitFunc = () => {
         if (idx == enu.sceneIdx.CREATION) {
             if (gameSocket !== null) gameSocket.close();
             fullClear()
+            activateAniM1()
             navigateTo("/");
             return ;
         }
@@ -433,6 +434,7 @@ const quitFunc = () => {
     status == enu.gameMode.LOCAL
     if (idx === enu.sceneIdx.WELCOME) {
         fullClear()
+        activateAniM1()
         navigateTo("/");
     }
     moveTo(to);
@@ -503,3 +505,24 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Video element not found');
     }
 });
+
+
+// animation menum1
+
+const activateAniM1 = () => {
+    document.getElementById('game-menu-invitationBox').style.opacity = 0;
+    document.getElementById('game-menu-invitationBox2').style.opacity = 0;
+    document.getElementById('menu-m1-button').style.opacity = 0;
+    document.getElementById('game-menu-invitationBox').animation = "fadeIn 0.5s ease-in-out forwards";
+    document.getElementById('game-menu-invitationBox2').animation = "fadeIn 0.5s ease-in-out forwards";
+    document.getElementById('menu-m1-button').animation = "fadeIn 0.5s ease-in-out forwards";
+}
+
+const desactivateAniM1 = () => {
+    document.getElementById('game-menu-invitationBox').style.opacity = 1;
+    document.getElementById('game-menu-invitationBox2').style.opacity = 1;
+    document.getElementById('menu-m1-button').style.opacity = 1;
+    document.getElementById('game-menu-invitationBox').animation = "none";
+    document.getElementById('game-menu-invitationBox2').animation = "none";
+    document.getElementById('menu-m1-button').animation = "none";
+}
