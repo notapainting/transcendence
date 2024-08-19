@@ -30,7 +30,7 @@ const _initWebsocket = (path) => {
     gameSocket.onclose = function (e) {
         console.log('GameWebSocket connection closed');
         moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
-        setTimeout(_initWebsocket, 5000, path)
+        if (path === enu.backendPath.REMOTE) setTimeout(_initWebsocket, 5000, path);
         gameSocket = null;
         clearListInvitation();
     };
