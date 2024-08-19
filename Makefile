@@ -28,7 +28,8 @@ build:
 
 #========#	start/stop rule	#========#
 start:
-	${CMP} up -d --build
+	sudo sysctl -w vm.max_map_count=262144
+	${CMP} up --build
 
 clear:
 	${CMP} down -v --remove-orphans --rmi all

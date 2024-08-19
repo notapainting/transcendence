@@ -1,6 +1,21 @@
 services:
   proxy:
     container_name: proxy
+    depends_on:
+      auth:
+       condition: service_started
+      chat:
+       condition: service_started
+      chat-redis:
+       condition: service_started
+      elasticsearch:
+       condition: service_healthy
+      kibana:
+       condition: service_healthy
+      filebeat01:
+       condition: service_started
+      logstash01:
+       condition: service_healthy
     image: owasp/modsecurity-crs:4.2-nginx-alpine-202405220605
     env_file:
       - conf/waf.env.example
