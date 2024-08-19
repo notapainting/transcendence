@@ -69,5 +69,5 @@ arch-chroot /mnt su - bjill -c 'echo ~/.bin/startup.sh >> ~/.bashrc'
 
 
 echo "Restarting..."
-sleep 10
+sleep 5
 reboot
