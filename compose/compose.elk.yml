@@ -34,7 +34,7 @@ services:
      test: 
        [
          "CMD-SHELL", 
-         "[ -f config/certs/es01/es01.crt ]"
+         "[ -f config/certs/elasticsearch/elasticsearch.crt ]"
        ]
      interval: 1s
      timeout: 5s
@@ -45,7 +45,7 @@ services:
 
 
 # Elasticsearch
- es01:
+ elasticsearch:
    container_name: elasticsearch
    depends_on:
      setup:
@@ -61,19 +61,19 @@ services:
    ports:
      - ${ES_PORT}:9200
    environment:
-     - node.name=es01
+     - node.name=elasticsearch
      - cluster.name=${CLUSTER_NAME}
      - discovery.type=single-node
      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
      - bootstrap.memory_lock=true
      - xpack.security.enabled=true
      - xpack.security.http.ssl.enabled=true
-     - xpack.security.http.ssl.key=certs/es01/es01.key
-     - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+     - xpack.security.http.ssl.key=certs/elasticsearch/elasticsearch.key
+     - xpack.security.http.ssl.certificate=certs/elasticsearch/elasticsearch.crt
      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
      - xpack.security.transport.ssl.enabled=true
-     - xpack.security.transport.ssl.key=certs/es01/es01.key
-     - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+     - xpack.security.transport.ssl.key=certs/elasticsearch/elasticsearch.key
+     - xpack.security.transport.ssl.certificate=certs/elasticsearch/elasticsearch.crt
      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
      - xpack.security.transport.ssl.verification_mode=certificate
      - xpack.license.self_generated.type=${LICENSE}
@@ -100,7 +100,7 @@ services:
  kibana:
    container_name: kibana
    depends_on:
-     es01:
+     elasticsearch:
        condition: service_healthy
    build:
      context: ./elk_struct/kibana
@@ -114,7 +114,7 @@ services:
      - 5601:5601
    environment:
      - SERVERNAME=kibana-server
-     - ELASTICSEARCH_HOSTS=https://es01:9200
+     - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
      - ELASTICSEARCH_USERNAME=kibana_system
      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
      - ELASTIC_USER=${ELASTIC_USER}
@@ -144,7 +144,7 @@ services:
  filebeat01:
    container_name: filebeat
    depends_on:
-     es01:
+     elasticsearch:
        condition: service_healthy
      logstash01:
        condition: service_healthy
@@ -162,7 +162,7 @@ services:
    environment:
      - ELASTIC_USER=${ELASTIC_PASSWORD}
      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-     - ELASTIC_HOSTS=https://es01:9200
+     - ELASTIC_HOSTS=https://elasticsearch:9200
      - KIBANA_HOSTS=http://kibana:5601
      - LOGSTASH_HOSTS=logstash:5044
    networks:
@@ -173,7 +173,7 @@ services:
  logstash01:
    container_name: logstash
    depends_on:
-     es01:
+     elasticsearch:
        condition: service_healthy
      kibana:
        condition: service_healthy
@@ -189,18 +189,24 @@ services:
      - certs:/usr/share/logstash/certs:ro
      - logstashdata01:/usr/share/logstash/data
    environment:
-     xpack.monitoring.enabled: false
-     ELASTIC_USER: ${ELASTIC_USER}
-     ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-     ELASTIC_HOSTS: https://es01:9200
+     - xpack.monitoring.enabled=false
+     - ELASTIC_USER=${ELASTIC_USER}
+     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+     - ELASTIC_HOSTS=https://elasticsearch:9200
    restart: always
    healthcheck:
       test:
+        # [
+        #   "CMD-SHELL",
+        #   "timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5140' && \
+          # timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5044' && \
+          # timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5141' || exit 1",
+        # ]
         [
           "CMD-SHELL",
           "timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5140' && \
           timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5044' && \
-          timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5141' || exit 1",
+          timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5142' || exit 1",
         ]
       interval: 10s
       timeout: 10s
@@ -212,7 +218,7 @@ services:
 # Elasticsearch's ILM container
  policy:
   depends_on:
-    es01:
+    elasticsearch:
       condition: service_healthy
     kibana:
       condition: service_healthy
