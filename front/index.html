@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/chat.css">
     <link rel="stylesheet" href="./game.css">
     <link rel="stylesheet" href="./banner.css">
+    <link rel="stylesheet" href="./tree.css">
     <link rel="stylesheet" href="./tournament.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -435,10 +436,6 @@
                                         <label for="bonusToggle" class="toggle-label"></label>
                                     </div>
                                 </div>
-                                <!-- <div class="toggle-button">
-                                    <input type="checkbox" id="bonusToggle" name="bonusToggle" class="toggle-input">
-                                    <label for="bonusToggle" class="toggle-label"></label>
-                                </div> -->
                             </li>
                             <li class="score-item">
                                 <label for="score">Maximum score :</label>
@@ -448,7 +445,8 @@
                             </li>
                             <li class="score-item">
                                 <label for="players">Number of Players :</label>
-                                <input type="range" class="slider" id="playersRange" name="playersRange" min="2" max="32" step="2" value="4" oninput="adjustSlider(this)">
+                                <input type="range" class="slider" id="playersRange" name="playersRange" min="2"
+                                    max="32" step="2" value="4" oninput="adjustSlider(this)">
                                 <output id="playersRangeOut"></output>
                                 <script>
                                     function adjustSlider(slider) {
@@ -684,8 +682,8 @@
                     </button>
                 </div>
             </div>
-            
-            
+
+
             <div id="menu-m6" class="menu-element">
                 <div class="announce-winner">
                     <div id="game-menu-banner-end" class="game-announce-base"></div>
@@ -706,23 +704,32 @@
             </div>
 
             <div id="menu-m7" class="menu-element">
-
+                <div class="theme theme-dark">
+                    <div id="bracket-disable-image" class="bracket disable-image"></div>
+                </div>
+                <div class="menu-m7-button" id="menu-m6-button">
+                    <button id="game-menu-m7-quit" class="stylized-button button-menu-quit">
+                        Q U I T
+                        <div id="clip">
+                            <div id="leftTop" class="corner"></div>
+                            <div id="rightBottom" class="corner"></div>
+                            <div id="rightTop" class="corner"></div>
+                            <div id="leftBottom" class="corner"></div>
+                        </div>
+                        <span id="rightArrow" class="arrow"></span>
+                        <span id="leftArrow" class="arrow"></span>
+                    </button>
+                </div>
             </div>
-            
+
         </div>
-        <!-- in game button -->
-        <!-- <button id="game-pause" class="game-element game-button" type="button">Pause</button> -->
     </div>
 
     </div>
-    <!-- <div id="settings" class="view">
-        <h1>settings OHH</h1>
 
-    </div> -->
     <script src="https://kit.fontawesome.com/3db1c2f3ab.js" crossorigin="anonymous"></script>
     <script type="module" src="js/index.js"></script>
     <script src="js/stars-animation.js"></script>
-    <!-- <script type="module" src="js/home.js"></script> -->
 </body>
 
 </html>
