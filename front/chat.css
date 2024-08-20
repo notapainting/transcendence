@@ -293,9 +293,16 @@
     cursor: pointer;
 }
 
+.add-or-block {
+    margin-left: 50px;
+}
+
 .add-button {
     font-size: 20px;
-    margin-left: 70px;
+}
+
+.block-button, .unblock-button {
+    margin-left: 10px;
 }
 
 .block-button {
