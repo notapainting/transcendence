@@ -396,6 +396,7 @@ const changeExistingStatus = (target, mode) => {
 }
 
 async function handleMessage(message) {
+    console.log(message)
     if (message.type === 'contact.summary'){
         contactSummary = message;
         console.log(message);
