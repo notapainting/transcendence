@@ -25,6 +25,7 @@ const   menuM6_button = document.getElementById('menu-m6-button');
 // <!-- animated background -->
 const   menuBgVid = document.getElementById('menu_bg_video');
 const   menuBg = document.getElementById('menu-background');
+const   menuBlurry = document.getElementById('blurry-background');
 
 // <!-- local  -->
 const   locContainerList = document.getElementById('game-menu-list-tournament');
@@ -87,8 +88,8 @@ const   scene = [
     [menuBg, menuBgVid, menuM1, invitationBox], // accueil du jeu
     [menuBgVid, menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
     [menuBgVid, menuM2b], // waiting room pour creation de tournoi (guest only)
-    [menuBgVid, menuM3], // phases du tournoi : montre les prochain match de la phas eet leur etat
-    [menuBgVid, menuM4], // afk check
+    [menuBlurry, menuM3], // phases du tournoi : montre les prochain match de la phase et leur etat
+    [menuBlurry, menuM4], // afk check
     [menuM5], // in game
     [menuM6], // ecran de fin de match 
     [menuM7], // ecran de fin de tournoi (recap)
@@ -137,7 +138,7 @@ export const moveTo = (i) => {
         players = [];
         clearGame();
         document.getElementById('bracket-disable-image').innerHTML = '';
-    };
+    } else if(idx === enu.sceneIdx.END_TR) countDivsWithColumnClass();
     scene[idx].forEach(div => {div.style.display = "flex";});
     if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6_button.style.display = "none";
 }
@@ -222,8 +223,6 @@ export const announcePhase = (data) => {
             column.appendChild(winnerBottom);
             odd = 0;
         }
-
-
         
         item.appendChild(itemPlayer1);
         item.appendChild(itemVS);
@@ -285,7 +284,9 @@ export const announceScore = () => {
 
 export const announceWinner = (data) => {
     const   banner = document.getElementById('game-menu-banner-end')
+    const   banner2 = document.getElementById('game-menu-banner-end2')
     banner.innerHTML = "Congratulations! Winner is " + data.winner;
+    banner2.innerHTML = "Congratulations! Winner is " + data.winner;
 }
 
 /*** utils ***/
@@ -565,6 +566,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+function countDivsWithColumnClass() {
+    const divs = document.querySelectorAll('div.column');
+
+    if (divs.length === 1) {
+        const bracketImage = document.getElementById('bracket-disable-image');
+        if (bracketImage) {
+            bracketImage.style.display = 'none';
+        }
+    }
+    else {
+        const bracketImage = document.getElementById('bracket-disable-image');
+        if (bracketImage) {
+            bracketImage.style.display = 'flex';
+        }
+    }
+}
 
 // animation menum1
 

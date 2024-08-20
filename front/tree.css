@@ -20,7 +20,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    min-width: 240px;
+    min-width: 150px;
     max-width: 240px;
     height: 62px;
     margin: 12px 24px 12px 0;
@@ -34,6 +34,7 @@
   .match .team {
     display: flex;
     align-items: center;
+    justify-content: center;
     width: 100%;
     height: 100%;
     border: 1px solid black;
@@ -128,17 +129,17 @@
     border-color: #040607;
   } */
   .theme-dark .match-lines .line {
-    background: #36404e;
+    background: #000000;
   }
   .theme-dark .team {
     background: #182026;
     border-color: #232c36;
-    color: #6b798c;
+    color: #9f7cc5;
   }
   .theme-dark .winner-top .match-top,
   .theme-dark .winner-bottom .match-bottom {
     background: #232c36;
-    color: #e3e8ef;
+    color: #51b5de;
     border-color: #36404e;
     z-index: 1;
   }
