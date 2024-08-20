@@ -39,19 +39,19 @@ up:
 down:
 	${CMP} down 
 
-msg:
-	echo ${ENV_FILE}
+
 #========#	tools rule	#========#
 env-create: ${ENV_FILE}
-	echo "Generate new .env files!"
+	
 
 env-clear:
-	rm ${ENV_FILE}
+	rm -f ${ENV_FILE}
 	echo "Delete old .env files.."
 
 
 ${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
-	cp $< $@
+	@cp $< $@
+	@echo "Generate new  $@ file!"
 
 config:
 	${CMP} config
@@ -62,29 +62,31 @@ ps:
 top:
 	${CMP} top
 
-logs:
-	${CMP} logs 
-
 reload:
 	docker container restart proxy
 
-dev:
-	sed -i 's/MODE=prod/MODE=dev/g' conf/env.dev
+mode-dev:	${ENV_FILE}
+	@sed -i 's/MODE=prod/MODE=dev/g' conf/main.env
+	@echo "Switch to DEV mode, please build and run accordly"
 
-prod:
-	sed -i 's/MODE=dev/MODE=prod/g' conf/env.dev
+mode-prod:	${ENV_FILE}
+	@sed -i 's/MODE=dev/MODE=prod/g' conf/main.env
+	@echo "Switch to PROD mode, please build and run accordly"
 
+
+#========#	container access	#========#
 proxy:
 	docker exec -it proxy sh
 
 auth:
-	docker exec -it auth bash
+	docker exec -it auth sh
 
 user:
-	docker exec -it user bash
+	docker exec -it user sh
 
 game:
-	docker exec -it game bash
+	docker exec -it game sh
 
 chat:
-	docker exec -it chat bash
+	docker exec -it chat sh
+
