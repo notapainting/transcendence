@@ -8,6 +8,7 @@ import game.enums as enu
 
 from game.lobby import Match, Tournament, LocalTournament, getDefault, LobbyException
 from game.plaza import plaza, PlazaException
+from game.gamestate import getDefaultState
 
 from logging import getLogger
 logger = getLogger('base')
@@ -54,7 +55,7 @@ class RemoteGamer(LocalConsumer):
             raise exchan.DenyConnection()
         await self.accept()
         plaza.join(self.username, self.channel_name)
-        await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault()})
+        await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault(), "state":getDefaultState()})
         logger.info(f"JOIN: {self.username} ({self.status})")
 
     async def disconnect(self, close_code):
@@ -116,7 +117,7 @@ class RemoteGamer(LocalConsumer):
             return await self.send_json({'type':enu.Errors.DECODE})
         match json_data['type']:
             case enu.Game.QUIT: await self.quit()
-            case enu.Game.DEFAULT: await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault()})
+            case enu.Game.DEFAULT: await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault(), "state":getDefaultState()})
             case _: await self.mode(json_data)
 
         
@@ -144,7 +145,7 @@ class RemoteGamer(LocalConsumer):
             case enu.Game.NEXT: logger.debug(f"PING: {self.username} ({self.status})")
             case enu.Game.SETTING:
                 settings = self.lobby.changeSettings(settings=data['message'])
-                await self.lobby.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Game.SETTING, "message":settings}})
+                await self.lobby.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Game.SETTING, "message":settings, "state":getDefaultState()}})
             case enu.Game.INVITE:
                 to_user = data['user']
                 response = await getInviteAuth(self.username, to_user)
