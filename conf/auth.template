@@ -6,7 +6,7 @@ DB_NAME=auth-db
 
 # postgres user for django with associate database name
 DB_USER=danaj
-DB_PASSWORD=password
+DB_PASSWORD=2SuNhaaAnFBQU08pSEB7
 DJ_DB_NAME=auth_db
 
 
@@ -16,8 +16,8 @@ DJ_DB_NAME=auth_db
 PGDATA=/var/lib/postgresql/data/
 
 # postgres root user
-POSTGRES_USER=borys
-POSTGRES_PASSWORD=password
+POSTGRES_USER=F8xnm8hScaBYdyfUwsUT
+POSTGRES_PASSWORD=0ugWSrbUeqQCja84jpkT
 POSTGRES_DB=coolname
 
 
