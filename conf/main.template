@@ -1,7 +1,7 @@
 # GENERAL
 
 # prod/dev
-MODE=env
+MODE=prod
 
 # postgres database location (for volume)
 PGDATA=/var/lib/postgresql/data/
