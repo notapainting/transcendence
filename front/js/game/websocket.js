@@ -2,6 +2,7 @@ import * as game from './game.js';
 import { gameData } from './game.js';
 import { updateSettings, changeGameStatus, getGameStatus, getSceneIdx, announcePhase, announceMatch, moveTo, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearInvitationList, clearScore } from './menu.js';
 import { fullClear } from './index.js';
+import { scene } from './game.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
 import { composer } from './game.js';
@@ -11,6 +12,8 @@ function updateTimer() {
 }
 
 export let gameSocket = null;
+
+let default_game_data = null;
 
 function askNext() { gameSocket.send(JSON.stringify({ 'type': enu.Game.NEXT })) }
 
@@ -30,7 +33,7 @@ const _initWebsocket = (path) => {
     gameSocket.onclose = function (e) {
         console.log('GameWebSocket connection closed');
         moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
-        setTimeout(_initWebsocket, 5000, path)
+        if (path === enu.backendPath.REMOTE) setTimeout(_initWebsocket, 5000, path);
         gameSocket = null;
         clearListInvitation();
     };
@@ -70,6 +73,7 @@ const _game = (content) => {
             // set users status to ready
             return true;
         case enu.Game.DEFAULT:
+            default_game_data = content.state
         case enu.Game.SETTING:
             updateSettings(content.message);
             return true;
@@ -169,6 +173,7 @@ const _match = (content) => {
             announceScore();
             return true;
         case enu.Match.END:
+            console.log(content)
             moveTo(enu.sceneIdx.END)
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
@@ -182,8 +187,9 @@ const _match = (content) => {
 const _tournament = (content) => {
     switch (content.type) {
         case enu.Tournament.PHASE:
+            console.log(content);
+            game.gameRenderer(default_game_data)
             moveTo(enu.sceneIdx.PHASE);
-            console.log(content)
             if (content.new === true) announcePhase(content.phase);
             return true;
         case enu.Tournament.MATCH:
@@ -209,12 +215,13 @@ const _tournament = (content) => {
 
 const messageHandler = (e) => {
     const content = JSON.parse(e.data);
-    console.log("message: ", content.type);
+    console.log("message type: ", content.type);
+    console.log("message: ", content);
     if (_match(content) === false)
         if (_invitations(content) === false)
             if (_game(content) === false)
                 if (_tournament(content) === false)
-                    console.error("unknow type");
+                    console.error("unknow type: " + content.type);
 };
 
 const bindKeyPress = (event) => {

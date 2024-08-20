@@ -1,0 +1,82 @@
+{
+  "index_patterns": ["nginx-index-*"],
+  "version": 1,
+  "template": {
+      "settings": {
+          "number_of_shards": 1,
+          "number_of_replicas": 0,
+          "index.lifecycle.name": "nginx_policy",
+          "index.lifecycle.rollover_alias": "nginx-index"
+      },
+      "mappings": {
+          "dynamic": false,
+          "properties": {
+              "@timestamp": {
+                  "type": "date"
+              },
+              "syslog_timestamp": {
+                  "type": "date",
+                  "format": "MMM  d HH:mm:ss||MMM dd HH:mm:ss"
+              },
+              "syslog_hostname": {
+                  "type": "keyword"
+              },
+              "syslog_program": {
+                  "type": "keyword"
+              },
+              "client_ip": {
+                  "type": "ip"
+              },
+              "timestamp": {
+                  "type": "date",
+                  "format": "dd/MMM/yyyy:HH:mm:ss Z"
+              },
+              "method": {
+                  "type": "keyword"
+              },
+              "request": {
+                  "type": "text",
+                  "fields": {
+                      "keyword": {
+                          "type": "keyword",
+                          "ignore_above": 256
+                      }
+                  }
+              },
+              "http_version": {
+                  "type": "keyword"
+              },
+              "status_code": {
+                  "type": "integer"
+              },
+              "response_size": {
+                  "type": "integer"
+              },
+              "referer": {
+                  "type": "text",
+                  "fields": {
+                      "keyword": {
+                          "type": "keyword",
+                          "ignore_above": 256
+                      }
+                  }
+              },
+              "user_agent": {
+                  "type": "text",
+                  "fields": {
+                      "keyword": {
+                          "type": "keyword",
+                          "ignore_above": 256
+                      }
+                  }
+              },
+              "hour_of_day": {
+                "type": "keyword"
+              },
+              "date_of_day": {
+                "type": "keyword"
+              }
+          }
+      }
+  }
+}

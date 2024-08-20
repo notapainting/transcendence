@@ -11,4 +11,4 @@ WORKDIR /app
 
 EXPOSE ${PORT}
 
-ENTRYPOINT ["ash", "/conf/init.sh"]
+ENTRYPOINT ["sh", "/conf/init.sh"]

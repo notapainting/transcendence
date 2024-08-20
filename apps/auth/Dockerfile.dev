@@ -9,9 +9,8 @@ RUN apt update -y \
 
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 
-# ensure python output send straight to term and not buffered
+# ensure python output not buffered
 ENV PYTHONUNBUFFERED 1
-
 
 # create directory for docker volume where app will be
 RUN mkdir /app /logs
@@ -34,3 +33,4 @@ RUN echo >> /root/.bashrc \
 
 EXPOSE ${PORT}
 
+ENTRYPOINT ["sh", "/conf/init_dev.sh"]
