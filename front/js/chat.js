@@ -444,14 +444,17 @@ const changeExistingStatus = (target, mode) => {
     }
 }
 
-const disableEnableInput = (target) => {
+const disableEnableInput = (target, mode) => {
+    console.log("DISABLE ENABLE")
     const focusedPerson = document.querySelector(".focus");
     if (focusedPerson) {
+        console.log("FOCUSED ", focusedPerson)
         const username = focusedPerson.dataset.username;
+        console.log("USERNAME " + username);
         if (target === username){
-            if (contactSummary.data.blockeds.find(elem => elem === target) || contactSummary.data.blocked_by.find(elem => elem === target))
+            if (mode === "disable" && contactSummary.data.blockeds.find(elem => elem === target) || contactSummary.data.blocked_by.find(elem => elem === target))
                 messageInput.disabled = true;
-            else if (!contactSummary.data.blockeds.find(elem => elem === target) && !contactSummary.data.blocked_by.find(elem => elem === target))
+            else if (mode === "enable" && !contactSummary.data.blockeds.find(elem => elem === target) && !contactSummary.data.blocked_by.find(elem => elem === target))
                 messageInput.disabled = false;
         }
     }
@@ -506,11 +509,11 @@ async function handleMessage(message) {
                 contactSummary.data.blockeds.push(message.data.name);
                 blockUnblockSwitch(message.data.name, "unblock");
                 deletePlusIcon(message.data.name);
-                disableEnableInput(message.data.name);
+                disableEnableInput(message.data.name, "disable");
             } else {  //celui qui recoit le block
                 contactSummary.data.blocked_by.push(message.data.author);
                 deletePlusIcon(message.data.author);
-                disableEnableInput(message.data.author);
+                disableEnableInput(message.data.author, "disable");
             }
         }
         if (message.data.operation === "remove") {
@@ -521,7 +524,7 @@ async function handleMessage(message) {
                 const amIblocked = contactSummary.data.blocked_by.find(elem => elem === message.data.name);
                 if (!amIblocked)
                     addPlusIcon(message.data.name);
-                disableEnableInput(message.data.name);
+                disableEnableInput(message.data.name, "enable");
                 
             } else {
                 let index = contactSummary.data.blocked_by.indexOf(message.data.author);
@@ -529,7 +532,7 @@ async function handleMessage(message) {
                 const didIblocked = contactSummary.data.blockeds.find(elem => elem === message.data.author);
                 if (!didIblocked)
                     addPlusIcon(message.data.author);
-                disableEnableInput(message.data.author);
+                disableEnableInput(message.data.author, "enable");
             }
         }
         console.log(message);
