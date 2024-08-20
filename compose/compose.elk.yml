@@ -196,12 +196,6 @@ services:
    restart: always
    healthcheck:
       test:
-        # [
-        #   "CMD-SHELL",
-        #   "timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5140' && \
-          # timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5044' && \
-          # timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5141' || exit 1",
-        # ]
         [
           "CMD-SHELL",
           "timeout 1 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5140' && \
