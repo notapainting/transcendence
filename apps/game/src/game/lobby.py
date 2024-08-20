@@ -38,6 +38,7 @@ def getDefault():
     }
 
 
+
 class BaseLobby:
     def __init__(self, host, host_channel_name, bonused=BONUSED, maxPlayer=LOBBY_DEFAULT_PLAYERS, scoreToWin=DEFAULT_SCORE) -> None:
         # lobby

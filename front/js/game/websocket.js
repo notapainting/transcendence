@@ -13,6 +13,8 @@ function updateTimer() {
 
 export let gameSocket = null;
 
+let default_game_data = null;
+
 function askNext() { gameSocket.send(JSON.stringify({ 'type': enu.Game.NEXT })) }
 
 export const initGameWebSocket = (path) => {
@@ -71,6 +73,7 @@ const _game = (content) => {
             // set users status to ready
             return true;
         case enu.Game.DEFAULT:
+            default_game_data = content.state
         case enu.Game.SETTING:
             updateSettings(content.message);
             return true;
@@ -186,8 +189,9 @@ const _match = (content) => {
 const _tournament = (content) => {
     switch (content.type) {
         case enu.Tournament.PHASE:
-            moveTo(enu.sceneIdx.PHASE);
             console.log(content);
+            game.gameRenderer(default_game_data)
+            moveTo(enu.sceneIdx.PHASE);
             if (content.new === true) announcePhase(content.phase);
             return true;
         case enu.Tournament.MATCH:

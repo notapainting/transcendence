@@ -30,6 +30,33 @@ RESET = 0
 COUNTER = -1
 MAX_SPEED = 2
 
+def getDefaultState():
+    return {
+        'x':0,
+        'y':0,
+        'speed':ballSpeedX,
+        'collisionX':0,
+        'collisionY':0,
+        'radius':1,
+        'width' : WIDTH,
+        'height' : HEIGHT,
+        'leftPaddleY' : 0,
+        'leftPaddleX' : -WIDTH,
+        'rightPaddleY' : 0,
+        'rightPaddleX' : WIDTH,
+        'paddleWidth' : 1,
+        'paddleHeightL' :10,
+        'paddleHeightR' :10,
+        'leftPlayerScore' : 0,
+        'rightPlayerScore' : 0,
+        'randomPointB': None,
+        'randomPointM': None,
+        'randomPointE': None,
+        'bonus': None,
+        'hitB': False,
+        'hitM': False,
+    }
+
 
 # host == left
 # guest == right
