@@ -20,6 +20,8 @@ all:	start
 
 re:	clear start
 
+init: ${ENV_FILE} vmmax build up
+	
 
 #========#	build rule	#========#
 build:
@@ -28,7 +30,7 @@ build:
 
 #========#	start/stop rule	#========#
 start:
-	${CMP} up -d --build
+	${CMP} up --build
 
 clear:
 	${CMP} down -v --remove-orphans --rmi all
@@ -42,7 +44,6 @@ down:
 
 #========#	tools rule	#========#
 env-create: ${ENV_FILE}
-	
 
 env-clear:
 	rm -f ${ENV_FILE}
@@ -52,6 +53,9 @@ env-clear:
 ${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
 	@cp $< $@
 	@echo "Generate new  $@ file!"
+
+vmmax:
+	sudo sysctl -w vm.max_map_count=262144
 
 config:
 	${CMP} config

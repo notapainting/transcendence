@@ -68,6 +68,26 @@ const addToFriend = (target) => {
     }
 }
 
+const blockUser = (target) => {
+    console.log(`Je vais blocker le user ${target}`);
+    try{
+        const requestBlock = {
+            type: "contact.update",
+            data: {
+                author: "",
+                name: target,
+                operation: "block"
+            }
+        };
+        socket.send(JSON.stringify(requestBlock));
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
+
+
+
 function addUserToMenu(target, profile_picture) {
     const displayMenu = document.querySelector('.display-menu');
     const existingPersonDiv = displayMenu.querySelector(`[data-username="${target}"]`);
@@ -103,8 +123,12 @@ function addUserToMenu(target, profile_picture) {
             addFriend.addEventListener("click", event => addToFriend(target));
             personDiv.appendChild(addFriend);
         }
+        const blockButton = document.createElement('i');
+        blockButton.classList.add("fa-solid", "fa-ban", "block-button");
+        blockButton.addEventListener("click", event => blockUser(target));
+        personDiv.appendChild(blockButton);
         displayMenu.insertBefore(personDiv, displayMenu.children[1]);
-        personDiv.removeEventListener("click", (event) => displayFocusedPerson(personDiv, targe, profile_picture));
+        personDiv.removeEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
         personDiv.addEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
     }
 }

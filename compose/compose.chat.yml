@@ -8,7 +8,7 @@ services:
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/chat.env.example
+      - conf/chat.env
     volumes:
       - chat_volume:/app
     networks:
@@ -25,7 +25,7 @@ services:
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/chat.env.example
+      - conf/chat.env
     volumes:
       - chat-db_volume:${PGDATA}
     networks: 

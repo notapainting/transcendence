@@ -20,10 +20,12 @@ const   menuM4 = document.getElementById('menu-m4');
 const   menuM5 = document.getElementById('menu-m5');
 const   menuM6 = document.getElementById('menu-m6');
 const   menuM7 = document.getElementById('menu-m7');
+const   menuM6_button = document.getElementById('menu-m6-button');
 
 // <!-- animated background -->
 const   menuBgVid = document.getElementById('menu_bg_video');
 const   menuBg = document.getElementById('menu-background');
+const   menuBlurry = document.getElementById('blurry-background');
 
 // <!-- local  -->
 const   locContainerList = document.getElementById('game-menu-list-tournament');
@@ -43,9 +45,7 @@ const   createLocal = document.getElementById('game-menu-local');
 const   invitationBox = document.getElementById('game-menu-invitationBox');
 
 // <!-- set ready -->
-const   ready = document.getElementById('game-menu-ready');
 const   readyP = document.getElementById('game-menu-ready-prematch');
-const   circle = document.getElementById('game-menu-ready-circle');
 
 // <!-- in game button -->
 const   pause = document.getElementById('game-menu-pause');
@@ -80,17 +80,19 @@ let     players = [];
 let     currentPlayers = [];
 let     currentScore = [0, 0];
 let     locked = false;
+let     is_match = false;
+
 
 // scene
 const   scene = [
     [menuBg, menuBgVid, menuM1, invitationBox], // accueil du jeu
     [menuBgVid, menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
     [menuBgVid, menuM2b], // waiting room pour creation de tournoi (guest only)
-    [menuBgVid, menuM3], // phases du tournoi : montre les prochain match de la phas eet leur etat
-    [menuBgVid, menuM4], // afk check
+    [menuBlurry, menuM3], // phases du tournoi : montre les prochain match de la phase et leur etat
+    [menuBlurry, menuM4], // afk check
     [menuM5], // in game
     [menuM6], // ecran de fin de match 
-    [menuM6], // ecran de fin de tournoi (recap)
+    [menuM7], // ecran de fin de tournoi (recap)
     [], // ecran erreur
 ];
 // menu 2b -> enlever ready
@@ -101,17 +103,19 @@ const   scene = [
 /*** initialisation ****/
 export const initMenu = (path) => {
     status = enu.gameMode.LOCAL;
+    activateAniM1()
     if (path === enu.backendPath.LOCAL) {
         anon = true;
         players = [];
         clearInvitationList();
         moveTo(enu.sceneIdx.CREATION);
-        console.log("init : local");
     } else {
         anon = false;
         clearInvitationList();
         moveTo(enu.sceneIdx.WELCOME);
     }
+    setTimeout(desactivateAniM1, 700);
+
 }
 
 export const clearInvitationList = () => {
@@ -132,11 +136,11 @@ export const moveTo = (i) => {
     if (idx === enu.sceneIdx.WELCOME) status = enu.gameMode.LOCAL;
     else if (idx === enu.sceneIdx.CREATION) {
         players = [];
-        clearGame()
-    };
+        clearGame();
+        document.getElementById('bracket-disable-image').innerHTML = '';
+    } else if(idx === enu.sceneIdx.END_TR) countDivsWithColumnClass();
     scene[idx].forEach(div => {div.style.display = "flex";});
-    if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6.style.display = "none";
-    console.log("status: " + status);
+    if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6_button.style.display = "none";
 }
 
 /*** banner update ****/
@@ -151,11 +155,21 @@ export const clearScore = () => {
 
 export const announcePhase = (data) => {
     document.getElementById('banner-phase-text').innerHTML = '';
+    let odd = 0;
+    const column = document.createElement('div');
+    column.className = "column";
     data.forEach((matchData) => {
         const   item = document.createElement('li');
         const   itemPlayer1 = document.createElement('div');
         const   itemPlayer2 = document.createElement('div');
         const   itemVS = document.createElement('div');
+
+        const winnerTop = document.createElement('div');
+        const winnerBottom = document.createElement('div');
+        const matchTop = document.createElement('div');
+        const matchBottom = document.createElement('div');
+        const columnUserTop = document.createElement('span');
+        const columnUserBottom = document.createElement('span');
     
         item.className = 'list-banner-element';
         itemPlayer1.textContent = matchData.host;
@@ -164,12 +178,58 @@ export const announcePhase = (data) => {
         itemPlayer1.className = 'list-banner-user-name';
         itemPlayer2.className = 'list-banner-user-name';
         itemVS.className = 'list-banner-vs';
-    
+
+        columnUserTop.textContent = matchData.host;
+        columnUserBottom.textContent = matchData.guest;
+        columnUserTop.className = "name";
+        columnUserBottom.className = "name";
+        winnerTop.className = "match winner-top";
+        winnerBottom.className = "match winner-bottom";
+        matchTop.className = "match-top team";
+        matchBottom.className = "match-bottom team";
+
+        if (odd === 0)
+        {
+            winnerTop.appendChild(matchTop);
+            winnerTop.appendChild(matchBottom);
+            matchTop.appendChild(columnUserTop);
+            matchBottom.appendChild(columnUserBottom);
+            winnerTop.innerHTML += `
+            </div>
+            <div class="match-lines">
+              <div class="line one"></div>
+              <div class="line two"></div>
+            </div>
+            <div class="match-lines alt">
+              <div class="line one"></div>
+            </div> `;
+            column.appendChild(winnerTop);
+            odd = 1;
+        }
+        else {
+            winnerBottom.appendChild(matchTop);
+            winnerBottom.appendChild(matchBottom);
+            matchTop.appendChild(columnUserTop);
+            matchBottom.appendChild(columnUserBottom);
+            winnerBottom.innerHTML += `
+            </div>
+            <div class="match-lines">
+              <div class="line one"></div>
+              <div class="line two"></div>
+            </div>
+            <div class="match-lines alt">
+              <div class="line one"></div>
+            </div> `;
+            column.appendChild(winnerBottom);
+            odd = 0;
+        }
+        
         item.appendChild(itemPlayer1);
         item.appendChild(itemVS);
         item.appendChild(itemPlayer2);
         document.getElementById('banner-phase-text').appendChild(item);
     })
+    document.getElementById('bracket-disable-image').appendChild(column);
 }
 
 export const announceMatch = (data) => {
@@ -224,7 +284,9 @@ export const announceScore = () => {
 
 export const announceWinner = (data) => {
     const   banner = document.getElementById('game-menu-banner-end')
+    const   banner2 = document.getElementById('game-menu-banner-end2')
     banner.innerHTML = "Congratulations! Winner is " + data.winner;
+    banner2.innerHTML = "Congratulations! Winner is " + data.winner;
 }
 
 /*** utils ***/
@@ -271,9 +333,14 @@ let gameSettings = {
 export const updateSettings = (data) => {
     gameSettings.bonused = data.bonused;
     gameSettings.scoreToWin = data.scoreToWin;
-    gameSettings.maxPlayer = data.maxPlayer;
+    if (is_match === true) {
+        gameSettings.maxPlayer = 2;
+        setMaxPlayer(); 
+    } else {
+        gameSettings.maxPlayer = data.maxPlayer;
+        setMaxPlayer();
+    }
     setScoreToWin();
-    setMaxPlayer();
     setBonused();
 }
 
@@ -292,18 +359,27 @@ const sendCreate = (mode) => {
 createMatch.addEventListener('click', () => {
     status = enu.gameMode.MATCH;
     document.getElementById('playersRange').min = 2;
+    document.getElementById('playersRange').disabled = true;
+    is_match = true;
+    document.getElementById('game-menu-list-players-title').innerText = "Fast Match";
     sendCreate(enu.Game.MATCH)
 });
 
 createTournament.addEventListener('click', () => {
     status = enu.gameMode.TOURNAMENT;
     document.getElementById('playersRange').min = 4;
+    document.getElementById('playersRange').disabled = false;
+    document.getElementById('game-menu-list-players-title').innerText = "Pong Tournament";
+    is_match = false;
     sendCreate(enu.Game.TRN)
 });
 
 createLocal.addEventListener('click', () => {
     status = enu.gameMode.LOCAL;
     document.getElementById('playersRange').min = 2;
+    document.getElementById('playersRange').disabled = false;
+    document.getElementById('game-menu-list-players-title').innerText = "Local Tournament";
+    is_match = false;
     sendCreate(enu.Game.LOCAL)
 })
 
@@ -389,7 +465,6 @@ const readyFunc = () => {
 };
 
 readyP.addEventListener('click', readyFunc);
-ready.addEventListener('click', readyFunc);
 
 pause.addEventListener('click', () => {
     if (locked === true) return ;
@@ -409,6 +484,7 @@ const quitFunc = () => {
         if (idx == enu.sceneIdx.CREATION) {
             if (gameSocket !== null) gameSocket.close();
             fullClear()
+            activateAniM1()
             navigateTo("/");
             return ;
         }
@@ -418,6 +494,7 @@ const quitFunc = () => {
     status == enu.gameMode.LOCAL
     if (idx === enu.sceneIdx.WELCOME) {
         fullClear()
+        activateAniM1()
         navigateTo("/");
     }
     moveTo(to);
@@ -488,3 +565,40 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Video element not found');
     }
 });
+
+function countDivsWithColumnClass() {
+    const divs = document.querySelectorAll('div.column');
+
+    if (divs.length === 1) {
+        const bracketImage = document.getElementById('bracket-disable-image');
+        if (bracketImage) {
+            bracketImage.style.display = 'none';
+        }
+    }
+    else {
+        const bracketImage = document.getElementById('bracket-disable-image');
+        if (bracketImage) {
+            bracketImage.style.display = 'flex';
+        }
+    }
+}
+
+// animation menum1
+
+const activateAniM1 = () => {
+    document.getElementById('game-menu-invitationBox').style.opacity = 0;
+    document.getElementById('game-menu-invitationBox2').style.opacity = 0;
+    document.getElementById('menu-m1-button').style.opacity = 0;
+    document.getElementById('game-menu-invitationBox').animation = "fadeIn 0.5s ease-in-out forwards";
+    document.getElementById('game-menu-invitationBox2').animation = "fadeIn 0.5s ease-in-out forwards";
+    document.getElementById('menu-m1-button').animation = "fadeIn 0.5s ease-in-out forwards";
+}
+
+const desactivateAniM1 = () => {
+    document.getElementById('game-menu-invitationBox').style.opacity = 1;
+    document.getElementById('game-menu-invitationBox2').style.opacity = 1;
+    document.getElementById('menu-m1-button').style.opacity = 1;
+    document.getElementById('game-menu-invitationBox').animation = "none";
+    document.getElementById('game-menu-invitationBox2').animation = "none";
+    document.getElementById('menu-m1-button').animation = "none";
+}

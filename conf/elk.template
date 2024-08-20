@@ -12,7 +12,7 @@ KIBANA_PASSWORD=kb_passwd
 
 
 # Version of Elastic products
-STACK_VERSION=8.12.2
+STACK_VERSION=8.14.1
 
 
 # Set the cluster name
