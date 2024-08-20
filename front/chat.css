@@ -301,7 +301,7 @@
     font-size: 20px;
 }
 
-.block-button {
+.block-button, .unblock-button {
     margin-left: 10px;
 }
 
