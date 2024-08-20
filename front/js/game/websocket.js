@@ -2,6 +2,7 @@ import * as game from './game.js';
 import { gameData } from './game.js';
 import { updateSettings, changeGameStatus, getGameStatus, getSceneIdx, announcePhase, announceMatch, moveTo, toggleLock, togglePause, announceWinner, updateScore, announceScore, clearInvitationList, clearScore } from './menu.js';
 import { fullClear } from './index.js';
+import { scene } from './game.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
 import { composer } from './game.js';
@@ -184,7 +185,7 @@ const _tournament = (content) => {
     switch (content.type) {
         case enu.Tournament.PHASE:
             moveTo(enu.sceneIdx.PHASE);
-            console.log(content)
+            console.log(content);
             if (content.new === true) announcePhase(content.phase);
             return true;
         case enu.Tournament.MATCH:
