@@ -153,6 +153,7 @@ const _match = (content) => {
             // contain result for a match (used in trn)
             return true;
         case enu.Match.START:
+            gameData.start = false;
             moveTo(enu.sceneIdx.MATCH);
             clearScore();
             announceScore();
@@ -170,6 +171,7 @@ const _match = (content) => {
             announceScore();
             return true;
         case enu.Match.END:
+            gameData.start = false;
             console.log(content)
             moveTo(enu.sceneIdx.END)
             document.removeEventListener('keydown', bindKeyPress)
