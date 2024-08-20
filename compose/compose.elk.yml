@@ -24,7 +24,7 @@ services:
      - "ELASTIC_PASSWORD=${ELASTIC_PASSWORD}"
      - "KIBANA_PASSWORD=${KIBANA_PASSWORD}"
    build:
-      context: ./elk_struct/setup
+      context: ./elk/setup
       dockerfile: Dockerfile
    volumes:
      - certs:/usr/share/elasticsearch/config/certs
@@ -51,7 +51,7 @@ services:
      setup:
        condition: service_healthy
    build: 
-     context: ./elk_struct/elasticsearch
+     context: ./elk/elasticsearch
      dockerfile: Dockerfile
    labels:
      co.elastic.logs/module: elasticsearch
@@ -103,7 +103,7 @@ services:
      elasticsearch:
        condition: service_healthy
    build:
-     context: ./elk_struct/kibana
+     context: ./elk/kibana
      dockerfile: Dockerfile
    labels:
      co.elastic.logs/module: kibana
@@ -151,7 +151,7 @@ services:
      kibana:
        condition: service_healthy    
    build:
-      context: ./elk_struct/filebeat
+      context: ./elk/filebeat
       dockerfile: Dockerfile
    user: root
    volumes:
@@ -180,7 +180,7 @@ services:
      policy:
       condition: service_healthy
    build:
-    context: ./elk_struct/logstash
+    context: ./elk/logstash
     dockerfile: Dockerfile
    labels:
      co.elastic.logs/module: logstash
