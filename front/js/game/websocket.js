@@ -185,7 +185,7 @@ const _tournament = (content) => {
     switch (content.type) {
         case enu.Tournament.PHASE:
             moveTo(enu.sceneIdx.PHASE);
-            console.log(content)
+            console.log(content);
             if (content.new === true) announcePhase(content.phase);
             return true;
         case enu.Tournament.MATCH:
