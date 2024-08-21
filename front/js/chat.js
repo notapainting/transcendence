@@ -32,6 +32,7 @@ function formatDate(dateString) {
     }
 }
 
+
 const displayFocusedPerson = (personDiv, target, profile_picture) => {
     document.querySelectorAll('.person').forEach(elem => {
         elem.classList.remove('focus');
@@ -49,6 +50,12 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
             messageElem.style.display = 'none';
         }
     });
+    if (contactSummary.data.blockeds.find(elem => elem === target) || contactSummary.data.blocked_by.find(elem => elem === target)){
+        messageInput.disabled = true;
+    }
+    else {
+        messageInput.disabled = false;
+    }
 }
 
 const addToFriend = (target) => {
@@ -86,6 +93,24 @@ const blockUser = (target) => {
     }
 }
 
+const unblockUser = (target) => {
+    try{
+        const requestBlock = {
+            type: "contact.update",
+            data: {
+                author: "",
+                name: target,
+                operation: "remove"
+            }
+        };
+        socket.send(JSON.stringify(requestBlock));
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
+
+
 
 
 function addUserToMenu(target, profile_picture) {
@@ -116,17 +141,32 @@ function addUserToMenu(target, profile_picture) {
             <div class="last-message">Last message</div>
         `;
         personDiv.append(picturePersonDiv, descriptionPersonDiv);
-        if (!contactSummary.data.contacts.find(elem => elem === target) && !contactSummary.data.invited_by.find(elem => elem === target) && !contactSummary.data.invitations.find(elem => elem === target)){
+        const addOrBlockDiv = document.createElement("div");
+        addOrBlockDiv.classList.add("add-or-block")
+        if (!contactSummary.data.contacts.find(elem => elem === target) && !contactSummary.data.invited_by.find(elem => elem === target) && !contactSummary.data.invitations.find(elem => elem === target) && !contactSummary.data.blockeds.find(elem => elem === target) && !contactSummary.data.blocked_by.find(elem => elem === target)){
             console.log("salut");
             const addFriend = document.createElement('i');
             addFriend.classList.add("fa-solid", "fa-plus", "add-button");
             addFriend.addEventListener("click", event => addToFriend(target));
-            personDiv.appendChild(addFriend);
+            addOrBlockDiv.appendChild(addFriend);
         }
         const blockButton = document.createElement('i');
         blockButton.classList.add("fa-solid", "fa-ban", "block-button");
         blockButton.addEventListener("click", event => blockUser(target));
-        personDiv.appendChild(blockButton);
+        addOrBlockDiv.appendChild(blockButton);
+        const unblockButton = document.createElement('i');
+        unblockButton.classList.add("fa-solid", "fa-handshake", "unblock-button");
+        unblockButton.addEventListener("click", event => unblockUser(target));
+        addOrBlockDiv.appendChild(unblockButton);
+        if (!contactSummary.data.blockeds.find(elem => elem === target)){
+            blockButton.style.display = "inline-block";
+            unblockButton.style.display = "none";
+        }
+        else {
+            blockButton.style.display = "none";
+            unblockButton.style.display = "inline-block";
+        }
+        personDiv.appendChild(addOrBlockDiv);
         displayMenu.insertBefore(personDiv, displayMenu.children[1]);
         personDiv.removeEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
         personDiv.addEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
@@ -346,12 +386,39 @@ const deleteNotif = (target) => {
     incrDecrNotifNumber("decrement");
 }
 
-const deletePlusIcon = (target) => {
+const blockUnblockSwitch = (target, type) => {
     const personElem = document.querySelector(`.person[data-username="${target}"]`);
+    if (personElem){
+        if (type === "unblock") {
+            personElem.querySelector(".block-button").style.display = "none";
+            personElem.querySelector(".unblock-button").style.display = "inline-block";
+        }
+        else {
+            personElem.querySelector(".block-button").style.display = "inline-block";
+            personElem.querySelector(".unblock-button").style.display = "none";
+        }
+    }
+}
+
+const deletePlusIcon = (target) => {
+    console.log("je erentre")
+    const personElem = document.querySelector(`.person[data-username="${target}"]`);
+    console.log(personElem);
     if (personElem){
         const plusElem = personElem.querySelector(".add-button");
         if (plusElem)
-            plusElem.remove();
+            plusElem.style.display = "none";
+    }
+}
+
+const addPlusIcon = (target) => {
+    console.log("je erentre")
+    const personElem = document.querySelector(`.person[data-username="${target}"]`);
+    console.log(personElem);
+    if (personElem){
+        const plusElem = personElem.querySelector(".add-button");
+        if (plusElem)
+            plusElem.style.display = "inline-block";
     }
 }
 
@@ -377,7 +444,24 @@ const changeExistingStatus = (target, mode) => {
     }
 }
 
+const disableEnableInput = (target, mode) => {
+    console.log("DISABLE ENABLE")
+    const focusedPerson = document.querySelector(".focus");
+    if (focusedPerson) {
+        console.log("FOCUSED ", focusedPerson)
+        const username = focusedPerson.dataset.username;
+        console.log("USERNAME " + username);
+        if (target === username){
+            if (mode === "disable" && contactSummary.data.blockeds.find(elem => elem === target) || contactSummary.data.blocked_by.find(elem => elem === target))
+                messageInput.disabled = true;
+            else if (mode === "enable" && !contactSummary.data.blockeds.find(elem => elem === target) && !contactSummary.data.blocked_by.find(elem => elem === target))
+                messageInput.disabled = false;
+        }
+    }
+}
+
 async function handleMessage(message) {
+    console.log(message)
     if (message.type === 'contact.summary'){
         contactSummary = message;
         console.log(message);
@@ -414,14 +498,44 @@ async function handleMessage(message) {
                 newFriendRequest(message.data.author); //si je ne suis celui qui recoit linvit
                 deletePlusIcon(message.data.author);
                 pushToContact(message.data.author);
-            }
-            else {
+            } else {
                 deletePlusIcon(message.data.name); //si je suis celui qui envoie linvit
                 pushToContact(message.data.name);
             }
         }
         if (message.data.author === whoIam && message.data.operation === "contact") //si je suis celui qui accepte
             deleteNotif(message.data.name);
+        if (message.data.operation === "block"){
+            if (message.data.author === whoIam) {// si je susi celui qui bloque
+                contactSummary.data.blockeds.push(message.data.name);
+                blockUnblockSwitch(message.data.name, "unblock");
+                deletePlusIcon(message.data.name);
+                disableEnableInput(message.data.name, "disable");
+            } else {  //celui qui recoit le block
+                contactSummary.data.blocked_by.push(message.data.author);
+                deletePlusIcon(message.data.author);
+                disableEnableInput(message.data.author, "disable");
+            }
+        }
+        if (message.data.operation === "remove") {
+            if (message.data.author === whoIam) {
+                let index = contactSummary.data.blockeds.indexOf(message.data.name);
+                contactSummary.data.blockeds.splice(index, 1);
+                blockUnblockSwitch(message.data.name, "block");
+                const amIblocked = contactSummary.data.blocked_by.find(elem => elem === message.data.name);
+                if (!amIblocked)
+                    addPlusIcon(message.data.name);
+                disableEnableInput(message.data.name, "enable");
+                
+            } else {
+                let index = contactSummary.data.blocked_by.indexOf(message.data.author);
+                contactSummary.data.blocked_by.splice(index, 1);
+                const didIblocked = contactSummary.data.blockeds.find(elem => elem === message.data.author);
+                if (!didIblocked)
+                    addPlusIcon(message.data.author);
+                disableEnableInput(message.data.author, "enable");
+            }
+        }
         console.log(message);
     }
     else if (message.type === "status.update"){
