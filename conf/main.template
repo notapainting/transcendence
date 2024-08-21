@@ -19,10 +19,10 @@ SERVER_NAME=bjill.fr
 
 #////////////////////////////////ELK_ENV_VAR//////////////////////////////////////////////////
 
-ELASTIC_USER=monkeydluffy
+ELASTIC_USER=elastic
 
 
-# Password for the 'monkeydluffy' user (at least 6 characters)
+# Password for the 'elastic' user (at least 6 characters)
 ELASTIC_PASSWORD=qcTrAAQSDgNwDEG2EMve
 
 
