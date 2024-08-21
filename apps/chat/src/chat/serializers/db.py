@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from rest_framework.serializers import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from uuid import uuid4
 
 from django.utils.timezone import now
@@ -120,7 +120,7 @@ class Message(BaseSerializer):
                 group=data['group'], 
                 user__name=data['author'], 
                 role__gt=mod.GroupShip.Roles.READER).exists() is False: 
-            raise ValidationError('user unauthorised to write in this group', code=403)
+            raise PermissionDenied('unauthorised to write in this group', code=403)
         return data
 
 
