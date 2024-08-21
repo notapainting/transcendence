@@ -4,11 +4,11 @@ services:
     build:
       context: apps/user/
       dockerfile: Dockerfile.dev
-    image: user_image
+    image: user_image_dev
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/user-common.env.example
+      - conf/user.env
     volumes:
       - user_volume:/app
     networks:
@@ -17,7 +17,6 @@ services:
     depends_on:
       user-db:
        condition: service_healthy
-    entrypoint: ["bash", "/conf/init.sh"]
 
   user-db:
     container_name: user-db
@@ -26,8 +25,7 @@ services:
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/user-db.env.example
-      - conf/user-common.env.example
+      - conf/user.env
     volumes:
       - user-db_volume:${PGDATA}
     networks: 
@@ -39,7 +37,6 @@ services:
       timeout: 5s
       interval: 12s
       start_period: 30s
-      # start_interval: 10s
 
 volumes:
   user_volume:

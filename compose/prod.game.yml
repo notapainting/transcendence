@@ -3,24 +3,18 @@ services:
     container_name: game
     build:
       context: apps/game/
-      dockerfile: Dockerfile.dev
-    image: game_image
+      dockerfile: Dockerfile.prod
+    image: game_image_prod
     environment:
       - TZ=${TZ}
-      - DJANGO_LOG_LEVEL=DEBUG
-      - DJANGO_LOG_FORMAT=MID
-    volumes:
-      - game_volume:/app
+    env_file:
+      - conf/game.env
     networks:
       - app_network
       - game_network
     restart: unless-stopped
     depends_on:
       - game-redis
-    entrypoint: ["bash", "/conf/init.sh"]
-    # stdin_open: true 
-    # tty: true
-
 
   game-redis:
     container_name: game-redis
@@ -32,13 +26,3 @@ services:
 networks:
   game_network:
     driver: bridge
-
-volumes:
-  game_volume:
-    name: game_volume
-    driver: local
-    driver_opts:
-      type: none
-      device: apps/game/src
-      o: bind
-      

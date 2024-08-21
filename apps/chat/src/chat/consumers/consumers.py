@@ -19,10 +19,6 @@ CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
 
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
-        if hasattr(self, "user"):
-            logger.info(f" {self.user.name} receive : {message}")
-        else:
-            logger.info(f" anon receive : {message}")
         try :
             await super().dispatch(message)
         except ValueError as error:

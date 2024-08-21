@@ -1,0 +1,6 @@
+# DJANGO ONLY
+
+# secrets key
+DJANGO_SECRET_KEY='django-insecure-rz=7lhx@_24v_e1)af0mhw4*gvnk=t&_yerz537^a)ryae&6w4'
+REDIS_HOSTNAME=game-redis
+REDIS_PORT=6379

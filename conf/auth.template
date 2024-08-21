@@ -1,0 +1,30 @@
+# COMMON SECTION
+
+# db hostname
+DB_PORT=5432
+DB_NAME=auth-db
+
+# postgres user for django with associate database name
+DB_USER=danajrill
+DB_PASSWORD=2SuNhaaAnFBQU08pSEB7
+DJ_DB_NAME=auth_db
+
+
+# POSTGRES ONLY
+
+# postgres database location
+PGDATA=/var/lib/postgresql/data/
+
+# postgres root user
+POSTGRES_USER=malicuzette
+POSTGRES_PASSWORD=0ugWSrbUeqQCja84jpkT
+POSTGRES_DB=coolname
+
+
+# DJANGO ONLY
+
+# secrets key
+DJANGO_SECRET_KEY='django-insecure-1nyh3mrd0y28m&^yw2+0j&p_7e^w9mr5cvf@1rxqa11*jk1gaa'
+
+UID=u-s4t2ud-df08c9009a68e9c00666c2530007d6b48e3810818ed96feb4820030f77b66597
+SECRET_KEY=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
