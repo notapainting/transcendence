@@ -19,13 +19,15 @@ SERVER_NAME=bjill.fr
 
 #////////////////////////////////ELK_ENV_VAR//////////////////////////////////////////////////
 
-ELASTIC_USER=elastic
+ELASTIC_USER=monkeydluffy
 
 
-# Password for the 'elastic' user (at least 6 characters)
+# Password for the 'monkeydluffy' user (at least 6 characters)
 ELASTIC_PASSWORD=qcTrAAQSDgNwDEG2EMve
 
 
+# user for kibana
+ELASTICSEARCH_USERNAME=kibana_system
 # Password for the 'kibana_system' user (at least 6 characters)
 KIBANA_PASSWORD=xCGCkzqkrwsPrgYA8Hzw
 

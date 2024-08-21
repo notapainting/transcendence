@@ -127,7 +127,7 @@ const _invitations = (content) => {
             }
             return true;
         case enu.Invitation.REJECT:
-            warnErrorInvitation(enu.Invitation.REJECT)
+            // warnErrorInvitation(enu.Invitation.REJECT)
             if (content.by === false) {
                 let target = 'invite-status-' + content.author;
                 document.getElementById(target).parentElement.remove();
@@ -155,12 +155,15 @@ const _match = (content) => {
         case enu.Match.RESULT:
             // contain result for a match (used in trn)
             return true;
-        case enu.Match.START:
+            case enu.Match.START:
             moveTo(enu.sceneIdx.MATCH);
             clearScore();
             announceScore();
             document.addEventListener('keydown', bindKeyPress)
             document.addEventListener('keyup', bindKeyRelease)
+            // content.message.x = 40;
+            gameData.start = false;
+            console.log("START A FALSE");
             game.gameRenderer(content.message);
             startMatch();
             return true;
@@ -173,6 +176,7 @@ const _match = (content) => {
             announceScore();
             return true;
         case enu.Match.END:
+            gameData.start = false;
             console.log(content)
             moveTo(enu.sceneIdx.END)
             document.removeEventListener('keydown', bindKeyPress)

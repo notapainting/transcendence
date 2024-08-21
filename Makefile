@@ -16,11 +16,13 @@
 #========#	general rule	#========#
 .PHONY: all re build start up down clear top ps config logs reload proxy chat game auth user dev prod
 
-all:	start
+all:	init
 
 re:	clear start
 
-init: ${ENV_FILE} vmmax build up
+init: ${ENV_FILE} vmmax build up-fg
+
+init-bg: ${ENV_FILE} vmmax build up-bg
 	
 
 #========#	build rule	#========#
@@ -29,17 +31,19 @@ build:
 
 
 #========#	start/stop rule	#========#
-start:
-	${CMP} up --build
+up-fg:
+	${CMP} up
 
-clear:
-	${CMP} down -v --remove-orphans --rmi all
-
-up:
+up-bg:
 	${CMP} up -d 
+
 
 down:
 	${CMP} down 
+
+clear:
+	${CMP} down -v --remove-orphans 
+
 
 
 #========#	tools rule	#========#
@@ -68,6 +72,9 @@ top:
 
 reload:
 	docker container restart proxy
+
+mode:
+	@echo "Mode is ${MODE}"
 
 mode-dev:	${ENV_FILE}
 	@sed -i 's/MODE=prod/MODE=dev/g' conf/Makefile.var

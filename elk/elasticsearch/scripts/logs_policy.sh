@@ -3,8 +3,6 @@ COLOR_GREEN='\e[1;32m'
 COLOR_RED='\e[1;31m'
 COLOR_RESET='\e[0m'
 
-ELASTIC_USER=elastic
-
 # Define the URL for Elasticsearch
 ELASTICSEARCH_URL="https://localhost:9200"
 
