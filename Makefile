@@ -70,11 +70,11 @@ reload:
 	docker container restart proxy
 
 mode-dev:	${ENV_FILE}
-	@sed -i 's/MODE=prod/MODE=dev/g' conf/main.env
+	@sed -i 's/MODE=prod/MODE=dev/g' conf/Makefile.var
 	@echo "Switch to DEV mode, please build and run accordly"
 
 mode-prod:	${ENV_FILE}
-	@sed -i 's/MODE=dev/MODE=prod/g' conf/main.env
+	@sed -i 's/MODE=dev/MODE=prod/g' conf/Makefile.var
 	@echo "Switch to PROD mode, please build and run accordly"
 
 

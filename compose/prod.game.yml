@@ -3,14 +3,12 @@ services:
     container_name: game
     build:
       context: apps/game/
-      dockerfile: Dockerfile.${MODE}
-    image: game_image_${MODE}
+      dockerfile: Dockerfile.prod
+    image: game_image_prod
     environment:
       - TZ=${TZ}
     env_file:
       - conf/game.env
-    volumes:
-      - game_volume:/app
     networks:
       - app_network
       - game_network
@@ -28,13 +26,3 @@ services:
 networks:
   game_network:
     driver: bridge
-
-volumes:
-  game_volume:
-    name: game_volume
-    driver: local
-    driver_opts:
-      type: none
-      device: apps/game/src
-      o: bind
-      

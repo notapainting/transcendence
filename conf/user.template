@@ -5,8 +5,8 @@ DB_PORT=5432
 DB_NAME=user-db
 
 # postgres user for django with associate database name
-DB_USER=danaj
-DB_PASSWORD=password
+DB_USER=danajrill
+DB_PASSWORD=4D1DqbQd0CGDQEdTGPhM
 DJ_DB_NAME=user_db
 
 
@@ -16,8 +16,8 @@ DJ_DB_NAME=user_db
 PGDATA=/var/lib/postgresql/data/
 
 # postgres root user
-POSTGRES_USER=borys
-POSTGRES_PASSWORD=password
+POSTGRES_USER=malicuzette
+POSTGRES_PASSWORD=cZt3CQQYww22bne6pS1G
 POSTGRES_DB=coolname
 
 # DJANGO ONLY

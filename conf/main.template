@@ -1,8 +1,5 @@
 # GENERAL
 
-# prod/dev
-MODE=prod
-
 # postgres database location (for volume)
 PGDATA=/var/lib/postgresql/data/
 
@@ -26,11 +23,11 @@ ELASTIC_USER=elastic
 
 
 # Password for the 'elastic' user (at least 6 characters)
-ELASTIC_PASSWORD=el_passwd
+ELASTIC_PASSWORD=qcTrAAQSDgNwDEG2EMve
 
 
 # Password for the 'kibana_system' user (at least 6 characters)
-KIBANA_PASSWORD=kb_passwd
+KIBANA_PASSWORD=xCGCkzqkrwsPrgYA8Hzw
 
 
 # Version of Elastic products

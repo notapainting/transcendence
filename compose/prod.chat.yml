@@ -3,14 +3,12 @@ services:
     container_name: chat
     build:
       context: apps/chat
-      dockerfile: Dockerfile.${MODE}
-    image: chat_image_${MODE}
+      dockerfile: Dockerfile.prod
+    image: chat_image_prod
     environment:
       - TZ=${TZ}
     env_file:
       - conf/chat.env
-    volumes:
-      - chat_volume:/app
     networks:
       - app_network
     restart: unless-stopped
@@ -37,7 +35,6 @@ services:
       timeout: 5s
       interval: 12s
       start_period: 30s
-      # start_interval: 10s
 
   chat-redis:
     container_name: chat-redis
@@ -47,14 +44,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  chat_volume:
-    name: chat
-    driver: local
-    driver_opts:
-      type: none
-      device: apps/chat/src
-      o: bind
-
   chat-db_volume:
     name: chat-db
     driver: local
