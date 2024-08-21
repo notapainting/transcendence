@@ -4,7 +4,7 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer, AsyncWebsocke
 
 from django.core.exceptions import ObjectDoesNotExist
 import channels.exceptions as exchan
-from rest_framework.serializers import ValidationError as DrfValidationError
+from rest_framework.exceptions import APIException
 
 import chat.enums as enu
 import chat.models as mod
@@ -19,7 +19,10 @@ CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
 
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
-        logger.info(f"msg type : {message['type']}")
+        if hasattr(self, "user"):
+            logger.info(f" {self.user.name} receive : {message}")
+        else:
+            logger.info(f" anon receive : {message}")
         try :
             await super().dispatch(message)
         except ValueError as error:
@@ -39,7 +42,8 @@ class BaseConsumer(AsyncWebsocketConsumer):
     async def encode_json(cls, content):
         try:
             return json.dumps(content)
-        except:
+        except BaseException as e:
+            logger.debug(e)
             return json.dumps({'type':enu.Event.Errors.ENCODE})
 
     async def send_json(self, content, close=False):
@@ -119,9 +123,9 @@ class ChatConsumer(BaseConsumer):
                 await self.channel_layer.group_add(ser_data['id'], self.channel_name)
             else:
                 targets, event = await cuti.get_targets(self.user, type, ser_data)
-        except DrfValidationError as error:
+        except APIException as error:
             logger.info(error)
-            await self.send_json({"type": enu.Event.Errors.DATA})
+            await self.send_json({"type": enu.Event.Errors.DATA, "code":error.status_code})
         else:
             if targets == enu.Self.LOCAL:
                 await self.send_json(event)
