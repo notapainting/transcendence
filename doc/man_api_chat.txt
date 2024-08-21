@@ -258,15 +258,6 @@ WebSocket :
                         }
                     }
 
-                group.delete (not implemented)
-                    {
-                        "type":"group.delete",
-                        "data":
-                        {
-                            "author":"",
-                            "id":""
-                        }
-                    }
 
             !only from backend to client!
                  group.summary

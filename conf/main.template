@@ -1,14 +1,35 @@
+# GENERAL
+
+# postgres database location (for volume)
+PGDATA=/var/lib/postgresql/data/
+
+# timezone
+TZ=Europe/Paris
+
+# path to cert/key for proxy (!has to start with . or .. if relative path) 
+PATH_TO_CERT=./certs/nginx-selfsigned.crt
+PATH_TO_KEY=./certs/nginx-selfsigned.key
+
+# default django log level, can be used in django container 
+DJANGO_LOG_LEVEL=INFO
+DJANGO_LOG_FORMAT=SIMPLE
+
+# server name (host)
+SERVER_NAME=bjill.fr
+
 #////////////////////////////////ELK_ENV_VAR//////////////////////////////////////////////////
 
-ELASTIC_USER=elastic
+ELASTIC_USER=monkeydluffy
 
 
-# Password for the 'elastic' user (at least 6 characters)
-ELASTIC_PASSWORD=el_passwd
+# Password for the 'monkeydluffy' user (at least 6 characters)
+ELASTIC_PASSWORD=qcTrAAQSDgNwDEG2EMve
 
 
+# user for kibana
+ELASTICSEARCH_USERNAME=kibana_system
 # Password for the 'kibana_system' user (at least 6 characters)
-KIBANA_PASSWORD=kb_passwd
+KIBANA_PASSWORD=xCGCkzqkrwsPrgYA8Hzw
 
 
 # Version of Elastic products

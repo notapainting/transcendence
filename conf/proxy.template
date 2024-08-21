@@ -1,3 +1,4 @@
+# modsecurity conf tweaks
 
 MODSEC_AUDIT_ENGINE=on 
 
@@ -27,10 +28,6 @@ MAX_FILE_SIZE=100000
 COMBINED_FILE_SIZES=1000000 
 
 TIMEOUT=60 
-
-SERVER_ADMIN=root@localhost 
-SERVER_NAME=localhost 
-
 
 MODSEC_RULE_ENGINE=on 
 

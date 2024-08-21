@@ -1,37 +1,33 @@
 services:
-  auth:
-    container_name: auth
+  chat:
+    container_name: chat
     build:
-      context: apps/auth/
+      context: apps/chat
       dockerfile: Dockerfile.dev
-    image: auth_image
+    image: chat_image_dev
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/auth.env.example
-      - conf/auth-common.env.example
+      - conf/chat.env
     volumes:
-      - auth_volume:/app
+      - chat_volume:/app
     networks:
       - app_network
     restart: unless-stopped
     depends_on:
-      auth-db:
+      chat-db:
        condition: service_healthy
-    entrypoint: ["bash", "/conf/init.sh"]
 
-
-  auth-db:
-    container_name: auth-db
+  chat-db:
+    container_name: chat-db
     build: postgres/
     image: postgres_image
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/auth-db.env.example
-      - conf/auth-common.env.example
+      - conf/chat.env
     volumes:
-      - auth-db_volume:${PGDATA}
+      - chat-db_volume:${PGDATA}
     networks: 
       - app_network
     restart: unless-stopped
@@ -41,17 +37,23 @@ services:
       timeout: 5s
       interval: 12s
       start_period: 30s
-      # start_interval: 10s
+
+  chat-redis:
+    container_name: chat-redis
+    image: redis:7.2.4-alpine
+    networks: 
+      - app_network
+    restart: unless-stopped
 
 volumes:
-  auth_volume:
-    name: auth_volume
+  chat_volume:
+    name: chat
     driver: local
     driver_opts:
       type: none
-      device: apps/auth/src
+      device: apps/chat/src
       o: bind
 
-  auth-db_volume:
-    name: auth-db_volume
+  chat-db_volume:
+    name: chat-db
     driver: local

@@ -1,0 +1,30 @@
+# COMMON SECTION
+
+# db hostname
+DB_PORT=5432
+DB_NAME=chat-db
+
+# postgres user for django with associate database name
+DB_USER=danajrill
+DB_PASSWORD=0ugWSrbUeqQCja84jpkT
+DJ_DB_NAME=chat_db
+
+
+# POSTGRES ONLY
+
+# postgres database location
+PGDATA=/var/lib/postgresql/data/
+
+# postgres root user
+POSTGRES_USER=malicuzette
+POSTGRES_PASSWORD=F8xnm8hScaBYdyfUwsUT
+POSTGRES_DB=coolname
+
+# DJANGO ONLY
+
+# secret key
+DJANGO_SECRET_KEY='django-insecure-0#_lx+w5u%tmt2kl*9li+!(3jdtc3re@ihht6#hn2!p8-90j_v'
+
+# redis backend hsotname
+REDIS_HOSTNAME=chat-redis
+REDIS_PORT=6379

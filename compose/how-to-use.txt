@@ -8,8 +8,8 @@ In your compose file :
 *	no need to add network or version 
 *	if you want you app to NOT start automatically and use it in "dev" mode:
 		- no entrypoint
-		- set this:
-		     stdin_open: true 
+		- add this:
+		    stdin_open: true 
 		    tty: true
 		(it's like the"dev" local compose (whose should be located in your app folder))
 	keep in mind that in this mode the django server of your app doesn't start by itself, 
@@ -17,4 +17,3 @@ In your compose file :
 *	else just set an entrypoint and no sttdin/tty
 
 
-You can also set all directory you need to be automatically created in mdir rule in Makefile 

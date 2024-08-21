@@ -8,50 +8,37 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rz=7lhx@_24v_e1)af0mhw4*gvnk=t&_yerz537^a)ryae&6w4'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
-# CSRF_TRUSTED_ORIGINS = ['*']
-CSRF_COOKIE_SECURE = False
-# CORS_ORIGIN_WHITELIST
-
-
 
 INSTALLED_APPS = [
-    "daphne",
+    'daphne',
 	'game',
-    'channels',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 # ROOT_URLCONF = 'game_back.urls'
 
+ASGI_APPLICATION = "game_back.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("game-redis", 6379)],
+            "hosts": [(os.getenv('REDIS_HOSTNAME', 'redis'), os.getenv('REDIS_PORT', 6379))],
         },
     },
 }
 
 
-ROOT_URLCONF = "game_back.urls"
-
-ASGI_APPLICATION = "game_back.asgi.application"
 
 LANGUAGE_CODE = 'en-us'
 
@@ -60,6 +47,7 @@ TIME_ZONE = 'CET'
 USE_I18N = True
 
 USE_TZ = True
+
 
 LOGGING = {
     "version": 1,
