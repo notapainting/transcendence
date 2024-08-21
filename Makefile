@@ -14,7 +14,7 @@
 
 
 #========#	general rule	#========#
-.PHONY: all re build start up down clear top ps config logs reload proxy chat game auth user dev prod
+.PHONY: all re init init-bg    
 
 all:	init
 
@@ -26,11 +26,34 @@ init-bg: ${ENV_FILE} vmmax build up-bg
 	
 
 #========#	build rule	#========#
+.PHONY: build env-create env-clear mode-dev mode-prod vmmax
 build:
 	${CMP} build
 
+env-create: ${ENV_FILE}
+
+env-clear:
+	rm -f ${ENV_FILE}
+	echo "Delete old .env files.."
+
+${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
+	@cp $< $@
+	@echo "Generate new  $@ file!"
+
+mode-dev:	${ENV_FILE}
+	@sed -i 's/MODE=prod/MODE=dev/g' conf/Makefile.var
+	@echo "Switch to DEV mode, please build and run accordly"
+
+mode-prod:	${ENV_FILE}
+	@sed -i 's/MODE=dev/MODE=prod/g' conf/Makefile.var
+	@echo "Switch to PROD mode, please build and run accordly"
+
+vmmax:
+	sudo sysctl -w vm.max_map_count=262144
+
 
 #========#	start/stop rule	#========#
+.PHONY: up-fg up-bg down clear
 up-fg:
 	${CMP} up
 
@@ -45,20 +68,7 @@ clear:
 
 
 #========#	tools rule	#========#
-env-create: ${ENV_FILE}
-
-env-clear:
-	rm -f ${ENV_FILE}
-	echo "Delete old .env files.."
-
-
-${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
-	@cp $< $@
-	@echo "Generate new  $@ file!"
-
-vmmax:
-	sudo sysctl -w vm.max_map_count=262144
-
+.PHONY: config ps top mode
 config:
 	${CMP} config
 
@@ -68,22 +78,15 @@ ps:
 top:
 	${CMP} top
 
-reload:
-	docker container restart proxy
-
 mode:
 	@echo "Mode is ${MODE}"
 
-mode-dev:	${ENV_FILE}
-	@sed -i 's/MODE=prod/MODE=dev/g' conf/Makefile.var
-	@echo "Switch to DEV mode, please build and run accordly"
-
-mode-prod:	${ENV_FILE}
-	@sed -i 's/MODE=dev/MODE=prod/g' conf/Makefile.var
-	@echo "Switch to PROD mode, please build and run accordly"
-
 
 #========#	container access	#========#
+.PHONY: reload proxy chat game auth user
+reload:
+	docker container restart proxy
+
 proxy:
 	docker exec -it proxy sh
 
