@@ -37,13 +37,11 @@ up-fg:
 up-bg:
 	${CMP} up -d 
 
-
 down:
 	${CMP} down 
 
 clear:
 	${CMP} down -v --remove-orphans 
-
 
 
 #========#	tools rule	#========#
