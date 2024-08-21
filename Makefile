@@ -20,10 +20,10 @@ all:	init
 
 re:	clear start
 
-init: ${ENV_FILE} vmmax build up-fg
+init: ${ENV_FILE} build up
 
-init-bg: ${ENV_FILE} vmmax build up-bg
-	
+init-bg: ${ENV_FILE} build up-bg
+
 
 #========#	build rule	#========#
 .PHONY: build env-create env-clear mode-dev mode-prod vmmax
@@ -53,8 +53,8 @@ vmmax:
 
 
 #========#	start/stop rule	#========#
-.PHONY: up-fg up-bg down clear
-up-fg:
+.PHONY: up up-bg down clear
+up:
 	${CMP} up
 
 up-bg:
