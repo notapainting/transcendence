@@ -306,7 +306,11 @@ const registerRequest = (event) => {
             messageBox.style.backgroundColor = "#f44336";
             return response.json().then(data => {
                 console.log(data);
-                messageBox.innerHTML = `${data.email || data.username}<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+                if (data.password)
+                    data.password = "Password too short, min. 8 characters";
+                if (data.email === "This field must be unique")
+                    data.email = "E-mail incorrect or already used"
+                messageBox.innerHTML = `${data.email || data.username || data.password}<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
                 messageBox.style.transform = "scale(1)";
             });
         }
