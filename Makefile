@@ -14,7 +14,7 @@
 
 
 #========#	general rule	#========#
-.PHONY: all re init init-bg    
+.PHONY: all re init init-fg    
 
 all:	init
 
@@ -22,7 +22,7 @@ re:	clear start
 
 init: ${ENV_FILE} build up
 
-init-bg: ${ENV_FILE} build up-bg
+init-fg: ${ENV_FILE} build up-fg
 
 
 #========#	build rule	#========#
@@ -40,11 +40,11 @@ ${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
 	@cp $< $@
 	@echo "Generate new  $@ file!"
 
-mode-dev:	${ENV_FILE}
+mode-dev:
 	@sed -i 's/MODE=prod/MODE=dev/g' conf/Makefile.var
 	@echo "Switch to DEV mode, please build and run accordly"
 
-mode-prod:	${ENV_FILE}
+mode-prod:
 	@sed -i 's/MODE=dev/MODE=prod/g' conf/Makefile.var
 	@echo "Switch to PROD mode, please build and run accordly"
 
@@ -53,11 +53,11 @@ vmmax:
 
 
 #========#	start/stop rule	#========#
-.PHONY: up up-bg down clear
-up:
+.PHONY: up up-fg down clear
+up:		${ENV_FILE}
 	${CMP} up
 
-up-bg:
+up-fg:	${ENV_FILE}
 	${CMP} up -d 
 
 down:
