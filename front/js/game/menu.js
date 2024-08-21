@@ -507,24 +507,43 @@ nextMatch.addEventListener('click', () => {
 })
 
 document.getElementById('game-menu-local-input-button').addEventListener('click', () => {
-    const   user = document.getElementById('game-menu-input-player').value;
+    const user = document.getElementById('game-menu-input-player').value;
+    const inputField = document.getElementById('game-menu-input-player');
+    const errorMessage = document.getElementById('input-error-message');
+    
     if (validate_name(user) === false) {
         console.warn("bad input: " + user);
-        return ;
+        inputField.classList.add('input-error');
+        errorMessage.textContent = 'Invalid player name!';
+        errorMessage.style.display = 'block';
+
+        setTimeout(() => {
+            errorMessage.style.display = 'none';
+        }, 1000);
+
+        setTimeout(() => {
+            inputField.classList.remove('input-error');
+        }, 500);
+
+
+        return;
     }
-    document.getElementById('game-menu-input-player').value = '';
+
+    inputField.value = '';
+    errorMessage.style.display = 'none';
 
     players.push(user);
     if (status === enu.gameMode.LOCAL) {
-        createListLocal(user)
+        createListLocal(user);
     } else {
         gameSocket.send(JSON.stringify({
             'type': enu.Game.INVITE,
             'user': user,
-            'mode': (status === enu.gameMode.MATCH ? enu.Game.MATCH: enu.Game.TRN),
+            'mode': (status === enu.gameMode.MATCH ? enu.Game.MATCH : enu.Game.TRN),
         }));
     }
-})
+});
+
 
 const createListLocal = (user) => {
     const   item = document.createElement('li');

@@ -112,10 +112,10 @@ function clearTrail() {
 }
 
 export function gameRenderer(data) {
+    animationData.ballFall = true;
     if (data)
     {
         utils.clearScene(); 
-		animationData.ballFall = true;
 		scene.add(load.intro);
 		scene.add(spotLight);
 		scene.add(light);
@@ -283,6 +283,7 @@ export function gameRenderer(data) {
 				sphere.position.set(data.x, data.y, 0);
 				scene.add(sphere);
 			} else {
+                console.log("SPHERE 40 SET");
 				sphere.position.set(data.x, data.y, 40);
 			}
 		}
