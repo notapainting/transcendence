@@ -3,8 +3,8 @@ services:
     container_name: user
     build:
       context: apps/user/
-      dockerfile: Dockerfile.${MODE}
-    image: user_image_${MODE}
+      dockerfile: Dockerfile.dev
+    image: user_image_dev
     environment:
       - TZ=${TZ}
     env_file:
@@ -37,7 +37,6 @@ services:
       timeout: 5s
       interval: 12s
       start_period: 30s
-      # start_interval: 10s
 
 volumes:
   user_volume:

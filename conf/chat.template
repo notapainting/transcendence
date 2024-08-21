@@ -5,8 +5,8 @@ DB_PORT=5432
 DB_NAME=chat-db
 
 # postgres user for django with associate database name
-DB_USER=danaj
-DB_PASSWORD=password
+DB_USER=danajrill
+DB_PASSWORD=0ugWSrbUeqQCja84jpkT
 DJ_DB_NAME=chat_db
 
 
@@ -16,8 +16,8 @@ DJ_DB_NAME=chat_db
 PGDATA=/var/lib/postgresql/data/
 
 # postgres root user
-POSTGRES_USER=borys
-POSTGRES_PASSWORD=password
+POSTGRES_USER=malicuzette
+POSTGRES_PASSWORD=F8xnm8hScaBYdyfUwsUT
 POSTGRES_DB=coolname
 
 # DJANGO ONLY

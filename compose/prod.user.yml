@@ -1,33 +1,31 @@
 services:
-  auth:
-    container_name: auth
+  user:
+    container_name: user
     build:
-      context: apps/auth/
-      dockerfile: Dockerfile.${MODE}
-    image: auth_image_${MODE}
+      context: apps/user/
+      dockerfile: Dockerfile.prod
+    image: user_image_prod
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/auth.env
-    volumes:
-      - auth_volume:/app
+      - conf/user.env
     networks:
       - app_network
     restart: unless-stopped
     depends_on:
-      auth-db:
+      user-db:
        condition: service_healthy
 
-  auth-db:
-    container_name: auth-db
+  user-db:
+    container_name: user-db
     build: postgres/
     image: postgres_image
     environment:
       - TZ=${TZ}
     env_file:
-      - conf/auth.env
+      - conf/user.env
     volumes:
-      - auth-db_volume:${PGDATA}
+      - user-db_volume:${PGDATA}
     networks: 
       - app_network
     restart: unless-stopped
@@ -37,17 +35,8 @@ services:
       timeout: 5s
       interval: 12s
       start_period: 30s
-      # start_interval: 10s
 
 volumes:
-  auth_volume:
-    name: auth_volume
-    driver: local
-    driver_opts:
-      type: none
-      device: apps/auth/src
-      o: bind
-
-  auth-db_volume:
-    name: auth-db_volume
+  user-db_volume:
+    name: user-db_volume
     driver: local
