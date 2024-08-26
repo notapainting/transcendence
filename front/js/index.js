@@ -7,8 +7,6 @@ import { showGame, showGameLocal } from "./game/index.js"
 export let whoIam;
 
 
-
-
 export const navigateTo = url => {
     history.pushState(null, null, url)
     router()

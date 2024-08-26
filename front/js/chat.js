@@ -1,4 +1,4 @@
-import { clearView } from "./index.js";
+import { clearView, navigateTo } from "./index.js";
 import { isUserAuthenticated } from "./index.js";
 import { whoIam } from "./index.js";
 import {initGameWebSocket} from "./game/websocket.js"
@@ -32,6 +32,16 @@ function formatDate(dateString) {
     }
 }
 
+const targetProfileDisplay = document.querySelector(".target-profile-display");
+const profileTargetInfo = document.querySelector(".profile-target-info");
+const displayTargetProfile = (data) => {
+    targetProfileDisplay.style.display = "flex";
+    setTimeout(()=> {
+        profileTargetInfo.style.transform = "scale(1)"
+    }, 100)
+}
+
+let currentPictureChatClickHandler;
 
 const displayFocusedPerson = (personDiv, target, profile_picture) => {
     document.querySelectorAll('.person').forEach(elem => {
@@ -56,6 +66,31 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
     else {
         messageInput.disabled = false;
     }
+    if (currentPictureChatClickHandler) {
+        pictureChat.removeEventListener('click', currentPictureChatClickHandler);
+    }
+
+    currentPictureChatClickHandler = async () => {
+        try {
+            const response = await fetch(`/user/users_info/?username=${encodeURIComponent(target)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            displayTargetProfile(data);
+
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    };
+    pictureChat.addEventListener('click', currentPictureChatClickHandler);
 }
 
 const addToFriend = (target) => {

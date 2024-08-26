@@ -93,8 +93,6 @@ class GetUserInfos(APIView):
 				user_data = {
 					'username': user.username,
                     'email': user.email,
-                    'isVerified': user.isVerified,
-                    'unique_id': user.unique_id,
                     'first_name': user.first_name,
                     'last_name': user.last_name,
                     'date_of_birth': user.date_of_birth,
@@ -116,7 +114,11 @@ class GetAllUserInfos(APIView):
 			user = get_object_or_404(CustomUser, username=username)
 			user_data = {
 				"username": user.username,
-				"profile_picture": user.profile_picture.url if user.profile_picture else settings.MEDIA_URL + 'default_profile_picture.jpg'
+				"profile_picture": user.profile_picture.url if user.profile_picture else settings.MEDIA_URL + 'default_profile_picture.jpg',
+				'first_name': user.first_name,
+				'last_name': user.last_name,
+				'date_of_birth': user.date_of_birth,
+				'gender': user.gender,
 			}
 			return Response(user_data, status=status.HTTP_200_OK)
 		else:
