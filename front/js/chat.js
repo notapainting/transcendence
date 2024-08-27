@@ -34,7 +34,22 @@ function formatDate(dateString) {
 
 const targetProfileDisplay = document.querySelector(".target-profile-display");
 const profileTargetInfo = document.querySelector(".profile-target-info");
-const displayTargetProfile = (data) => {
+
+const displayTargetProfile = (data, matchHistory) => {
+    const profilePicture = document.querySelector(".target-picture");
+    profilePicture.style.backgroundImage = `url("${data.profile_picture}")`;
+    const targetInfo = document.querySelector(".target-info");
+    targetInfo.innerHTML = "";
+    Object.entries(data).forEach(([key, value]) => {
+        if (key === "profile_picture" || key === "date_of_birth")
+            return ;
+        const infoItem = document.createElement("p");
+        infoItem.classList.add("info-item");
+
+        // Set innerHTML with the key in a span and the value or "None"
+        infoItem.innerHTML = `<span>${key}:</span> ${value || "None"}`;
+        targetInfo.appendChild(infoItem);
+    });
     targetProfileDisplay.style.display = "flex";
     setTimeout(()=> {
         profileTargetInfo.style.transform = "scale(1)"
@@ -72,20 +87,37 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
 
     currentPictureChatClickHandler = async () => {
         try {
-            const response = await fetch(`/user/users_info/?username=${encodeURIComponent(target)}`, {
+            const userInfoResponse = await fetch(`/user/users_info/?username=${encodeURIComponent(target)}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 }
             });
-
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+    
+            if (!userInfoResponse.ok) {
+                throw new Error('Network response was not ok when fetching user info');
             }
-
-            const data = await response.json();
-            displayTargetProfile(data);
-
+    
+            const userInfo = userInfoResponse.status !== 204 ? await userInfoResponse.json() : {};
+    
+            const matchHistoryResponse = await fetch(`/user/match_history/${encodeURIComponent(target)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+    
+            if (!matchHistoryResponse.ok) {
+                throw new Error('Network response was not ok when fetching match history');
+            }
+            // console.log(matchHistoryResponse.status)
+            const matchHistoryText = await matchHistoryResponse.text();
+            const matchHistory = null;
+            console.log(matchHistoryText);
+            if (matchHistoryText)
+                 matchHistory = await matchHistoryResponse.json();
+            displayTargetProfile(userInfo, matchHistory);
+    
         } catch (error) {
             console.error('There was a problem with the fetch operation:', error);
         }
