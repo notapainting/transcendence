@@ -218,7 +218,17 @@ const closeTwoFactorLogin = (event) => {
     setTimeout(()=> {
             twoFactorDisplay.style.display = "none"
     }, 200)
-} 
+}
+
+const profileTargetContainer = document.querySelector(".profile-target-info");
+const profileTargetDisplay = document.querySelector(".target-profile-display");
+
+const closeProfileDisplay = (event) => {
+    profileTargetContainer.style.transform = "scale(0)"
+    setTimeout(()=> {
+            profileTargetDisplay.style.display = "none"
+    }, 200)
+}
 
 const loginRequest = (event) => {
     const dataSend = {
@@ -306,7 +316,11 @@ const registerRequest = (event) => {
             messageBox.style.backgroundColor = "#f44336";
             return response.json().then(data => {
                 console.log(data);
-                messageBox.innerHTML = `${data.email || data.username}<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+                if (data.password)
+                    data.password = "Password too short, min. 8 characters";
+                if (data.email === "This field must be unique")
+                    data.email = "E-mail incorrect or already used"
+                messageBox.innerHTML = `${data.email || data.username || data.password}<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
                 messageBox.style.transform = "scale(1)";
             });
         }
@@ -445,6 +459,7 @@ export const showHome = async () => {
     homeFormButton.removeEventListener("click", loginOrRegisterRequest)
     document.querySelector(".login-42").removeEventListener('click', authenticateWith42);
     document.querySelector(".close-two-factor-login").addEventListener("click", closeTwoFactorLogin)
+    document.querySelector(".close-profile-display").addEventListener("click", closeProfileDisplay);
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
     document.querySelector(".login-42").addEventListener('click', authenticateWith42);
 } 
