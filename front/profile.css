@@ -236,7 +236,7 @@ two factor */
     background-color: rgba(0, 0, 0, 0.8);
     align-items: center;
     justify-content: center;
-    display: flex;
+    display: none;
     z-index: 6;
 }
 
@@ -246,7 +246,7 @@ two factor */
     background-color: #16a085;
     border-radius: 10px;
     color: black;
-    transform: scale(1);
+    transform: scale(0);
     transition: transform 0.2s ease;
     display: flex;
 }
