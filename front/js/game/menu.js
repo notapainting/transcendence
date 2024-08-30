@@ -365,6 +365,27 @@ createMatch.addEventListener('click', () => {
     sendCreate(enu.Game.MATCH)
 });
 
+export const fastmatchOK = () => {
+    if (status !== enu.gameMode.LOCAL) return false;
+    return true; 
+}
+
+export const   fastmatch = () => {
+    if (status !== enu.gameMode.LOCAL) return false; 
+    status = enu.gameMode.MATCH;
+    document.getElementById('playersRange').min = 2;
+    document.getElementById('playersRange').disabled = true;
+    is_match = true;
+    document.getElementById('game-menu-list-players-title').innerText = "Fast Match";
+    sendCreate(enu.Game.MATCH)
+    gameSocket.send(JSON.stringify({
+        'type': enu.Game.INVITE,
+        'user': user,
+        'mode': enu.Game.MATCH,
+    }));
+    return true;
+}
+
 createTournament.addEventListener('click', () => {
     status = enu.gameMode.TOURNAMENT;
     document.getElementById('playersRange').min = 4;
