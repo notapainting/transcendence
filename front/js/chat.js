@@ -67,8 +67,8 @@ const displayTargetProfile = (data, matchHistory) => {
                 amItheWinner = false;
             }
             newMatch.innerHTML = `  <div class="score target-score">${amItheWinner ? object.score_w : object.score_l}</div>
-                                    <div class='vs-text'><span>${data.username}</span><span>VS</span><span>${otherPerson}</span>
-                                    </div><div class="score opponent-score">${amItheWinner ? object.score_l : object.score_w}</div>`
+                                    <div class='vs-text'><span>${data.username}</span><span>VS</span><span>${otherPerson}</span></div>
+                                    <div class="score opponent-score">${amItheWinner ? object.score_l : object.score_w}</div>`
             targetMatchHistory.appendChild(newMatch);
         })
     }

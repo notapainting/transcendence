@@ -161,7 +161,7 @@ class MatchHistory(APIView):
             qset2 = Match.objects.filter(loser__username=username)
             m = qset1.union(qset1, qset2)
             s = MatchSerializer(m, many=True)
-            return HttpResponse(status=200, content=s.data)
+            return JsonResponse(s.data, safe=False, status=200)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)
 

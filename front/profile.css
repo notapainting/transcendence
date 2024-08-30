@@ -421,59 +421,100 @@ two factor */
     text-align: center;
 }
 
-
-
-/* .column {
-    flex: 1;
-    width: 100%;
-    margin-top: 15px;
-}
-
-.row {
-    margin-bottom: 40px;
-    height: 40px;
+.profile-navbar {
+    position: absolute;
+    width: 150px;
+    height: 110px;
+    color: white;
+    top: 50%;
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    /* z-index: 2; */
+    transform: translateY(-50%);
+    left: 10px;
 }
 
-.row-margin {
-    margin-left: 20px;
-    margin-right: 0;
-}
-
-.row label {
-    margin-bottom: 3px;
-    margin-right: 5px;
-    width: 20%;
-}
-
-.row input {
-    border: 1px solid black;
-    border-radius: 10px;    font-size: 4rem;
-    text-align: center;
-    font-size: 22px;
-    height: 100%;
-    width: 70%;
-}
-
-.gender-options input {
-    width: 20px;
-    height: 20px;
-}
-
-
-.gender-options {
-    display: flex;
-}
-
-.mini-gender-container {
+.link-profile {
+    width: 100%;
+    height: 50px;
+    margin: 2px 0;
+    background-color: black;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 10px;
-
+    font-size: 20px;
+    cursor: pointer;
+    color: white;
 }
 
-.mini-gender-container label {
-    margin-left: 5px;
-} */
+.focus-profile {
+    background-color: #ff90e8;
+    color: black;
+}
+
+.history-container {
+    height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-history-container {
+    height: 80%;
+    width: 50%;
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    color: black;
+}
+
+.profile-history-container h3 {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 32px;
+    display: inline-block;
+    padding: 20px 0;
+}
+
+
+
+.match-profile {
+    margin: 5px 0;
+    height: 100px;
+    width: 100%;
+    border-radius: 8px; 
+    overflow: hidden; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    font-weight: bold;
+    font-size: 20px; 
+    text-align: center;
+}
+
+.profile-win{
+    background: rgb(91, 192, 222);
+}
+
+.profile-lose {
+    background: rgb(217,83,79);
+}
+
+.profile-score {
+    font-size: 30px;
+    width: 35%;
+}
+
+.profile-vs-text {
+    width: 30%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border-radius: 4px; 
+}
