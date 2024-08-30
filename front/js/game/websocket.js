@@ -6,6 +6,7 @@ import { scene } from './game.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
 import { composer } from './game.js';
+import { isUserAuthenticated } from '../index.js';
 
 function updateTimer() {
     gameData.elapsedTime += 1;
@@ -21,8 +22,9 @@ export const initGameWebSocket = (path) => {
     _initWebsocket(path)
 }
 
-const _initWebsocket = (path) => {
+const _initWebsocket = async (path) => { 
     if (gameSocket !== null) return;
+    await isUserAuthenticated();
     gameSocket = new WebSocket(
         'wss://'
         + window.location.host
