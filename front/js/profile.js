@@ -189,8 +189,12 @@ const confirm2FaRequest = async (event) => {
     })
     .then(response => response.json())
     .then(data => {
-        closeTwoFactorActivate();
-        window.location.reload();
+        console.log(data);
+        if (data.success){
+            closeTwoFactorActivate();
+            window.location.reload();
+        }
+
     })
     .catch(error => {
         
