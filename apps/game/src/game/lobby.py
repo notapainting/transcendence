@@ -6,6 +6,7 @@ from rest_framework.renderers import JSONRenderer
 import game.enums as enu
 import random, httpx
 from uuid import uuid4
+from .blockchain import record_match_on_blockchain
 
 from game.plaza import plaza
 
@@ -209,6 +210,7 @@ class BaseTournament:
         self.match_count = len(self.current)
         await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.PHASE, "new":True, "phase":self.current}})
 
+import asyncio
 
 class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
     def __init__(self, host, host_channel_name):
@@ -248,6 +250,18 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
                 await self.make_phase()
 
     async def end(self, smooth=True):
+        print("Je rentre dans la fonction END et j'envoie dans la blockchain")
+        
+        tournament_id = 69
+        winner = 'Louisa'
+        loser = 'Islem'
+        winner_score = 69
+        loser_score = 200
+
+        # Exécuter la fonction synchronisée dans un exécuteur
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, record_match_on_blockchain, tournament_id, winner, loser, winner_score, loser_score)
+
         await self.match_stop()
         await super()._end()
 
