@@ -21,6 +21,7 @@ services:
  setup:
    container_name: setup
    environment:
+     - "ELASTIC_USER=${ELASTIC_USER}"
      - "ELASTIC_PASSWORD=${ELASTIC_PASSWORD}"
      - "KIBANA_PASSWORD=${KIBANA_PASSWORD}"
    build:
