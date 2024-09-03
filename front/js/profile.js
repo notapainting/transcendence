@@ -1,5 +1,5 @@
 import { loggedInStatus } from "./home.js";
-import { isUserAuthenticated } from "./index.js";
+import { isUserAuthenticated, whoIam } from "./index.js";
 import { clearView } from "./index.js";
 
 let firstnameInput = document.querySelector("#first-name")
@@ -201,6 +201,70 @@ const confirm2FaRequest = async (event) => {
     });
 }
 
+async function getMatchHistory() {
+    const url = `/user/match_history/${encodeURIComponent(whoIam)}`;
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Erreur: ${response.statusText}`);
+        }
+
+        const matchHistory = await response.json();
+
+        return matchHistory;
+    } catch (error) {
+        return null;
+    }
+}
+
+const settingsLink = document.querySelector(".link-settings");
+console.log(settingsLink);
+const historyLink = document.querySelector(".link-history");
+const profileContainer = document.querySelector(".profile-container");
+const historyContainer = document.querySelector(".history-container");
+const profileHistoryContainer = document.querySelector(".profile-history-container")
+
+const showSettings = () => {
+    historyContainer.style.display = "none";
+    profileContainer.style.display = "flex";
+    historyLink.classList.remove("focus-profile");
+    settingsLink.classList.add("focus-profile");
+}
+
+const showMatchHistory = async () => {
+    historyContainer.style.display = "none";
+    historyContainer.style.display = "flex";
+    const dataMatch = await getMatchHistory();
+    if (dataMatch){
+        profileHistoryContainer.innerHTML = "";
+        const titleContainer = document.createElement("h3");
+        titleContainer.innerText = "Match History";
+        profileHistoryContainer.appendChild(titleContainer);
+        dataMatch.forEach(object => {
+            const newMatch = document.createElement("div");
+            let otherPerson;
+            let amItheWinner;
+            if (object.winner === whoIam){
+                newMatch.classList.add("match-profile", "profile-win");
+                otherPerson = object.loser;
+                amItheWinner = true;
+            } else {
+                newMatch.classList.add("match-profile", "profile-lose");
+                otherPerson = object.winner;
+                amItheWinner = false;
+            }
+            newMatch.innerHTML = `  <div class="profile-score">${amItheWinner ? object.score_w : object.score_l}</div>
+                                    <div class='profile-vs-text'><span>${whoIam}</span><span>VS</span><span>${otherPerson}</span></div>
+                                    <div class="profile-score">${amItheWinner ? object.score_l : object.score_w}</div>`
+            profileHistoryContainer.appendChild(newMatch);
+        })
+    }
+    console.log(dataMatch);
+    settingsLink.classList.remove("focus-profile");
+    historyLink.classList.add("focus-profile");
+}
+
 export const showProfile = async () => {
     await isUserAuthenticated();
     fetch('/auth/get_pers_infos/', {
@@ -235,5 +299,7 @@ export const showProfile = async () => {
     document.querySelector(".close-two-factor").removeEventListener("click", closeTwoFactorActivate)
     document.querySelector(".close-two-factor").addEventListener("click", closeTwoFactorActivate)
     activate2FaButton.removeEventListener("click", confirm2FaRequest);
+    settingsLink.addEventListener("click", showSettings);
+    historyLink.addEventListener("click", showMatchHistory);
     activate2FaButton.addEventListener("click", confirm2FaRequest);
 }
