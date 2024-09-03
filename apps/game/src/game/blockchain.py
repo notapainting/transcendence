@@ -1,7 +1,6 @@
 import os
 from web3 import Web3
 from eth_account import Account
-from eth_account.signers.local import LocalAccount
 from web3.middleware import construct_sign_and_send_raw_middleware
 
 infura_api_key = os.environ.get('INFURA_API_KEY')
@@ -141,10 +140,7 @@ contract_abi = [
 
 contract_address = '0x2947e45e3C99e4a11E0466A8Cbecda9fD956A8CC'
 
-contract = web3.eth.contract(address=contract_address, abi=contract_abi)    
-
-import traceback
-import sys
+contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
 def record_match_on_blockchain(tournament_id, winner, loser, winner_score, loser_score):
     try:
@@ -169,15 +165,7 @@ def record_match_on_blockchain(tournament_id, winner, loser, winner_score, loser
         else:
             print("L'enregistrement du match a échoué.")
     except Exception as e:
-        error_message = "Erreur lors de l'enregistrement du match :\n"
-        error_message += f"Type d'erreur : {type(e).__name__}\n"
-        error_message += f"Message d'erreur : {str(e)}\n"
-        error_message += "Traceback complet :\n"
-        error_message += traceback.format_exc()
-        print(error_message, file=sys.stderr)
-        print("\nVariables locales au moment de l'erreur :")
-        for name, value in locals().items():
-            print(f"{name} = {value}")
+        print("Erreur lors de l'ajout du match au tournoi :", e)
 
 def print_etherscan_transaction_url(tx_hash):
     etherscan_url = 'https://sepolia.etherscan.io/tx/'
