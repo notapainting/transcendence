@@ -5,13 +5,14 @@ from eth_account.signers.local import LocalAccount
 from web3.middleware import construct_sign_and_send_raw_middleware
 
 infura_api_key = os.environ.get('INFURA_API_KEY')
+if infura_api_key is None:
+    raise ValueError("La variable d'environnement INFURA_API_KEY n'est pas définie")
 
-# Se connecter à un nœud Ethereum (nœud local ou RPC)
-# web3 = Web3(Web3.HTTPProvider(f"https://sepolia.infura.io/v3/{infura_api_key}"))
+private_key = os.environ.get('ACCOUNT_PRIVATE_KEY')
+if private_key is None:
+    raise ValueError("La variable d'environnement ACCOUNT_PRIVATE_KEY n'est pas définie")
 
-web3 = Web3(Web3.HTTPProvider(f"https://sepolia.infura.io/v3/82baf32070fa426a9603f544c7ccf3cc"))
-
-private_key = '784da8965fb39e878bec458d9ceb342b6a9ee506a7a8c16d33e95ea6ac823895'
+web3 = Web3(Web3.HTTPProvider(f"https://sepolia.infura.io/v3/{infura_api_key}"))
 
 account = Account.from_key(private_key)
 
