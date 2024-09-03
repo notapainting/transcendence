@@ -258,7 +258,6 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
         winner_score = 69
         loser_score = 200
 
-        # Exécuter la fonction synchronisée dans un exécuteur
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, record_match_on_blockchain, tournament_id, winner, loser, winner_score, loser_score)
 
