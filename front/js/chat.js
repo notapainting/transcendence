@@ -34,22 +34,44 @@ function formatDate(dateString) {
 
 const targetProfileDisplay = document.querySelector(".target-profile-display");
 const profileTargetInfo = document.querySelector(".profile-target-info");
+const targetMatchHistory = document.querySelector(".target-match-history");
 
 const displayTargetProfile = (data, matchHistory) => {
     const profilePicture = document.querySelector(".target-picture");
     profilePicture.style.backgroundImage = `url("${data.profile_picture}")`;
     const targetInfo = document.querySelector(".target-info");
     targetInfo.innerHTML = "";
+    targetMatchHistory.innerHTML = "";
     Object.entries(data).forEach(([key, value]) => {
         if (key === "profile_picture" || key === "date_of_birth")
             return ;
         const infoItem = document.createElement("p");
         infoItem.classList.add("info-item");
-
-        // Set innerHTML with the key in a span and the value or "None"
         infoItem.innerHTML = `<span>${key}:</span> ${value || "None"}`;
         targetInfo.appendChild(infoItem);
     });
+    if (matchHistory){
+        matchHistory.forEach(object => {
+            const newMatch = document.createElement("div");
+            console.log("yooo");
+            console.log(data.username, object.winner);
+            let otherPerson;
+            let amItheWinner;
+            if (object.winner === data.username){
+                newMatch.classList.add("match-target", "target-win");
+                otherPerson = object.loser;
+                amItheWinner = true;
+            } else {
+                newMatch.classList.add("match-target", "target-lose");
+                otherPerson = object.winner;
+                amItheWinner = false;
+            }
+            newMatch.innerHTML = `  <div class="score target-score">${amItheWinner ? object.score_w : object.score_l}</div>
+                                    <div class='vs-text'><span>${data.username}</span><span>VS</span><span>${otherPerson}</span></div>
+                                    <div class="score opponent-score">${amItheWinner ? object.score_l : object.score_w}</div>`
+            targetMatchHistory.appendChild(newMatch);
+        })
+    }
     targetProfileDisplay.style.display = "flex";
     setTimeout(()=> {
         profileTargetInfo.style.transform = "scale(1)"
@@ -112,11 +134,14 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
             }
             // console.log(matchHistoryResponse.status)
             const matchHistoryText = await matchHistoryResponse.text();
-            const matchHistory = null;
             console.log(matchHistoryText);
-            if (matchHistoryText)
-                 matchHistory = await matchHistoryResponse.json();
-            displayTargetProfile(userInfo, matchHistory);
+            if (matchHistoryText) {
+                const matchHistory = JSON.parse(matchHistoryText); // Parser le texte en JSON si non vide
+                console.log(matchHistory);
+                displayTargetProfile(userInfo, matchHistory);
+            } else {
+                displayTargetProfile(userInfo, null); // Passer un tableau vide si le texte est vide
+            }
     
         } catch (error) {
             console.error('There was a problem with the fetch operation:', error);

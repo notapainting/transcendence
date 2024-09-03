@@ -1,7 +1,6 @@
 import { logoutRequest, showHome } from "./home.js"
 import { showProfile } from "./profile.js"
 
-import {showSettings} from "./settings.js"
 import { loggedInStatus } from "./home.js";
 import { showGame, showGameLocal } from "./game/index.js"
 export let whoIam;
@@ -80,7 +79,6 @@ const router = async () => {
     const routes = [
         {path: "/", view:() => showHome() },
         {path: "/profile", view:() => showProfile()},
-        {path: "/settings", view:() => showSettings()},
         {path: "/play", view:() => showGame()},
         {path: "/local", view:() => showGameLocal()},
     ];
