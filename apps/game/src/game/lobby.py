@@ -6,7 +6,6 @@ from rest_framework.renderers import JSONRenderer
 import game.enums as enu
 import random, httpx
 from uuid import uuid4
-from .blockchain import record_match_on_blockchain
 
 from game.plaza import plaza
 
@@ -210,7 +209,12 @@ class BaseTournament:
         self.match_count = len(self.current)
         await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.PHASE, "new":True, "phase":self.current}})
 
+import httpx
 import asyncio
+import traceback
+import sys
+
+
 
 class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
     def __init__(self, host, host_channel_name):
@@ -249,17 +253,59 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
             else:
                 await self.make_phase()
 
+    # async def end(self, smooth=True):
+    #     print("Je rentre dans la fonction END et j'envoie dans la blockchain")
+        
+    #     tournament_id = 69
+    #     winner = 'Louisa'
+    #     loser = 'Islem'
+    #     winner_score = 69
+    #     loser_score = 200
+
+    #     loop = asyncio.get_running_loop()
+    #     await loop.run_in_executor(None, record_match_on_blockchain, tournament_id, winner, loser, winner_score, loser_score)
+
+    #     await self.match_stop()
+    #     await super()._end()
+
     async def end(self, smooth=True):
         print("Je rentre dans la fonction END et j'envoie dans la blockchain")
         
-        tournament_id = 69
-        winner = 'Louisa'
-        loser = 'Islem'
-        winner_score = 69
-        loser_score = 200
+        tournament_id = 70
+        winner = 'Gagnant'
+        loser = 'Perdant'
+        winner_score = 12
+        loser_score = 34
 
-        loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, record_match_on_blockchain, tournament_id, winner, loser, winner_score, loser_score)
+        url = "http://blockchain:8000/register_match/"
+
+        data = {
+            'tournament_id': tournament_id,
+            'winner': winner,
+            'loser': loser,
+            'winner_score': winner_score,
+            'loser_score': loser_score
+        }
+
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(url, json=data)
+
+                if response.status_code == 200:
+                    print("Le match a été envoyé à l'API blockchain avec succès.")
+                else:
+                    print(f"Échec de l'envoi à l'API blockchain : {response.text}")
+
+            except Exception as e:
+                error_message = "Erreur lors de l'envoi à l'API blockchain :\n"
+                error_message += f"Type d'erreur : {type(e).__name__}\n"
+                error_message += f"Message d'erreur : {str(e)}\n"
+                error_message += "Traceback complet :\n"
+                error_message += traceback.format_exc()
+                print(error_message, file=sys.stderr)
+                print("\nVariables locales au moment de l'erreur :")
+                for name, value in locals().items():
+                    print(f"{name} = {value}")
 
         await self.match_stop()
         await super()._end()
