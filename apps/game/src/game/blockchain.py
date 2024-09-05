@@ -155,10 +155,15 @@ def record_match_on_blockchain(tournament_id, winner, loser, winner_score, loser
 			loser_score
 		).build_transaction({
 			'from': my_account,
-			'nonce': web3.eth.get_transaction_count(my_account),
-			'gas': 2000000,
-			'gasPrice': web3.to_wei('20', 'gwei')
+			'nonce': web3.eth.get_transaction_count(my_account, 'pending'),
+			'gas': web3.eth.estimate_gas({
+				'from': my_account,
+				'to': contract_address,
+				'data': contract.encodeABI(fn_name="recordMatch", args=[tournament_id, winner, loser, winner_score, loser_score])
+			}),
+			'gasPrice': web3.to_wei('100', 'gwei')
 		})
+
         signed_txn = web3.eth.account.sign_transaction(transaction, private_key)
         tx_hash = web3.eth.send_raw_transaction(signed_txn.raw_transaction)
         receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
