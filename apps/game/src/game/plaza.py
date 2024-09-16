@@ -1,5 +1,7 @@
 # game/plaza.py
 
+import httpx
+
 class PlazaException(Exception):
     pass
 
@@ -43,3 +45,15 @@ class Plaza(metaclass=Singleton):
 
 plaza = Plaza()
 
+class TournamentCount(metaclass=Singleton):
+	_id = 0;
+
+	async def retrieve(self):
+		if _id == 0:
+			promise = await httpx.AsyncClient().get("http://blockchain:8000/register_match/")
+			if promise.status == 200:
+				_id = promise.json()['last_tournament_id']
+		_id += 1
+		return _id
+
+tid_count = TournamentCount()

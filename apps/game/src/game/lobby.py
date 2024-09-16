@@ -12,7 +12,7 @@ import asyncio
 import traceback
 import sys
 
-from game.plaza import plaza
+from game.plaza import plaza. tid_count
 
 from logging import getLogger
 logger = getLogger('base')
@@ -377,6 +377,7 @@ class Tournament(RemoteLobby, BaseTournament):
     def __init__(self, host):
         super().__init__(host=host, host_channel_name=plaza.translate(host, raise_exception=True))
         self.match_count = 0
+        self.id = tid_count
 
     async def check(self, user=None):
         return False
