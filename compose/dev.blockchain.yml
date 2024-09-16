@@ -13,9 +13,6 @@ services:
       - app_network
       - blockchain_network
     restart: unless-stopped
-    depends_on:
-      data_views:
-       condition: service_healthy
 
 networks:
   blockchain_network:

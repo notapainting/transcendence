@@ -13,7 +13,7 @@ ENV_FILE            =   ${TEMPLATE_FILE:.template=.env}
 #========#	compose	#========#
 DIR_CMP		=	compose/
 RAW_FILE	=	.auth.yml .user.yml .chat.yml .game.yml .blockchain.yml
-OK_FILE     =   compose.elk.yml compose.proxy.yml   
+OK_FILE     =   compose.proxy.yml compose.elk.yml
 LST_FILE    =   ${addprefix ${MODE}, ${RAW_FILE}} ${OK_FILE}
 
 

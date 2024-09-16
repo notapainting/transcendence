@@ -6,7 +6,7 @@
 #    By: tlegrand <tlegrand@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/10 21:52:05 by tlegrand          #+#    #+#              #
-#    Updated: 2024/08/18 19:59:47 by tlegrand         ###   ########.fr        #
+#    Updated: 2024/05/13 20:14:09 by tlegrand         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,61 +14,34 @@
 
 
 #========#	general rule	#========#
-.PHONY: all re init init-fg    
+.PHONY: all re build start up down clear top ps config logs reload proxy chat game auth user
 
-all:	init
+all:	start
 
 re:	clear start
 
-init: ${ENV_FILE} build up
-
-init-fg: ${ENV_FILE} build up-fg
-
 
 #========#	build rule	#========#
-.PHONY: build env-create env-clear mode-dev mode-prod vmmax
 build:
 	${CMP} build
 
-env-create: ${ENV_FILE}
-
-env-clear:
-	rm -f ${ENV_FILE}
-	echo "Delete old .env files.."
-
-${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
-	@cp $< $@
-	@echo "Generate new  $@ file!"
-
-mode-dev:
-	@sed -i 's/MODE=prod/MODE=dev/g' conf/Makefile.var
-	@echo "Switch to DEV mode, please build and run accordly"
-
-mode-prod:
-	@sed -i 's/MODE=dev/MODE=prod/g' conf/Makefile.var
-	@echo "Switch to PROD mode, please build and run accordly"
-
-vmmax:
-	sudo sysctl -w vm.max_map_count=262144
-
 
 #========#	start/stop rule	#========#
-.PHONY: up up-fg down clear
-up:		${ENV_FILE}
-	${CMP} up
+start:
+	sudo sysctl -w vm.max_map_count=262144
+	${CMP} up --build
 
-up-fg:	${ENV_FILE}
+clear:
+	${CMP} down -v --remove-orphans --rmi all
+
+up:
 	${CMP} up -d 
 
 down:
 	${CMP} down 
 
-clear:
-	${CMP} down -v --remove-orphans 
-
 
 #========#	tools rule	#========#
-.PHONY: config ps top mode
 config:
 	${CMP} config
 
@@ -78,12 +51,9 @@ ps:
 top:
 	${CMP} top
 
-mode:
-	@echo "Mode is ${MODE}"
+logs:
+	${CMP} logs 
 
-
-#========#	container access	#========#
-.PHONY: reload proxy chat game auth user
 reload:
 	docker container restart proxy
 
@@ -91,14 +61,13 @@ proxy:
 	docker exec -it proxy sh
 
 auth:
-	docker exec -it auth sh
+	docker exec -it auth bash
 
 user:
-	docker exec -it user sh
+	docker exec -it user bash
 
 game:
-	docker exec -it game sh
+	docker exec -it game bash
 
 chat:
-	docker exec -it chat sh
-
+	docker exec -it chat bash
