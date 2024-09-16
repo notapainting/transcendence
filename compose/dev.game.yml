@@ -17,6 +17,7 @@ services:
     restart: unless-stopped
     depends_on:
       - game-redis
+      - data_views
 
   game-redis:
     container_name: game-redis

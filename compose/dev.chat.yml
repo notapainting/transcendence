@@ -43,6 +43,9 @@ services:
 
   chat-redis:
     container_name: chat-redis
+    depends_on:
+     data_views:
+       condition: service_healthy
     image: redis:7.2.4-alpine
     networks: 
       - app_network
