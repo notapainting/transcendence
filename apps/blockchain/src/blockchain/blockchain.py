@@ -8,12 +8,9 @@ import sys
 
 infura_api_key = os.environ.get('INFURA_API_KEY')
 
-# Se connecter à un nœud Ethereum (nœud local ou RPC)
-# web3 = Web3(Web3.HTTPProvider(f"https://sepolia.infura.io/v3/{infura_api_key}"))
+private_key = os.environ.get('ACCOUNT_PRIVATE_KEY')
 
-web3 = Web3(Web3.HTTPProvider(f"https://sepolia.infura.io/v3/82baf32070fa426a9603f544c7ccf3cc"))
-
-private_key = '784da8965fb39e878bec458d9ceb342b6a9ee506a7a8c16d33e95ea6ac823895'
+web3 = Web3(Web3.HTTPProvider(f"https://sepolia.infura.io/v3/{infura_api_key}"))
 
 account = Account.from_key(private_key)
 
