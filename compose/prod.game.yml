@@ -12,6 +12,7 @@ services:
     networks:
       - app_network
       - game_network
+      - blockchain_network
     restart: unless-stopped
     depends_on:
       - game-redis

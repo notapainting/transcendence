@@ -48,8 +48,6 @@ async def send_match_to_blockchain(tournament_id, result):
 
     data = result
     data['tournament_id'] = tournament_id
-    data['winner_score'] = result['score_w']
-    data['loser_score'] = result['score_l']
 
     timeout = httpx.Timeout(90.0, connect=90.0)
     try:

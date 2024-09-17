@@ -530,11 +530,12 @@ nextMatch.addEventListener('click', () => {
     gameSocket.send(JSON.stringify({'type': enu.Game.NEXT}));
 })
 
-document.getElementById('game-menu-local-input-button').addEventListener('click', () => {
+
+const addUser = () => {
     const user = document.getElementById('game-menu-input-player').value;
     const inputField = document.getElementById('game-menu-input-player');
     const errorMessage = document.getElementById('input-error-message');
-    
+
     if (validate_name(user) === false) {
         console.warn("bad input: " + user);
         inputField.classList.add('input-error');
@@ -566,8 +567,15 @@ document.getElementById('game-menu-local-input-button').addEventListener('click'
             'mode': (status === enu.gameMode.MATCH ? enu.Game.MATCH : enu.Game.TRN),
         }));
     }
-});
+}; 
 
+document.getElementById('game-menu-local-input-button').addEventListener('click', addUser);
+document.getElementById('playerForm').addEventListener('submit', (e) => {
+    console.log("here")
+    e.preventDefault();
+    addUser();
+  
+});
 
 const createListLocal = (user) => {
     const   item = document.createElement('li');
@@ -625,6 +633,7 @@ function countDivsWithColumnClass() {
         }
     }
 }
+
 
 // animation menum1
 

@@ -13,7 +13,6 @@ services:
     volumes:
       - blockchain_volume:/app
     networks:
-      - app_network
       - blockchain_network
     restart: unless-stopped
 
