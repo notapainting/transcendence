@@ -1,19 +1,19 @@
 #========#    general    #========#
-MAKEFLAGS   +=   -sj
+MAKEFLAGS   +=   -s
 MODE=dev
 
 
 #========#	env 	#========#
 DIR_ENV_FILE        =   conf/
-LST_TEMPLATE_FILE   =   auth.template chat.template game.template proxy.template user.template main.template
+LST_TEMPLATE_FILE   =   auth.template chat.template game.template proxy.template user.template blockchain.template main.template
 TEMPLATE_FILE       =   ${addprefix ${DIR_ENV_FILE}, ${LST_TEMPLATE_FILE}}
 ENV_FILE            =   ${TEMPLATE_FILE:.template=.env}
 
 
 #========#	compose	#========#
 DIR_CMP		=	compose/
-RAW_FILE	=	.auth.yml .user.yml .chat.yml .game.yml
-OK_FILE     =   compose.elk.yml compose.proxy.yml   
+RAW_FILE	=	.auth.yml .user.yml .chat.yml .game.yml .blockchain.yml
+OK_FILE     =   compose.proxy.yml compose.elk.yml
 LST_FILE    =   ${addprefix ${MODE}, ${RAW_FILE}} ${OK_FILE}
 
 
@@ -21,6 +21,7 @@ FILE	=	${addprefix --file , ${addprefix ${DIR_CMP}, ${LST_FILE}}}
 
 
 BASE    =    docker compose \
+				--parallel -1\
                 --env-file conf/main.env \
                 --file compose.network.yml 
 

@@ -62,8 +62,11 @@ class LocalConsumer(BaseConsumer):
         await self.send_json(data["relay"])
 
     async def match_end(self, data):
+        logger.info(f"data: {data}")
         await self.send_json(data)
         if hasattr(self, "lobby"):
             await self.lobby.update_result(data)
 
+    async def tournament_end(self, data):
+        await self.send_json(data)
 

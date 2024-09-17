@@ -1,5 +1,11 @@
 # game/plaza.py
 
+import httpx
+
+from logging import getLogger
+logger = getLogger('base')
+
+
 class PlazaException(Exception):
     pass
 
@@ -43,3 +49,19 @@ class Plaza(metaclass=Singleton):
 
 plaza = Plaza()
 
+class TournamentCount(metaclass=Singleton):
+    _id = 0;
+
+    async def retrieve(self):
+        if TournamentCount._id == 0:
+            try:
+                promise = await httpx.AsyncClient().get("http://blockchain:8000/register_match/")
+                if promise.status_code == 200:
+                    TournamentCount._id = promise.json()['last_tournament_id']
+                    logger.info(f"id retrieved: {TournamentCount._id}")
+            except (httpx.HTTPError) as error:
+                logger.critical(f"failed to send to blockchain, error : {error}")
+        TournamentCount._id += 1
+        return TournamentCount._id
+
+tid_count = TournamentCount()

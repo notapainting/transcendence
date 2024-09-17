@@ -1,52 +1,32 @@
-# game_back/settings.py
+# blockchain/settings.py
 
 from pathlib import Path
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+ROOT_URLCONF = 'blockchain.urls'
 
+USE_I18N = True
+LANGUAGE_CODE = 'en-us'
 
+ADMIN_USERNAME = 'admin'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
 ALLOWED_HOSTS = ['*']
 
 
-INSTALLED_APPS = [
-    'daphne',
-	'game',
-]
+APPEND_SLASH = False
+
+DEBUG = False
+
 
 MIDDLEWARE = [
-    'django.middleware.common.CommonMiddleware',
+    "django.middleware.common.CommonMiddleware",
 ]
 
-# ROOT_URLCONF = 'game_back.urls'
-
-ASGI_APPLICATION = "game_back.asgi.application"
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(os.getenv('REDIS_HOSTNAME', 'redis'), os.getenv('REDIS_PORT', 6379))],
-        },
-    },
-}
-
-
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'CET'
-
-USE_I18N = True
-
-USE_TZ = True
+AUTHENTICATION_BACKENDS = []
 
 
 LOGGING = {

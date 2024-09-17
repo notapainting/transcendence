@@ -17,9 +17,13 @@ services:
     restart: unless-stopped
     depends_on:
       - game-redis
+      - data_views
 
   game-redis:
     container_name: game-redis
+    depends_on:
+     data_views:
+       condition: service_healthy
     image: redis:7.2.4-alpine
     networks: 
       - game_network

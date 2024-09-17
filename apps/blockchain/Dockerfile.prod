@@ -1,0 +1,14 @@
+#image officiel de python, base sur alpine pour une taille minuscule
+FROM python:3.10-alpine3.19
+
+ENV PYTHONUNBUFFERED 1
+
+COPY src/ /app
+COPY conf/ /conf/
+RUN pip install -r /conf/requirements.txt 
+
+WORKDIR /app
+
+EXPOSE ${PORT}
+
+ENTRYPOINT ["sh", "/conf/init.sh"]

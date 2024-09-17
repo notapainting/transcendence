@@ -10,19 +10,21 @@
 #                                                                              #
 # **************************************************************************** #
 
--include conf/Makefile.var
+-include conf/var.mk
 
 
 #========#	general rule	#========#
 .PHONY: all re init init-fg    
 
-all:	init
+all:	init-fg
 
 re:	clear start
 
-init: ${ENV_FILE} build up
+init: ${ENV_FILE} vmmax
+	${CMP} up --build -d 
 
-init-fg: ${ENV_FILE} build up-fg
+init-fg: ${ENV_FILE} vmmax
+	${CMP} up --build
 
 
 #========#	build rule	#========#
@@ -33,7 +35,7 @@ build:
 env-create: ${ENV_FILE}
 
 env-clear:
-	rm -f ${ENV_FILE}
+	@rm -f ${ENV_FILE}
 	echo "Delete old .env files.."
 
 ${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
@@ -55,10 +57,10 @@ vmmax:
 #========#	start/stop rule	#========#
 .PHONY: up up-fg down clear
 up:		${ENV_FILE}
-	${CMP} up
+	${CMP} up -d
 
 up-fg:	${ENV_FILE}
-	${CMP} up -d 
+	${CMP} up 
 
 down:
 	${CMP} down 
