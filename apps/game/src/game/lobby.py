@@ -12,7 +12,7 @@ import asyncio
 import traceback
 import sys
 
-from game.plaza import plaza. tid_count
+from game.plaza import plaza, tid_count
 
 from logging import getLogger
 logger = getLogger('base')
@@ -42,6 +42,27 @@ def getDefault():
         "maxPlayer":LOBBY_DEFAULT_PLAYERS,
     }
 
+async def send_match_to_blockchain(tournament_id, result):
+    logger.info("try to talk to bc")
+    url = "http://blockchain:8000/register_match/"
+
+    data = result
+    data['tournament_id'] = tournament_id
+    data['winner_score'] = result['score_w']
+    data['loser_score'] = result['score_l']
+
+    timeout = httpx.Timeout(90.0, connect=90.0)
+    try:
+        task = asyncio.create_task(httpx.AsyncClient(timeout=timeout).post(url, json=data))
+        logger.info("Le match a été envoyé à l'API blockchain avec succès.")
+
+    except Exception as e:
+        error_message = "Erreur lors de l'envoi à l'API blockchain :\n"
+        error_message += f"Type d'erreur : {type(e).__name__}\n"
+        error_message += f"Message d'erreur : {str(e)}\n"
+        error_message += "Traceback complet :\n"
+        error_message += traceback.format_exc()
+        logger.critical(error_message)
 
 
 class BaseLobby:
@@ -214,40 +235,15 @@ class BaseTournament:
         self.match_count = len(self.current)
         await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.PHASE, "new":True, "phase":self.current}})
 
-async def send_match_to_blockchain(tournament_id, winner, loser, winner_score, loser_score):
-    url = "http://blockchain:8000/register_match/"
-
-    data = {
-        'tournament_id': tournament_id,
-        'winner': winner,
-        'loser': loser,
-        'winner_score': winner_score,
-        'loser_score': loser_score
-    }
-
-    timeout = httpx.Timeout(90.0, connect=90.0)
-    async with httpx.AsyncClient(timeout=timeout) as client:
-        try:
-            response = await client.post(url, json=data)
-
-            if response.status_code == 200:
-                print("Le match a été envoyé à l'API blockchain avec succès.")
-            else:
-                print(f"Échec de l'envoi à l'API blockchain : {response.text}")
-
-        except Exception as e:
-            error_message = "Erreur lors de l'envoi à l'API blockchain :\n"
-            error_message += f"Type d'erreur : {type(e).__name__}\n"
-            error_message += f"Message d'erreur : {str(e)}\n"
-            error_message += "Traceback complet :\n"
-            error_message += traceback.format_exc()
-            print(error_message, file=sys.stderr)
-
 class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
     def __init__(self, host, host_channel_name):
         super().__init__(host=host, host_channel_name=host_channel_name)
         self.current = []
         self.match_count = -2
+
+    async def _init(self):
+        await super()._init()
+        self.id = await tid_count.retrieve()
 
     async def broadcast(self, message):
         message['author'] = self.host
@@ -273,28 +269,18 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
             await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.MATCH, "match":match, "state":self.game_state.to_dict()}})
 
     async def update_result(self, data):
+        await send_match_to_blockchain(self.id, self.game_state.result)
         if await super().update_result(data):
             if self.is_end():
                 await self.broadcast({"type":enu.Tournament.END, "winner":data['winner']})
                 self.reset()
             else:
                 await self.make_phase()
-
-            
+   
     async def end(self, smooth=True):
-        
-        print("Je rentre dans la fonction END et j'envoie dans la blockchain")
-        
-        tournament_id = 0
-        winner = 'Samedi 7 septembre TEST'
-        loser = 'Premiere transaction blockchain'
-        winner_score = 12
-        loser_score = 34
-        
-        asyncio.create_task(send_match_to_blockchain(tournament_id, winner, loser, winner_score, loser_score))
-        
         await self.match_stop()
         await super()._end()
+
 
 class RemoteLobby(BaseLobby):
     def __init__(self, host, host_channel_name, maxPlayer=LOBBY_DEFAULT_PLAYERS):
@@ -377,8 +363,11 @@ class Tournament(RemoteLobby, BaseTournament):
     def __init__(self, host):
         super().__init__(host=host, host_channel_name=plaza.translate(host, raise_exception=True))
         self.match_count = 0
-        self.id = tid_count
 
+    async def _init(self):
+        await super()._init()
+        self.id = await tid_count.retrieve()
+        
     async def check(self, user=None):
         return False
 
@@ -443,6 +432,7 @@ class Tournament(RemoteLobby, BaseTournament):
         pass
 
     async def update_result(self, data):
+        await send_match_to_blockchain(self.id, data)
         if await super().update_result(data):
             if self.is_end():
                 await self.broadcast({"type":enu.Tournament.END, "winner":data['winner']})
@@ -496,6 +486,8 @@ class Match(RemoteLobby, BaseMatch):
             await httpx.AsyncClient().post(url='http://user:8000/user/match_history/new/', data=JSONRenderer().render(result))
             if self.tournament is not None:
                 await self._send(self.tournament, {"type":enu.Match.RESULT, "message":result})
+            else:
+                await send_match_to_blockchain(0, result)
         await super().end(smooth=smooth)
 
     async def next(self):

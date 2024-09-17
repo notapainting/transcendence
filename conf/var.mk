@@ -1,5 +1,5 @@
 #========#    general    #========#
-MAKEFLAGS   +=   -sj
+MAKEFLAGS   +=   -s
 MODE=dev
 
 
@@ -21,6 +21,7 @@ FILE	=	${addprefix --file , ${addprefix ${DIR_CMP}, ${LST_FILE}}}
 
 
 BASE    =    docker compose \
+				--parallel -1\
                 --env-file conf/main.env \
                 --file compose.network.yml 
 

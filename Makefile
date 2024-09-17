@@ -6,42 +6,71 @@
 #    By: tlegrand <tlegrand@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/10 21:52:05 by tlegrand          #+#    #+#              #
-#    Updated: 2024/05/13 20:14:09 by tlegrand         ###   ########.fr        #
+#    Updated: 2024/08/18 19:59:47 by tlegrand         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
--include conf/Makefile.var
+-include conf/var.mk
 
 
 #========#	general rule	#========#
-.PHONY: all re build start up down clear top ps config logs reload proxy chat game auth user
+.PHONY: all re init init-fg    
 
-all:	start
+all:	init-fg
 
 re:	clear start
 
+init: ${ENV_FILE} vmmax
+	${CMP} up --build -d 
+
+init-fg: ${ENV_FILE} vmmax
+	${CMP} up --build
+
 
 #========#	build rule	#========#
+.PHONY: build env-create env-clear mode-dev mode-prod vmmax
 build:
 	${CMP} build
 
+env-create: ${ENV_FILE}
+
+env-clear:
+	@rm -f ${ENV_FILE}
+	echo "Delete old .env files.."
+
+${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
+	@cp $< $@
+	@echo "Generate new  $@ file!"
+
+mode-dev:
+	@sed -i 's/MODE=prod/MODE=dev/g' conf/Makefile.var
+	@echo "Switch to DEV mode, please build and run accordly"
+
+mode-prod:
+	@sed -i 's/MODE=dev/MODE=prod/g' conf/Makefile.var
+	@echo "Switch to PROD mode, please build and run accordly"
+
+vmmax:
+	sudo sysctl -w vm.max_map_count=262144
+
 
 #========#	start/stop rule	#========#
-start:
-	sudo sysctl -w vm.max_map_count=262144
-	${CMP} up --build
+.PHONY: up up-fg down clear
+up:		${ENV_FILE}
+	${CMP} up -d
 
-clear:
-	${CMP} down -v --remove-orphans --rmi all
-
-up:
-	${CMP} up -d 
+up-fg:	${ENV_FILE}
+	${CMP} up 
 
 down:
 	${CMP} down 
 
+clear:
+	${CMP} down -v --remove-orphans 
+
 
 #========#	tools rule	#========#
+.PHONY: config ps top mode
 config:
 	${CMP} config
 
@@ -51,9 +80,12 @@ ps:
 top:
 	${CMP} top
 
-logs:
-	${CMP} logs 
+mode:
+	@echo "Mode is ${MODE}"
 
+
+#========#	container access	#========#
+.PHONY: reload proxy chat game auth user
 reload:
 	docker container restart proxy
 
@@ -61,13 +93,14 @@ proxy:
 	docker exec -it proxy sh
 
 auth:
-	docker exec -it auth bash
+	docker exec -it auth sh
 
 user:
-	docker exec -it user bash
+	docker exec -it user sh
 
 game:
-	docker exec -it game bash
+	docker exec -it game sh
 
 chat:
-	docker exec -it chat bash
+	docker exec -it chat sh
+

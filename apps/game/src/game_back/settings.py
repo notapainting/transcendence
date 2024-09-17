@@ -1,4 +1,4 @@
-
+# game_back/settings.py
 
 from pathlib import Path
 import os

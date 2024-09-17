@@ -1,4 +1,4 @@
-# projet/settings.py
+# blockchain/settings.py
 
 from pathlib import Path
 import os
@@ -29,15 +29,6 @@ MIDDLEWARE = [
 AUTHENTICATION_BACKENDS = []
 
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(os.getenv('REDIS_HOSTNAME', 'redis'), os.getenv('REDIS_PORT', 6379))],
-        },
-    },
-}
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -61,6 +52,11 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": os.getenv("DJANGO_LOG_FORMAT", "MID"),
         },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+        "propagate": False,
     },
     "loggers": {
         "base": {

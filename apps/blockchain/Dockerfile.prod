@@ -1,5 +1,5 @@
 #image officiel de python, base sur alpine pour une taille minuscule
-FROM python:3.12-alpine3.19
+FROM python:3.10-alpine3.19
 
 ENV PYTHONUNBUFFERED 1
 

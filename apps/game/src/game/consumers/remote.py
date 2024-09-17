@@ -300,8 +300,8 @@ class RemoteGamer(LocalConsumer):
 # TOURNAMENT (4)
     async def match_result(self, data):
         if data['author'] != self.username and hasattr(self, "master"):
-            await self.lobby.update_result(data['message'])
             await self.lobby.broadcast(data)
+            await self.lobby.update_result(data['message'])
             await self.send_json(data)
 
     async def tournament_phase(self, data):
