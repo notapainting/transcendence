@@ -120,7 +120,7 @@ class RemoteGamer(LocalConsumer):
             case enu.Game.DEFAULT: await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault(), "state":getDefaultState()})
             case _: await self.mode(json_data)
 
-        
+
 #  MODE (5)
     async def idle(self, data):
         match data['type']:
@@ -149,11 +149,13 @@ class RemoteGamer(LocalConsumer):
             case enu.Game.INVITE:
                 to_user = data['user']
                 response = await getInviteAuth(self.username, to_user)
-                if response['type'] == enu.Invitation.VALID:
-                    await self.lobby.invite(to_user)
                 response['user'] = to_user
                 response['mode'] = data['mode']
-                await self.send_json(response) 
+                if response['type'] == enu.Invitation.VALID:
+                    if await self.lobby.invite(to_user):
+                        await self.send_json(response) 
+                else:
+                    await self.send_json(response) 
             case enu.Game.KICK:
                 await self.lobby.kick(data['message'])
             case enu.Game.START:

@@ -6,7 +6,7 @@
 #    By: tlegrand <tlegrand@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/10 21:52:05 by tlegrand          #+#    #+#              #
-#    Updated: 2024/08/18 19:59:47 by tlegrand         ###   ########.fr        #
+#    Updated: 2024/09/18 19:20:40 by tlegrand         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,21 +14,23 @@
 
 
 #========#	general rule	#========#
-.PHONY: all re init init-fg    
+.PHONY: all re init init-fg
 
-all:	init-fg
+all:	up-fg
 
-re:	clear start
+fclean:
+	@script/docker-full-clear.sh
 
-init: ${ENV_FILE} vmmax
-	${CMP} up --build -d 
+re:	fclean up-fg
 
-init-fg: ${ENV_FILE} vmmax
-	${CMP} up --build
+init: ${ENV_FILE} vmmax 
+	${CMP} build
+
 
 
 #========#	build rule	#========#
 .PHONY: build env-create env-clear mode-dev mode-prod vmmax
+
 build:
 	${CMP} build
 
@@ -36,7 +38,7 @@ env-create: ${ENV_FILE}
 
 env-clear:
 	@rm -f ${ENV_FILE}
-	echo "Delete old .env files.."
+	@echo "Delete old .env files.."
 
 ${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
 	@cp $< $@
@@ -60,6 +62,7 @@ vmmax:
 
 #========#	start/stop rule	#========#
 .PHONY: up up-fg down clear
+
 up:		${ENV_FILE}
 	${CMP} up -d
 
@@ -69,12 +72,11 @@ up-fg:	${ENV_FILE}
 down:
 	${CMP} down 
 
-clear:
-	${CMP} down -v --remove-orphans 
 
 
 #========#	tools rule	#========#
 .PHONY: config ps top mode
+
 config:
 	${CMP} config
 
@@ -90,6 +92,7 @@ mode:
 
 #========#	container access	#========#
 .PHONY: reload proxy chat game auth user
+
 reload:
 	docker container restart proxy
 

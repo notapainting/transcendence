@@ -467,7 +467,8 @@ class Match(RemoteLobby, BaseMatch):
 
     async def invite(self, user):
         if self.tournament is None:
-            await super().invite(user, mode=enu.Game.MATCH)
+            return await super().invite(user, mode=enu.Game.MATCH)
+        return False
 
     async def kick(self, user):
         if self.tournament is None:

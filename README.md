@@ -6,8 +6,7 @@ Our last common core projects at 42 school
 
 ## Demo
 
-
-![screenshot of the game](https://raw.githubusercontent.com/Louisa4124/Cub3d/master/screenshot0.png)
+![screenshot of the game](https://raw.githubusercontent.com/notapainting/transcendence/main/doc/demo.gif)
 
 ## Features
 
@@ -31,8 +30,10 @@ Our last common core projects at 42 school
 - ELK stack for log managment
 - Backend protected by proxy with modSecurity WAF
 - Deployement using docker container and docker compose
-- (almost) cross plateform
+- Cross plateform
 - Dev and prod docker image
+
+
 ## Tech Stack
 
 **Frontend:** HTML, JS, CSS
@@ -52,13 +53,15 @@ This will generate .env file based on template in conf/, please change the defau
 ## Deployment
 
 
-
 To deploy this project run
 
 ```bash
     make up-fg
 ```
 
+## Module Documentations
+
+[Chat](https://github.com/notapainting/transcendence/blob/main/doc/LICENSE)
 
 ## Authors
 
