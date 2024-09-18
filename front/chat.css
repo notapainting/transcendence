@@ -335,3 +335,19 @@
 .offline {
     background-color: gray;  
 }
+
+
+.invite-button {
+    width: 90px;
+    height: 30px;
+    background-color: red;
+    color: white;
+    cursor: pointer;
+    display: none;
+    position: absolute;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
