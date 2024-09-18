@@ -31,6 +31,7 @@ services:
       - chat-db_volume:${PGDATA}
     networks: 
       - app_network
+      - chat_network
     restart: unless-stopped
     healthcheck:
       test: "pg_isready -U $$DB_USER -d $$DJ_DB_NAME || exit 1"
@@ -46,8 +47,12 @@ services:
        condition: service_healthy
     image: redis:7.2.4-alpine
     networks: 
-      - app_network
+      - chat_network
     restart: unless-stopped
+
+networks:
+  chat_network:
+    driver: bridge
 
 volumes:
   chat-db_volume:

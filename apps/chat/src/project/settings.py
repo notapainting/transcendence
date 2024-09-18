@@ -30,6 +30,7 @@ ASGI_APPLICATION = "project.asgi.application"
 
 INSTALLED_APPS = [
     'daphne',
+    'djangoviz',
     'chat',
 ]
 
