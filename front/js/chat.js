@@ -79,12 +79,25 @@ const displayTargetProfile = (data, matchHistory) => {
 }
 
 let currentPictureChatClickHandler;
+let currentTarget = null;
+const inviteButton =  document.querySelector(".invite-button");
 
 const displayFocusedPerson = (personDiv, target, profile_picture) => {
     document.querySelectorAll('.person').forEach(elem => {
         elem.classList.remove('focus');
     });
+    inviteButton.style.display = "flex";
     personDiv.classList.add('focus');
+
+    if (currentTarget){
+        inviteButton.removeEventListener("click", currentTarget);
+    }
+
+    currentTarget = () => {
+        console.log("websocket send to " + target);
+    };
+    
+    inviteButton.addEventListener('click', currentTarget);
     const username = personDiv.getAttribute('data-username');
     const pictureChat = document.querySelector(".picture-chat");
     const usernameTitle = document.querySelector(".username-title");
