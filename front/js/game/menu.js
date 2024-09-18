@@ -370,7 +370,7 @@ export const fastmatchOK = () => {
     return true; 
 }
 
-export const   fastmatch = () => {
+export const   fastmatch = (user) => {
     if (status === enu.gameMode.TOURNAMENT) return false; 
     
     if (status === enu.gameMode.LOCAL) {

@@ -3,6 +3,7 @@ import { isUserAuthenticated } from "./index.js";
 import { whoIam } from "./index.js";
 import {initGameWebSocket} from "./game/websocket.js"
 import * as enu from './game/enums.js'
+import { fastmatch, fastmatchOK } from "./game/menu.js";
 // enlever le bouton + lorsque la demande damis a ete accepte
 // enlever la notif lorsque lautre personne accepte
 
@@ -94,7 +95,15 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
     }
 
     currentTarget = () => {
-        console.log("websocket send to " + target);
+        if (fastmatchOK()){
+            if (window.location.pathname !== "/play")
+                navigateTo("/play");
+            setTimeout(() => {
+                fastmatch(target);
+            }, 3000)
+            
+        }
+
     };
     
     inviteButton.addEventListener('click', currentTarget);

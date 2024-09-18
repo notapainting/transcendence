@@ -345,8 +345,7 @@
     cursor: pointer;
     display: none;
     position: absolute;
-    right: 30px;
-    display: flex;
+    right: 35px;
     align-items: center;
     justify-content: center;
     border-radius: 5px;

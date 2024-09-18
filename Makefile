@@ -51,7 +51,11 @@ mode-prod:
 	@echo "Switch to PROD mode, please build and run accordly"
 
 vmmax:
-	sudo sysctl -w vm.max_map_count=262144
+	@if [ "$$(uname)" = "Linux" ]; then \
+		sudo sysctl -w vm.max_map_count=262144; \
+	else \
+		echo "Skipping vm.max_map_count setting on non-Linux system"; \
+	fi
 
 
 #========#	start/stop rule	#========#
