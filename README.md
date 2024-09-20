@@ -70,7 +70,7 @@ To deploy this project run
 
 ### Micro services architecture
 
-![microservice architecture](https://raw.githubusercontent.com/notapainting/transcendence/main/)
+![microservice architecture](https://raw.githubusercontent.com/notapainting/transcendence/main/tr_ms_arch.png)
 
 
 ## Authors
