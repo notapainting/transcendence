@@ -57,10 +57,14 @@ To deploy this project run
 ```
 
 ## Module Documentations
-[Chat](https://github.com/notapainting/transcendence/blob/main/apps/chat)
-[Auth](https://github.com/notapainting/transcendence/blob/main/apps/chat)
-[Blockchain](https://github.com/notapainting/transcendence/blob/main/apps/chat)
-[User Managment](https://github.com/notapainting/transcendence/blob/main/apps/chat)
+- [Chat](https://github.com/notapainting/transcendence/blob/main/apps/chat)
+
+- [Auth](https://github.com/notapainting/transcendence/blob/main/apps/chat)
+
+- [Blockchain](https://github.com/notapainting/transcendence/blob/main/apps/chat)
+
+- [User Managment](https://github.com/notapainting/transcendence/blob/main/apps/chat)
+
 
 
 ## Authors
