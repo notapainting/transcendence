@@ -56,18 +56,25 @@ To deploy this project run
     make up-fg
 ```
 
-## Module Documentations
+## Documentation
+
+### Index
+
 - [Chat](https://github.com/notapainting/transcendence/blob/main/apps/chat)
+- [Authentification](https://github.com/notapainting/transcendence/blob/main/apps/auth)
+- [Blockchain](https://github.com/notapainting/transcendence/blob/main/apps/blockchain)
+- [User Managment](https://github.com/notapainting/transcendence/blob/main/apps/user)
+- [Game](https://github.com/notapainting/transcendence/blob/main/apps/game)
+- [Logging](https://github.com/notapainting/transcendence/blob/main/elk)
 
-- [Auth](https://github.com/notapainting/transcendence/blob/main/apps/chat)
 
-- [Blockchain](https://github.com/notapainting/transcendence/blob/main/apps/chat)
+### Micro services architecture
 
-- [User Managment](https://github.com/notapainting/transcendence/blob/main/apps/chat)
-
+![microservice architecture](https://raw.githubusercontent.com/notapainting/transcendence/main/)
 
 
 ## Authors
+
 - [@Louisa4124](https://www.github.com/Louisa4124)
 - [@Bilel Lakehal](https://www.github.com/BilelLk)
 - [@ikaismou](https://www.github.com/islemk69)
