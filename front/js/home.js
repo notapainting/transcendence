@@ -220,15 +220,9 @@ const closeTwoFactorLogin = (event) => {
     }, 200)
 }
 
-const profileTargetContainer = document.querySelector(".profile-target-info");
-const profileTargetDisplay = document.querySelector(".target-profile-display");
 
-const closeProfileDisplay = (event) => {
-    profileTargetContainer.style.transform = "scale(0)"
-    setTimeout(()=> {
-            profileTargetDisplay.style.display = "none"
-    }, 200)
-}
+
+
 
 const displayTwoFactorLogin = async ()  => {
     twoFactorDisplay.style.display = "flex"
@@ -465,7 +459,7 @@ export const showHome = async () => {
     homeFormButton.removeEventListener("click", loginOrRegisterRequest)
     document.querySelector(".login-42").removeEventListener('click', authenticateWith42);
     document.querySelector(".close-two-factor-login").addEventListener("click", closeTwoFactorLogin)
-    document.querySelector(".close-profile-display").addEventListener("click", closeProfileDisplay);
+    
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
     document.querySelector(".login-42").addEventListener('click', authenticateWith42);
 } 

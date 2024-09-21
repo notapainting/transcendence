@@ -102,6 +102,16 @@ const router = async () => {
 
 window.addEventListener("popstate", router);
 
+const profileTargetContainer = document.querySelector(".profile-target-info");
+const profileTargetDisplay = document.querySelector(".target-profile-display");
+
+const closeProfileDisplay = (event) => {
+    profileTargetContainer.style.transform = "scale(0)"
+    setTimeout(()=> {
+            profileTargetDisplay.style.display = "none"
+    }, 200)
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener('click', e => {
@@ -112,6 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     const logoutButton = document.querySelector(".fa-right-from-bracket");
     const logoutButtonMenu = document.querySelector(".menu-logout");
+    document.querySelector(".close-profile-display").addEventListener("click", closeProfileDisplay);
     logoutButton.addEventListener("click", logoutRequest);
     logoutButtonMenu.addEventListener("click", logoutRequest);
     window.scrollTo({
