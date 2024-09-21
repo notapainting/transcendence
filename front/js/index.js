@@ -125,6 +125,19 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".close-profile-display").addEventListener("click", closeProfileDisplay);
     logoutButton.addEventListener("click", logoutRequest);
     logoutButtonMenu.addEventListener("click", logoutRequest);
+    const notificationContainer = document.querySelector(".notification-container");
+
+    document.querySelector(".fa-bell").addEventListener('click', () => {
+        const currentDisplay = window.getComputedStyle(notificationContainer).display;
+        console.log("bonjouuurr");
+        console.log(notificationContainer)
+        console.log(currentDisplay)
+        if (currentDisplay === 'flex') {
+            notificationContainer.style.display = "none";
+        } else {
+            notificationContainer.style.display = "flex";
+        }
+    })
     window.scrollTo({
         top: 0,
         behavior: "smooth",
