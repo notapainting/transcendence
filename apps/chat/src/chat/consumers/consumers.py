@@ -1,8 +1,7 @@
 # chat/consumers/consumers.py
 
-from channels.generic.websocket import AsyncJsonWebsocketConsumer, AsyncWebsocketConsumer
+from channels.generic.websocket import  AsyncWebsocketConsumer
 
-from django.core.exceptions import ObjectDoesNotExist
 import channels.exceptions as exchan
 from rest_framework.exceptions import APIException
 
@@ -79,7 +78,7 @@ class ChatConsumer(BaseConsumer):
         await self.send_json(await cuti.get_group_summary(self.user))
         await self.send_json(await cuti.get_contact_summary(self.user))
 
-        await self.channel_layer.group_add(self.user.name, self.channel_name)#attention au name
+        await self.channel_layer.group_add(self.user.name, self.channel_name)
 
         # add user to channel groups
         self.group_list = await cuti.get_group_list(self.user)

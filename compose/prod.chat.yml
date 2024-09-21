@@ -11,6 +11,7 @@ services:
       - conf/chat.env
     networks:
       - app_network
+      - chat_network
     restart: unless-stopped
     depends_on:
       chat-db:
@@ -30,7 +31,6 @@ services:
     volumes:
       - chat-db_volume:${PGDATA}
     networks: 
-      - app_network
       - chat_network
     restart: unless-stopped
     healthcheck:
