@@ -86,7 +86,7 @@ class GameState:
 
     def _statused(self):
         self.status = {
-            'ballX': 40,
+            'ballX': 0,
             'ballY': 0,
             'collisionX': 0,
             'collisionY': 0,
