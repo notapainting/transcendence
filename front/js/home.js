@@ -230,6 +230,16 @@ const closeProfileDisplay = (event) => {
     }, 200)
 }
 
+const displayTwoFactorLogin = async ()  => {
+    twoFactorDisplay.style.display = "flex"
+    setTimeout(()=> {
+        twoFactorContainerLogin.style.transform = "scale(1)"
+    }, 200)
+    login2faButton.removeEventListener("click", loginRequest);
+    login2faButton.addEventListener("click", loginRequest);
+}
+
+
 const loginRequest = (event) => {
     const dataSend = {
         username: homeEmailUsernameInput.value,
@@ -251,9 +261,12 @@ const loginRequest = (event) => {
             closeTwoFactorLogin();
             return response.json();
         } else if (response.status === 403) {
+            console.log("bonjour")
             return response.json().then(data => {
+                console.log(data);
                 messageBox.style.backgroundColor = "#f44336";
-                if (data.detail === 'Two Factor Authentification needed.') {
+                if (data === 'Two Factor Authentification needed.') {
+                    console.log("JE PASSe");
                     displayTwoFactorLogin();
                 }
                 else {
@@ -262,6 +275,7 @@ const loginRequest = (event) => {
                 }
             });
         } else {
+            console.log("bonjour");
             messageBox.style.backgroundColor = "#f44336";
             messageBox.innerHTML = `Server error, please retry later.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
             messageBox.style.transform = "scale(1)";
@@ -282,14 +296,6 @@ const loginRequest = (event) => {
     })
 }
 
-const displayTwoFactorLogin = async ()  => {
-    twoFactorDisplay.style.display = "flex"
-    setTimeout(()=> {
-        twoFactorContainerLogin.style.transform = "scale(1)"
-    }, 200)
-    login2faButton.removeEventListener("click", loginRequest);
-    login2faButton.addEventListener("click", loginRequest);
-}
 
 const registerRequest = (event) => {
     const dataSend = {

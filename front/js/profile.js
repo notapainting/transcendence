@@ -4,7 +4,6 @@ import { clearView } from "./index.js";
 
 let firstnameInput = document.querySelector("#first-name")
 let lastnameInput = document.querySelector("#last-name")
-let usernameInput = document.querySelector("#username")
 let emailInput = document.querySelector("#email")
 let maleInput = document.querySelector("#male")
 let femaleInput = document.querySelector("#female")
@@ -34,8 +33,6 @@ const activate2FaButton = document.querySelector(".activate-2fa");
 const twoFactorButton = document.querySelector(".two-factor");
 
 let displayUserInformations = (data) => {
-    usernameInput.value = data.username || "";
-    usernameInput.placeholder = !data.username ? "Not Defined" : "";
     firstnameInput.value = data.first_name || "";
     firstnameInput.placeholder = !data.first_name ? "Not Defined" : "";
     lastnameInput.value = data.last_name || "";
@@ -131,7 +128,6 @@ let updateUserInfosRequest = async () => {
     errorMessage.style.display = 'none';
 
     const userData = {
-        username: usernameInput.value,
         first_name: firstnameInput.value,
         last_name: lastnameInput.value,
         email: emailInput.value,
