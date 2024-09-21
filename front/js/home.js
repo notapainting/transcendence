@@ -221,9 +221,6 @@ const closeTwoFactorLogin = (event) => {
 }
 
 
-
-
-
 const displayTwoFactorLogin = async ()  => {
     twoFactorDisplay.style.display = "flex"
     setTimeout(()=> {

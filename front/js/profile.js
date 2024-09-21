@@ -1,5 +1,5 @@
 import { loggedInStatus } from "./home.js";
-import { isUserAuthenticated, whoIam } from "./index.js";
+import { isUserAuthenticated, navigateTo, whoIam } from "./index.js";
 import { clearView } from "./index.js";
 
 let firstnameInput = document.querySelector("#first-name")
@@ -43,7 +43,7 @@ let displayUserInformations = (data) => {
     determineGender(data.gender);
     if (data.is_2fa_enabled){ 
         twoFactorButton.removeEventListener("click", displayTwoFactorActivation);
-        twoFactorButton.innerText = 'DISABLE 2FA';
+        twoFactorButton.style.display = 'none';
     }
 
     else{
@@ -121,12 +121,6 @@ let updateUserInfosRequest = async () => {
         genderValue = null; // Aucun genre sélectionné
     }
 
-    const inputField = document.getElementById('username');
-    const errorMessage = document.getElementById('username-error-message');
-
-    inputField.value = '';
-    errorMessage.style.display = 'none';
-
     const userData = {
         first_name: firstnameInput.value,
         last_name: lastnameInput.value,
@@ -155,13 +149,6 @@ let updateUserInfosRequest = async () => {
         console.log(error);
         console.error('Erreur lors de la mise à jour des informations de l\'utilisateur:', error);
         inputField.classList.add('input-error');
-        errorMessage.textContent = 'Invalid username';
-        errorMessage.style.display = 'block';
-
-        setTimeout(() => {
-            errorMessage.style.display = 'none';
-        }, 1500);
-
         setTimeout(() => {
             inputField.classList.remove('input-error');
         }, 500);
@@ -335,5 +322,5 @@ export const showProfile = async () => {
 }
 
 document.querySelector('.profile-menu-quit').addEventListener('click', () => {
-    window.history.back();
+    navigateTo('/')
 });
