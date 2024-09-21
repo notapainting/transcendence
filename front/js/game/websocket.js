@@ -7,6 +7,7 @@ import * as enu from './enums.js'
 import * as utils from './utils.js';
 import { composer } from './game.js';
 import { isUserAuthenticated } from '../index.js';
+import { fetchUsers } from '../chat.js';
 
 function updateTimer() {
     gameData.elapsedTime += 1;
@@ -295,16 +296,20 @@ const bindKeyRelease = (event) => {
 
 
 // invitations 
-const updateListInvitation = (user) => {
+const updateListInvitation = async (user) => {
     const item = document.createElement('li');
     const itemPicture = document.createElement('img');
     const itemName = document.createElement('div');
     const button = document.createElement('button');
     const itemStatus = document.createElement('span');
+    const itemPic = await fetchUsers(user);
+    console.log("ITEM PIC");
+    console.log(itemPic);
 
     item.className = 'list-tournoi-element';
     itemPicture.className = 'list-tournoi-user-pic';
-    itemPicture.src = '../../img/anon.jpg'; // a remplacer !!!! (par la vrai foto)
+    // itemPicture.src = '../../img/anon.jpg'; // a remplacer !!!! (par la vrai foto)
+    itemPicture.src = itemPic.profile_picture;
     itemName.textContent = user;
     itemName.className = 'list-tournoi-user-name';
     itemStatus.id = 'invite-status-' + user;
