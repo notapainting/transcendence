@@ -16,7 +16,7 @@ A `Group` can be used as a private conversation between two `User` or a group co
 
 A `Message` has a `User` author, a `Group` related, a `date` (set automatically), a `body` and optionnaly can respond to another `Message`
 
-![schema of database architecture](https://raw.githubusercontent.com/notapainting/transcendence/main/chat_db_schema_short.png)
+![schema of database architecture](https://raw.githubusercontent.com/notapainting/transcendence/main/img/doc/chat_db_schema_short.png)
 
 
 ## API Reference

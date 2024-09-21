@@ -4,7 +4,7 @@ Our last common core projects at 42 school
 
 
 ## Demo
-![gif of the site landing page](https://raw.githubusercontent.com/notapainting/transcendence/main/demo.gif)
+![gif of the site landing page](https://raw.githubusercontent.com/notapainting/transcendence/main/img/doc/demo.gif)
 
 ## Features
 
@@ -70,7 +70,7 @@ To deploy this project run
 
 ### Micro services architecture
 
-![microservice architecture](https://raw.githubusercontent.com/notapainting/transcendence/main/tr_ms_arch.png)
+![microservice architecture](https://raw.githubusercontent.com/notapainting/transcendence/main/img/doc/tr_ms_arch.png)
 
 
 ## Authors
