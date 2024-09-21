@@ -64,10 +64,10 @@ vmmax:
 .PHONY: up up-fg down clear
 
 up:		${ENV_FILE}
-	${CMP} up -d
+	${CMP} up --build -d
 
 up-fg:	${ENV_FILE}
-	${CMP} up 
+	${CMP} up --build
 
 down:
 	${CMP} down 
