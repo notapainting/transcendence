@@ -60,7 +60,7 @@ class TournamentCount(metaclass=Singleton):
                     TournamentCount._id = promise.json()['last_tournament_id']
                     logger.info(f"id retrieved: {TournamentCount._id}")
                     if TournamentCount._id == None:
-                        TournamentCount._id = 1
+                        TournamentCount._id = 0
             except (httpx.HTTPError) as error:
                 logger.critical(f"failed to send to blockchain, error : {error}")
         TournamentCount._id += 1

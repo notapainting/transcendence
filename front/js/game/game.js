@@ -73,7 +73,8 @@ export var sphere;
 export var cylinderRight;
 export var cylinderLeft;
 export var plane;
-export var line;
+export var line = null;
+var geometryBall;
 
 export let scoreRight = 0
 export let scoreLeft = 0
@@ -128,24 +129,33 @@ export function gameRenderer(data) {
 	
 		// Game limits
 		const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
-		const points = [];
-		points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
-		points.push(new THREE.Vector3(data.width + 5, data.height, 0));
-		points.push(new THREE.Vector3(-data.width - 5, data.height, 0));
-		points.push(new THREE.Vector3(-data.width - 5, -data.height, 0));
-		points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
-		points.push(new THREE.Vector3(0, -data.height, 0));
-		points.push(new THREE.Vector3(data.heigt, 0, 0));
-		points.push(new THREE.Vector3(0, data.height, 0));
-		const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
-		line = new THREE.Line(geometryLine, materialLine);
+		if (line === null)
+		{
+			const points = [];
+			points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
+			points.push(new THREE.Vector3(data.width + 5, data.height, 0));
+			points.push(new THREE.Vector3(-data.width - 5, data.height, 0));
+			points.push(new THREE.Vector3(-data.width - 5, -data.height, 0));
+			points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
+			points.push(new THREE.Vector3(0, -data.height, 0));
+			points.push(new THREE.Vector3(data.heigt, 0, 0));
+			points.push(new THREE.Vector3(0, data.height, 0));
+			const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
+			line = new THREE.Line(geometryLine, materialLine);
+
+			// Background plane
+			const geometryPlane = new THREE.PlaneGeometry((data.width + 5) * 2, data.height * 2);
+			const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5, transparent: true, opacity: 0.5 });
+			plane = new THREE.Mesh(geometryPlane, materialPlane);
+			plane.position.z = -2;
+			plane.receiveShadow = true;
+
+			// Ball
+			geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 10);
+			const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
+			sphere = new THREE.Mesh(geometryBall, materialBall);
+		}
 	
-		// Background plane
-		const geometryPlane = new THREE.PlaneGeometry((data.width + 5) * 2, data.height * 2);
-		const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5, transparent: true, opacity: 0.5 });
-		plane = new THREE.Mesh(geometryPlane, materialPlane);
-		plane.position.z = -2;
-		plane.receiveShadow = true;
 		
 		// Paddles
 		const geometryR = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightR - 1, 20);
@@ -158,10 +168,6 @@ export function gameRenderer(data) {
 		cylinderRight.castShadow = true; 
 		cylinderLeft.castShadow = true; 
 		
-		// Ball
-		const geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 10);
-		const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
-		sphere = new THREE.Mesh(geometryBall, materialBall);
 		sphere.position.set(data.x, data.y, 0);
 		
 		const materialTrail = new THREE.MeshToonMaterial({ color: 0xffffff, transparent:true});
