@@ -17,17 +17,21 @@ services:
       # logstash01:
       #  condition: service_healthy
     image: owasp/modsecurity-crs:4.2-nginx-alpine-202405220605
+    environment:
+      - TZ=${TZ}
+      - SERVER_NAME=${SERVER_NAME}
     env_file:
-      - conf/waf.env.example
+      - conf/proxy.env
     ports:
      - "443:8443"
      - "80:8080"
     networks: 
       - app_network
     volumes:
-      - ./certs/nginx-selfsigned.crt:/etc/nginx/conf/server.crt:ro
-      - ./certs/nginx-selfsigned.key:/etc/nginx/conf/server.key:ro
+      - ${PATH_TO_CERT}:/etc/nginx/conf/server.crt:ro
+      - ${PATH_TO_KEY}:/etc/nginx/conf/server.key:ro
       - ./front:/usr/share/nginx/html
       - ./nginx/default.conf:/etc/nginx/templates/conf.d/default.conf.template:ro
       - ./nginx/proxy_backend.conf:/etc/nginx/templates/includes/proxy_backend.conf.template:ro
     restart: unless-stopped
+

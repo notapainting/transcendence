@@ -6,6 +6,7 @@ import { scene } from './game.js';
 import * as enu from './enums.js'
 import * as utils from './utils.js';
 import { composer } from './game.js';
+import { isUserAuthenticated } from '../index.js';
 
 function updateTimer() {
     gameData.elapsedTime += 1;
@@ -21,8 +22,9 @@ export const initGameWebSocket = (path) => {
     _initWebsocket(path)
 }
 
-const _initWebsocket = (path) => {
+const _initWebsocket = async (path) => { 
     if (gameSocket !== null) return;
+    await isUserAuthenticated();
     gameSocket = new WebSocket(
         'wss://'
         + window.location.host
@@ -156,7 +158,7 @@ const _invitations = (content) => {
     };
     return false;
 }
-
+let timeout_asknext = null;
 const _match = (content) => {
     switch (content.type) {
         case enu.Match.PAUSE:
@@ -172,7 +174,7 @@ const _match = (content) => {
         case enu.Match.RESULT:
             // contain result for a match (used in trn)
             return true;
-            case enu.Match.START:
+        case enu.Match.START:
             moveTo(enu.sceneIdx.MATCH);
             clearScore();
             announceScore();
@@ -199,7 +201,7 @@ const _match = (content) => {
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content);
-            if (getGameStatus() === enu.gameMode.LOCAL) setTimeout(askNext, 3000);
+            if (getGameStatus() === enu.gameMode.LOCAL) timeout_asknext = setTimeout(askNext, 3000);
             return true;
     };
     return false;
@@ -209,6 +211,10 @@ const _tournament = (content) => {
     switch (content.type) {
         case enu.Tournament.PHASE:
             console.log(content);
+            if (timeout_asknext !== null) {
+                clearTimeout(timeout_asknext);
+                timeout_asknext = null;
+            }
             game.gameRenderer(default_game_data)
             moveTo(enu.sceneIdx.PHASE);
             if (content.new === true) announcePhase(content.phase);

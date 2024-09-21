@@ -365,6 +365,30 @@ createMatch.addEventListener('click', () => {
     sendCreate(enu.Game.MATCH)
 });
 
+export const fastmatchOK = () => {
+    if (status === enu.gameMode.TOURNAMENT) return false; 
+    return true; 
+}
+
+export const   fastmatch = (user) => {
+    if (status === enu.gameMode.TOURNAMENT) return false; 
+    
+    if (status === enu.gameMode.LOCAL) {
+        status = enu.gameMode.MATCH;
+        document.getElementById('playersRange').min = 2;
+        document.getElementById('playersRange').disabled = true;
+        is_match = true;
+        document.getElementById('game-menu-list-players-title').innerText = "Fast Match";
+        sendCreate(enu.Game.MATCH)
+    }
+    gameSocket.send(JSON.stringify({
+        'type': enu.Game.INVITE,
+        'user': user,
+        'mode': enu.Game.MATCH,
+    }));
+    return true;
+}
+
 createTournament.addEventListener('click', () => {
     status = enu.gameMode.TOURNAMENT;
     document.getElementById('playersRange').min = 4;
@@ -506,11 +530,12 @@ nextMatch.addEventListener('click', () => {
     gameSocket.send(JSON.stringify({'type': enu.Game.NEXT}));
 })
 
-document.getElementById('game-menu-local-input-button').addEventListener('click', () => {
+
+const addUser = () => {
     const user = document.getElementById('game-menu-input-player').value;
     const inputField = document.getElementById('game-menu-input-player');
     const errorMessage = document.getElementById('input-error-message');
-    
+
     if (validate_name(user) === false) {
         console.warn("bad input: " + user);
         inputField.classList.add('input-error');
@@ -542,8 +567,15 @@ document.getElementById('game-menu-local-input-button').addEventListener('click'
             'mode': (status === enu.gameMode.MATCH ? enu.Game.MATCH : enu.Game.TRN),
         }));
     }
-});
+}; 
 
+document.getElementById('game-menu-local-input-button').addEventListener('click', addUser);
+document.getElementById('playerForm').addEventListener('submit', (e) => {
+    console.log("here")
+    e.preventDefault();
+    addUser();
+  
+});
 
 const createListLocal = (user) => {
     const   item = document.createElement('li');
@@ -601,6 +633,7 @@ function countDivsWithColumnClass() {
         }
     }
 }
+
 
 // animation menum1
 

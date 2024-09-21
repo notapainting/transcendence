@@ -182,6 +182,7 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    cursor: pointer;
 }
 
 .description-chat {
@@ -333,4 +334,19 @@
 
 .offline {
     background-color: gray;  
+}
+
+
+.invite-button {
+    width: 90px;
+    height: 30px;
+    background-color: red;
+    color: white;
+    cursor: pointer;
+    display: none;
+    position: absolute;
+    right: 35px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
 }

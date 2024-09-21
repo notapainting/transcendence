@@ -1,0 +1,60 @@
+services:
+  chat:
+    container_name: chat
+    build:
+      context: apps/chat
+      dockerfile: Dockerfile.prod
+    image: chat_image_prod
+    environment:
+      - TZ=${TZ}
+    env_file:
+      - conf/chat.env
+    networks:
+      - app_network
+    restart: unless-stopped
+    depends_on:
+      chat-db:
+       condition: service_healthy
+
+  chat-db:
+    container_name: chat-db
+    depends_on:
+     data_views:
+       condition: service_healthy
+    build: postgres/
+    image: postgres_image
+    environment:
+      - TZ=${TZ}
+    env_file:
+      - conf/chat.env
+    volumes:
+      - chat-db_volume:${PGDATA}
+    networks: 
+      - app_network
+      - chat_network
+    restart: unless-stopped
+    healthcheck:
+      test: "pg_isready -U $$DB_USER -d $$DJ_DB_NAME || exit 1"
+      retries: 3
+      timeout: 5s
+      interval: 12s
+      start_period: 30s
+
+  chat-redis:
+    container_name: chat-redis
+    depends_on:
+     data_views:
+       condition: service_healthy
+    image: redis:7.2.4-alpine
+    networks: 
+      - chat_network
+    restart: unless-stopped
+
+networks:
+  chat_network:
+    driver: bridge
+
+volumes:
+  chat-db_volume:
+    name: chat-db
+    driver: local

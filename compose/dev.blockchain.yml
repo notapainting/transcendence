@@ -1,0 +1,30 @@
+services:
+  blockchain:
+    container_name: blockchain
+    depends_on:
+     data_views:
+       condition: service_healthy
+    build:
+      context: apps/blockchain/
+      dockerfile: Dockerfile.dev
+    image: blockchain_image_dev
+    env_file:
+      - conf/blockchain.env
+    volumes:
+      - blockchain_volume:/app
+    networks:
+      - blockchain_network
+    restart: unless-stopped
+
+networks:
+  blockchain_network:
+    driver: bridge
+
+volumes:
+  blockchain_volume:
+    name: blockchain_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: apps/blockchain/src
+      o: bind

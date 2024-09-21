@@ -1,8 +1,9 @@
-import { clearView } from "./index.js";
+import { clearView, navigateTo } from "./index.js";
 import { isUserAuthenticated } from "./index.js";
 import { whoIam } from "./index.js";
 import {initGameWebSocket} from "./game/websocket.js"
 import * as enu from './game/enums.js'
+import { fastmatch, fastmatchOK } from "./game/menu.js";
 // enlever le bouton + lorsque la demande damis a ete accepte
 // enlever la notif lorsque lautre personne accepte
 
@@ -32,12 +33,80 @@ function formatDate(dateString) {
     }
 }
 
+const targetProfileDisplay = document.querySelector(".target-profile-display");
+const profileTargetInfo = document.querySelector(".profile-target-info");
+const targetMatchHistory = document.querySelector(".target-match-history");
+
+const displayTargetProfile = (data, matchHistory) => {
+    const profilePicture = document.querySelector(".target-picture");
+    profilePicture.style.backgroundImage = `url("${data.profile_picture}")`;
+    const targetInfo = document.querySelector(".target-info");
+    targetInfo.innerHTML = "";
+    targetMatchHistory.innerHTML = "";
+    Object.entries(data).forEach(([key, value]) => {
+        if (key === "profile_picture" || key === "date_of_birth")
+            return ;
+        const infoItem = document.createElement("p");
+        infoItem.classList.add("info-item");
+        infoItem.innerHTML = `<span>${key}:</span> ${value || "None"}`;
+        targetInfo.appendChild(infoItem);
+    });
+    if (matchHistory){
+        matchHistory.forEach(object => {
+            const newMatch = document.createElement("div");
+            console.log("yooo");
+            console.log(data.username, object.winner);
+            let otherPerson;
+            let amItheWinner;
+            if (object.winner === data.username){
+                newMatch.classList.add("match-target", "target-win");
+                otherPerson = object.loser;
+                amItheWinner = true;
+            } else {
+                newMatch.classList.add("match-target", "target-lose");
+                otherPerson = object.winner;
+                amItheWinner = false;
+            }
+            newMatch.innerHTML = `  <div class="score target-score">${amItheWinner ? object.score_w : object.score_l}</div>
+                                    <div class='vs-text'><span>${data.username}</span><span>VS</span><span>${otherPerson}</span></div>
+                                    <div class="score opponent-score">${amItheWinner ? object.score_l : object.score_w}</div>`
+            targetMatchHistory.appendChild(newMatch);
+        })
+    }
+    targetProfileDisplay.style.display = "flex";
+    setTimeout(()=> {
+        profileTargetInfo.style.transform = "scale(1)"
+    }, 100)
+}
+
+let currentPictureChatClickHandler;
+let currentTarget = null;
+const inviteButton =  document.querySelector(".invite-button");
 
 const displayFocusedPerson = (personDiv, target, profile_picture) => {
     document.querySelectorAll('.person').forEach(elem => {
         elem.classList.remove('focus');
     });
+    inviteButton.style.display = "flex";
     personDiv.classList.add('focus');
+
+    if (currentTarget){
+        inviteButton.removeEventListener("click", currentTarget);
+    }
+
+    currentTarget = () => {
+        if (fastmatchOK()){
+            if (window.location.pathname !== "/play")
+                navigateTo("/play");
+            setTimeout(() => {
+                fastmatch(target);
+            }, 3000)
+            
+        }
+
+    };
+    
+    inviteButton.addEventListener('click', currentTarget);
     const username = personDiv.getAttribute('data-username');
     const pictureChat = document.querySelector(".picture-chat");
     const usernameTitle = document.querySelector(".username-title");
@@ -56,6 +125,51 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
     else {
         messageInput.disabled = false;
     }
+    if (currentPictureChatClickHandler) {
+        pictureChat.removeEventListener('click', currentPictureChatClickHandler);
+    }
+
+    currentPictureChatClickHandler = async () => {
+        try {
+            const userInfoResponse = await fetch(`/user/users_info/?username=${encodeURIComponent(target)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+    
+            if (!userInfoResponse.ok) {
+                throw new Error('Network response was not ok when fetching user info');
+            }
+    
+            const userInfo = userInfoResponse.status !== 204 ? await userInfoResponse.json() : {};
+    
+            const matchHistoryResponse = await fetch(`/user/match_history/${encodeURIComponent(target)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+    
+            if (!matchHistoryResponse.ok) {
+                throw new Error('Network response was not ok when fetching match history');
+            }
+            // console.log(matchHistoryResponse.status)
+            const matchHistoryText = await matchHistoryResponse.text();
+            console.log(matchHistoryText);
+            if (matchHistoryText) {
+                const matchHistory = JSON.parse(matchHistoryText); // Parser le texte en JSON si non vide
+                console.log(matchHistory);
+                displayTargetProfile(userInfo, matchHistory);
+            } else {
+                displayTargetProfile(userInfo, null); // Passer un tableau vide si le texte est vide
+            }
+    
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    };
+    pictureChat.addEventListener('click', currentPictureChatClickHandler);
 }
 
 const addToFriend = (target) => {
@@ -559,8 +673,9 @@ async function handleMessage(message) {
 
 let flg = 0;
 
-export function initializeWebSocket() {
+export async function initializeWebSocket() {
     flg = 1;
+    await isUserAuthenticated();
     socket = new WebSocket('wss://' + host + '/chat/');
 
     socket.onopen = function() {

@@ -1,0 +1,29 @@
+services:
+  game:
+    container_name: game
+    build:
+      context: apps/game/
+      dockerfile: Dockerfile.prod
+    image: game_image_prod
+    environment:
+      - TZ=${TZ}
+    env_file:
+      - conf/game.env
+    networks:
+      - app_network
+      - game_network
+      - blockchain_network
+    restart: unless-stopped
+    depends_on:
+      - game-redis
+
+  game-redis:
+    container_name: game-redis
+    image: redis:7.2.4-alpine
+    networks: 
+      - game_network
+    restart: unless-stopped
+
+networks:
+  game_network:
+    driver: bridge

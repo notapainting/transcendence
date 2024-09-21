@@ -1,0 +1,55 @@
+services:
+  user:
+    container_name: user
+    build:
+      context: apps/user/
+      dockerfile: Dockerfile.dev
+    image: user_image_dev
+    environment:
+      - TZ=${TZ}
+    env_file:
+      - conf/user.env
+    volumes:
+      - user_volume:/app
+    networks:
+      - app_network
+    restart: unless-stopped
+    depends_on:
+      user-db:
+       condition: service_healthy
+
+  user-db:
+    container_name: user-db
+    depends_on:
+     data_views:
+       condition: service_healthy
+    build: postgres/
+    image: postgres_image
+    environment:
+      - TZ=${TZ}
+    env_file:
+      - conf/user.env
+    volumes:
+      - user-db_volume:${PGDATA}
+    networks: 
+      - app_network
+    restart: unless-stopped
+    healthcheck:
+      test: "pg_isready -U $$DB_USER -d $$DJ_DB_NAME || exit 1"
+      retries: 3
+      timeout: 5s
+      interval: 12s
+      start_period: 30s
+
+volumes:
+  user_volume:
+    name: user_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: apps/user/src
+      o: bind
+
+  user-db_volume:
+    name: user-db_volume
+    driver: local
