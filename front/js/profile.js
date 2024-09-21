@@ -60,7 +60,12 @@ let displayUserInformations = (data) => {
 const updateProfilePicture = () => {
     const selectedFile = fileInput.files[0];
     const formData = new FormData();
+    const inputField = document.getElementById('profile-btn-upload');
+    const errorMessage = document.getElementById('picture-error-message');
     formData.append("profile_picture", selectedFile);
+
+    inputField.value = '';
+    errorMessage.style.display = 'none';
 
     fetch('/auth/update_picture/', {
         method: 'PUT',
@@ -72,6 +77,17 @@ const updateProfilePicture = () => {
             console.log("Image de profil mise à jour avec succès !");
             window.location.reload();
         } else {
+            inputField.classList.add('input-error');
+            errorMessage.textContent = 'Invalid profile picture';
+            errorMessage.style.display = 'block';
+        
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 1500);
+        
+            setTimeout(() => {
+                inputField.classList.remove('input-error');
+            }, 500);
             throw new Error("Erreur lors de la mise à jour de l'image de profil !");
         }
     })
@@ -108,6 +124,12 @@ let updateUserInfosRequest = async () => {
         genderValue = null; // Aucun genre sélectionné
     }
 
+    const inputField = document.getElementById('username');
+    const errorMessage = document.getElementById('username-error-message');
+
+    inputField.value = '';
+    errorMessage.style.display = 'none';
+
     const userData = {
         username: usernameInput.value,
         first_name: firstnameInput.value,
@@ -134,7 +156,19 @@ let updateUserInfosRequest = async () => {
         window.location.reload();
     })
     .catch(error => {
+        console.log(error);
         console.error('Erreur lors de la mise à jour des informations de l\'utilisateur:', error);
+        inputField.classList.add('input-error');
+        errorMessage.textContent = 'Invalid username';
+        errorMessage.style.display = 'block';
+
+        setTimeout(() => {
+            errorMessage.style.display = 'none';
+        }, 1500);
+
+        setTimeout(() => {
+            inputField.classList.remove('input-error');
+        }, 500);
     });
 }
 const twoFactorDisplay = document.querySelector(".two-factor-display");
@@ -233,3 +267,7 @@ export const showProfile = async () => {
     activate2FaButton.removeEventListener("click", confirm2FaRequest);
     activate2FaButton.addEventListener("click", confirm2FaRequest);
 }
+
+document.querySelector('.profile-menu-quit').addEventListener('click', () => {
+    window.history.back();
+});

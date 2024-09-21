@@ -514,7 +514,7 @@ document.getElementById('game-menu-local-input-button').addEventListener('click'
     if (validate_name(user) === false) {
         console.warn("bad input: " + user);
         inputField.classList.add('input-error');
-        errorMessage.textContent = 'Invalid player name!';
+        errorMessage.textContent = 'Invalid player name';
         errorMessage.style.display = 'block';
 
         setTimeout(() => {

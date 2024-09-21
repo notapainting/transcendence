@@ -7,8 +7,8 @@ APP_FILE	=	compose.proxy.yml \
                 compose.auth.yml \
                 compose.user.yml \
                 compose.chat.yml \
-                compose.game.yml \
-                compose.elk.yml
+                compose.game.yml 
+               # compose.elk.yml
 
 FILE	=	${addprefix --file , ${addprefix ${APP_DIR}, ${APP_FILE}}}
 

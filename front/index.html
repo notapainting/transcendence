@@ -279,6 +279,7 @@
                             <div class="grid-item">
                                 <label for="username">Username</label>
                                 <input class="text-input" type="text" id="username" name="username">
+                                <div id="username-error-message" class="error-message" style="display: none;"></div>
                             </div>
                             <div class="grid-item">
                                 <label for="email">E-mail</label>
@@ -309,8 +310,9 @@
                         <h3 class="profile-h3">Upload your profile photo</h3>
                         <div class="profile-picture"></div>
                         <div class="upload-remove">
-                            <button class="profile-btn upload">UPLOAD</button>
+                            <button id="profile-btn-upload" class="profile-btn upload">UPLOAD</button>
                             <button class="profile-btn remove">REMOVE</button>
+                            <div id="picture-error-message" class="error-message" style="display: none;"></div>
                         </div>
                     </div>
                 </div>
@@ -335,7 +337,10 @@
                         </div>
                         <button class="profile-btn change-password">CHANGE PASSWORD</button>
                     </div>
-                    <button class="profile-btn two-factor">ENABLE 2FA</button>
+                    <div class="profile-bottom-button">
+                        <button class="profile-btn two-factor">ENABLE 2FA</button>
+                        <button class="profile-btn profile-menu-quit">BACK TO MENU</button>
+                    </div>
                 </div>
             </div>
 

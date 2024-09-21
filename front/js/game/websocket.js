@@ -82,6 +82,12 @@ const _game = (content) => {
 }
 
 const _invitations = (content) => {
+    const inputField = document.getElementById('game-menu-input-player');
+    const errorMessage = document.getElementById('input-error-message');
+    
+    inputField.value = '';
+    errorMessage.style.display = 'none';
+
     switch (content.type) {
         case enu.Game.INVITE:
             updateListInvitedBy(content.mode, content.author);
@@ -91,6 +97,17 @@ const _invitations = (content) => {
             return true;
         case enu.Invitation.ERROR:
             warnErrorInvitation(content.error);
+            inputField.classList.add('input-error');
+            errorMessage.style.display = 'block';
+
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 1500);
+    
+            setTimeout(() => {
+                inputField.classList.remove('input-error');
+            }, 500);
+
             return true;
         case enu.Invitation.ACCEPT:
             console.log(content);
@@ -406,10 +423,25 @@ const updateStatusInvitation = (user) => {
 }
 
 const warnErrorInvitation = (error) => {
-    if (error === enu.Error.FBD_403) console.warn("FORBIDDEN")
-    else if (error === enu.Error.NTF_404) console.warn("USER NOT FOUND")
-    else if (error === enu.Error.ABSENT) console.warn("USER ABSENT")
-    else if (error === enu.Invitation.REJECT) console.warn("REJECTED")
+    const errorMessage = document.getElementById('input-error-message');
+    if (error === enu.Error.FBD_403)
+    {
+        console.warn("FORBIDDEN");
+        errorMessage.textContent = 'Stop being a creep. You are blocked.';
+    } 
+    else if (error === enu.Error.NTF_404) 
+    {
+        console.warn("USER NOT FOUND");
+        errorMessage.textContent = 'User not found';
+    } 
+    else if (error === enu.Error.ABSENT)
+    {
+        console.warn("USER ABSENT");
+        errorMessage.textContent = 'User not connected';
+    }
+    else if (error === enu.Invitation.REJECT) {
+        console.warn("REJECTED");
+    }
 }
 
 

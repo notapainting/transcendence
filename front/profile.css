@@ -284,6 +284,14 @@ two factor */
     text-align: center;
 }
 
+.profile-bottom-button{
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 
 
 /* .column {
