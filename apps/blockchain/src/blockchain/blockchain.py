@@ -164,15 +164,13 @@ contract_abi = [
 	}
 ]
 
-
-
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
 import time
 
 def record_match_on_blockchain(tournament_id, winner, loser, winner_score, loser_score):
     try:
-        time.sleep(5)
+        time.sleep(20)
         
         tx_hash = (contract.functions.recordMatch(tournament_id, winner, loser, winner_score, loser_score).
                    transact({'from':  my_account}))
