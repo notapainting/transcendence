@@ -248,13 +248,22 @@ const showSettings = () => {
     historyLink.classList.remove("focus-profile");
     settingsLink.classList.add("focus-profile");
 }
-
+const options = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZone: 'UTC' // Garder le fuseau horaire UTC si nécessaire
+};
 
 const showMatchHistory = async () => {
     historyContainer.style.display = "none";
     historyContainer.style.display = "flex";
     const dataMatch = await getMatchHistory();
     if (dataMatch){
+        console.log(dataMatch);
         profileHistoryContainer.innerHTML = "";
         const titleContainer = document.createElement("h3");
         titleContainer.innerText = "Match History";
@@ -272,9 +281,12 @@ const showMatchHistory = async () => {
                 otherPerson = object.winner;
                 amItheWinner = false;
             }
+            const date = new Date(object.date);
+
             newMatch.innerHTML = `  <div class="profile-score">${amItheWinner ? object.score_w : object.score_l}</div>
                                     <div class='profile-vs-text'><span>${whoIam}</span><span>VS</span><span>${otherPerson}</span></div>
-                                    <div class="profile-score">${amItheWinner ? object.score_l : object.score_w}</div>`
+                                    <div class="profile-score">${amItheWinner ? object.score_l : object.score_w}</div>
+                                    <div class="profile-date">${date.toLocaleDateString('fr-FR', options)}</div>`
             profileHistoryContainer.appendChild(newMatch);
         })
     }
