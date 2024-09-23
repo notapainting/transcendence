@@ -324,3 +324,10 @@ export const showProfile = async () => {
 document.querySelector('.profile-menu-quit').addEventListener('click', () => {
     navigateTo('/')
 });
+
+document.querySelector('.back-to-top-button ').addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    });
+});
