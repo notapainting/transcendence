@@ -37,6 +37,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    margin-left: 50px;
 }
 
 .my-profile-container {
@@ -243,12 +244,14 @@ two factor */
 .profile-target-info{
     width: 50%;
     height: 60%;
-    background-color: #16a085;
+    background-color: #080f2b;
     border-radius: 10px;
     color: black;
     transform: scale(0);
     transition: transform 0.2s ease;
     display: flex;
+    justify-content: space-around;
+    align-items: center;
 }
 
 .target-left {
@@ -256,6 +259,7 @@ two factor */
     height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
 }
 
@@ -263,7 +267,6 @@ two factor */
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    margin-top: 20px;
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -272,11 +275,11 @@ two factor */
 
 .target-info {
     width: 100%;
-    height: 50%;
-    background-color: red;
+    height: 40%;
+    background-color: #141c3b;
     margin-top: 10%;
     padding: 10px;
-    margin-left: 20px;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     text-align: justify;
@@ -285,18 +288,59 @@ two factor */
 
 .info-item {
     font-size: 18px;
-    margin: 20px 0;
-
+    margin: 10px 0;
+    color: #cec3e5;
 }
 
 .info-item span {
     font-weight: bold;
 }
 
+.targetRight {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    background-image: linear-gradient(163deg, #10173F 0%, #8346a5 100%);
+    transition: all .3s; 
+}
+
+.targetRight2 {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    color: #A78FDB;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    background-image: url('img/box-bg.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    transition: all .2s;
+}
+
+.targetRight2:hover {
+    transform: scale(0.98);
+    border-radius: 20px;
+  }
+  
+.targetRight:hover {
+    box-shadow: 0px 0px 30px 1px rgba(170, 0, 255, 0.3);
+  }
+
 .target-right{
-    width: 80%;
-    height: 100%;
-    padding: 25px;
+    /* width: 80%;
+    height: 100%; */
+    /* padding: 25px; */
     overflow-y: auto;
 }
 
@@ -306,7 +350,9 @@ two factor */
 
 .target-match-history {
     width: 100%;
+    height: 70px;
     display: flex;
+    color: black;
     flex-direction: column;
     align-items: center;
 }
@@ -319,16 +365,14 @@ two factor */
 .match-target {
     margin: 5px 0;
     height: 100px;
-    width: 70%;
-    border-radius: 8px; /* Coins arrondis (optionnel) */
-    overflow: hidden; /* Pour s'assurer que le texte ne dépasse pas les bords */
+    width: 100%;
+    padding: 10px;
+    background-color: #c08fdb92;
+    border-radius: 4px;
+    margin-bottom: 10px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    color: #333; /* Couleur du texte VS, ajustez selon votre design */
-    font-weight: bold;
-    font-size: 20px; /* Ajustez la taille de la police selon vos besoins */
-    text-align: center;
 }
 
 .target-win{
@@ -336,7 +380,7 @@ two factor */
 }
 
 .target-lose {
-    background: rgb(217,83,79);/* Vert clair */
+    background: rgb(217,83,79);
 }
 
 .score {
@@ -345,13 +389,14 @@ two factor */
 }
 
 .vs-text {
-    background-color: #ffffff; /* Fond blanc pour le texte */
-    width: 30%;
+    background-color: #ffffff; 
     height: 100%;
     display: flex;
+    padding: 5px;
+    gap:5px;
     align-items: center;
     justify-content: space-around;
-    border-radius: 4px; /* Coins arrondis (optionnel) */
+    border-radius: 4px; 
 }
 
 
@@ -402,7 +447,7 @@ two factor */
 }
 
 .close-btn:hover {
-    color: #ff0000; /* Change la couleur de la croix au survol */
+    color: #ff0000; 
 }
 
 .manual-code {
@@ -433,7 +478,9 @@ two factor */
 .profile-navbar {
     position: absolute;
     width: 150px;
-    height: 110px;
+    height: 100%;
+    background-color: #00233d;
+    gap: 5%;
     color: white;
     top: 50%;
     display: flex;
@@ -442,7 +489,7 @@ two factor */
     justify-content: center;
     /* z-index: 2; */
     transform: translateY(-50%);
-    left: 10px;
+    /* left: 10px; */
 }
 
 .link-profile {
@@ -473,11 +520,17 @@ two factor */
 .profile-history-container {
     height: 80%;
     width: 50%;
-    background-color: white;
+    /* background-color: white; */
+    background-image: url('img/box-bg.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     color: black;
+    align-items:center; 
+    gap: 10px;
 }
 
 .profile-history-container h3 {
@@ -487,14 +540,14 @@ two factor */
     font-size: 32px;
     display: inline-block;
     padding: 20px 0;
+    color: #b277cf;
 }
 
 
 
 .match-profile {
-    margin: 5px 0;
     height: 100px;
-    width: 100%;
+    width: 90%;
     border-radius: 8px; 
     overflow: hidden; 
     display: flex;
