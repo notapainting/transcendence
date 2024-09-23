@@ -209,7 +209,6 @@
 }
 
 .message-person::-webkit-scrollbar {
-    width: 0; /* Cacher la barre de défilement */
 }
 
 .message-person > :first-child {
@@ -217,17 +216,17 @@
 }
 
 .message {
-    min-height: 55px;
     width: 60%;
     margin: 10px 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Aligne le contenu en haut pour que la hauteur grandisse vers le haut */
     box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
     padding: 10px;
     word-wrap: break-word;
     overflow-wrap: break-word;
-
+    flex-direction: column; /* Permet au paragraphe de prendre toute la largeur de la div */
 }
+
 
 .message p {
     margin: 0;
@@ -241,7 +240,7 @@
     font-size: 10px;
 }
 
-.left-message {
+.right-message {
     align-self: flex-start;
     margin-left: 5px;
     background-color: #FFFFFF;
@@ -249,7 +248,7 @@
 }
 
 
-.right-message {
+.left-message {
     align-self: flex-end;
     margin-right: 5px;
     background-color: #343434;

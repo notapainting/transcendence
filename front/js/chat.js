@@ -112,6 +112,9 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
     document.querySelectorAll('.message-person').forEach(messageElem => {
         if (messageElem.classList.contains(`username-${username}`)) {
             messageElem.style.display = 'flex';
+            setTimeout(() => {
+                messageElem.scrollTop = messageElem.scrollHeight; // Scroll en bas de la div
+            }, 0)
         } else {
             messageElem.style.display = 'none';
         }
@@ -342,7 +345,9 @@ let receiveMessage = async (message) => {
     newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
     newMessageDiv.innerHTML = `<p>${message.data.body}</p><span>${formatDate(message.data.date)}</span>`;   
     messageContainer.appendChild(newMessageDiv);
-    messageInput.value = ``;
+    console.log(message);
+    if(message.data.author === whoIam)
+        messageInput.value = '';
     const focusedPerson = document.querySelector('.person.focus');
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
@@ -662,9 +667,6 @@ async function handleMessage(message) {
         console.log(message);
         console.log(friendStatus);
     }
-    else if (message.type === "message.game"){
-        console.log("recu : game a annoncer")
-    }
     statusPromiseResolve();
 }
 
@@ -768,6 +770,8 @@ const sendToWebSocket = (username, message) => {
 
 function sendMessage() {
     const message = messageInput.value.trim();
+    if (message.length > 512)
+        return window.alert('Your message is to long (512 max)');
     if (!message) return;
     const focusedPerson = document.querySelector('.person.focus');
     if (!focusedPerson) {
