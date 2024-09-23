@@ -282,8 +282,7 @@ two factor */
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    text-align: justify;
-    /* align-items: center; */
+    justify-content: center;
 }
 
 .info-item {

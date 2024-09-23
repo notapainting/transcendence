@@ -58,12 +58,13 @@ class TournamentCount(metaclass=Singleton):
                 promise = await httpx.AsyncClient().get("http://blockchain:8000/register_match/")
                 if promise.status_code == 200:
                     TournamentCount._id = promise.json()['last_tournament_id']
-                    logger.info(f"id retrieved: {TournamentCount._id}")
+                    logger.info(f"set id to: {TournamentCount._id}")
                     if TournamentCount._id == None:
                         TournamentCount._id = 0
             except (httpx.HTTPError) as error:
                 logger.critical(f"failed to send to blockchain, error : {error}")
         TournamentCount._id += 1
+        logger.info(f"id retrieved: {TournamentCount._id}")
         return TournamentCount._id
 
 tid_count = TournamentCount()
