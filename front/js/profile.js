@@ -294,6 +294,7 @@ const showMatchHistory = async () => {
 export const showHistory = async () => {
     if (await isUserAuthenticated() === true)
     {
+        document.title = "bill | history";
         fetch('/auth/get_pers_infos/', {
             method: 'GET',
             credentials: 'same-origin'
@@ -306,7 +307,6 @@ export const showHistory = async () => {
             }
         })
         .then(async (data)  =>  {
-            
             loggedInStatus(data.profile_picture, data.username);
             await showMatchHistory();
             clearView();
@@ -329,6 +329,7 @@ export const showProfile = async () => {
         }
     })
     .then(data => {
+        document.title = "bill | profile";
         clearView();
         loggedInStatus(data.profile_picture, data.username);
         displayUserInformations(data);

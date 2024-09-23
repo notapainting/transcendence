@@ -411,6 +411,7 @@ const smoothSroll = (event) => {
 
 export const showHome = async () => {
     clearView();
+    document.title = "bill | home";
     let isAuthenticated = await isUserAuthenticated();
     const homeElement = document.querySelector("#home");
     homeElement.style.display = "block";

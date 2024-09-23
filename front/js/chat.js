@@ -547,6 +547,12 @@ const disableEnableInput = (target, mode) => {
     }
 }
 
+const deleteGroup = (data) => {
+    const groupId = data.id;
+    const chatContainer = document.querySelector(`#${groupId}`);
+    chatContainer.remove();
+}
+
 async function handleMessage(message) {
     if (message.type === 'contact.summary'){
         contactSummary = message;
@@ -560,6 +566,7 @@ async function handleMessage(message) {
             displayMenu.removeChild(displayMenu.children[1]);
         }
         let personList = await fetchUsers();
+        
         message.data.forEach(group => {
             let id = group.id;
             let person = group.members.find(value => value !== whoIam);
@@ -628,7 +635,10 @@ async function handleMessage(message) {
             changeExistingStatus(message.data.author, "offline");
         }
         statusPromiseResolve();
-                    }
+    }
+    else if (message.type === group.delete){
+        deleteGroup(message.data);
+    }
     statusPromiseResolve();
 }
 
