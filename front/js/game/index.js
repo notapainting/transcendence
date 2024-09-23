@@ -10,7 +10,6 @@ const   transition = document.getElementById('menu-transition')
 
 
 export const showGame = async () => {
-    console.log("in show : rem")
     await isUserAuthenticated();
     const data = await getPersInfo();
     loggedInStatus(data.profile_picture, data.username);
@@ -18,7 +17,6 @@ export const showGame = async () => {
 }
 
 export const showGameLocal  = async () => {
-    console.log("in show : loc")
     if (await isUserAuthenticated()){
         navigateTo("/");
         return ;
@@ -27,7 +25,6 @@ export const showGameLocal  = async () => {
 }
 
 const transitionToGame = (path) => {
-    console.log("show game with path: " + path)
     clearView();
     fullClear();
     initGameWebSocket(path);

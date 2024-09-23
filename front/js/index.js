@@ -11,7 +11,6 @@ export const navigateTo = url => {
 }
 
 export const clearView = () => {
-console.log("Appel ClearView")
     document.querySelectorAll(".view").forEach(div => {
         div.style.display = "none";
     });
@@ -69,7 +68,6 @@ function resetHomePage() {
 
 
 const router = async () => {
-    console.log("Appel Router")
     if (window.location.pathname === '/') { 
         resetHomePage();
     }
@@ -130,9 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelector(".fa-bell").addEventListener('click', () => {
         const currentDisplay = window.getComputedStyle(notificationContainer).display;
-        
-        console.log(notificationContainer)
-        console.log(currentDisplay)
         if (currentDisplay === 'flex') {
             notificationContainer.style.display = "none";
         } else {

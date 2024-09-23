@@ -31,7 +31,6 @@ const _initWebsocket = async (path) => {
         + window.location.host
         + path
     );
-    console.log("GWS connection open on : " + path)
     gameSocket.onmessage = messageHandler;
     gameSocket.onclose = function (e) {
                 moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
@@ -129,7 +128,7 @@ const _invitations = (content) => {
             if (content.mode === enu.Game.MATCH) {
                 if (content.by === false) {
                     let target = 'invite-status-' + content.message;
-                    console.log(target)
+    
                     document.getElementById(target).parentElement.remove();
                 } 
                 changeGameStatus(enu.gameMode.MATCH);
@@ -137,9 +136,7 @@ const _invitations = (content) => {
                 announceMatch(content.players);
             } else if (getGameStatus() === enu.gameMode.TOURNAMENT) {
                 updateStatusInvitation(content.author)
-                console.log("bad: " + getGameStatus())
             } else if (content.mode === enu.Game.TRN){
-                console.log("good")
                 moveTo(enu.sceneIdx.WAITING)
                 changeGameStatus(enu.gameMode.TOURNAMENT);
             }
@@ -188,13 +185,11 @@ const _match = (content) => {
             game.gameRenderer(content.message);
             return true;
         case enu.Match.SCORE:
-            console.log(content)
             updateScore(content);
             announceScore();
             return true;
         case enu.Match.END:
             gameData.start = false;
-            console.log(content)
             moveTo(enu.sceneIdx.END)
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
@@ -217,7 +212,6 @@ const _tournament = (content) => {
             if (content.new === true) announcePhase(content.phase);
             return true;
         case enu.Tournament.MATCH:
-            console.log(content)
             if (getGameStatus() === enu.gameMode.LOCAL) {
                 moveTo(enu.sceneIdx.PREMATCH);
                 document.addEventListener('keydown', bindKeyPress)

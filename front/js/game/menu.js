@@ -570,7 +570,6 @@ const addUser = () => {
 
 document.getElementById('game-menu-local-input-button').addEventListener('click', addUser);
 document.getElementById('playerForm').addEventListener('submit', (e) => {
-    console.log("here")
     e.preventDefault();
     addUser();
   

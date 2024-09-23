@@ -243,7 +243,7 @@ const loginRequest = (event) => {
             closeTwoFactorLogin();
             return response.json();
         } else if (response.status === 403) {
-            console.log("bonjour")
+
             return response.json().then(data => {
                                 messageBox.style.backgroundColor = "#f44336";
                 if (data === 'Two Factor Authentification needed.') {
@@ -261,8 +261,6 @@ const loginRequest = (event) => {
         }
     })
     .then(data => {
-        console.log("YOOO")
-        console.log(data)
         loggedInStatus(data.profile_picture, data.username);
         var buttonLogout = document.querySelector('.menu-logout');
         var buttonSettings = document.querySelector('.menu-settings');

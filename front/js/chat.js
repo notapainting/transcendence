@@ -495,7 +495,6 @@ const blockUnblockSwitch = (target, type) => {
 }
 
 const deletePlusIcon = (target) => {
-    console.log("je erentre")
     const personElem = document.querySelector(`.person[data-username="${target}"]`);
         if (personElem){
         const plusElem = personElem.querySelector(".add-button");
@@ -505,7 +504,6 @@ const deletePlusIcon = (target) => {
 }
 
 const addPlusIcon = (target) => {
-    console.log("je erentre")
     const personElem = document.querySelector(`.person[data-username="${target}"]`);
         if (personElem){
         const plusElem = personElem.querySelector(".add-button");
@@ -537,10 +535,8 @@ const changeExistingStatus = (target, mode) => {
 }
 
 const disableEnableInput = (target, mode) => {
-    console.log("DISABLE ENABLE")
     const focusedPerson = document.querySelector(".focus");
     if (focusedPerson) {
-        console.log("FOCUSED ", focusedPerson)
         const username = focusedPerson.dataset.username;
                 if (target === username){
             if (mode === "disable" && contactSummary.data.blockeds.find(elem => elem === target) || contactSummary.data.blocked_by.find(elem => elem === target))
@@ -552,7 +548,6 @@ const disableEnableInput = (target, mode) => {
 }
 
 async function handleMessage(message) {
-    console.log(message)
     if (message.type === 'contact.summary'){
         contactSummary = message;
                 fillNotification();
@@ -761,13 +756,11 @@ const chatElement = document.querySelector(".chatbox");
 const bubbleElement = document.querySelector(".bubble");
 
 const displayChat = () => {
-    console.log("open chat")
     chatElement.style.display = "flex";
     bubbleElement.style.display = "none"
 }
 
 const closeChat = () => {
-    console.log("close chat")
     chatElement.style.display = "none";
     bubbleElement.style.display = "flex"
 }
