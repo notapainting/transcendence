@@ -54,8 +54,6 @@ const displayTargetProfile = (data, matchHistory) => {
     if (matchHistory){
         matchHistory.forEach(object => {
             const newMatch = document.createElement("div");
-            console.log("yooo");
-            console.log(data.username, object.winner);
             let otherPerson;
             let amItheWinner;
             if (object.winner === data.username){
@@ -154,12 +152,9 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
             if (!matchHistoryResponse.ok) {
                 throw new Error('Network response was not ok when fetching match history');
             }
-            // console.log(matchHistoryResponse.status)
             const matchHistoryText = await matchHistoryResponse.text();
-            console.log(matchHistoryText);
             if (matchHistoryText) {
                 const matchHistory = JSON.parse(matchHistoryText); // Parser le texte en JSON si non vide
-                console.log(matchHistory);
                 displayTargetProfile(userInfo, matchHistory);
             } else {
                 displayTargetProfile(userInfo, null); // Passer un tableau vide si le texte est vide
@@ -185,13 +180,11 @@ const addToFriend = (target) => {
         socket.send(JSON.stringify(requestFriend));
     }
     catch (e) {
-        console.log(e);
-    }
+            }
 }
 
 const blockUser = (target) => {
-    console.log(`Je vais blocker le user ${target}`);
-    try{
+        try{
         const requestBlock = {
             type: "contact.update",
             data: {
@@ -203,8 +196,7 @@ const blockUser = (target) => {
         socket.send(JSON.stringify(requestBlock));
     }
     catch (e) {
-        console.log(e);
-    }
+            }
 }
 
 const unblockUser = (target) => {
@@ -220,8 +212,7 @@ const unblockUser = (target) => {
         socket.send(JSON.stringify(requestBlock));
     }
     catch (e) {
-        console.log(e);
-    }
+            }
 }
 
 
@@ -231,11 +222,9 @@ function addUserToMenu(target, profile_picture) {
     const displayMenu = document.querySelector('.display-menu');
     const existingPersonDiv = displayMenu.querySelector(`[data-username="${target}"]`);
     if (existingPersonDiv) {
-        console.log("je vais remonter le user: " + target + "avec la photo de profil : " + profile_picture);
-        displayMenu.insertBefore(existingPersonDiv, displayMenu.children[1]);
+                displayMenu.insertBefore(existingPersonDiv, displayMenu.children[1]);
     } else {
-        console.log("je vais add le user: " + target + "avec la photo de profil : " + profile_picture);
-        const personDiv = document.createElement('div');
+                const personDiv = document.createElement('div');
         personDiv.classList.add('person');
         personDiv.setAttribute('data-username', target);
 
@@ -245,9 +234,7 @@ function addUserToMenu(target, profile_picture) {
 
         const descriptionPersonDiv = document.createElement('div');
         descriptionPersonDiv.classList.add('description-person');
-        console.log(friendStatus);
-        console.log(contactSummary);
-        descriptionPersonDiv.innerHTML = `
+                        descriptionPersonDiv.innerHTML = `
             <div class="username-status">
                 <h4 class="username-person">${target}</h4>
                 <span class="status ${friendStatus.find(elem => elem === target) ? "online" : "offline"}" style="display: ${friendStatus.find(elem => elem === target) || contactSummary.data.contacts.find(elem => elem === target) ? 'inline-block' : 'none'};"><span>
@@ -258,8 +245,7 @@ function addUserToMenu(target, profile_picture) {
         const addOrBlockDiv = document.createElement("div");
         addOrBlockDiv.classList.add("add-or-block")
         if (!contactSummary.data.contacts.find(elem => elem === target) && !contactSummary.data.invited_by.find(elem => elem === target) && !contactSummary.data.invitations.find(elem => elem === target) && !contactSummary.data.blockeds.find(elem => elem === target) && !contactSummary.data.blocked_by.find(elem => elem === target)){
-            console.log("salut");
-            const addFriend = document.createElement('i');
+                        const addFriend = document.createElement('i');
             addFriend.classList.add("fa-solid", "fa-plus", "add-button");
             addFriend.addEventListener("click", event => addToFriend(target));
             addOrBlockDiv.appendChild(addFriend);
@@ -311,11 +297,8 @@ export async function fetchUsers(username = null) {
 }
 
 let createGroup = async (message) => {
-    console.log("je cree le groupe au front: ");
-    console.log(message);
-    const target = message.data.members.find(person => person != whoIam);
-    console.log("LE GROUPE SE CREE sur la target :" + target);
-    const personData = await fetchUsers(target);
+            const target = message.data.members.find(person => person != whoIam);
+        const personData = await fetchUsers(target);
     const profile_picture = personData.profile_picture;
     addUserToMenu(target, profile_picture);
     let messageContainer = document.getElementById(message.data.group);
@@ -333,20 +316,17 @@ let createGroup = async (message) => {
     messageContainer.scrollTop = messageContainer.scrollHeight;
     if (focusedPerson.getAttribute('data-username') === target){
         messageContainer.style.display = 'flex';
-        console.log("je display le message");
-    }
+            }
     messageInput.value = ``;
 }
 
 let receiveMessage = async (message) => {
     let messageContainer = document.getElementById(message.data.group);
-    console.log(messageContainer);
-    const newMessageDiv = document.createElement('div');
+        const newMessageDiv = document.createElement('div');
     newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
     newMessageDiv.innerHTML = `<p>${message.data.body}</p><span>${formatDate(message.data.date)}</span>`;   
     messageContainer.appendChild(newMessageDiv);
-    console.log(message);
-    if(message.data.author === whoIam)
+        if(message.data.author === whoIam)
         messageInput.value = '';
     const focusedPerson = document.querySelector('.person.focus');
     messageContainer.scrollTop = messageContainer.scrollHeight;
@@ -439,8 +419,7 @@ const fillNotification = () => {
                     socket.send(JSON.stringify(requestFriend));
                 }
                 catch (e) {
-                    console.log(e);
-                }   
+                                    }   
             })
             declineButton.addEventListener("click", () => {
                 notifElem.remove();
@@ -488,8 +467,7 @@ const newFriendRequest = (target) => {
             socket.send(JSON.stringify(requestFriend));
         }
         catch (e) {
-            console.log(e);
-        }   
+                    }   
     })
     btnContainer.append(acceptButton, declineButton);
     notifElem.appendChild(btnContainer);
@@ -519,8 +497,7 @@ const blockUnblockSwitch = (target, type) => {
 const deletePlusIcon = (target) => {
     console.log("je erentre")
     const personElem = document.querySelector(`.person[data-username="${target}"]`);
-    console.log(personElem);
-    if (personElem){
+        if (personElem){
         const plusElem = personElem.querySelector(".add-button");
         if (plusElem)
             plusElem.style.display = "none";
@@ -530,8 +507,7 @@ const deletePlusIcon = (target) => {
 const addPlusIcon = (target) => {
     console.log("je erentre")
     const personElem = document.querySelector(`.person[data-username="${target}"]`);
-    console.log(personElem);
-    if (personElem){
+        if (personElem){
         const plusElem = personElem.querySelector(".add-button");
         if (plusElem)
             plusElem.style.display = "inline-block";
@@ -566,8 +542,7 @@ const disableEnableInput = (target, mode) => {
     if (focusedPerson) {
         console.log("FOCUSED ", focusedPerson)
         const username = focusedPerson.dataset.username;
-        console.log("USERNAME " + username);
-        if (target === username){
+                if (target === username){
             if (mode === "disable" && contactSummary.data.blockeds.find(elem => elem === target) || contactSummary.data.blocked_by.find(elem => elem === target))
                 messageInput.disabled = true;
             else if (mode === "enable" && !contactSummary.data.blockeds.find(elem => elem === target) && !contactSummary.data.blocked_by.find(elem => elem === target))
@@ -580,13 +555,11 @@ async function handleMessage(message) {
     console.log(message)
     if (message.type === 'contact.summary'){
         contactSummary = message;
-        console.log(message);
-        fillNotification();
+                fillNotification();
         contactSummaryPromiseResolve();
     }
     else if (message.type === 'group.summary'){
-        console.log(message);
-        await contactSummaryPromise;
+                await contactSummaryPromise;
         await statusPromise;
         while (displayMenu.children.length > 1) {
             displayMenu.removeChild(displayMenu.children[1]);
@@ -600,13 +573,10 @@ async function handleMessage(message) {
         })
     }
     else if (message.type === 'group.update'){
-        console.log("EVENT GROUP UPDATE");
-        createGroup(message);
+                createGroup(message);
     }
     else if (message.type === 'message.text') {
-        console.log("EVENT TEXT");
-        console.log("EVENT MESSAGE TEXT");
-        receiveMessage(message);
+                        receiveMessage(message);
     }
     else if (message.type === "contact.update"){
         if (message.data.operation === "invitation"){
@@ -652,8 +622,7 @@ async function handleMessage(message) {
                 disableEnableInput(message.data.author, "enable");
             }
         }
-        console.log(message);
-    }
+            }
     else if (message.type === "status.update"){
         if (message.data.status === "o" || message.data.status === "online"){
             friendStatus.push(message.data.author);
@@ -664,9 +633,7 @@ async function handleMessage(message) {
             changeExistingStatus(message.data.author, "offline");
         }
         statusPromiseResolve();
-        console.log(message);
-        console.log(friendStatus);
-    }
+                    }
     statusPromiseResolve();
 }
 
@@ -678,8 +645,7 @@ export async function initializeWebSocket() {
     socket = new WebSocket('wss://' + host + '/chat/');
 
     socket.onopen = function() {
-        console.log('WebSocket connection established');
-    };
+            };
 
     socket.onmessage = function(event) {
         const message = JSON.parse(event.data);
@@ -691,8 +657,7 @@ export async function initializeWebSocket() {
     };
 
     socket.onclose = function() {
-        console.log('WebSocket connection closed');
-        setTimeout(initializeWebSocket, 5000);
+                setTimeout(initializeWebSocket, 5000);
     };
 }
 
@@ -734,12 +699,9 @@ function fetchMessages(username) {
 
 const sendToWebSocket = (username, message) => {
     try {
-        console.log(username, message);
-        const isGroupAlreadyExist = document.querySelector(`.username-${username}`);
-        console.log(isGroupAlreadyExist);
-        if (!isGroupAlreadyExist){
-            console.log("le groupe n'existe pas");
-            const createGroup = {
+                const isGroupAlreadyExist = document.querySelector(`.username-${username}`);
+                if (!isGroupAlreadyExist){
+                        const createGroup = {
                 type: "message.first",
                 data: {
                     target: username,
@@ -749,8 +711,7 @@ const sendToWebSocket = (username, message) => {
             socket.send(JSON.stringify(createGroup));
         }
         else {
-            console.log("j'envoie message message.text " + isGroupAlreadyExist.id + " " + message);
-            const privateMessage = {
+                        const privateMessage = {
                 type:"message.text",
                 data:
                 {
@@ -779,8 +740,7 @@ function sendMessage() {
         return;
     }
     const username = focusedPerson.getAttribute('data-username');
-    console.log("sendToWebsocket " + username + " " + message);
-    sendToWebSocket(username, message);
+        sendToWebSocket(username, message);
 }
 
 const searchUsers = async () => {

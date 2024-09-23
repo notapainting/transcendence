@@ -458,8 +458,7 @@ const requestUpdateSettings = (type) => {
         }}));
 
     updateRequested[type][1] = null;
-    console.log("settings: " + updateRequested[type][0] + ", update to: " + updateRequested[type][2]());
-}
+    }
 
 settingsReInit.addEventListener('click', () => {
     resetSettings();

@@ -245,11 +245,9 @@ const loginRequest = (event) => {
         } else if (response.status === 403) {
             console.log("bonjour")
             return response.json().then(data => {
-                console.log(data);
-                messageBox.style.backgroundColor = "#f44336";
+                                messageBox.style.backgroundColor = "#f44336";
                 if (data === 'Two Factor Authentification needed.') {
-                    console.log("JE PASSe");
-                    displayTwoFactorLogin();
+                                        displayTwoFactorLogin();
                 }
                 else {
                     messageBox.innerHTML = `Username / e-mail or password incorrect.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
@@ -257,8 +255,7 @@ const loginRequest = (event) => {
                 }
             });
         } else {
-            console.log("bonjour");
-            messageBox.style.backgroundColor = "#f44336";
+                        messageBox.style.backgroundColor = "#f44336";
             messageBox.innerHTML = `Server error, please retry later.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
             messageBox.style.transform = "scale(1)";
         }
@@ -294,8 +291,7 @@ const registerRequest = (event) => {
     })
     .then(response => {
         if (response.ok){
-            console.log('OKKK');
-            messageBox.style.backgroundColor = "#36B985";
+                        messageBox.style.backgroundColor = "#36B985";
             messageBox.innerHTML = `An link have been send to your e-mail address<br> please check you mailbox.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
             messageBox.style.transform = "scale(1)";
             return response.json();
@@ -303,8 +299,7 @@ const registerRequest = (event) => {
         else {
             messageBox.style.backgroundColor = "#f44336";
             return response.json().then(data => {
-                console.log(data);
-                if (data.password)
+                                if (data.password)
                     data.password = "Password too short, min. 8 characters";
                 if (data.email === "This field must be unique")
                     data.email = "E-mail incorrect or already used"

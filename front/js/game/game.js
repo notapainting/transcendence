@@ -289,8 +289,7 @@ export function gameRenderer(data) {
 				sphere.position.set(data.x, data.y, 0);
 				scene.add(sphere);
 			} else {
-                console.log("SPHERE 40 SET");
-				sphere.position.set(data.x, data.y, 40);
+                				sphere.position.set(data.x, data.y, 40);
 			}
 		}
 

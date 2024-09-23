@@ -34,8 +34,7 @@ const _initWebsocket = async (path) => {
     console.log("GWS connection open on : " + path)
     gameSocket.onmessage = messageHandler;
     gameSocket.onclose = function (e) {
-        console.log('GameWebSocket connection closed');
-        moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
+                moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
         if (path === enu.backendPath.REMOTE) setTimeout(_initWebsocket, 5000, path);
         gameSocket = null;
         clearListInvitation();
@@ -113,8 +112,7 @@ const _invitations = (content) => {
 
             return true;
         case enu.Invitation.ACCEPT:
-            console.log(content);
-            const message = content.message;  
+                        const message = content.message;  
             const listItems = document.querySelectorAll('.list-tournoi-element');
         
             listItems.forEach(li => {
@@ -183,8 +181,7 @@ const _match = (content) => {
             document.addEventListener('keyup', bindKeyRelease)
             // content.message.x = 40;
             gameData.start = false;
-            console.log("START A FALSE");
-            game.gameRenderer(content.message);
+                        game.gameRenderer(content.message);
             startMatch();
             return true;
         case enu.Match.UPDATE:
@@ -211,8 +208,7 @@ const _match = (content) => {
 const _tournament = (content) => {
     switch (content.type) {
         case enu.Tournament.PHASE:
-            console.log(content);
-            if (timeout_asknext !== null) {
+                        if (timeout_asknext !== null) {
                 clearTimeout(timeout_asknext);
                 timeout_asknext = null;
             }
@@ -243,9 +239,7 @@ const _tournament = (content) => {
 
 const messageHandler = (e) => {
     const content = JSON.parse(e.data);
-    console.log("message type: ", content.type);
-    console.log("message: ", content);
-    if (_match(content) === false)
+            if (_match(content) === false)
         if (_invitations(content) === false)
             if (_game(content) === false)
                 if (_tournament(content) === false)
@@ -303,10 +297,7 @@ const updateListInvitation = async (user) => {
     const button = document.createElement('button');
     const itemStatus = document.createElement('span');
     const itemPic = await fetchUsers(user);
-    console.log("ITEM PIC");
-    console.log(itemPic);
-
-    item.className = 'list-tournoi-element';
+            item.className = 'list-tournoi-element';
     itemPicture.className = 'list-tournoi-user-pic';
     // itemPicture.src = '../../img/anon.jpg'; // a remplacer !!!! (par la vrai foto)
     itemPicture.src = itemPic.profile_picture;

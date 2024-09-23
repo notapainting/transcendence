@@ -17,8 +17,7 @@ function updateBallPosition(newPosition) {
     let displacement = new THREE.Vector3();
     displacement.subVectors(currentPosition, previousPosition);
     direction.copy(displacement).normalize();
-    console.log(`Le vecteur de direction de la balle est :`, direction);
-}
+    }
 
 function applyRotationToObject(object, direction) {
     let referenceVector = new THREE.Vector3(0, -1, 0);

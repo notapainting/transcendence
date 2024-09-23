@@ -25,8 +25,7 @@ export const isUserAuthenticated = () => {
     .then(response => response.json().then(data => {
         if (response.ok) {
             whoIam = data.username; 
-            console.log("Je return true dans access");
-            return true;
+                        return true;
         } else {
             return fetch('auth/token/refresh/', {
                 method: 'POST',
@@ -35,11 +34,9 @@ export const isUserAuthenticated = () => {
             .then(refreshResponse => refreshResponse.json().then(refreshData => {
                 if (refreshResponse.ok) {
                     whoIam = refreshData.username;  // Stocker le username
-                    console.log("Je return true dans refresh");
-                    return true;
+                                        return true;
                 } else {
-                    console.log("Je return false dans refresh");
-                    return false;  
+                                        return false;  
                 }
             }));
         }

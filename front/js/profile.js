@@ -72,8 +72,7 @@ const updateProfilePicture = () => {
     })
     .then(response => {
         if (response.ok) {
-            console.log("Image de profil mise à jour avec succès !");
-            window.location.reload();
+                        window.location.reload();
         } else {
             inputField.classList.add('input-error');
             errorMessage.textContent = 'Invalid profile picture';
@@ -147,8 +146,7 @@ let updateUserInfosRequest = async () => {
         window.location.reload();
     })
     .catch(error => {
-        console.log(error);
-        console.error('Erreur lors de la mise à jour des informations de l\'utilisateur:', error);
+                console.error('Erreur lors de la mise à jour des informations de l\'utilisateur:', error);
         inputField.classList.add('input-error');
         setTimeout(() => {
             inputField.classList.remove('input-error');
@@ -207,8 +205,7 @@ const confirm2FaRequest = async (event) => {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
-        if (data.success){
+                if (data.success){
             closeTwoFactorActivate();
             window.location.reload();
         }
@@ -237,7 +234,6 @@ async function getMatchHistory() {
 }
 
 const settingsLink = document.querySelector(".link-settings");
-console.log(settingsLink);
 const historyLink = document.querySelector(".link-history");
 const profileContainer = document.querySelector(".profile-container");
 const historyContainer = document.querySelector(".history-container");
@@ -264,8 +260,7 @@ const showMatchHistory = async () => {
     historyContainer.style.display = "flex";
     const dataMatch = await getMatchHistory();
     if (dataMatch){
-        console.log(dataMatch);
-        profileHistoryContainer.innerHTML = "";
+                profileHistoryContainer.innerHTML = "";
         const titleContainer = document.createElement("h3");
         titleContainer.innerText = "Match History";
         profileHistoryContainer.appendChild(titleContainer);
@@ -291,8 +286,7 @@ const showMatchHistory = async () => {
             profileHistoryContainer.appendChild(newMatch);
         })
     }
-    console.log(dataMatch);
-    settingsLink.classList.remove("focus-profile");
+        settingsLink.classList.remove("focus-profile");
     historyLink.classList.add("focus-profile");
 }
 
@@ -340,8 +334,7 @@ export const showProfile = async () => {
         displayUserInformations(data);
         const profileElement = document.querySelector("#profile");
         profileElement.style.display = "block";
-        console.log(data);
-    })
+            })
     const modifyButton = document.querySelector(".modify");
     modifyButton.removeEventListener("click", updateUserInfosRequest);
     modifyButton.addEventListener("click", updateUserInfosRequest);
