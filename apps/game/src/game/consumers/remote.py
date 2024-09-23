@@ -78,6 +78,8 @@ class RemoteGamer(LocalConsumer):
         if hasattr(self, "loopback_host"):
             await self.send_cs(self.loopback_host, {"type":enu.Game.QUIT})
         self.set_mode(enu.Game.IDLE)
+        for invitor in self.invited_by:
+            await self.send_cs(invitor, {'type':enu.Invitation.REJECT})
 
 
     def set_mode(self, status=None, host=None):
