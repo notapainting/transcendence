@@ -568,10 +568,10 @@ async function handleMessage(message) {
         })
     }
     else if (message.type === 'group.update'){
-                createGroup(message);
+        createGroup(message);
     }
     else if (message.type === 'message.text') {
-                        receiveMessage(message);
+        receiveMessage(message);
     }
     else if (message.type === "contact.update"){
         if (message.data.operation === "invitation"){
