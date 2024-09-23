@@ -1,10 +1,8 @@
 import os
 from web3 import Web3
 from eth_account import Account
-from eth_account.signers.local import LocalAccount
 from web3.middleware import construct_sign_and_send_raw_middleware
 import traceback
-import sys
 
 from logging import getLogger
 logger = getLogger('base')
@@ -170,8 +168,12 @@ contract_abi = [
 
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
+import time
+
 def record_match_on_blockchain(tournament_id, winner, loser, winner_score, loser_score):
     try:
+        time.sleep(5)
+        
         tx_hash = (contract.functions.recordMatch(tournament_id, winner, loser, winner_score, loser_score).
                    transact({'from':  my_account}))
         
