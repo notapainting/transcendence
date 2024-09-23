@@ -283,7 +283,7 @@ two factor */
     display: flex;
     flex-direction: column;
     text-align: justify;
-    align-items: center;
+    /* align-items: center; */
 }
 
 .info-item {
@@ -476,6 +476,7 @@ two factor */
 
 
 .profile-navbar {
+    display: none;
     position: absolute;
     width: 150px;
     height: 100%;
@@ -483,7 +484,7 @@ two factor */
     gap: 5%;
     color: white;
     top: 50%;
-    display: flex;
+    /* display: flex; */
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -505,10 +506,7 @@ two factor */
     color: white;
 }
 
-.focus-profile {
-    background-color: #ff90e8;
-    color: black;
-}
+
 
 .history-container {
     height: 100vh;

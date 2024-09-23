@@ -194,7 +194,7 @@ export const loggedInStatus = (profile_picture, username) => {
     //     playBtnElement.style.transform = "translateX(100%)";
     // }, 200)
     showChat();
-    document.querySelector(".welcome-msg").innerHTML = `Welcome<br>${username}`;
+    
     document.querySelector(".profile-picture-home").style.backgroundImage = `url('${profile_picture}')`
     document.querySelector(".navbar").style.display= "flex"
 }

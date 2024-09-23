@@ -249,6 +249,7 @@ const showSettings = () => {
     settingsLink.classList.add("focus-profile");
 }
 
+
 const showMatchHistory = async () => {
     historyContainer.style.display = "none";
     historyContainer.style.display = "flex";
@@ -280,6 +281,16 @@ const showMatchHistory = async () => {
     console.log(dataMatch);
     settingsLink.classList.remove("focus-profile");
     historyLink.classList.add("focus-profile");
+}
+
+
+export const showHistory = async () => {
+    if (await isUserAuthenticated() === true)
+    {
+        await showMatchHistory();
+        clearView();
+        document.querySelector("#history").style.display = "block";
+    };
 }
 
 export const showProfile = async () => {
@@ -317,7 +328,7 @@ export const showProfile = async () => {
     document.querySelector(".close-two-factor").addEventListener("click", closeTwoFactorActivate)
     activate2FaButton.removeEventListener("click", confirm2FaRequest);
     settingsLink.addEventListener("click", showSettings);
-    historyLink.addEventListener("click", showMatchHistory);
+
     activate2FaButton.addEventListener("click", confirm2FaRequest);
 }
 
@@ -325,7 +336,7 @@ document.querySelector('.profile-menu-quit').addEventListener('click', () => {
     navigateTo('/')
 });
 
-document.querySelector('.back-to-top-button ').addEventListener('click', () => {
+document.querySelector('.back-to-top-button').addEventListener('click', () => {
     window.scrollTo({
         top: 0,
         behavior: "smooth",

@@ -1,7 +1,6 @@
 import { logoutRequest, showHome } from "./home.js"
-import { showProfile } from "./profile.js"
+import { showProfile, showHistory } from "./profile.js"
 
-import { loggedInStatus } from "./home.js";
 import { showGame, showGameLocal } from "./game/index.js"
 export let whoIam;
 
@@ -50,6 +49,7 @@ export const isUserAuthenticated = () => {
         return false;
     });
 };
+
 function resetHomePage() {
     const backThrees = document.querySelector('.back-threes');
     const backgroundThrees = document.querySelector('.background-threes');
@@ -79,6 +79,7 @@ const router = async () => {
     const routes = [
         {path: "/", view:() => showHome() },
         {path: "/profile", view:() => showProfile()},
+        {path: "/history", view:() => showHistory()},
         {path: "/play", view:() => showGame()},
         {path: "/local", view:() => showGameLocal()},
     ];
@@ -97,7 +98,6 @@ const router = async () => {
     }
     match.route.view()
 };
-
 
 
 window.addEventListener("popstate", router);
@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelector(".fa-bell").addEventListener('click', () => {
         const currentDisplay = window.getComputedStyle(notificationContainer).display;
-        console.log("bonjouuurr");
+        
         console.log(notificationContainer)
         console.log(currentDisplay)
         if (currentDisplay === 'flex') {

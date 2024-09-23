@@ -82,7 +82,7 @@ input:focus::placeholder {
 }
 
 .navbar {
-    width: 250px;
+    width: 200px;
     height: 80px;
     position: fixed;
     right: 10px;
@@ -97,10 +97,11 @@ input:focus::placeholder {
 }
 
 .profile-picture-home {
-    height: 55px;
-    width: 55px;
+    height: 40px;
+    width: 40px;
     border-radius: 50%;
     cursor: pointer;
+    border: 1px solid #ffffff;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -132,7 +133,7 @@ input:focus::placeholder {
     flex-direction: column;
     width: 350px;
     font-size: 16px;
-    height: 500px;
+    height: 400px;
     border-radius: 5px;
     position: fixed;
     z-index: 2;
@@ -140,7 +141,7 @@ input:focus::placeholder {
     top: 85px;
     overflow-y: auto;
     color: black;
-    background-color: white;
+    background-color: #ffffff80;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 

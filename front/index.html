@@ -36,10 +36,10 @@
     </audio>
     <nav class="navbar">
         <!-- <i class="item fa-solid fa-house"data-link data-href="/"></i> -->
-        <p class="welcome-msg">Welcome <br>username</p>
         <div class="profile-picture-home" data-link data-href="/profile"></div>
-        <i class="item fa-solid fa-right-from-bracket"></i>
+        <i class="item fa-solid fa-trophy link-history" data-link data-href="/history"></i>
         <i class="item fa-solid fa-bell"><span class="cpt"></span></i>
+        <i class="item fa-solid fa-right-from-bracket"></i>
     </nav>
     <div class="notification-container">
     </div>
@@ -263,11 +263,7 @@
             <div class="link-profile link-settings focus-profile">Settings</div>
             <div class="link-profile link-history">Match History</div>
             <div class="link-profile profile-menu-quit">Back to Menu</div>
-        </div>
-        <div class="history-container">
-            <div class="profile-history-container">
-            </div>
-        </div>
+        </div>     
         <div class="profile-container">
             <div class="my-profile-container">
                 <div class="my-profile">
@@ -329,10 +325,17 @@
                     <div class="profile-sep"></div>
                     <div class="profile-bottom-button">
                         <button class="profile-btn two-factor">ENABLE 2FA</button>
+                        <button class="profile-btn profile-menu-quit">BACK TO MENU</button>
                     </div>
                 </div>
             </div>
 
+        </div>
+    </div>
+    <div id="history" class="view">
+        <div class="history-container">
+            <div class="profile-history-container">
+            </div>
         </div>
     </div>
     <div class="two-factor-display">
