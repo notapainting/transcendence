@@ -93,17 +93,14 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
     if (currentTarget){
         inviteButton.removeEventListener("click", currentTarget);
     }
-
     currentTarget = () => {
         if (fastmatchOK()){
             if (window.location.pathname !== "/play")
                 navigateTo("/play");
             setTimeout(() => {
                 fastmatch(target);
-            }, 3000)
-            
+            }, 3000)   
         }
-
     };
     
     inviteButton.addEventListener('click', currentTarget);
@@ -824,7 +821,7 @@ const showChatLeft = () => {
 }
 
 const sendMessageEnter = (event) => {
-    if (event.key === "") {
+    if (event.key === "Enter") {
         sendMessage();
     }
 }

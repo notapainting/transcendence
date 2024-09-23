@@ -278,11 +278,14 @@
 
 .emoji-send {
     width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .emoji, .chat-send {
-    margin-right: 5px;
-    font-size: 20px;
+    font-size: 25px;
+    margin-right: 10px;
 }
 
 .emoji {
