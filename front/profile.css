@@ -509,9 +509,13 @@ two factor */
 
 .history-container {
     height: 100vh;
+    background-color: #0C3452;
     display: none;
+    flex-direction: column;
+    justify-content: space-evenly;
     align-items: center;
     justify-content: center;
+    gap: 20px;
 }
 
 .profile-history-container {
@@ -572,6 +576,7 @@ two factor */
 .profile-vs-text {
     width: 30%;
     height: 100%;
+    gap: 5px;
     display: flex;
     align-items: center;
     justify-content: space-around;

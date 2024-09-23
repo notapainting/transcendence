@@ -1,3 +1,4 @@
+import { showChat } from "./chat.js";
 import { loggedInStatus } from "./home.js";
 import { isUserAuthenticated, navigateTo, whoIam } from "./index.js";
 import { clearView } from "./index.js";
@@ -299,9 +300,24 @@ const showMatchHistory = async () => {
 export const showHistory = async () => {
     if (await isUserAuthenticated() === true)
     {
-        await showMatchHistory();
-        clearView();
-        document.querySelector("#history").style.display = "block";
+        fetch('/auth/get_pers_infos/', {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            else {
+                throw new Error("Identifiant ou mot de passe incorrect");
+            }
+        })
+        .then(async (data)  =>  {
+            
+            loggedInStatus(data.profile_picture, data.username);
+            await showMatchHistory();
+            clearView();
+            document.querySelector("#history").style.display = "block";
+        })
     };
 }
 
@@ -314,8 +330,6 @@ export const showProfile = async () => {
     .then(response => {
         if (response.ok)
             return response.json();
-
-
         else {
             throw new Error("Identifiant ou mot de passe incorrect");
         }
@@ -344,9 +358,9 @@ export const showProfile = async () => {
     activate2FaButton.addEventListener("click", confirm2FaRequest);
 }
 
-document.querySelector('.profile-menu-quit').addEventListener('click', () => {
-    navigateTo('/')
-});
+// document.querySelector('.profile-menu-quit').addEventListener('click', () => {
+//     navigateTo('/')
+// });
 
 document.querySelector('.back-to-top-button').addEventListener('click', () => {
     window.scrollTo({

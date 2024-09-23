@@ -127,6 +127,10 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutButtonMenu.addEventListener("click", logoutRequest);
     const notificationContainer = document.querySelector(".notification-container");
 
+    document.querySelectorAll('.profile-menu-quit').forEach(elem => elem.addEventListener('click', () => {
+        navigateTo('/')
+    }));
+
     document.querySelector(".fa-bell").addEventListener('click', () => {
         const currentDisplay = window.getComputedStyle(notificationContainer).display;
         
@@ -157,3 +161,4 @@ document.addEventListener("DOMContentLoaded", () => {
 //     })
 //     router();
 // })
+
