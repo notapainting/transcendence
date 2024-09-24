@@ -328,7 +328,8 @@ let createGroup = async (message) => {
         let messageContainer = document.getElementById(message.data.group);
         if (!messageContainer) {
             messageContainer = document.createElement('div');
-            messageContainer.classList.add('message-person', `username-${target}`);
+            const sanitizedTarget = target.replace(/\s+/g, '');
+            messageContainer.classList.add('message-person', `username-${sanitizedTarget}`);
             messageContainer.setAttribute('id', message.data.id);
             document.querySelector('.messages').appendChild(messageContainer);
         }
@@ -665,7 +666,7 @@ async function handleMessage(message) {
         }
         statusPromiseResolve();
     }
-    else if (message.type === group.delete){
+    else if (message.type === "group.delete"){
         deleteGroup(message.data);
     }
     statusPromiseResolve();
