@@ -277,8 +277,6 @@ function addUserToMenu(target, profile_picture, id = null) {
 }
 
 
-
-
 export async function fetchUsers(username = null) {
     try {
         let url = '/user/users_info/';
@@ -300,31 +298,55 @@ export async function fetchUsers(username = null) {
 }
 
 let createGroup = async (message) => {
-            const target = message.data.members.find(person => person != whoIam);
+    if (message.name === '@'){
+        const target = message.data.members.find(person => person != whoIam);
         const personData = await fetchUsers(target);
-    const profile_picture = personData.profile_picture;
-    addUserToMenu(target, profile_picture, message.data.id);
-    let messageContainer = document.getElementById(message.data.group);
-    if (!messageContainer) {
-        messageContainer = document.createElement('div');
-        messageContainer.classList.add('message-person', `username-${target}`);
-        messageContainer.setAttribute('id', message.data.id);
-        document.querySelector('.messages').appendChild(messageContainer);
+        const profile_picture = personData.profile_picture;
+        addUserToMenu(target, profile_picture, message.data.id);
+        let messageContainer = document.getElementById(message.data.group);
+        if (!messageContainer) {
+            messageContainer = document.createElement('div');
+            messageContainer.classList.add('message-person', `username-${target}`);
+            messageContainer.setAttribute('id', message.data.id);
+            document.querySelector('.messages').appendChild(messageContainer);
+        }
+        const newMessageDiv = document.createElement('div');
+        newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
+        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
+        messageContainer.appendChild(newMessageDiv);
+        const focusedPerson = document.querySelector('.person.focus');
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+        if (focusedPerson.getAttribute('data-username') === target){
+            messageContainer.style.display = 'flex';
+        }
+        messageInput.value = ``;
     }
-    const newMessageDiv = document.createElement('div');
-    newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
-    newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
-    messageContainer.appendChild(newMessageDiv);
-    const focusedPerson = document.querySelector('.person.focus');
-    messageContainer.scrollTop = messageContainer.scrollHeight;
-    if (focusedPerson.getAttribute('data-username') === target){
-        messageContainer.style.display = 'flex';
+    else {
+        const target = message.data.name;
+        const profile_picture = "/media/default_profile_picture.jpg";
+        addUserToMenu(target, profile_picture, message.data.id);
+        let messageContainer = document.getElementById(message.data.group);
+        if (!messageContainer) {
+            messageContainer = document.createElement('div');
+            messageContainer.classList.add('message-person', `username-${target}`);
+            messageContainer.setAttribute('id', message.data.id);
+            document.querySelector('.messages').appendChild(messageContainer);
+        }
+        const newMessageDiv = document.createElement('div');
+        newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
+        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
+        messageContainer.appendChild(newMessageDiv);
+        const focusedPerson = document.querySelector('.person.focus');
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+        if (focusedPerson.getAttribute('data-username') === target){
+            messageContainer.style.display = 'flex';
+        }
+        messageInput.value = ``;
     }
-    messageInput.value = ``;
 }
 
-const notifChatCpt = 0;
-const notifChat = document.querySelector(".chatcpt");
+let notifChatCpt = 0;
+let notifChat = document.querySelector(".chatcpt");
 
 let receiveMessage = async (message) => {
     let messageContainer = document.getElementById(message.data.group);
@@ -332,14 +354,6 @@ let receiveMessage = async (message) => {
     newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
     newMessageDiv.innerHTML = `<p>${message.data.body}</p><span>${formatDate(message.data.date)}</span>`;   
     messageContainer.appendChild(newMessageDiv);
-    if(message.data.author === whoIam)
-        messageInput.value = '';
-    else {
-        notifChatCpt++;
-        notifChat.innerHTML = notifChatCpt;
-    }
-
-
     const focusedPerson = document.querySelector('.person.focus');
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
