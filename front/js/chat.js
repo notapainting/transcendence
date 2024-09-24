@@ -352,11 +352,24 @@ let notifChat = document.querySelector(".chatcpt");
 let receiveMessage = async (message) => {
     let messageContainer = document.getElementById(message.data.group);
     const newMessageDiv = document.createElement('div');
+    const newMessageHour = document.createElement('span');
+    const newMessageContainer = document.createElement('div');
+
+    newMessageContainer.classList.add('message-container', `${message.data.author === whoIam ? 'left-container' : 'right-container'}`);
+
     newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
-    newMessageDiv.innerHTML = `<p>${message.data.body}</p><span>${formatDate(message.data.date)}</span>`;   
-    messageContainer.appendChild(newMessageDiv);
+    newMessageDiv.innerHTML = `<p>${message.data.body}</p>`
+    newMessageContainer.appendChild(newMessageDiv);
+
+    newMessageHour.classList.add(`${message.data.author === whoIam ? 'left-hour' : 'right-hour'}`);
+    newMessageHour.textContent = formatDate(message.data.date);
+    newMessageContainer.appendChild(newMessageHour);
+
+    messageContainer.appendChild(newMessageContainer);
+
     const focusedPerson = document.querySelector('.person.focus');
     messageContainer.scrollTop = messageContainer.scrollHeight;
+
 }
 
 
@@ -369,10 +382,21 @@ const displayHistoryConversations = async (id, person, message, personList) => {
     document.querySelector('.messages').appendChild(messageContainer);
     message.forEach(bullet => {
         const newMessageDiv = document.createElement('div');
+        const newMessageHour = document.createElement('span');
+        const newMessageContainer = document.createElement('div');
+
+        newMessageContainer.classList.add('message-container', `${bullet.author === whoIam ? 'left-container' : 'right-container'}`);
+
         newMessageDiv.classList.add('message', `${bullet.author === whoIam ? 'left-message' : 'right-message'}`);
         newMessageDiv.setAttribute('id', bullet.id);
-        newMessageDiv.innerHTML = `<p>${bullet.body}</p><span>${formatDate(bullet.date)}</span>`;
-        messageContainer.insertBefore(newMessageDiv, messageContainer.firstChild);
+        newMessageDiv.innerHTML = `<p>${bullet.body}</p>`;
+        newMessageContainer.appendChild(newMessageDiv);
+        
+        newMessageHour.classList.add(`${bullet.author === whoIam ? 'left-hour' : 'right-hour'}`);
+        newMessageHour.textContent = formatDate(bullet.date);
+        newMessageContainer.appendChild(newMessageHour);
+
+        messageContainer.insertBefore(newMessageContainer, messageContainer.firstChild);
     })
 
     personDiv.addEventListener("click", async function() {
@@ -776,6 +800,7 @@ function sendMessage() {
     }
     const username = focusedPerson.getAttribute('data-username');
         sendToWebSocket(username, message);
+    messageInput.value = '';
 }
 
 const searchUsers = async () => {
