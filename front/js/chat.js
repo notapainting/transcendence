@@ -218,20 +218,23 @@ const unblockUser = (target) => {
 
 
 
-function addUserToMenu(target, profile_picture) {
+function addUserToMenu(target, profile_picture, id = null) {
     const displayMenu = document.querySelector('.display-menu');
     const existingPersonDiv = displayMenu.querySelector(`[data-username="${target}"]`);
     if (existingPersonDiv) {
-                displayMenu.insertBefore(existingPersonDiv, displayMenu.children[1]);
+
+        displayMenu.insertBefore(existingPersonDiv, displayMenu.children[1]);
     } else {
-                const personDiv = document.createElement('div');
+
+        const personDiv = document.createElement('div');
         personDiv.classList.add('person');
         personDiv.setAttribute('data-username', target);
-
+        if (id){
+            personDiv.classList.add(id);
+        }
         const picturePersonDiv = document.createElement('div');
         picturePersonDiv.classList.add('picture-person');
         picturePersonDiv.style.backgroundImage = `url(${profile_picture})`;
-
         const descriptionPersonDiv = document.createElement('div');
         descriptionPersonDiv.classList.add('description-person');
                         descriptionPersonDiv.innerHTML = `
@@ -300,7 +303,7 @@ let createGroup = async (message) => {
             const target = message.data.members.find(person => person != whoIam);
         const personData = await fetchUsers(target);
     const profile_picture = personData.profile_picture;
-    addUserToMenu(target, profile_picture);
+    addUserToMenu(target, profile_picture, message.data.id);
     let messageContainer = document.getElementById(message.data.group);
     if (!messageContainer) {
         messageContainer = document.createElement('div');
@@ -316,25 +319,34 @@ let createGroup = async (message) => {
     messageContainer.scrollTop = messageContainer.scrollHeight;
     if (focusedPerson.getAttribute('data-username') === target){
         messageContainer.style.display = 'flex';
-            }
+    }
     messageInput.value = ``;
 }
 
+const notifChatCpt = 0;
+const notifChat = document.querySelector(".chatcpt");
+
 let receiveMessage = async (message) => {
     let messageContainer = document.getElementById(message.data.group);
-        const newMessageDiv = document.createElement('div');
+    const newMessageDiv = document.createElement('div');
     newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
     newMessageDiv.innerHTML = `<p>${message.data.body}</p><span>${formatDate(message.data.date)}</span>`;   
     messageContainer.appendChild(newMessageDiv);
-        if(message.data.author === whoIam)
+    if(message.data.author === whoIam)
         messageInput.value = '';
+    else {
+        notifChatCpt++;
+        notifChat.innerHTML = notifChatCpt;
+    }
+
+
     const focusedPerson = document.querySelector('.person.focus');
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
 
 
 const displayHistoryConversations = async (id, person, message, personList) => {
-    addUserToMenu(person, personList.find(elem => elem.username===person).profile_picture);
+    addUserToMenu(person, personList.find(elem => elem.username===person).profile_picture, id);
     const personDiv = displayMenu.querySelector(`[data-username="${person}"]`);
     let messageContainer = document.createElement('div');
     messageContainer.classList.add('message-person', `username-${person}`);
@@ -550,6 +562,8 @@ const disableEnableInput = (target, mode) => {
 const deleteGroup = (data) => {
     const groupId = data.id;
     const chatContainer = document.querySelector(`#${groupId}`);
+    const personDiv = document.querySelector(`.${groupId}`);
+    personDiv.remove();
     chatContainer.remove();
 }
 
@@ -575,6 +589,7 @@ async function handleMessage(message) {
         })
     }
     else if (message.type === 'group.update'){
+        console.log(message.data);
         createGroup(message);
     }
     else if (message.type === 'message.text') {
@@ -662,7 +677,7 @@ export async function initializeWebSocket() {
     };
 
     socket.onclose = function() {
-                setTimeout(initializeWebSocket, 5000);
+        setTimeout(initializeWebSocket, 5000);
     };
 }
 
