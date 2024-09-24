@@ -51,7 +51,7 @@ class GroupApiView(View):
             data = uti.parse_json(request.body)
             data = await database_sync_to_async(_post_helper)(data)
             for user in data['members']:
-                _channel_layer.group_send(user, {'type':enu.Event.Group.UPDATE, 'data':data})
+                await _channel_layer.group_send(user, {'type':enu.Event.Group.UPDATE, 'data':data})
             return HttpResponse(status=201, content=uti.render_json({'id':data['id']}))
         except (DrfValidationError, ParseError) as error:
             logger.error(error)
@@ -89,11 +89,11 @@ class GroupApiView(View):
 
     async def delete(self, request, *args, **kwargs):
         try :
-            members = await database_sync_to_async(_delete_helper)(kwargs.get('id'))
+            group_id = kwargs.get('id')
+            members = await database_sync_to_async(_delete_helper)(group_id)
             for user in members:
-                _channel_layer.group_send(user, {'type':enu.Event.Group.DELETE, 'data':str(id)})
-            group.delete()
-            logger.info("group %s, deleted", id)
+                await _channel_layer.group_send(user, {'type':enu.Event.Group.DELETE, 'data':str(group_id)})
+            logger.info("group %s, deleted", group_id)
             return HttpResponse(status=200)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)

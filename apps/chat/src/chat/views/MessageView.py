@@ -42,7 +42,7 @@ class MessageApiView(View):
         try:
             data = uti.parse_json(request.body)
             data = await database_sync_to_async(_post_helper)(data)
-            _channel_layer.group_send(data['group'], {'type':enu.Event.Message.TEXT, 'data':data})
+            await _channel_layer.group_send(data['group'], {'type':enu.Event.Message.TEXT, 'data':data})
             return HttpResponse(status=201)
         except (DrfValidationError, ParseError) as error:
             logger.error(error)
@@ -68,11 +68,11 @@ class MessageApiView(View):
 
     async def patch(self, request, *args, **kwargs):
         try :
-            id = kwargs.get('id')
-            if id is None:
+            message_id = kwargs.get('id')
+            if message_id is None:
                 return HttpResponse(status=400)
             data = uti.parse_json(request.body)
-            await database_sync_to_async(_patch_helper)(id, data)
+            await database_sync_to_async(_patch_helper)(message_id, data)
             return HttpResponse(status=200)
         except (DrfValidationError, ParseError) as error:
             logger.error(error)
