@@ -424,6 +424,7 @@
 .invite-button {
     cursor: pointer;
     position: absolute;
+    display: none;
     right: 40px;
     align-items: center;
     justify-content: center;
