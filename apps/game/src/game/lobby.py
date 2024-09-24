@@ -213,7 +213,8 @@ class BaseTournament:
         return False
 
     async def update_result(self, data):
-        self.players.remove(data['loser'])
+        if data['loser'] in self.players:
+            self.players.remove(data['loser'])
         self.match_count -= 1
         if self.match_count == 0:
             return True
@@ -223,16 +224,17 @@ class BaseTournament:
         if len(self.players) % 2 != 0:
             if hasattr(self, "odd"):
                 self.players.append(self.odd)
-                logger.debug(f"add odd : {self.odd}, rest: {self.players}")
+                logger.info(f"add odd : {self.odd}, rest: {self.players}")
                 del self.odd
             else:
                 self.odd = self.players.pop()
-                logger.debug(f"pop odd : {self.odd}, rest: {self.players}")
-        random.shuffle(self.players)    
+                logger.info(f"pop odd : {self.odd}, rest: {self.players}")
+        random.shuffle(self.players)
         self.current = [{"id":i, "host":self.players[i],"guest":self.players[i + 1]} for i in range(0, len(self.players), 2)]
         self.match_count = len(self.current)
         await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.PHASE, "new":True, "phase":self.current}})
 
+ 
 class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
     def __init__(self, host, host_channel_name):
         super().__init__(host=host, host_channel_name=host_channel_name)
@@ -279,7 +281,6 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
         await self.match_stop()
         await super()._end()
 
-
 class RemoteLobby(BaseLobby):
     def __init__(self, host, host_channel_name, maxPlayer=LOBBY_DEFAULT_PLAYERS):
         super().__init__(host=host, host_channel_name=host_channel_name, maxPlayer=maxPlayer)
@@ -287,7 +288,9 @@ class RemoteLobby(BaseLobby):
 
     async def _send(self, target_name, message):
         message['author'] = self.host
-        await self._chlayer.send(plaza.translate(target_name, raise_exception=True), message)
+        target = plaza.translate(target_name)
+        if target is not None:
+            await self._chlayer.send(target, message)
 
     async def broadcast(self, message):
         message['author'] = self.host
@@ -392,7 +395,7 @@ class Tournament(RemoteLobby, BaseTournament):
         if hasattr(self, "chat_group_id"):
             url = f'http://chat:8000/api/v1/groups/{self.chat_group_id}/'
             await httpx.AsyncClient().delete(url=url)
-        await super().end()
+        await super().end(smooth)
 
     async def make_phase(self):
         await super().make_phase()
@@ -413,18 +416,29 @@ class Tournament(RemoteLobby, BaseTournament):
 
     async def cheat(self, user):
         data = {}
-        for match in self.current:
-            if match['host'] == user:
-                data['winner'] = match['guest']
-                data['loser'] = match['host']
-                break 
-            elif match['guest'] == user:
-                data['winner'] = match['host']
-                data['loser'] = match['guest']
-                break
-        data['score_w'] = 99
         data['score_l'] = 0
-        await self.update_result(data)
+        data['score_w'] = 99
+        if hasattr(self, "current"):
+            for match in self.current:
+                if match['host'] == user:
+                    data['winner'] = match['guest']
+                    data['loser'] = match['host']
+                    self.current.remove(match)
+                    return await self._cheating(data)
+                elif match['guest'] == user:
+                    data['winner'] = match['host']
+                    data['loser'] = match['guest']
+                    self.current.remove(match)
+                    return await self._cheating(data)
+        await self.remove(user)
+
+
+    async def _cheating(self, data):
+        await self.remove(data['loser'])
+        if not hasattr(self, "odd"):
+            self.odd = data['winner']
+        logger.info(f"current match : {self.current}")
+        await self.update_result(data) 
 
     async def next(self, user):
         pass
@@ -438,8 +452,8 @@ class Tournament(RemoteLobby, BaseTournament):
             else:
                 await self.make_phase()
         else:
-            await self._send(data['winner'], {"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.PHASE, "new":False}})
-            await self._send(data['loser'], {"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.PHASE, "new":False}})
+            await self._send(data['winner'], {"type":enu.Tournament.PHASE, "new":False})
+            await self._send(data['loser'], {"type":enu.Tournament.PHASE, "new":False})
 
     def players_state(self):
         return {"invited":self.invitations, "players":self.players, "host":self.host, "size":self.maxPlayer}
@@ -485,7 +499,7 @@ class Match(RemoteLobby, BaseMatch):
             await httpx.AsyncClient().post(url='http://user:8000/user/match_history/new/', data=JSONRenderer().render(result))
             if self.tournament is not None:
                 await self._send(self.tournament, {"type":enu.Match.RESULT, "message":result})
-            else:
+            elif cancelled is True:
                 await send_match_to_blockchain(0, result)
         await super().end(smooth=smooth)
 
