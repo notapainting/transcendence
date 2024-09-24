@@ -216,6 +216,29 @@ const unblockUser = (target) => {
 }
 
 
+const addTournamentToMenu = (target, profile_picture, id = null) => {
+    const displayMenu = document.querySelector('.display-menu');
+    const personDiv = document.createElement('div');
+    personDiv.classList.add('person');
+    personDiv.setAttribute('data-username', target);
+    if (id){
+        personDiv.classList.add(id);
+    }
+    const picturePersonDiv = document.createElement('div');
+    picturePersonDiv.classList.add('picture-person');
+    picturePersonDiv.style.backgroundImage = `url(${profile_picture})`;
+    const descriptionPersonDiv = document.createElement('div');
+    descriptionPersonDiv.classList.add('description-person');
+    descriptionPersonDiv.innerHTML = `
+                                        <div class="username-status">
+                                            <h4 class="username-person">${target}</h4>
+                                        </div>
+                                     `;
+    personDiv.append(picturePersonDiv, descriptionPersonDiv);
+    displayMenu.insertBefore(personDiv, displayMenu.children[1]);
+    personDiv.removeEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
+    personDiv.addEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
+}
 
 
 function addUserToMenu(target, profile_picture, id = null) {
@@ -298,7 +321,7 @@ export async function fetchUsers(username = null) {
 }
 
 let createGroup = async (message) => {
-    if (message.name === '@'){
+    if (message.data.name === '@'){
         const target = message.data.members.find(person => person != whoIam);
         const personData = await fetchUsers(target);
         const profile_picture = personData.profile_picture;
@@ -323,23 +346,25 @@ let createGroup = async (message) => {
     }
     else {
         const target = message.data.name;
+        const sanitizedTarget = target.replace(/\s+/g, '');
         const profile_picture = "/media/default_profile_picture.jpg";
-        addUserToMenu(target, profile_picture, message.data.id);
+        addTournamentToMenu(sanitizedTarget, profile_picture, message.data.id);
         let messageContainer = document.getElementById(message.data.group);
         if (!messageContainer) {
             messageContainer = document.createElement('div');
-            const sanitizedTarget = target.replace(/\s+/g, '');
             messageContainer.classList.add('message-person', `username-${sanitizedTarget}`);
             messageContainer.setAttribute('id', message.data.id);
             document.querySelector('.messages').appendChild(messageContainer);
         }
         const newMessageDiv = document.createElement('div');
+        console.log("BONJOUUUR");
+        console.log(message);
         newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
         newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
         messageContainer.appendChild(newMessageDiv);
         const focusedPerson = document.querySelector('.person.focus');
         messageContainer.scrollTop = messageContainer.scrollHeight;
-        if (focusedPerson.getAttribute('data-username') === target){
+        if (focusedPerson.getAttribute('data-username') === sanitizedTarget){
             messageContainer.style.display = 'flex';
         }
         messageInput.value = ``;
