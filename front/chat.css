@@ -1,3 +1,18 @@
+@font-face {
+    font-family: 'Gotham Narrow';
+    src: url('front/font/GothamNarrow-Book.otf') format('otf');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Gotham Narrow';
+    src: url('front/font/GothamNarrow-Book.otf') format('otf');
+    font-weight: bold;
+    font-style: normal;
+  }
+
+
 .bubble {
     position: fixed;
     bottom: 30px;
@@ -232,30 +247,32 @@
 }
 
 .message-person {
-    width: 100%;
-    height: 100%;
+    width: 290px;
+    height: 99%;
     overflow-y: auto;
+    overflow-x: hidden;
     flex-direction: column;
-    display: none; /* Assurez-vous que votre conteneur utilise flex */
+    display: none; 
 }
 
-.message-person::-webkit-scrollbar {
-}
 
 .message-person > :first-child {
-    margin-top: auto; /* Aligner le premier enfant en bas */
+    margin-top: auto; 
 }
 
 .message {
-    width: 60%;
-    margin: 10px 0;
-    display: flex;
-    align-items: flex-start; /* Aligne le contenu en haut pour que la hauteur grandisse vers le haut */
+    max-width: 60%;
+    margin-top: 10px;
+    display: inline-block; 
+    font-family: 'Gotham Narrow', sans-serif;
+    font-size: 13px;
     box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
-    padding: 10px;
+    padding: 5px 12px;
     word-wrap: break-word;
-    overflow-wrap: break-word;
-    flex-direction: column; /* Permet au paragraphe de prendre toute la largeur de la div */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto; 
+    box-sizing: border-box;
 }
 
 
@@ -263,28 +280,62 @@
     margin: 0;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    word-break: break-all; /* Assure que le texte reviendra à la ligne */
-    flex: 1; /* Prend tout l'espace disponible */
+    word-break: break-all;
+    flex: 1; 
 }
 
 .message span {
     font-size: 10px;
 }
 
+.message-person span {
+    font-size: 8px;
+}
+
+.message-container {
+    display: flex;
+    flex-direction: column;
+}
+
 .right-message {
     align-self: flex-start;
     margin-left: 5px;
-    background-color: #FFFFFF;
-    border-radius: 20px 20px 20px 0px;
+    background-color: #343434;
+    color: white;
+    border-radius: 20px 20px 20px 5px;
 }
 
 
 .left-message {
     align-self: flex-end;
     margin-right: 5px;
-    background-color: #343434;
-    color: white;
-    border-radius: 20px 20px 0px 20px;
+    background-color: #FFFFFF;
+    border-radius: 20px 20px 5px 20px;
+}
+
+.right-hour {
+    align-self: flex-start;
+    margin-left: 6px;
+    color: #000000ad;
+}
+
+.left-hour {
+    align-self: flex-end;
+    margin-right: 6px;
+    font-family: 'Gotham Narrow', sans-serif;
+    color: #000000ad;
+}
+
+.left-container {
+    display: flex;
+    gap: 1px;
+    align-items: flex-end;
+}
+
+.right-container {
+    display: flex;
+    gap: 1px;
+    align-items: flex-start;
 }
 
 .send-container {
@@ -301,7 +352,7 @@
     width: 70%;
     height: 70%;
     border-radius: 10px;
-    font-size: 18px;
+    font-size: 15px;
     padding: 10px;
     box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
 }
@@ -371,17 +422,37 @@
 
 
 .invite-button {
-    width: 90px;
-    height: 30px;
-    background-color: red;
-    color: white;
     cursor: pointer;
-    display: none;
     position: absolute;
-    right: 35px;
+    right: 40px;
     align-items: center;
     justify-content: center;
     border-radius: 5px;
+    font-size: 24px;
+}
+
+.invite-button::after {
+    content: "Invite player"; 
+    visibility: hidden; 
+    background-color: #6c6c6c; 
+    color: #fff;
+    font-size: 10px;
+    text-align: center; 
+    border-radius: 15px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 1;
+    right: 110%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s; 
+    white-space: nowrap;
+}
+
+.invite-button:hover::after {
+    visibility: visible; 
+    opacity: 1; 
 }
 
 .chatcpt {
@@ -396,3 +467,4 @@
     top: 7px;
     right: 20px;
 }
+
