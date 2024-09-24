@@ -16,6 +16,8 @@ A `Group` can be used as a private conversation between two `User` or a group co
 
 A `Message` has a `User` author, a `Group` related, a `date` (set automatically), a `body` and optionnaly can respond to another `Message`
 
+`date` format : `YYYY-MM-DDTHH:MM:SS.FFFFFF` or `%Y-%m-%dT%H:%M:%S.%f`
+
 ![schema of database architecture](https://raw.githubusercontent.com/notapainting/transcendence/main/img/doc/chat_db_schema_short.png)
 
 
@@ -208,6 +210,25 @@ Initiate a private conversation with another `User` if there wasn't already a pr
 	}
 }
 ```
+
+#### Read Notification
+
+`message.read`
+
+Notify `date` of last read message by `author` in `group`
+
+```json
+{
+	"type":"message.read",
+	"data":
+	{
+		"author":"SilverWolfe",
+		"group":"755b83ae-0cb9-461c-8639-b55ec589a6a5",
+		"date":"2024-05-15T12:02:01.005411"
+	}
+}
+```
+
 #### Message history
 
 `message.fetch`
@@ -220,6 +241,7 @@ Request last 20 message older than `date`
 	"data":
 	{
 		"author":"SilverWolfe",
+		"group":"755b83ae-0cb9-461c-8639-b55ec589a6a5",
 		"date":"2024-05-15T12:02:01.005411"
 	}
 }
