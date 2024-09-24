@@ -228,7 +228,7 @@ class RemoteGamer(LocalConsumer):
             del self.invited_by[author]
             data['by'] = True
         elif hasattr(self, "lobby"):
-            self.lobby.invitations.remove(author)
+            self.lobby.uninvite(author)
             data['by'] = False
         await self.send_json(data)
 
@@ -246,9 +246,9 @@ class RemoteGamer(LocalConsumer):
                 await self.lobby.cheat(data['author'])
             else:
                 logger.debug("match to rem")
-                await self.lobby.remove(data['author'])
                 if hasattr(self.lobby, "game_state"):
                     await self.lobby.end(cancelled=True)
+                await self.lobby.remove(data['author'])
                 self.set_mode()
             await self.send_json({"type":enu.Game.KICK})
         await self.send_json(data)
