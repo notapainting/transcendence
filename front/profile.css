@@ -3,6 +3,10 @@
   #profile {
     display: none;
     background-color: #0C3452;
+    background-image: url('img/bg.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
     color: white;
     height: 100vh;
 }
@@ -510,6 +514,10 @@ two factor */
 .history-container {
     height: 100vh;
     background-color: #0C3452;
+    background-image: url('img/bg.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
     display: none;
     flex-direction: column;
     justify-content: space-evenly;
@@ -521,11 +529,11 @@ two factor */
 .profile-history-container {
     height: 80%;
     width: 50%;
-    /* background-color: white; */
-    background-image: url('img/box-bg.png'); 
+    background-color: #262f53;
+    /* background-image: url('img/box-bg.png'); 
     background-size: cover; 
     background-position: center; 
-    background-repeat: no-repeat;
+    background-repeat: no-repeat; */
     border-radius: 10px;
     display: flex;
     flex-direction: column;
@@ -541,7 +549,7 @@ two factor */
     font-size: 32px;
     display: inline-block;
     padding: 20px 0;
-    color: #b277cf;
+    color: #aeb0ff;
 }
 
 

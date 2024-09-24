@@ -271,6 +271,10 @@
     font-size: 10px;
 }
 
+.message-person span {
+    font-size: 10px;
+}
+
 .right-message {
     align-self: flex-start;
     margin-left: 5px;
