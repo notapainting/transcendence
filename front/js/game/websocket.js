@@ -154,6 +154,7 @@ const _invitations = (content) => {
     };
     return false;
 }
+
 let timeout_asknext = null;
 const _match = (content) => {
     switch (content.type) {
@@ -233,7 +234,9 @@ const _tournament = (content) => {
 
 const messageHandler = (e) => {
     const content = JSON.parse(e.data);
-            if (_match(content) === false)
+	console.log("type: " + content.type)
+	console.log(content)
+	if (_match(content) === false)
         if (_invitations(content) === false)
             if (_game(content) === false)
                 if (_tournament(content) === false)
