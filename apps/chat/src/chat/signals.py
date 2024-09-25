@@ -18,7 +18,7 @@ def create_admin_user(sender, **kwargs):
     for user in enu.SpecialUser.values:
         if not User.objects.filter(name=user).exists():
             user = User.objects.create(name=user)
-            logger.info("Special user: {user} created")
+            logger.info(f"Special user: {user} created")
     
     if not User.objects.filter(name='islem').exists():
         user = User.objects.create(

@@ -107,6 +107,8 @@ const closeProfileDisplay = (event) => {
     }, 200)
 }
 
+export let permissionNotification = null;
+
 
 document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener('click', e => {
@@ -121,7 +123,12 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutButton.addEventListener("click", logoutRequest);
     logoutButtonMenu.addEventListener("click", logoutRequest);
     const notificationContainer = document.querySelector(".notification-container");
-
+    if ("Notification" in window) {
+        // Demande la permission à l'utilisateur
+        Notification.requestPermission().then(permission => {
+            permissionNotification = permission;
+        });
+      }
     document.querySelectorAll('.profile-menu-quit').forEach(elem => elem.addEventListener('click', () => {
         navigateTo('/')
     }));

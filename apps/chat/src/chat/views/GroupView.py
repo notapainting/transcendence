@@ -43,7 +43,7 @@ def _delete_helper(id):
     group = mod.Group.objects.get(id=id)
     group_data = ser.Group(group).data
     group.delete()
-    return group_data
+    return group_data['members']
 
 class GroupApiView(View):
     async def post(self, request, *args, **kwargs):
@@ -92,8 +92,9 @@ class GroupApiView(View):
             group_id = kwargs.get('id')
             members = await database_sync_to_async(_delete_helper)(group_id)
             for user in members:
+                logger.info(f"send to {user}")
                 await _channel_layer.group_send(user, {'type':enu.Event.Group.DELETE, 'data':str(group_id)})
-            logger.info("group %s, deleted", group_id)
+            logger.info("DELETE group %s", group_id)
             return HttpResponse(status=200)
         except (ValidationError, ObjectDoesNotExist):
             return HttpResponse(status=404)

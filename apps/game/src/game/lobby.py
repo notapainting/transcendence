@@ -265,7 +265,6 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
             await self.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Tournament.MATCH, "match":match, "state":self.game_state.to_dict()}})
 
     async def update_result(self, data):
-        await send_match_to_blockchain(self.id, self.game_state.result)
         if await super().update_result(data):
             if self.is_end():
                 await self.broadcast({"type":enu.Tournament.END, "winner":data['winner']})
@@ -398,6 +397,13 @@ class Tournament(RemoteLobby, BaseTournament):
 
     async def make_phase(self):
         await super().make_phase()
+        if hasattr(self, "chat_group_id"):
+            message = {
+                'author':'tournament',
+                'group':self.chat_group_id,
+                'body': f"New phase !!!!",
+            }
+            await httpx.AsyncClient().post(url='http://chat:8000/api/v1/messages/', data=JSONRenderer().render(message))
         for match in self.current:
             if match['host'] == self.host:
                 match['host'] = match['guest']
@@ -409,7 +415,7 @@ class Tournament(RemoteLobby, BaseTournament):
                 message = {
                     'author':'tournament',
                     'group':self.chat_group_id,
-                    'body': f"Waiting for {match['host']} VS {match['guest']}",
+                    'body': f"Waiting for:\n {match['host']} VS {match['guest']}",
                 }
                 await httpx.AsyncClient().post(url='http://chat:8000/api/v1/messages/', data=JSONRenderer().render(message))
 
@@ -426,18 +432,16 @@ class Tournament(RemoteLobby, BaseTournament):
                 data['winner'] = match['host']
                 data['loser'] = match['guest']
                 break
-        # self.current.remove(match)
-        logger.info(f"match is {match}")
-
         await self.remove(data['loser'])
-        await self.update_result(data)
+        if hasattr(data, "winner"):
+            await self.update_result(data, cheat=True)
         logger.info(f"current state : {self.players_state()}")
 
 
     async def next(self, user):
         pass
 
-    async def update_result(self, data):
+    async def update_result(self, data, cheat=False):
         await send_match_to_blockchain(self.id, data)
         if await super().update_result(data):
             if self.is_end():
@@ -447,7 +451,8 @@ class Tournament(RemoteLobby, BaseTournament):
                 await self.make_phase()
         else:
             await self._send(data['winner'], {"type":enu.Tournament.PHASE, "new":False})
-            await self._send(data['loser'], {"type":enu.Tournament.PHASE, "new":False})
+            if cheat is False:
+                await self._send(data['loser'], {"type":enu.Tournament.PHASE, "new":False})
 
     def players_state(self):
         return {"invited":self.invitations, "players":self.players, "host":self.host, "size":self.maxPlayer}
