@@ -216,6 +216,29 @@ const unblockUser = (target) => {
 }
 
 
+const addTournamentToMenu = (target, profile_picture, id = null) => {
+    const displayMenu = document.querySelector('.display-menu');
+    const personDiv = document.createElement('div');
+    personDiv.classList.add('person');
+    personDiv.setAttribute('data-username', target);
+    if (id){
+        personDiv.classList.add(id);
+    }
+    const picturePersonDiv = document.createElement('div');
+    picturePersonDiv.classList.add('picture-person');
+    picturePersonDiv.style.backgroundImage = `url(${profile_picture})`;
+    const descriptionPersonDiv = document.createElement('div');
+    descriptionPersonDiv.classList.add('description-person');
+    descriptionPersonDiv.innerHTML = `
+                                        <div class="username-status">
+                                            <h4 class="username-person">${target}</h4>
+                                        </div>
+                                     `;
+    personDiv.append(picturePersonDiv, descriptionPersonDiv);
+    displayMenu.insertBefore(personDiv, displayMenu.children[1]);
+    personDiv.removeEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
+    personDiv.addEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
+}
 
 
 function addUserToMenu(target, profile_picture, id = null) {
@@ -298,22 +321,36 @@ export async function fetchUsers(username = null) {
 }
 
 let createGroup = async (message) => {
-    if (message.name === '@'){
+    if (message.data.name === '@'){
         const target = message.data.members.find(person => person != whoIam);
         const personData = await fetchUsers(target);
         const profile_picture = personData.profile_picture;
         addUserToMenu(target, profile_picture, message.data.id);
         let messageContainer = document.getElementById(message.data.group);
+
         if (!messageContainer) {
             messageContainer = document.createElement('div');
             messageContainer.classList.add('message-person', `username-${target}`);
             messageContainer.setAttribute('id', message.data.id);
             document.querySelector('.messages').appendChild(messageContainer);
         }
+
         const newMessageDiv = document.createElement('div');
+        const newMessageHour = document.createElement('span');
+        const newMessageContainer = document.createElement('div');
+
+        newMessageContainer.classList.add('message-container', `${message.data.messages[0].author === whoIam ? 'left-container' : 'right-container'}`);
+
         newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
-        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
-        messageContainer.appendChild(newMessageDiv);
+        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p>`
+        newMessageContainer.appendChild(newMessageDiv);
+         
+        newMessageHour.classList.add(`${message.data.messages[0].author === whoIam ? 'left-hour' : 'right-hour'}`);
+        newMessageHour.textContent = formatDate(message.data.messages[0].date);
+        newMessageContainer.appendChild(newMessageHour);
+
+        messageContainer.appendChild(newMessageContainer);
+        
         const focusedPerson = document.querySelector('.person.focus');
         messageContainer.scrollTop = messageContainer.scrollHeight;
         if (focusedPerson.getAttribute('data-username') === target){
@@ -323,23 +360,25 @@ let createGroup = async (message) => {
     }
     else {
         const target = message.data.name;
+        const sanitizedTarget = target.replace(/\s+/g, '');
         const profile_picture = "/media/default_profile_picture.jpg";
-        addUserToMenu(target, profile_picture, message.data.id);
+        addTournamentToMenu(sanitizedTarget, profile_picture, message.data.id);
         let messageContainer = document.getElementById(message.data.group);
         if (!messageContainer) {
             messageContainer = document.createElement('div');
-            const sanitizedTarget = target.replace(/\s+/g, '');
             messageContainer.classList.add('message-person', `username-${sanitizedTarget}`);
             messageContainer.setAttribute('id', message.data.id);
             document.querySelector('.messages').appendChild(messageContainer);
         }
         const newMessageDiv = document.createElement('div');
+        console.log("BONJOUUUR");
+        console.log(message);
         newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
         newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
         messageContainer.appendChild(newMessageDiv);
         const focusedPerson = document.querySelector('.person.focus');
         messageContainer.scrollTop = messageContainer.scrollHeight;
-        if (focusedPerson.getAttribute('data-username') === target){
+        if (focusedPerson.getAttribute('data-username') === sanitizedTarget){
             messageContainer.style.display = 'flex';
         }
         messageInput.value = ``;
@@ -354,7 +393,7 @@ let receiveMessage = async (message) => {
     const newMessageDiv = document.createElement('div');
     const newMessageHour = document.createElement('span');
     const newMessageContainer = document.createElement('div');
-
+    
     newMessageContainer.classList.add('message-container', `${message.data.author === whoIam ? 'left-container' : 'right-container'}`);
 
     newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
@@ -367,7 +406,6 @@ let receiveMessage = async (message) => {
 
     messageContainer.appendChild(newMessageContainer);
 
-    const focusedPerson = document.querySelector('.person.focus');
     messageContainer.scrollTop = messageContainer.scrollHeight;
 
 }
