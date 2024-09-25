@@ -327,16 +327,30 @@ let createGroup = async (message) => {
         const profile_picture = personData.profile_picture;
         addUserToMenu(target, profile_picture, message.data.id);
         let messageContainer = document.getElementById(message.data.group);
+
         if (!messageContainer) {
             messageContainer = document.createElement('div');
             messageContainer.classList.add('message-person', `username-${target}`);
             messageContainer.setAttribute('id', message.data.id);
             document.querySelector('.messages').appendChild(messageContainer);
         }
+
         const newMessageDiv = document.createElement('div');
+        const newMessageHour = document.createElement('span');
+        const newMessageContainer = document.createElement('div');
+
+        newMessageContainer.classList.add('message-container', `${message.data.messages[0].author === whoIam ? 'left-container' : 'right-container'}`);
+
         newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
-        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
-        messageContainer.appendChild(newMessageDiv);
+        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p>`
+        newMessageContainer.appendChild(newMessageDiv);
+         
+        newMessageHour.classList.add(`${message.data.messages[0].author === whoIam ? 'left-hour' : 'right-hour'}`);
+        newMessageHour.textContent = formatDate(message.data.messages[0].date);
+        newMessageContainer.appendChild(newMessageHour);
+
+        messageContainer.appendChild(newMessageContainer);
+        
         const focusedPerson = document.querySelector('.person.focus');
         messageContainer.scrollTop = messageContainer.scrollHeight;
         if (focusedPerson.getAttribute('data-username') === target){
@@ -357,8 +371,6 @@ let createGroup = async (message) => {
             document.querySelector('.messages').appendChild(messageContainer);
         }
         const newMessageDiv = document.createElement('div');
-        console.log("BONJOUUUR");
-        console.log(message);
         newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
         newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
         messageContainer.appendChild(newMessageDiv);
@@ -379,7 +391,7 @@ let receiveMessage = async (message) => {
     const newMessageDiv = document.createElement('div');
     const newMessageHour = document.createElement('span');
     const newMessageContainer = document.createElement('div');
-
+    
     newMessageContainer.classList.add('message-container', `${message.data.author === whoIam ? 'left-container' : 'right-container'}`);
 
     newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
@@ -391,8 +403,6 @@ let receiveMessage = async (message) => {
     newMessageContainer.appendChild(newMessageHour);
 
     messageContainer.appendChild(newMessageContainer);
-
-    const focusedPerson = document.querySelector('.person.focus');
     messageContainer.scrollTop = messageContainer.scrollHeight;
 
 }
@@ -653,7 +663,7 @@ async function handleMessage(message) {
         })
     }
     else if (message.type === 'group.update'){
-        console.log(message.data);
+        // console.log(message.data);
         createGroup(message);
     }
     else if (message.type === 'message.text') {
@@ -815,12 +825,37 @@ const sendToWebSocket = (username, message) => {
 
 function sendMessage() {
     const message = messageInput.value.trim();
+    const inputField = document.getElementById('message-box');
+
+    inputField.value = '';
+
     if (message.length > 512)
-        return window.alert('Your message is to long (512 max)');
+    {
+        inputField.classList.add('input-error');
+        document.getElementById("messageInput").placeholder = "Message too long (512 max)";
+
+        setTimeout(() => {
+            document.getElementById("messageInput").placeholder = "Message...";
+        }, 1500);
+
+        setTimeout(() => {
+            inputField.classList.remove('input-error');
+        }, 500);
+    }
     if (!message) return;
     const focusedPerson = document.querySelector('.person.focus');
     if (!focusedPerson) {
-        alert('Please select a person to send the message to.');
+        inputField.classList.add('input-error');
+        document.getElementById("messageInput").placeholder = "Select a person first";
+
+        setTimeout(() => {
+            document.getElementById("messageInput").placeholder = "Message...";
+        }, 1500);
+
+        setTimeout(() => {
+            inputField.classList.remove('input-error');
+        }, 500);
+        messageInput.value = '';
         return;
     }
     const username = focusedPerson.getAttribute('data-username');
@@ -895,3 +930,5 @@ export const showChat = async () => {
     messageInput.removeEventListener("keydown", sendMessageEnter);
     messageInput.addEventListener("keydown", sendMessageEnter);
 }
+
+

@@ -262,7 +262,7 @@
         <div class="profile-navbar">
             <div class="link-profile link-settings focus-profile">Settings</div>
             <div class="link-profile link-history">Match History</div>
-        </div>     
+        </div>
         <div class="profile-container">
             <div class="my-profile-container">
                 <div class="my-profile">
@@ -312,7 +312,6 @@
                         <div class="profile-picture"></div>
                         <div class="upload-remove">
                             <button id="profile-btn-upload" class="profile-btn upload">UPLOAD</button>
-                            <button class="profile-btn remove">REMOVE</button>
                             <div id="picture-error-message" class="error-message" style="display: none;"></div>
                         </div>
                     </div>
@@ -377,7 +376,9 @@
         </div>
     </div>
     </div>
-    <div class="bubble"><i class="fa-solid fa-comment"></i><div class="chatcpt">5</div></div>
+    <div class="bubble"><i class="fa-solid fa-comment"></i>
+        <div class="chatcpt">5</div>
+    </div>
     <div class="chatbox">
         <i class="fa-sharp fa-solid fa-xmark close-chat"></i>
         <div class="left-hide"><i class="fa-sharp fa-solid fa-arrow-right"></i></div>
@@ -404,11 +405,25 @@
                 </span>
             </div>
             <div class="messages">
+                <div id="message-input-error" class="error-message" style="display: none;"> </div>
             </div>
             <div class="send-container">
-                <input type="text" id="message-input" class="message-input">
-                <div class="emoji-send">
-                    <i class="fa-solid fa-arrow-right chat-send"></i>
+                <div class="input-message-container">
+                    <div class="messageBox" id="message-box">
+                        <input class="message-input" required="" placeholder="Message..." type="text"
+                            id="messageInput" />
+                        <button id="sendButton" class="chat-send">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 664 663">
+                                <path fill="none"
+                                    d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888">
+                                </path>
+                                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="33.67"
+                                    stroke="#6c6c6c"
+                                    d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -420,7 +435,7 @@
 
 
         <div id="game-menu" class="video-background">
-            
+
             <div class="menu-element" id="menu-background"></div>
             <div class="menu-element" id="menu-transition"></div>
             <video autoplay muted loop class="menu-element" id="menu_bg_video"></video>
