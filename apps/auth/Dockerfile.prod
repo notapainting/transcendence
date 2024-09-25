@@ -5,6 +5,7 @@ ENV PYTHONUNBUFFERED 1
 
 COPY src/ /app
 COPY conf/ /conf/
+run apk add python3 py3-pip python3-dev musl-dev gcc libffi-dev openssl-dev make libc-dev bash linux-headers
 RUN pip install -r /conf/requirements.txt 
 
 WORKDIR /app
