@@ -327,16 +327,30 @@ let createGroup = async (message) => {
         const profile_picture = personData.profile_picture;
         addUserToMenu(target, profile_picture, message.data.id);
         let messageContainer = document.getElementById(message.data.group);
+
         if (!messageContainer) {
             messageContainer = document.createElement('div');
             messageContainer.classList.add('message-person', `username-${target}`);
             messageContainer.setAttribute('id', message.data.id);
             document.querySelector('.messages').appendChild(messageContainer);
         }
+
         const newMessageDiv = document.createElement('div');
+        const newMessageHour = document.createElement('span');
+        const newMessageContainer = document.createElement('div');
+
+        newMessageContainer.classList.add('message-container', `${message.data.messages[0].author === whoIam ? 'left-container' : 'right-container'}`);
+
         newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
-        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
-        messageContainer.appendChild(newMessageDiv);
+        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p>`
+        newMessageContainer.appendChild(newMessageDiv);
+         
+        newMessageHour.classList.add(`${message.data.messages[0].author === whoIam ? 'left-hour' : 'right-hour'}`);
+        newMessageHour.textContent = formatDate(message.data.messages[0].date);
+        newMessageContainer.appendChild(newMessageHour);
+
+        messageContainer.appendChild(newMessageContainer);
+        
         const focusedPerson = document.querySelector('.person.focus');
         messageContainer.scrollTop = messageContainer.scrollHeight;
         if (focusedPerson.getAttribute('data-username') === target){
@@ -379,7 +393,7 @@ let receiveMessage = async (message) => {
     const newMessageDiv = document.createElement('div');
     const newMessageHour = document.createElement('span');
     const newMessageContainer = document.createElement('div');
-
+    
     newMessageContainer.classList.add('message-container', `${message.data.author === whoIam ? 'left-container' : 'right-container'}`);
 
     newMessageDiv.classList.add('message', `${message.data.author === whoIam ? 'left-message' : 'right-message'}`);
@@ -392,7 +406,6 @@ let receiveMessage = async (message) => {
 
     messageContainer.appendChild(newMessageContainer);
 
-    const focusedPerson = document.querySelector('.person.focus');
     messageContainer.scrollTop = messageContainer.scrollHeight;
 
 }
