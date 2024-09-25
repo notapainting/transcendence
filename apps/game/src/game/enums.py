@@ -56,7 +56,7 @@ class Tournament(enum.StrEnum):
     PHASE   = "tournament.phase"
     MATCH   = "tournament.match"
     RESULT  = "tournament.result"
-    END  = "tournament.end"
+    END     = "tournament.end"
 
 
 
@@ -64,3 +64,9 @@ class CStatus(enum.StrEnum):
     IDLE    = "status.idle"
     HOST    = "status.host"
     GUEST   = "status.guest"
+
+class LobbyState(enum.Enum):
+    CREATED = 0
+    STARTED = 1
+    ENDED   = 2
+ 

@@ -199,7 +199,7 @@ class RemoteGamer(LocalConsumer):
         await self.send_json(data)
 
     async def invitation_accept(self, data):
-        logger.error(f"inv accp from: {data['author']}, ful {data}")
+        logger.error(f"{self.username} ({self.status}): inv accp from: {data['author']}, ful {data}")
         author = data['author']
         if author == self.username:
             return await self.send_json(data)
@@ -236,27 +236,23 @@ class RemoteGamer(LocalConsumer):
         if hasattr(self, "lobby"):
             await self.lobby.quit()
         await self.send_json(data)
-        # if data['author'] != self.username and hasattr(self, "host") and data['author'] == self.host:
-        #     self.set_mode()
-        #     if self.status != enu.Game.IDLE:
-        #         data = {'type':enu.Tournament.PHASE, "new":False, "kicked":True}
 
     async def game_quit(self, data):
-        if hasattr(self, "lobby") and not hasattr(self.lobby, "current"):
-            return await self.send_json(data)
-        await self.quit(False)
+        if hasattr(self, "lobby"):
+            if isinstance(self.lobby, Tournament):
+                if hasattr(self.lobby, "current") and data['author'] in self.lobby.players:
+                    logger.info(f"{self.username} ({self.status}): should cheat and make {data['author']} loose")
+                    await self.lobby.cheat(data['author'])
+                else:
+                    logger.info(f"{self.username} ({self.status}): should quietly remove {data['author']}")
+                    await self.lobby.remove(data['author'])
+            elif isinstance(self.lobby, Match):
+                await self.lobby.end(cancelled=True)
+                del self.lobby
+                self.set_mode()
+        else:
+            await self.set_mode()
         await self.send_json(data)
-        # if hasattr(self, "lobby"):
-        #     logger.info("before test")
-        #     if isinstance(self.lobby, Tournament):
-        #         logger.info(f"user {data['author']} quit tournament")
-        #         await self.lobby.cheat(data['author'])
-        #     else:
-        #         logger.info(f"user {data['author']} quit match")
-        #         if hasattr(self.lobby, "game_state"):
-        #             await self.lobby.end(cancelled=True)
-        #         await self.lobby.remove(data['author'])
-        #         self.set_mode()
 
 
     async def game_ready(self, data):
