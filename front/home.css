@@ -22,7 +22,7 @@ h2 {
     font-size: 40px;
 }
 
-input {
+/* input {
     outline: none;
     border: none;
     height: 30px;
@@ -36,7 +36,7 @@ input::placeholder {
 input:focus::placeholder {
     color: transparent; /* Placeholder transparent lorsque l'input est en focus */
 
-}
+/* } */ */
 
 .btn {
     border: none;

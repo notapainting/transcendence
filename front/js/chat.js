@@ -371,8 +371,6 @@ let createGroup = async (message) => {
             document.querySelector('.messages').appendChild(messageContainer);
         }
         const newMessageDiv = document.createElement('div');
-        console.log("BONJOUUUR");
-        console.log(message);
         newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
         newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
         messageContainer.appendChild(newMessageDiv);
@@ -405,7 +403,6 @@ let receiveMessage = async (message) => {
     newMessageContainer.appendChild(newMessageHour);
 
     messageContainer.appendChild(newMessageContainer);
-
     messageContainer.scrollTop = messageContainer.scrollHeight;
 
 }
@@ -666,7 +663,7 @@ async function handleMessage(message) {
         })
     }
     else if (message.type === 'group.update'){
-        console.log(message.data);
+        // console.log(message.data);
         createGroup(message);
     }
     else if (message.type === 'message.text') {
@@ -828,12 +825,37 @@ const sendToWebSocket = (username, message) => {
 
 function sendMessage() {
     const message = messageInput.value.trim();
+    const inputField = document.getElementById('message-box');
+
+    inputField.value = '';
+
     if (message.length > 512)
-        return window.alert('Your message is to long (512 max)');
+    {
+        inputField.classList.add('input-error');
+        document.getElementById("messageInput").placeholder = "Message too long (512 max)";
+
+        setTimeout(() => {
+            document.getElementById("messageInput").placeholder = "Message...";
+        }, 1500);
+
+        setTimeout(() => {
+            inputField.classList.remove('input-error');
+        }, 500);
+    }
     if (!message) return;
     const focusedPerson = document.querySelector('.person.focus');
     if (!focusedPerson) {
-        alert('Please select a person to send the message to.');
+        inputField.classList.add('input-error');
+        document.getElementById("messageInput").placeholder = "Select a person first";
+
+        setTimeout(() => {
+            document.getElementById("messageInput").placeholder = "Message...";
+        }, 1500);
+
+        setTimeout(() => {
+            inputField.classList.remove('input-error');
+        }, 500);
+        messageInput.value = '';
         return;
     }
     const username = focusedPerson.getAttribute('data-username');
@@ -908,3 +930,5 @@ export const showChat = async () => {
     messageInput.removeEventListener("keydown", sendMessageEnter);
     messageInput.addEventListener("keydown", sendMessageEnter);
 }
+
+
