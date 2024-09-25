@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED 1
 
 COPY src/ /app
 COPY conf/ /conf/
-RUN apk add gcc
+# RUN apk add gcc
 RUN pip install -r /conf/requirements.txt 
 
 WORKDIR /app

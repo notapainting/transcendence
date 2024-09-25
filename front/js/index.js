@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
             notificationContainer.style.display = "none";
         } else {
             notificationContainer.style.display = "flex";
+            
         }
     })
     window.scrollTo({
