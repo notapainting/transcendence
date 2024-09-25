@@ -6,17 +6,12 @@ const loader = new GLTFLoader();
 export var intro;
 export var bonus;
 export var malus;
-export var boost;
-export var mixer;
-export var clips;
 export var clipsBonus;
 export var clipsMalus;
-export var clipsBoost;
 
 export const loadData = {
 	mixerBonus: null,
-	mixerMalus: null,
-	mixerBoost: null
+	mixerMalus: null
   };
 
 loader.load('./models/scene.glb', function ( gltf ) {
@@ -26,14 +21,6 @@ loader.load('./models/scene.glb', function ( gltf ) {
     intro.position.set(0,0,-20);
     intro.scale.set(10, 10, 10); 
     intro.rotation.x += Math.PI / 2;
-
-	mixer = new THREE.AnimationMixer(intro);
-    clips = gltf.animations;
-    if (clips && clips.length) {
-        clips.forEach(function (clip) {
-            mixer.clipAction(clip).play();
-        });
-    }
 
 	gltf.scene.traverse( function ( child ) {
 		if ( child.isMesh ) {
@@ -81,24 +68,6 @@ loader.load('./models/effectMalus.glb', function ( gltf ) {
     if (clipsMalus && clipsMalus.length) {
         clipsMalus.forEach(function (clip) {
             loadData.mixerMalus.clipAction(clip).play();
-        });
-    }
-}, undefined, function ( error ) {
-	console.error( error );
-} );
-
-loader.load('./models/boost2.glb', function ( gltf ) {
-
-    boost = gltf.scene;
-
-    boost.position.set(10,10,0);
-    boost.scale.set(7, 7, 7);
-
-	loadData.mixerBoost = new THREE.AnimationMixer(boost);
-    clipsBoost = gltf.animations;
-    if (clipsBoost && clipsBoost.length) {
-        clipsBoost.forEach(function (clip) {
-            loadData.mixerBoost.clipAction(clip).play();
         });
     }
 }, undefined, function ( error ) {

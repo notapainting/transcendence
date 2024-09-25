@@ -25,14 +25,10 @@ export async function animate() {
 	// models animation
     if (gameData.sceneHandler == 1)
     {
-        if (load.mixer)
-            load.mixer.update(0.01);
         if (loadData.mixerBonus)
             loadData.mixerBonus.update(0.01);
         if (loadData.mixerMalus)
             loadData.mixerMalus.update(0.01); 
-        if (loadData.mixerBoost)
-            loadData.mixerBoost.update(0.01); 
     }
 
 	if (gameData.sceneHandler === 1)
