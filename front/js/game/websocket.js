@@ -8,6 +8,7 @@ import * as utils from './utils.js';
 import { composer } from './game.js';
 import { isUserAuthenticated } from '../index.js';
 import { fetchUsers } from '../chat.js';
+import { incrDecrNotifNumber } from '../chat.js';
 
 function updateTimer() {
     gameData.elapsedTime += 1;
@@ -23,7 +24,7 @@ export const initGameWebSocket = (path) => {
     _initWebsocket(path)
 }
 
-const _initWebsocket = async (path) => { 
+const _initWebsocket = async (path) => {
     if (gameSocket !== null) return;
     await isUserAuthenticated();
     gameSocket = new WebSocket(
@@ -33,7 +34,7 @@ const _initWebsocket = async (path) => {
     );
     gameSocket.onmessage = messageHandler;
     gameSocket.onclose = function (e) {
-                moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
+        moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
         if (path === enu.backendPath.REMOTE) setTimeout(_initWebsocket, 5000, path);
         gameSocket = null;
         clearListInvitation();
@@ -90,7 +91,7 @@ const _game = (content) => {
 const _invitations = (content) => {
     const inputField = document.getElementById('game-menu-input-player');
     const errorMessage = document.getElementById('input-error-message');
-    
+
     inputField.value = '';
     errorMessage.style.display = 'none';
 
@@ -109,19 +110,19 @@ const _invitations = (content) => {
             setTimeout(() => {
                 errorMessage.style.display = 'none';
             }, 1500);
-    
+
             setTimeout(() => {
                 inputField.classList.remove('input-error');
             }, 500);
 
             return true;
         case enu.Invitation.ACCEPT:
-                        const message = content.message;  
+            const message = content.message;
             const listItems = document.querySelectorAll('.list-tournoi-element');
-        
+
             listItems.forEach(li => {
                 const userNameDiv = li.querySelector('.list-tournoi-user-name');
-                
+
                 if (userNameDiv && userNameDiv.textContent.trim() === message) {
                     const typingIndicator = li.querySelector('.typing-indicator');
                     if (typingIndicator) {
@@ -133,15 +134,15 @@ const _invitations = (content) => {
             if (content.mode === enu.Game.MATCH) {
                 if (content.by === false) {
                     let target = 'invite-status-' + content.message;
-    
+
                     document.getElementById(target).parentElement.remove();
-                } 
+                }
                 changeGameStatus(enu.gameMode.MATCH);
                 moveTo(enu.sceneIdx.PREMATCH);
                 announceMatch(content.players);
             } else if (getGameStatus() === enu.gameMode.TOURNAMENT) {
                 updateStatusInvitation(content.author)
-            } else if (content.mode === enu.Game.TRN){
+            } else if (content.mode === enu.Game.TRN) {
                 moveTo(enu.sceneIdx.WAITING)
                 changeGameStatus(enu.gameMode.TOURNAMENT);
             }
@@ -184,7 +185,7 @@ const _match = (content) => {
             document.addEventListener('keyup', bindKeyRelease)
             // content.message.x = 40;
             gameData.start = false;
-                        game.gameRenderer(content.message);
+            game.gameRenderer(content.message);
             startMatch();
             return true;
         case enu.Match.UPDATE:
@@ -209,7 +210,7 @@ const _match = (content) => {
 const _tournament = (content) => {
     switch (content.type) {
         case enu.Tournament.PHASE:
-                        if (timeout_asknext !== null) {
+            if (timeout_asknext !== null) {
                 clearTimeout(timeout_asknext);
                 timeout_asknext = null;
             }
@@ -239,9 +240,9 @@ const _tournament = (content) => {
 
 const messageHandler = (e) => {
     const content = JSON.parse(e.data);
-	console.log("type: " + content.type)
-	console.log(content)
-	if (_match(content) === false)
+    console.log("type: " + content.type)
+    console.log(content)
+    if (_match(content) === false)
         if (_invitations(content) === false)
             if (_game(content) === false)
                 if (_tournament(content) === false)
@@ -299,7 +300,7 @@ const updateListInvitation = async (user) => {
     const button = document.createElement('button');
     const itemStatus = document.createElement('span');
     const itemPic = await fetchUsers(user);
-            item.className = 'list-tournoi-element';
+    item.className = 'list-tournoi-element';
     itemPicture.className = 'list-tournoi-user-pic';
     // itemPicture.src = '../../img/anon.jpg'; // a remplacer !!!! (par la vrai foto)
     itemPicture.src = itemPic.profile_picture;
@@ -353,6 +354,8 @@ export const clearListInvitation = () => {
 }
 
 function updateListInvitedBy(mode, user) {
+    const notificationContainer = document.querySelector(".notification-container");
+
     if (mode === enu.Game.MATCH) {
         var typeGame = "invitationTypeMatch";
         var containerClass = "invitationTypeContainerMatch";
@@ -375,9 +378,17 @@ function updateListInvitedBy(mode, user) {
     itemStatusContainer.className = "invitationTypeContainer " + containerClass + " " + typeGame;
     itemStatus.className = typeClass;
     itemName.textContent = user;
-    acceptButton.textContent = 'Accepter';
+    acceptButton.textContent = 'Accept';
     acceptButton.className = 'accept-button';
     refuseButton.className = 'remove-button';
+
+    const notifDiv = document.createElement('div');
+    const notifText = document.createElement('p');
+    const notifDelete = document.createElement('i');
+
+    notifDiv.className = 'notif';
+    notifText.textContent = user + " invited you to play";
+    notifDelete.className = "fa-solid fa-xmark";
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', '0 0 448 512');
@@ -404,14 +415,24 @@ function updateListInvitedBy(mode, user) {
             'type': enu.Invitation.REJECT,
             'message': user
         }));
-
     });
+
+    notifDelete.addEventListener('click', (e) => {
+        e.target.parentElement.remove();
+        incrDecrNotifNumber("decrement", -1);
+    });
+
     itemStatusContainer.appendChild(itemStatus);
     item.appendChild(itemStatusContainer);
     item.appendChild(itemName);
     item.appendChild(acceptButton);
     refuseButton.appendChild(svg);
     item.appendChild(refuseButton);
+
+    notifDiv.appendChild(notifText);
+    notifDiv.appendChild(notifDelete);
+    notificationContainer.appendChild(notifDiv);
+    incrDecrNotifNumber("increment", 1);
 
     document.getElementById('game-menu-invitationList').appendChild(item);
 
@@ -428,18 +449,15 @@ const updateStatusInvitation = (user) => {
 
 const warnErrorInvitation = (error) => {
     const errorMessage = document.getElementById('input-error-message');
-    if (error === enu.Error.FBD_403)
-    {
+    if (error === enu.Error.FBD_403) {
         console.warn("FORBIDDEN");
         errorMessage.textContent = 'Stop being a creep. You are blocked.';
-    } 
-    else if (error === enu.Error.NTF_404) 
-    {
+    }
+    else if (error === enu.Error.NTF_404) {
         console.warn("USER NOT FOUND");
         errorMessage.textContent = 'User not found';
-    } 
-    else if (error === enu.Error.ABSENT)
-    {
+    }
+    else if (error === enu.Error.ABSENT) {
         console.warn("USER ABSENT");
         errorMessage.textContent = 'User not connected';
     }
