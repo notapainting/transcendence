@@ -800,6 +800,21 @@ ul {
     background-color: #8093f1;
 }
 
+.remove-button2 {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 50px; 
+  background-color: #f12525;
+  color: #421010;
+  cursor: pointer;
+  margin-right: 5px;
+  display: inline-block; 
+}
+
+.remove-button2:hover {
+  background-color: #f75555;
+}
+
 .remove-button {
     width: 28px;
     height: 28px;

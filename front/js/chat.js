@@ -456,8 +456,12 @@ const displayHistoryConversations = async (id, person, message, personList) => {
 
 const notificationContainer = document.querySelector(".notification-container");
 
-const incrDecrNotifNumber = (mode) => {
+export const incrDecrNotifNumber = (mode, num) => {
     const notifSpan =  document.querySelector(".cpt");
+    if (num === 1)
+        cpt++;
+    if (num === -1)
+        cpt--;
     if (mode === "increment"){
         if (cpt > 0){
             notifSpan.style.backgroundColor = "red"
@@ -510,13 +514,13 @@ const fillNotification = () => {
             declineButton.addEventListener("click", () => {
                 notifElem.remove();
                 cpt--;
-                incrDecrNotifNumber("decrement");
+                incrDecrNotifNumber("decrement", 0);
             })
             btnContainer.append(acceptButton, declineButton);
             notifElem.appendChild(btnContainer);
             notificationContainer.appendChild(notifElem);
         })
-        incrDecrNotifNumber("increment");
+        incrDecrNotifNumber("increment", 0);
     }
 }
 
