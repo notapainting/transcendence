@@ -503,6 +503,7 @@ pause.addEventListener('click', () => {
 const quitFunc = () => {
     updateRequested.forEach(req => {clearTimeout(req[1]);});
     clearInvitationList();
+    document.getElementById('bracket-disable-image').innerHTML = '';
     if (anon === true) {
         if (idx == enu.sceneIdx.CREATION) {
             if (gameSocket !== null) gameSocket.close();
