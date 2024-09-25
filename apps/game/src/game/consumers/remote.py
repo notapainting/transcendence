@@ -83,6 +83,7 @@ class RemoteGamer(LocalConsumer):
 
 
     def set_mode(self, status=None, host=None):
+        logger.info(f"{self.username} ({self.status}): setmode with s:{status}, l:{self.loopback}")
         if status == None:
             if hasattr(self, "loopback_host"):
                 self.host = self.loopback_host
@@ -199,18 +200,18 @@ class RemoteGamer(LocalConsumer):
         await self.send_json(data)
 
     async def invitation_accept(self, data):
-        logger.error(f"{self.username} ({self.status}): inv accp from: {data['author']}, ful {data}")
+        logger.error(f"{self.username} ({self.status}): inv accp from: {data['author']}, full {data}")
         author = data['author']
         if author == self.username:
             return await self.send_json(data)
-        if self.status == enu.Game.IDLE:
+        if self.status == enu.Game.IDLE and author in self.invited_by:
             data['mode'] = self.invited_by[author]
             data['by'] = True
             await self.send_json(data)
             self.host = author
             self.set_mode(status=enu.Game.GUEST)
             del self.invited_by[author]
-        else:
+        elif hasattr(self, "lobby"):
             if self.lobby.invited(author) and await self.lobby.add(author):
                 data['players'] = self.lobby.players
                 data['by'] = False

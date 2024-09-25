@@ -54,9 +54,14 @@ export const startMatch = () => {
 }
 
 const _game = (content) => {
+
     switch (content.type) {
         case enu.Game.QUIT:
-            // if (getSceneIdx() === enu.sceneIdx.PREMATCH) moveTo(enu.WELCOME);
+            try {
+                const target = document.getElementById('invite-status-' + content.author);
+                target.parentElement.remove();
+            }
+            catch (error) {}
             return true;
         case enu.Game.START:
             // ?
