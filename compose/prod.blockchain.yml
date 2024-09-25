@@ -10,8 +10,6 @@ services:
     image: blockchain_image_prod
     env_file:
       - conf/blockchain.env
-    volumes:
-      - blockchain_volume:/app
     networks:
       - blockchain_network
     restart: unless-stopped

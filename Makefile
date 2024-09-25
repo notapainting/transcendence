@@ -44,13 +44,24 @@ ${DIR_ENV_FILE}%.env:	${DIR_ENV_FILE}%.template
 	@cp $< $@
 	@echo "Generate new  $@ file!"
 
+UNAME_S := $(shell uname -s)
+
 mode-dev:
-	@sed -i 's/MODE=prod/MODE=dev/g' conf/Makefile.var
-	@echo "Switch to DEV mode, please build and run accordly"
+ifeq ($(UNAME_S), Linux)
+	@sed -i 's/MODE=prod/MODE=dev/g' conf/var.mk
+else ifeq ($(UNAME_S), Darwin)
+	@sed -i '' 's/MODE=prod/MODE=dev/g' conf/var.mk
+endif
+	@echo "Switched to DEV mode, please build and run accordingly."
 
 mode-prod:
-	@sed -i 's/MODE=dev/MODE=prod/g' conf/Makefile.var
-	@echo "Switch to PROD mode, please build and run accordly"
+ifeq ($(UNAME_S), Linux)
+	@sed -i 's/MODE=dev/MODE=prod/g' conf/var.mk
+else ifeq ($(UNAME_S), Darwin)
+	@sed -i '' 's/MODE=dev/MODE=prod/g' conf/var.mk
+endif
+	@echo "Switched to PROD mode, please build and run accordingly."
+
 
 vmmax:
 	@if [ "$$(uname)" = "Linux" ]; then \
