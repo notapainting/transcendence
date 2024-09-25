@@ -462,8 +462,9 @@
     height: 20px;
     background-color: red;
     border-radius: 50%;
-    display: flex;
+    display: none;
     align-items: center;
+    font-size: 12px;
     justify-content: center;
     top: 7px;
     right: 20px;

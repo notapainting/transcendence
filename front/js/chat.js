@@ -379,12 +379,19 @@ let createGroup = async (message) => {
         if (focusedPerson.getAttribute('data-username') === sanitizedTarget){
             messageContainer.style.display = 'flex';
         }
+        if (Notification.permission === 'granted') {
+            const notification = new Notification("Tournament", {
+                body: `${message.data.name}`,
+              });
+        }  
         messageInput.value = ``;
     }
 }
 
 let notifChatCpt = 0;
 let notifChat = document.querySelector(".chatcpt");
+
+import { permissionNotification } from "./index.js";
 
 let receiveMessage = async (message) => {
     let messageContainer = document.getElementById(message.data.group);
