@@ -776,7 +776,7 @@ function displaySearchResults(users) {
     searchResults.innerHTML = '';
     if (users.length > 0) {
         users.forEach(user => {
-            if (user.username === whoIam)
+            if (user.username === whoIam || user.username === "admin")
                 return ;
             const userDiv = document.createElement('div');
             userDiv.classList.add('result-item');

@@ -273,7 +273,6 @@ const loginRequest = (event) => {
     })
 }
 
-
 const registerRequest = (event) => {
     const dataSend = {
         email: homeEmailInput.value,
@@ -430,18 +429,12 @@ export const showHome = async () => {
     document.removeEventListener('wheel', scrollDownEffect);
     document.addEventListener('mousemove', parallaxEffect);
     document.addEventListener('wheel', scrollDownEffect);
-//     playOfflineBtnElement.removeEventListener("click", scrollUpEffect)
-//     playOnlineBtnElement.removeEventListener("click", smoothSroll)
-//     playOfflineBtnElement.addEventListener("click", scrollUpEffect)
-//     playOnlineBtnElement.addEventListener("click", smoothSroll)
     document.removeEventListener("click", switchForm);
-
     document.addEventListener("click", switchForm);
     document.querySelector(".close-two-factor-login").removeEventListener("click", closeTwoFactorLogin)
     homeFormButton.removeEventListener("click", loginOrRegisterRequest)
     document.querySelector(".login-42").removeEventListener('click', authenticateWith42);
     document.querySelector(".close-two-factor-login").addEventListener("click", closeTwoFactorLogin)
-    
     homeFormButton.addEventListener("click", loginOrRegisterRequest)
     document.querySelector(".login-42").addEventListener('click', authenticateWith42);
 } 

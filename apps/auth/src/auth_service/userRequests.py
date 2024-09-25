@@ -24,6 +24,7 @@ class UpdateProfilePicture(APIView):
 		else:
 			return Response({"error": "No profile picture provided"}, status=status.HTTP_400_BAD_REQUEST)
 
+from requests.exceptions import HTTPError
 class UpdateClientInfo(APIView):
 	authentication_classes = [JWTAuthentication]
 	def put(self, request, *args, **kwargs):
@@ -33,7 +34,12 @@ class UpdateClientInfo(APIView):
 		try:
 			request.data['unique_id'] = user.unique_id
 			update_response = requests.put('http://user:8000/update_client/', json=request.data, verify=False)
-			update_response.raise_for_status()  
+			update_response.raise_for_status()
+		except HTTPError as http_err:
+			if update_response.status_code == 400:
+				return Response({"error": "Email incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				return Response({"error": f"HTTP error occurred: {str(http_err)}"}, status=update_response.status_code) 
 		except requests.exceptions.RequestException as e:
 			return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 		data = request.data

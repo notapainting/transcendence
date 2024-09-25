@@ -55,11 +55,12 @@ let displayUserInformations = (data) => {
     
 };
 
+const errorMessage = document.getElementById('picture-error-message');
+
 const updateProfilePicture = () => {
     const selectedFile = fileInput.files[0];
     const formData = new FormData();
     const inputField = document.getElementById('profile-btn-upload');
-    const errorMessage = document.getElementById('picture-error-message');
     formData.append("profile_picture", selectedFile);
 
     inputField.value = '';
@@ -146,10 +147,17 @@ let updateUserInfosRequest = async () => {
         window.location.reload();
     })
     .catch(error => {
-                console.error('Erreur lors de la mise à jour des informations de l\'utilisateur:', error);
-        inputField.classList.add('input-error');
+        const btnModify = document.querySelector(".modify");
+        btnModify.classList.add('input-error');
+        errorMessage.textContent = 'Invalid email format';
+        errorMessage.style.display = 'block';
+
         setTimeout(() => {
-            inputField.classList.remove('input-error');
+            errorMessage.style.display = 'none';
+        }, 1500);
+
+        setTimeout(() => {
+            btnModify.classList.remove('input-error');
         }, 500);
     });
 }
