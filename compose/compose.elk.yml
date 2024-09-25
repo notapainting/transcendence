@@ -37,8 +37,8 @@ services:
          "CMD-SHELL", 
          "[ -f config/certs/elasticsearch/elasticsearch.crt ]"
        ]
-     interval: 1s
-     timeout: 5s
+     interval: 20s
+     timeout: 40s
      retries: 120
    networks:
     - app_network
@@ -88,10 +88,10 @@ services:
      test:
        [
          "CMD-SHELL",
-         "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+         "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'"
        ]
-     interval: 10s
-     timeout: 10s
+     interval: 20s
+     timeout: 40s
      retries: 120
    networks:
     - app_network
@@ -103,6 +103,8 @@ services:
    container_name: kibana
    depends_on:
      elasticsearch:
+       condition: service_healthy
+     setup:
        condition: service_healthy
    build:
      context: ./elk/kibana

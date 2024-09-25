@@ -22,7 +22,12 @@ async def register_match(request):
             loser_score = data['score_l']
 
             loop = asyncio.get_running_loop()
+
+            await asyncio.sleep(5)
+            
             await loop.run_in_executor(None, record_match_on_blockchain, tournament_id, winner, loser, winner_score, loser_score)
+            
+            await asyncio.sleep(5)
 
             return JsonResponse({'status': 'success', 'message': 'Match enregistré sur la blockchain.'})
 
