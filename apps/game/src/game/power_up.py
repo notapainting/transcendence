@@ -18,9 +18,7 @@ class PowerUpManager:
         self.reducingL = False
         self.maximizeR = False
         self.maximizeL = False
-        # self.rand_bonus = ['longPaddle', 'boost']
         self.rand_bonus = ['longPaddle']
-        # self.rand_malus = ['slow', 'shortPaddle', 'invertedKey']
         self.rand_malus = ['slow', 'shortPaddle']
         self.rand_effect = ['hurricane', 'earthquake', 'glitch']
         self.p1 = {'x': -45, 'y': -25}
@@ -223,13 +221,3 @@ class PowerUpManager:
         if self.randB == 'boost' and data['playerBonus'] == 1:
             self.randB = 'boostL'
             self.bonusStartTime = self.timer.time()
-        
-        # if self.randB == 'boostR':
-            # elapsed_time = self.timer.time() - self.bonusStartTime
-            # if elapsed_time >= 10:
-            #     data['paddleSpeedR'] = 1.2
-        
-        # if self.randB == 'boostL':
-        #     elapsed_time = self.timer.time() - self.bonusStartTime
-        #     if elapsed_time >= 10:
-        #         data['paddleSpeedL'] = 1.2 

@@ -2,15 +2,11 @@
 
 from channels.db import database_sync_to_async
 
-from django.core.exceptions import ObjectDoesNotExist
-from channels.exceptions import DenyConnection
 from rest_framework.serializers import ValidationError as DrfValidationError
 
 import chat.serializers.db as ser
 import chat.serializers.events as event
-import chat.models as mod
 import chat.enums as enu
-import chat.utils as uti
 
 async def validate_data(username, data):
     type = data.get('type', None)

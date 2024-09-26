@@ -19,7 +19,7 @@ ALLOWED_HOSTS = ['*']
 
 APPEND_SLASH = False
 
-DEBUG = False
+DEBUG = os.getenv('DJANGO_DEBUG', False)
 
 INSTALLED_APPS = [
     'daphne',

@@ -3,16 +3,12 @@ from django.http import  HttpResponse
 from django.views import View
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
-from rest_framework.exceptions import ParseError
 
 from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
 
-import chat.serializers.db as ser
-import chat.serializers.events as event
 import chat.models as mod
 import chat.utils as uti
-import chat.enums as enu
 
 from logging import getLogger
 logger = getLogger('base')

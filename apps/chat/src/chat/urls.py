@@ -1,7 +1,6 @@
 # chat/urls.py
 
 from django.urls import path, include
-from django.views.generic.base import RedirectView 
 
 from chat.views.UserViews import UserApiView
 from chat.views.GroupView import GroupApiView

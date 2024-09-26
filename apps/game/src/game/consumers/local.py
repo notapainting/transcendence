@@ -1,6 +1,5 @@
 # game/consumers/local.py
 
-import random, asyncio
 import game.enums as enu
 
 from game.consumers.base import BaseConsumer
@@ -56,7 +55,7 @@ class LocalConsumer(BaseConsumer):
             case enu.Game.QUIT:
                 await self.lobby.end()
             case _:
-                logger.warn(f"local bad type")
+                logger.warning(f"local bad type")
 
     async def game_relay(self, data):
         await self.send_json(data["relay"])
