@@ -61,7 +61,7 @@ class RemoteGamer(LocalConsumer):
     async def disconnect(self, close_code):
         if self.username is not None:
             await self.channel_layer.group_discard(self.username, self.channel_name)
-        await self.quit()
+        await self.quit(smooth=False)
         for invitor in self.invited_by:
             await self.send_cs(invitor, {'type':enu.Invitation.REJECT})
         plaza.leave(self.username)
