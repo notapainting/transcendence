@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { EffectComposer } from "https:
-import { RenderPass } from "https:
-import { OrbitControls } from 'https:
+import { EffectComposer } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/RenderPass.js";
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
 
 import { animationData } from './animation.js';
 import { animate } from './animation.js';

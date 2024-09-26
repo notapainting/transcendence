@@ -747,7 +747,7 @@ let flg = 0;
 export async function initializeWebSocket() {
     flg = 1;
     await isUserAuthenticated();
-    socket = new WebSocket('wss:
+    socket = new WebSocket('wss://' + host + '/chat/');
 
     socket.onopen = function() {
             };

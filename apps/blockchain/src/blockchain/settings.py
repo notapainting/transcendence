@@ -31,6 +31,7 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = []
 
+ASGI_APPLICATION = "blockchain.asgi.application"
 
 LOGGING = {
     "version": 1,
