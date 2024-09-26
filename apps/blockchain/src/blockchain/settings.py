@@ -21,6 +21,9 @@ APPEND_SLASH = False
 
 DEBUG = False
 
+INSTALLED_APPS = [
+    'daphne',
+]
 
 MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",

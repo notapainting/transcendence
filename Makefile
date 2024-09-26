@@ -24,7 +24,6 @@ fclean:
 re:	fclean up-fg
 
 init: ${ENV_FILE} vmmax 
-	${CMP} build
 
 
 

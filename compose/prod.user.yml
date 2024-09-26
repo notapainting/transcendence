@@ -9,6 +9,8 @@ services:
       - TZ=${TZ}
     env_file:
       - conf/user.env
+    volumes:
+      - user-media_volume:/app
     networks:
       - app_network
     restart: unless-stopped
@@ -42,4 +44,8 @@ services:
 volumes:
   user-db_volume:
     name: user-db_volume
+    driver: local
+
+  user-media_volume:
+    name: user-media_volume
     driver: local
