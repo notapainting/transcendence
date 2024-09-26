@@ -64,7 +64,7 @@ class UpdateClientInfo(APIView):
 				user.profile_picture.delete(save=False)
 				user.profile_picture.save(f"{user.username}.jpg", value, save=True)
 				user.save()
-				return Response({"message": "User information updated successfully"}, status=status.HTTP_200_OK)
+				return Response({"message": "User information updated successfully", "data": user.profile_picture.url}, status=status.HTTP_200_OK)
 		if serializer.is_valid():
 			serializer.save()
 			return Response({"message": "User information updated successfully"}, status=status.HTTP_200_OK)

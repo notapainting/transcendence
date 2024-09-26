@@ -20,7 +20,7 @@ class UpdateProfilePicture(APIView):
 				update_response.raise_for_status()
 			except requests.exceptions.RequestException as e:
 				return Response({"error": f"Failed to update user information: {str(e)}"}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-			return Response({"message": "Profile picture updated successfully"}, status=status.HTTP_200_OK)
+			return Response(update_response.json(), status=status.HTTP_200_OK)
 		else:
 			return Response({"error": "No profile picture provided"}, status=status.HTTP_400_BAD_REQUEST)
 

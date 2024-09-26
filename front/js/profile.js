@@ -73,7 +73,15 @@ const updateProfilePicture = () => {
     })
     .then(response => {
         if (response.ok) {
-                window.location.reload();
+            errorMessage.textContent = 'Picture updated!';
+            errorMessage.style.color = 'green';
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+                errorMessage.style.color = 'red';
+            }, 1500);
+            console.log(response);
+            return response.json();
         } else {
             inputField.classList.add('input-error');
             errorMessage.textContent = 'Invalid profile picture';
@@ -88,6 +96,9 @@ const updateProfilePicture = () => {
             }, 500);
             throw new Error("Erreur lors de la mise à jour de l'image de profil !");
         }
+    })
+    .then(data => {
+        document.querySelector(".profile-picture").style.backgroundImage = `url(${data.data})`;
     })
     .catch(error => {
         console.error(error);
@@ -144,7 +155,13 @@ let updateUserInfosRequest = async () => {
         }
     })
     .then(data => {
-        window.location.reload();
+        errorMessage.textContent = 'Informations updated!';
+            errorMessage.style.color = 'green';
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+                errorMessage.style.color = 'red';
+            }, 1500);
     })
     .catch(error => {
         const btnModify = document.querySelector(".modify");
@@ -213,9 +230,9 @@ const confirm2FaRequest = async (event) => {
     })
     .then(response => response.json())
     .then(data => {
-                if (data.success){
+        if (data.success){
             closeTwoFactorActivate();
-            window.location.reload();
+            twoFactorButton.style.display = 'none';
         }
 
     })

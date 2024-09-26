@@ -388,7 +388,6 @@ export let logoutRequest = (event) => {
     .then(response => {
         if (response.ok) {
             navigateTo("/");
-            window.location.reload();
             
         } else {
         }
