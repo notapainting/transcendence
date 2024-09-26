@@ -7,7 +7,7 @@ from game.consumers.local import LocalConsumer
 import game.enums as enu
 
 from game.lobby import Match, Tournament, LocalTournament, getDefault, LobbyException
-from game.plaza import plaza, PlazaException
+from game.plaza import plaza, PlazaNotFound
 from game.gamestate import getDefaultState
 
 from logging import getLogger
@@ -44,7 +44,7 @@ class RemoteGamer(LocalConsumer):
     async def dispatch(self, message):
         try :
             await super().dispatch(message)
-        except PlazaException:
+        except PlazaNotFound:
             await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.NTF_404})
         except BaseException:
             raise 
@@ -177,22 +177,38 @@ class RemoteGamer(LocalConsumer):
             case enu.Game.NEXT: logger.info(f"PING: {self.username} ({self.status})")
 
     async def mode_playing_match_host(self, data):
-        match data['type']:
-            case enu.Game.READY :
-                await self.lobby.check(self.username)
-                if self.lobby.checked():
-                    await self.lobby.start()
-            case enu.Match.UPDATE :
-                data['message'] = format_paddle_key(True, data['message'])
-                await self.lobby.match_feed(data)
-            case enu.Match.PAUSE :
-                await self.lobby.match_pause(self.username)
-            case enu.Game.NEXT: await self.send_json(data)
+        if data['type'] == enu.Match.UPDATE:
+            data['message'] = format_paddle_key(True, data['message'])
+            await self.lobby.match_feed(data)
+        elif data['type'] == enu.Match.PAUSE:
+            await self.lobby.match_pause(self.username)
+        elif data['type'] == enu.Game.READY:
+            await self.lobby.check(self.username)
+            if self.lobby.checked():
+                await self.lobby.start()
+        elif data['type'] == enu.Game.NEXT:
+            await self.send_json(data)
+
+        # match data['type']:
+            # case enu.Game.READY :
+            #     await self.lobby.check(self.username)
+            #     if self.lobby.checked():
+            #         await self.lobby.start()
+            # case enu.Match.UPDATE :
+            #     data['message'] = format_paddle_key(True, data['message'])
+            #     await self.lobby.match_feed(data)
+            # case enu.Match.PAUSE :
+            #     await self.lobby.match_pause(self.username)
+            # case enu.Game.NEXT: await self.send_json(data)
 
     async def mode_playing_match_guest(self, data):
-        match data['type']:
-            case enu.Match.UPDATE | enu.Match.RESUME | enu.Match.PAUSE | enu.Game.READY: await self.send_cs(self.host, data)
-            case enu.Game.NEXT: await self.send_json(data)
+        if data['type'] == enu.Match.UPDATE or data['type'] == enu.Match.RESUME or data['type'] == enu.Match.PAUSE or data['type'] == enu.Game.READY:
+            await self.send_cs(self.host, data)
+        elif data['type'] == enu.Game.NEXT:
+            await self.send_json(data)
+        # match data['type']:
+        #     case enu.Match.UPDATE | enu.Match.RESUME | enu.Match.PAUSE | enu.Game.READY: await self.send_cs(self.host, data)
+        #     case enu.Game.NEXT: await self.send_json(data)
 
 # GENERAL (8)
     async def game_invite(self, data):

@@ -6,9 +6,6 @@ from logging import getLogger
 logger = getLogger('base')
 
 
-class PlazaException(Exception):
-    pass
-
 class PlazaNotFound(Exception):
     pass
 
