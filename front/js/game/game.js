@@ -76,7 +76,7 @@ export let initialSpeed = 0.8;
 
 export let light1;
 export let light2;
-export let light3;
+export let lightBall;
 export let lightBonus;
 export let lightMalus;
 
@@ -209,8 +209,8 @@ export function gameRenderer(data) {
 		lightColor = utils.interpolateColor(customData.colorBall); 
 		lightIntensity = 100;
 		lightDistance = 80;
-		light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
-		light3.position.set(data.x, data.y, sphere.position.z);
+		lightBall = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
+		lightBall.position.set(data.x, data.y, sphere.position.z);
 		lightBonus = new THREE.PointLight(0x90e0ef, 20, 0);	
 		lightMalus = new THREE.PointLight(0xd62828, 20, 0);
 
@@ -294,11 +294,11 @@ export function gameRenderer(data) {
 				sphere.position.set(data.x, data.y, 0);
 				scene.add(sphere);
 			} else {
-                				sphere.position.set(data.x, data.y, 40);
+                sphere.position.set(data.x, data.y, 40);
 			}
 		}
 
-		scene.add(light3);
+		scene.add(lightBall);
 
 		scene.add(cylinderRight);
 		scene.add(cylinderLeft);
