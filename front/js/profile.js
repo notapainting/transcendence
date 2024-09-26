@@ -25,7 +25,7 @@ let determineGender = (gender) => {
             otherInput.checked = true;
             break;
         default:
-            // Aucun genre spécifié ou genre invalide, ne coche aucune case
+            
             break;
     }
 };
@@ -73,7 +73,7 @@ const updateProfilePicture = () => {
     })
     .then(response => {
         if (response.ok) {
-                        window.location.reload();
+                window.location.reload();
         } else {
             inputField.classList.add('input-error');
             errorMessage.textContent = 'Invalid profile picture';
@@ -119,7 +119,7 @@ let updateUserInfosRequest = async () => {
     } else if (otherInput.checked) {
         genderValue = 'O';
     } else {
-        genderValue = null; // Aucun genre sélectionné
+        genderValue = null; 
     }
 
     const userData = {
@@ -180,8 +180,8 @@ const displayTwoFactorActivation = async (event) => {
     .then(data => {
         const qrImgBase64 = data.qr_img;
         const qrImgElement = document.querySelector(".qr-code-img");
-        qrImgElement.src = 'data:image/png;base64,' + qrImgBase64; // Définir la source de l'image sur l'image QR base64
-        qrImgElement.alt = 'QR Code'; // Ajouter une description alternative pour l'image
+        qrImgElement.src = 'data:image/png;base64,' + qrImgBase64; 
+        qrImgElement.alt = 'QR Code'; 
         const manualCodeElement = document.querySelector(".manual-code");
         manualCodeElement.innerText = 'Manual code : ' + data.secret_key;
     })
@@ -260,7 +260,7 @@ const options = {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    timeZone: 'UTC' // Garder le fuseau horaire UTC si nécessaire
+    timeZone: 'UTC' 
 };
 
 const showMatchHistory = async () => {
@@ -360,9 +360,9 @@ export const showProfile = async () => {
     activate2FaButton.addEventListener("click", confirm2FaRequest);
 }
 
-// document.querySelector('.profile-menu-quit').addEventListener('click', () => {
-//     navigateTo('/')
-// });
+
+
+
 
 document.querySelector('.back-to-top-button').addEventListener('click', () => {
     window.scrollTo({

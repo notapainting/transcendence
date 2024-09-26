@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { EffectComposer } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/postprocessing/RenderPass.js";
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from "https:
+import { RenderPass } from "https:
+import { OrbitControls } from 'https:
 
 import { animationData } from './animation.js';
 import { animate } from './animation.js';
@@ -23,14 +23,14 @@ var context = canvas.getContext('2d');
 canvas.width = 512;
 canvas.height = 512;
 
-// Dessiner du texte sur le canvas
+
 context.fillStyle = 'white';
 context.fillRect(0, 0, canvas.width, canvas.height);
 context.font = '48px sans-serif';
 context.fillStyle = 'black';
 context.fillText('Bonjour, monde !', 50, 256);
 
-// Créer une texture à partir du canvas
+
 var texture = new THREE.CanvasTexture(canvas);
 
 var material = new THREE.MeshBasicMaterial({ map: texture });
@@ -51,7 +51,7 @@ const materialBall1 = new THREE.MeshToonMaterial({ color: 0xfcca46});
 let spotLight = new THREE.Mesh(geometryBall1, materialBall1);
 spotLight.position.set(-90, 60, 1);
 
-// Light
+
 const light = new THREE.AmbientLight(0x3a86ff, 4);
 light.position.set(0, 0, 0);
 const lightWall = new THREE.DirectionalLight(0x3a86ff, 0);
@@ -61,10 +61,10 @@ spotLight1.position.set(90, 60, 5);
 const spotLight2 = new THREE.DirectionalLight(0x0e7b7f, 7);
 spotLight2.position.set(-90, 60, 1);
 
-// Activate shadows in the renderer
+
 renderer.shadowMap.enabled = true;
 
-// Composer pour la scène principale
+
 export const composer = new EffectComposer(renderer);
 const renderScene = new RenderPass(scene, camera);
 composer.addPass(renderScene);
@@ -127,7 +127,7 @@ export function gameRenderer(data) {
 		gameData.width = data.width;
 		gameData.height = data.height;
 	
-		// Game limits
+		
 		const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
 		if (line === null)
 		{
@@ -143,21 +143,21 @@ export function gameRenderer(data) {
 			const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
 			line = new THREE.Line(geometryLine, materialLine);
 
-			// Background plane
+			
 			const geometryPlane = new THREE.PlaneGeometry((data.width + 5) * 2, data.height * 2);
 			const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5, transparent: true, opacity: 0.5 });
 			plane = new THREE.Mesh(geometryPlane, materialPlane);
 			plane.position.z = -2;
 			plane.receiveShadow = true;
 
-			// Ball
+			
 			geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 10);
 			const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
 			sphere = new THREE.Mesh(geometryBall, materialBall);
 		}
 	
 		
-		// Paddles
+		
 		const geometryR = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightR - 1, 20);
 		const geometryL = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightL - 1, 20);
 		const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
@@ -196,7 +196,7 @@ export function gameRenderer(data) {
 		});
 
 	
-		// Lights
+		
 		const lightColor = utils.interpolateColor(customData.colorBall); 
 		const lightIntensity = 100;
 		const lightDistance = 80;
@@ -209,7 +209,7 @@ export function gameRenderer(data) {
 		lightBonus = new THREE.PointLight(0x90e0ef, 20, 0);	
 		lightMalus = new THREE.PointLight(0xd62828, 20, 0);
 
-		// Explosion collision
+		
 		if (data.leftPlayerScore > scoreLeft) {
 			collisionX = data.collisionX;
 			collisionY = data.collisionY;

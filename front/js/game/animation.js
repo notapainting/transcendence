@@ -22,7 +22,7 @@ export const animationData = {
 export async function animate() {
     requestAnimationFrame(animate);
 
-	// models animation
+	
     if (gameData.sceneHandler == 1)
     {
         if (loadData.mixerBonus)
