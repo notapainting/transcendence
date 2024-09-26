@@ -13,12 +13,13 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from auth_service.utils import get_user_from_access_token
 from auth_service.models import CustomUser
 
-
 class ValidateTokenView(APIView):
 	authentication_classes = [JWTAuthentication]
 	def post(self, request):
 		access_token_cookie = request.COOKIES.get('access')
 		user = get_user_from_access_token(access_token_cookie)
+		if not user:
+			return Response({'message': 'User not found', 'username': user.username}, status=status.HTTP_401_UNAUTHORIZED)
 		return Response({'message': 'token valide.', 'username': user.username}, status=status.HTTP_200_OK)
 
 class CustomTokenRefreshView(TokenRefreshView):
