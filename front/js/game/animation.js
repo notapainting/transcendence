@@ -21,7 +21,6 @@ export const animationData = {
 
 export async function animate() {
     requestAnimationFrame(animate);
-
 	
     if (gameData.sceneHandler == 1)
     {

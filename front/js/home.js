@@ -256,7 +256,7 @@ const loginRequest = (event) => {
             });
         } else {
                         messageBox.style.backgroundColor = "#f44336";
-            messageBox.innerHTML = `Server error, please retry later.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
+            messageBox.innerHTML = `Invalid field, please retry.<span class="closebtn" onclick="this.parentElement.style.transform='scale(0)';">&times;</span>`
             messageBox.style.transform = "scale(1)";
         }
     })

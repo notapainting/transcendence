@@ -4,6 +4,8 @@ import { animationData } from './animation.js';
 import { camera } from './game.js';
 import { customData } from './custom.js';
 
+import * as load from './loader.js';
+
 export var colorTransitionTime = 3000;
 export var colorStartTime = Date.now();
 
@@ -280,18 +282,6 @@ export function rotationAroundXYZ(camera, object, camera_offset, camera_speed, i
 
 
 	camera.lookAt(target.x, target.y, target.z);
-}
-
-export function clearScene() {
-    let toRemove = [];
-    scene.children.forEach((child) => {
-        if (child.type !== 'Points') {
-            toRemove.push(child);
-        }
-    });
-    toRemove.forEach((child) => {
-        scene.remove(child);
-    });
 }
 
 export function createParticle(positionX, positionY, particuleSize, distance, color) {

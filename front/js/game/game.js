@@ -23,14 +23,6 @@ var context = canvas.getContext('2d');
 canvas.width = 512;
 canvas.height = 512;
 
-
-context.fillStyle = 'white';
-context.fillRect(0, 0, canvas.width, canvas.height);
-context.font = '48px sans-serif';
-context.fillStyle = 'black';
-context.fillText('Bonjour, monde !', 50, 256);
-
-
 var texture = new THREE.CanvasTexture(canvas);
 
 var material = new THREE.MeshBasicMaterial({ map: texture });
@@ -88,6 +80,10 @@ export let light3;
 export let lightBonus;
 export let lightMalus;
 
+let lightColor; 
+let lightIntensity;
+let lightDistance;
+
 export const gameData = {
 	explosion: false,
 	catchBonus: false,
@@ -112,26 +108,35 @@ function clearTrail() {
     trailPositions = []; 
 }
 
+export function clearScene() {
+    let toRemove = [];
+    const preserveList = [load.intro, line, plane, spotLight, spotLight1, spotLight2, light, lightWall];
+
+    scene.children.forEach((child) => {
+        if (child.type !== 'Points' && !preserveList.includes(child)) {
+            toRemove.push(child);
+        }
+    });
+
+    toRemove.forEach((child) => {
+        scene.remove(child);
+    });
+}
+
 export function gameRenderer(data) {
     animationData.ballFall = true;
     if (data)
     {
-        utils.clearScene(); 
-		scene.add(load.intro);
-		scene.add(spotLight);
-		scene.add(light);
-		scene.add(lightWall);
-		scene.add(spotLight1);
-		scene.add(spotLight2);
-	
+        clearScene(); 
+		
 		gameData.width = data.width;
 		gameData.height = data.height;
-	
 		
 		const materialLine = new THREE.LineBasicMaterial({ color: 0xdabcff });
 		if (line === null)
 		{
 			const points = [];
+			
 			points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
 			points.push(new THREE.Vector3(data.width + 5, data.height, 0));
 			points.push(new THREE.Vector3(-data.width - 5, data.height, 0));
@@ -143,26 +148,32 @@ export function gameRenderer(data) {
 			const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
 			line = new THREE.Line(geometryLine, materialLine);
 
-			
 			const geometryPlane = new THREE.PlaneGeometry((data.width + 5) * 2, data.height * 2);
 			const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5, transparent: true, opacity: 0.5 });
 			plane = new THREE.Mesh(geometryPlane, materialPlane);
 			plane.position.z = -2;
 			plane.receiveShadow = true;
 
-			
 			geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 10);
 			const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
 			sphere = new THREE.Mesh(geometryBall, materialBall);
+
+			scene.add(line);
+			scene.add(plane);
+			scene.add(load.intro);
+			scene.add(spotLight1);
+			scene.add(spotLight2);
+			scene.add(spotLight);
+			scene.add(light);
+			scene.add(lightWall);
 		}
 	
-		
-		
 		const geometryR = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightR - 1, 20);
 		const geometryL = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightL - 1, 20);
 		const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
 		cylinderRight = new THREE.Mesh(geometryR, material);
 		cylinderLeft = new THREE.Mesh(geometryL, material);
+
 		cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY, 0);
 		cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY, 0);
 		cylinderRight.castShadow = true; 
@@ -194,16 +205,10 @@ export function gameRenderer(data) {
 			materialTrail.opacity = 0.5;
 			scene.add(trailSphere);
 		});
-
-	
 		
-		const lightColor = utils.interpolateColor(customData.colorBall); 
-		const lightIntensity = 100;
-		const lightDistance = 80;
-		light1 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
-		light1.position.set(data.width - 5, data.rightPaddleY, cylinderRight.position.z + 5);
-		light2 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
-		light2.position.set(-data.width + 5, data.leftPaddleY, cylinderLeft.position.z + 5);
+		lightColor = utils.interpolateColor(customData.colorBall); 
+		lightIntensity = 100;
+		lightDistance = 80;
 		light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
 		light3.position.set(data.x, data.y, sphere.position.z);
 		lightBonus = new THREE.PointLight(0x90e0ef, 20, 0);	
@@ -293,15 +298,11 @@ export function gameRenderer(data) {
 			}
 		}
 
-		scene.add(light2);
-		scene.add(light1);
 		scene.add(light3);
 
-		scene.add(line);
 		scene.add(cylinderRight);
 		scene.add(cylinderLeft);
 		scene.add(sphere);
-		scene.add(plane);
 	}
 
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;

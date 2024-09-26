@@ -1,6 +1,6 @@
 import { clearMenu, initMenu } from './menu.js';
 import { initGameWebSocket, clearGame } from './websocket.js';
-import { clearScene } from './utils.js';
+import { clearScene } from './game.js';
 import { clearThree } from './game.js';
 import { clearView, isUserAuthenticated, navigateTo } from "../index.js";
 import { loggedInStatus, getPersInfo } from '../home.js';

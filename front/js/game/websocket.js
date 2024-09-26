@@ -241,8 +241,6 @@ const _tournament = (content) => {
 
 const messageHandler = (e) => {
     const content = JSON.parse(e.data);
-    console.log("type: " + content.type)
-    console.log(content)
     if (_match(content) === false)
         if (_invitations(content) === false)
             if (_game(content) === false)
@@ -472,7 +470,7 @@ export const clearGame = () => {
     document.removeEventListener('keydown', bindKeyPress)
     document.removeEventListener('keyup', bindKeyRelease)
     document.querySelectorAll(".game-element").forEach(div => { div.style.display = "none"; });
-    utils.clearScene();
+    game.clearScene();
     composer.render();
     game.scene.children
         .filter(obj => obj.userData.isTrailSphere)
