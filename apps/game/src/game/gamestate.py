@@ -3,6 +3,9 @@ import game.timer as tim
 import game.power_up as pow
 import game.enums as enu
 import random, asyncio
+import threading
+import time
+import sys
 
 from channels.layers import get_channel_layer
 from logging import getLogger
@@ -113,7 +116,8 @@ class GameState:
             'game_running' : False,
             'playerBonus' : -1,
             'startTime': 0,
-            'totalTime': 0
+            'totalTime': 0,
+            'last_update_time' : 0
         }
         self.right_paddle_top = self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2
         self.right_paddle_bottom = self.status['rightPaddleY'] - self.status['paddleHeightR'] / 2
@@ -126,7 +130,7 @@ class GameState:
 
     async def update_player_position(self, message):
         if message == "wPressed":
-            self.status['wPressed'] = True
+            self.status['wPressed'] = True 
         elif message == "sPressed":
             self.status['sPressed'] = True
         elif message == "upPressed":
@@ -188,7 +192,7 @@ class GameState:
             self.p.slow(self.status)
             self.p.boost(self.status)
 
-    def computeMovementPaddle(self):
+    def computeMovementPaddle(self, delta_time):
         if self.status['upPressed'] and self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2 < HEIGHT:
             self.status['rightPaddleY'] += self.status['paddleSpeedR']
             self.right_paddle_top = self.status['rightPaddleY'] + self.status['paddleHeightR'] / 2
@@ -207,9 +211,9 @@ class GameState:
             self.left_paddle_top = self.status['leftPaddleY'] + self.status['paddleHeightL'] / 2
             self.left_paddle_bottom = self.status['leftPaddleY'] - self.status['paddleHeightL'] / 2
 
-    def computeMovementBall(self):
-        self.status['ballX'] += self.status['ballSpeedX']
-        self.status['ballY'] += self.status['ballSpeedY']
+    def computeMovementBall(self, delta_time):
+        self.status['ballX'] += self.status['ballSpeedX'] * delta_time
+        self.status['ballY'] += self.status['ballSpeedY'] * delta_time
 
     def computeCollisionBallWall(self):
         if self.status['ballY'] <= -HEIGHT + self.status['ballRadius'] or self.status['ballY'] >= HEIGHT - self.status['ballRadius']:
@@ -286,15 +290,23 @@ class GameState:
         return True
 
     async def update(self):
+        current_time = time.time()
+        if (self.status['last_update_time'] == 0):
+            delta_time = 1
+        else:
+            delta_time = (current_time - self.status['last_update_time']) * 30
+        self.status['last_update_time'] = current_time
+
         self.applyBonus()
-        self.computeMovementPaddle()
-        self.computeMovementBall()
+        self.computeMovementPaddle(delta_time)
+        self.computeMovementBall(delta_time)
         self.computeCollisionBallWall()
         if self.computeCollisionPaddleBall() is False:
             await self.computeScore()
         return await self.computeWin()
 
     def reseting(self):
+        self.status['last_update_time'] = 0
         self.status['ballX'] = 0
         self.status['ballY'] = 0
         self.status['playerBonus'] = -1
@@ -321,14 +333,17 @@ class GameState:
     async def start(self):
         self.running = True
         self.timer.resume()
-        self.task = asyncio.create_task(self._loop())
+        # self.task = asyncio.create_task(self._loop())
+        # self.status['last_update_time'] = time.time()
+        self.task = threading.Thread(target=lambda: asyncio.run(self._loop()))
+        self.task.start()
 
     async def stop(self):
         self.running = False
         self.timer.pause()
         if self.task is not None:
-            self.task.cancel()
-            await self.task
+            self.task._stop()
+            # await self.task
 
     async def pause(self):
         if self.running:
