@@ -32,7 +32,7 @@ export const isUserAuthenticated = () => {
             })
             .then(refreshResponse => refreshResponse.json().then(refreshData => {
                 if (refreshResponse.ok) {
-                    whoIam = refreshData.username;  // Stocker le username
+                    whoIam = refreshData.username;  
                                         return true;
                 } else {
                                         return false;  
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutButtonMenu.addEventListener("click", logoutRequest);
     const notificationContainer = document.querySelector(".notification-container");
     if ("Notification" in window) {
-        // Demande la permission à l'utilisateur
+        
         Notification.requestPermission().then(permission => {
             permissionNotification = permission;
         });
@@ -149,16 +149,16 @@ document.addEventListener("DOMContentLoaded", () => {
     router();
 });
 
-// document.addEventListener("DOMContentLoaded", () => {
-//     document.addEventListener('click', e => {
-//         if (e.target.matches("[data-link]")){
-//             e.preventDefault();
-//             navigateTo(e.target.href)
-//         }
-//     })
-//     document.querySelector(".login-signin-form").addEventListener("submit", event => {
-//         event.preventDefault();
-//     })
-//     router();
-// })
+
+
+
+
+
+
+
+
+
+
+
+
 

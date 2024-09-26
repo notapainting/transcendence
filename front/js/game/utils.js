@@ -271,8 +271,8 @@ export function rotationAroundXYZ(camera, object, camera_offset, camera_speed, i
 	var target={x:2,y:2,z:2};
 
 	target.x = object.x;
-	// target.y=object.y
-	// target.y = 2
+	
+	
 	target.z = object.z;
 	camera.position.x = target.x + camera_offset.x * (Math.sin(time * camera_speed));
 	camera.position.z = target.z + camera_offset.z * (Math.cos(time * camera_speed));

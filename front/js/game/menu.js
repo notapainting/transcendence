@@ -4,14 +4,14 @@ import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import { gameData } from './game.js';
 
-// html element
-// <!-- deplacement -->
+
+
 
 const   start = document.getElementById('game-menu-start');
 const   nextMatch = document.getElementById('game-menu-next');
 const   settingsReInit = document.getElementById('settings-button-reinit');
 
-// <!-- div buttons -->
+
 const   menuM1 = document.getElementById('menu-m1-button');
 const   menuM2a = document.getElementById('menu-m2a-button');
 const   menuM2b = document.getElementById('menu-m2b');
@@ -22,12 +22,12 @@ const   menuM6 = document.getElementById('menu-m6');
 const   menuM7 = document.getElementById('menu-m7');
 const   menuM6_button = document.getElementById('menu-m6-button');
 
-// <!-- animated background -->
+
 const   menuBgVid = document.getElementById('menu_bg_video');
 const   menuBg = document.getElementById('menu-background');
 const   menuBlurry = document.getElementById('blurry-background');
 
-// <!-- local  -->
+
 const   locContainerList = document.getElementById('game-menu-list-tournament');
 const   locContainerSettings = document.getElementById('game-menu-settings');
 const   settingsSendBonus = document.getElementById('bonusToggle');
@@ -35,25 +35,25 @@ const   settingsSendScore = document.getElementById('scoreRange');
 const   settingsSendPlayer = document.getElementById('playersRange');
 
 
-// <!-- remote -->
-// <!-- choose mode -->
+
+
 const   createMatch = document.getElementById('game-menu-fastGame');
 const   createTournament = document.getElementById('game-menu-tournament');
 const   createLocal = document.getElementById('game-menu-local');
 
-// <!-- invite player -->
+
 const   invitationBox = document.getElementById('game-menu-invitationBox');
 
-// <!-- set ready -->
+
 const   readyP = document.getElementById('game-menu-ready-prematch');
 
-// <!-- in game button -->
+
 const   pause = document.getElementById('game-menu-pause');
 
 
 /*** variable ****/
 
-// client's status
+
 let     status = enu.gameMode.LOCAL;
 let     anon = true;
 
@@ -65,7 +65,7 @@ export const getGameStatus = () => {
     return status;
 }
 
-// scene idx
+
 let     idx = enu.sceneIdx.WELCOME;
 
 export const getSceneIdx = () => {
@@ -73,32 +73,32 @@ export const getSceneIdx = () => {
 }
 
 
-// list of players invited
+
 let     players = [];
 
-// current match data
+
 let     currentPlayers = [];
 let     currentScore = [0, 0];
 let     locked = false;
 let     is_match = false;
 
 
-// scene
+
 const   scene = [
-    [menuBg, menuBgVid, menuM1, invitationBox], // accueil du jeu
-    [menuBgVid, menuM2a, locContainerList, locContainerSettings], // creation de partie/tournoi (host only)
-    [menuBgVid, menuM2b], // waiting room pour creation de tournoi (guest only)
-    [menuBlurry, menuM3], // phases du tournoi : montre les prochain match de la phase et leur etat
-    [menuBlurry, menuM4], // afk check
-    [menuM5], // in game
-    [menuM6, menuM6_button], // ecran de fin de match 
-    [menuM7], // ecran de fin de tournoi (recap)
-    [], // ecran erreur
+    [menuBg, menuBgVid, menuM1, invitationBox], 
+    [menuBgVid, menuM2a, locContainerList, locContainerSettings], 
+    [menuBgVid, menuM2b], 
+    [menuBlurry, menuM3], 
+    [menuBlurry, menuM4], 
+    [menuM5], 
+    [menuM6, menuM6_button], 
+    [menuM7], 
+    [], 
 ];
-// menu 2b -> enlever ready
-// add menu m7
-// better transition fin de match /tournoi
-// 
+
+
+
+
 
 /*** initialisation ****/
 export const initMenu = (path) => {
@@ -312,7 +312,7 @@ const validate_name = (name) => {
     return true;
 }
 
-// allow to lock pause in remote game if oponent has paused the game
+
 export const toggleLock = () => {
     if (locked == false) locked = true;
     else if (locked == true) locked = false;
@@ -323,7 +323,7 @@ export const togglePause = (pause) => {
     else document.getElementById('game-menu-pause-text').innerHTML = "P A U S E";
 }
 
-// game settings
+
 let gameSettings = {
     bonused:"True",
     scoreToWin:"5",
@@ -474,7 +474,7 @@ start.addEventListener('click', () => {
     } )
     var message = {'type': enu.Game.START}
     if (status === enu.gameMode.LOCAL) message['players'] = players; 
-    // if (status === enu.gameMode.MATCH) moveTo(enu.sceneIdx.MATCH);
+    
     gameSocket.send(JSON.stringify(message));
 })
 
@@ -591,11 +591,11 @@ const createListLocal = (user) => {
         e.target.parentElement.remove();
     });
 
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const svg = document.createElementNS('http:
     svg.setAttribute('viewBox', '0 0 448 512');
     svg.setAttribute('class', 'svgIcon'); 
 
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const path = document.createElementNS('http:
     path.setAttribute('d', 'M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z');
     path.setAttribute('fill', 'white'); 
 
@@ -634,7 +634,7 @@ function countDivsWithColumnClass() {
 }
 
 
-// animation menum1
+
 
 const activateAniM1 = () => {
     document.getElementById('game-menu-invitationBox').style.opacity = 0;

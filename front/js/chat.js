@@ -4,8 +4,8 @@ import { whoIam } from "./index.js";
 import {initGameWebSocket} from "./game/websocket.js"
 import * as enu from './game/enums.js'
 import { fastmatch, fastmatchOK } from "./game/menu.js";
-// enlever le bouton + lorsque la demande damis a ete accepte
-// enlever la notif lorsque lautre personne accepte
+
+
 
 const searchbar = document.querySelector('.searchbar');
 const searchResults = document.querySelector('.search-results');
@@ -111,7 +111,7 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
         if (messageElem.classList.contains(`username-${username}`)) {
             messageElem.style.display = 'flex';
             setTimeout(() => {
-                messageElem.scrollTop = messageElem.scrollHeight; // Scroll en bas de la div
+                messageElem.scrollTop = messageElem.scrollHeight; 
             }, 0)
         } else {
             messageElem.style.display = 'none';
@@ -154,10 +154,10 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
             }
             const matchHistoryText = await matchHistoryResponse.text();
             if (matchHistoryText) {
-                const matchHistory = JSON.parse(matchHistoryText); // Parser le texte en JSON si non vide
+                const matchHistory = JSON.parse(matchHistoryText); 
                 displayTargetProfile(userInfo, matchHistory);
             } else {
-                displayTargetProfile(userInfo, null); // Passer un tableau vide si le texte est vide
+                displayTargetProfile(userInfo, null); 
             }
     
         } catch (error) {
@@ -674,7 +674,7 @@ async function handleMessage(message) {
         })
     }
     else if (message.type === 'group.update'){
-        // console.log(message.data);
+        
         createGroup(message);
     }
     else if (message.type === 'message.text') {
@@ -683,23 +683,23 @@ async function handleMessage(message) {
     else if (message.type === "contact.update"){
         if (message.data.operation === "invitation"){
             if (message.data.author !== whoIam){
-                newFriendRequest(message.data.author); //si je ne suis celui qui recoit linvit
+                newFriendRequest(message.data.author); 
                 deletePlusIcon(message.data.author);
                 pushToContact(message.data.author);
             } else {
-                deletePlusIcon(message.data.name); //si je suis celui qui envoie linvit
+                deletePlusIcon(message.data.name); 
                 pushToContact(message.data.name);
             }
         }
-        if (message.data.author === whoIam && message.data.operation === "contact") //si je suis celui qui accepte
+        if (message.data.author === whoIam && message.data.operation === "contact") 
             deleteNotif(message.data.name);
         if (message.data.operation === "block"){
-            if (message.data.author === whoIam) {// si je susi celui qui bloque
+            if (message.data.author === whoIam) {
                 contactSummary.data.blockeds.push(message.data.name);
                 blockUnblockSwitch(message.data.name, "unblock");
                 deletePlusIcon(message.data.name);
                 disableEnableInput(message.data.name, "disable");
-            } else {  //celui qui recoit le block
+            } else {  
                 contactSummary.data.blocked_by.push(message.data.author);
                 deletePlusIcon(message.data.author);
                 disableEnableInput(message.data.author, "disable");
@@ -747,7 +747,7 @@ let flg = 0;
 export async function initializeWebSocket() {
     flg = 1;
     await isUserAuthenticated();
-    socket = new WebSocket('wss://' + host + '/chat/');
+    socket = new WebSocket('wss:
 
     socket.onopen = function() {
             };
@@ -790,7 +790,6 @@ function displaySearchResults(users) {
         searchResults.style.display = 'none';
     }
 }
-
 
 function fetchMessages(username) {
     const payload = {

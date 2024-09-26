@@ -27,7 +27,7 @@ const parallaxEffect = (event) => {
     let xAxis = (window.innerWidth / 2 - event.pageX) / 10;
     let yAxis = (window.innerHeight / 2 - event.pageY) / 10;
 
-    // xAxis = Math.min(Math.max(xAxis, -maxOffsetX), maxOffsetX);
+    
     yAxis = Math.min(Math.max(yAxis, -maxOffsetY), maxOffsetY);
 
     backThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.2}px) calc(50% + ${yAxis * 0.2}px)`;
@@ -190,9 +190,9 @@ export const loggedInStatus = (profile_picture, username) => {
     document.querySelector(".login-signin-form").style.display = "none"
     playBtnElement.removeEventListener("click", playOfflineEvent);
     playBtnElement.addEventListener("click", playOnlineEvent);
-    // setTimeout(() => {
-    //     playBtnElement.style.transform = "translateX(100%)";
-    // }, 200)
+    
+    
+    
     showChat();
     
     document.querySelector(".profile-picture-home").style.backgroundImage = `url('${profile_picture}')`
@@ -334,7 +334,7 @@ const adjustZoom = (event) => {
         isZooming = false;
         return ;
     }
-    zoomFactor = Math.max(1, Math.min(10, zoomFactor)); // Limiter le zoom entre 0.5x et 2x
+    zoomFactor = Math.max(1, Math.min(10, zoomFactor)); 
     document.querySelectorAll(".banner").forEach(x => x.style.opacity = "0")
     const backThrees = document.querySelector('.back-threes');
     const backgroundThrees = document.querySelector('.background-threes')
@@ -372,8 +372,8 @@ const adjustZoom = (event) => {
     }
     indexZoom++;
     setTimeout(() => {
-        isZooming = false; // Réinitialiser l'indicateur après 2 secondes
-    }, 400); // Attendre 2 secondes avant de permettre un autre événement wheel
+        isZooming = false; 
+    }, 400); 
     
 };
 
@@ -389,7 +389,7 @@ export let logoutRequest = (event) => {
         if (response.ok) {
             navigateTo("/");
             window.location.reload();
-            // Effectuez ici les actions nécessaires après la déconnexion, par exemple rediriger l'utilisateur vers une autre page
+            
         } else {
         }
     })
