@@ -6,6 +6,5 @@ from chat.urls import urls
 
 urlpatterns = [
     path('api/', view=include(urls)),
-    path('log/', my_view),
 ]
 
