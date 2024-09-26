@@ -138,6 +138,7 @@ const _invitations = (content) => {
                     document.getElementById(target).parentElement.remove();
                 }
                 changeGameStatus(enu.gameMode.MATCH);
+                game.gameRenderer(content.message);
                 moveTo(enu.sceneIdx.PREMATCH);
                 announceMatch(content.players);
             } else if (getGameStatus() === enu.gameMode.TOURNAMENT) {
