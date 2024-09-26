@@ -287,7 +287,7 @@ class GameState:
             }
             await self._send({"type":enu.Match.END, "winner":self.result['winner'], "loser":self.result['loser']})
             return False
-        return True
+        return self.running
 
     async def update(self):
         current_time = time.time()
@@ -318,7 +318,11 @@ class GameState:
     async def _loop(self):
         try :
             await asyncio.sleep(TIME_PAUSE_START)
-            while self.running:
+            # while self.running:
+            while True:
+                if (self.running == False):
+                    await asyncio.sleep(0.5)
+                    continue
                 await asyncio.sleep(TIME_REFRESH)
                 self.running = await self.update()
                 await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict()}})
@@ -341,15 +345,16 @@ class GameState:
     async def stop(self):
         self.running = False
         self.timer.pause()
-        if self.task is not None:
-            self.task._stop()
-            # await self.task
+        # if self.task is not None:
+        #     # self.task._stop()
+        #     await self.task
 
     async def pause(self):
         if self.running:
             await self.stop()
             await self._send({"type":enu.Match.PAUSE})
         else:
+            print("resume game", file=sys.stderr)
             await self.start()
             await self._send({"type":enu.Game.RELAY, "relay":{"type":enu.Match.RESUME}})
 
@@ -363,6 +368,8 @@ class GameState:
 
     async def _end(self):
         if self.task is not None:
-            self.task.cancel()
-            await self.task
+            # self.task.cancel()
+            self.task._stop()
+            # await self.task
+
 
