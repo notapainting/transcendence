@@ -283,9 +283,7 @@ class RemoteLobby(BaseLobby):
 
     async def _send(self, target_name, message):
         message['author'] = self.host
-        target = plaza.translate(target_name)
-        if target is not None:
-            await self._chlayer.send(target, message)
+        await self._chlayer.send(plaza.translate(target_name, raise_exception=True), message)
 
     async def broadcast(self, message):
         message['author'] = self.host
@@ -314,18 +312,15 @@ class RemoteLobby(BaseLobby):
 
     async def add(self, user):
         if super().add(user):
-            target = plaza.translate(user, raise_exception=True)
-            await self._chlayer.group_add(self._id, target)
+            await self._chlayer.group_add(self._id, plaza.translate(user, raise_exception=True))
             logger.info(f"add: {user} in {self.__class__.__name__}")
             return True
         return False
 
     async def remove(self, user):
         if super().kick(user):
-            target = plaza.translate(user)
-            if target is not None:
-                await self._chlayer.group_discard(self._id, target)
-                logger.info(f"remove: {user} from {self.__class__.__name__}")
+            await self._chlayer.group_discard(self._id, plaza.translate(user, raise_exception=True))
+            logger.info(f"remove: {user} from {self.__class__.__name__}")
             return True
         return False
 
@@ -349,9 +344,7 @@ class RemoteLobby(BaseLobby):
         if smooth is False:
             await self.broadcast({"type":enu.Game.KICK})
         for player_name in self.players:
-            player = plaza.translate(player_name)
-            if player is not None:
-                await self._chlayer.group_discard(self._id, player)
+            await self._chlayer.group_discard(self._id, plaza.translate(player_name, raise_exception=True))
         await super()._end()
 
     async def quit(self):
