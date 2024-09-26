@@ -3,18 +3,14 @@ COLOR_GREEN='\e[1;32m'
 COLOR_RED='\e[1;31m'
 COLOR_RESET='\e[0m'
 
-# Define the URL for Elasticsearch
 ELASTICSEARCH_URL="https://localhost:9200"
 
-# Define the path to the CA certificate
 CA_CERT="/usr/share/elasticsearch/config/certs/ca/ca.crt"
 
 set -e
 
-# ILM policy JSON
 ILM_JSON=$(cat /usr/share/elasticsearch/scripts/ilm.json)
 
-# List of policy names
 policy_names=("nginx_policy" "filebeat_policy")
 
 for policy_name in "${policy_names[@]}"; do
