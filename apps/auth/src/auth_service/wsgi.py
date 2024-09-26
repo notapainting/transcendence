@@ -8,9 +8,9 @@ https://docs.djangoproject.com/en/5.0/howto/deployment/wsgi/
 """
 
 import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'auth_service.settings')
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'auth_service.settings')
 
 application = get_wsgi_application()

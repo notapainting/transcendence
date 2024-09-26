@@ -14,7 +14,7 @@ LANGUAGE_CODE = 'en-us'
 USE_TZ = True
 TIME_ZONE = 'CET'
 
-ADMIN_USERNAME = 'admin'
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
@@ -24,7 +24,7 @@ ALLOWED_HOSTS = ['*']
 
 APPEND_SLASH = False
 
-DEBUG = False
+DEBUG = os.getenv('DJANGO_DEBUG', False)
 
 ASGI_APPLICATION = "project.asgi.application"
 

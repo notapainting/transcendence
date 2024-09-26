@@ -1,9 +1,8 @@
 # game/gamestate.py
-import game.utils as utils
 import game.timer as tim
 import game.power_up as pow
 import game.enums as enu
-import random, asyncio, time
+import random, asyncio
 
 from channels.layers import get_channel_layer
 from logging import getLogger
@@ -143,7 +142,7 @@ class GameState:
         elif message == "downRelease":
             self.status['downPressed'] = False
 
-    def to_dict(self): #mise en forme
+    def to_dict(self):
         return {
             'x': self.status['ballX'],
             'y': self.status['ballY'],
@@ -287,9 +286,6 @@ class GameState:
         return True
 
     async def update(self):
-        # if self.reset == 1:
-        #     self.reset = 2
-
         self.applyBonus()
         self.computeMovementPaddle()
         self.computeMovementBall()

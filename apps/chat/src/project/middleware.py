@@ -1,15 +1,10 @@
 # projet/middleware.py
 
-from asgiref.sync import sync_to_async, async_to_sync
-from django.utils.decorators import async_only_middleware
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 from channels.middleware import BaseMiddleware
-from channels.exceptions import DenyConnection
 from django.core.exceptions import ObjectDoesNotExist
 import chat.enums as enu
 from channels.db import database_sync_to_async
 
-from django.http import HttpResponseForbidden
 
 from logging import getLogger
 logger = getLogger('base')

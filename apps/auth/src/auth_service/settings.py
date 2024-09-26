@@ -92,8 +92,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')#for https
-# USE_X_FORWARDED_HOST = True
 
 CORS_ALLOW_ALL_ORIGINS = True
 ALLOWED_HOSTS = ['*']
@@ -167,7 +165,6 @@ WSGI_APPLICATION = 'auth_service.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -178,10 +175,7 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),
     }
 }
-# JWT_AUTH = {
-        # 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-#     },
-# ]
+
 
 
 # Internationalization

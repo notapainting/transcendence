@@ -1,4 +1,4 @@
-import asyncio, random, httpx
+import httpx
 
 import channels.exceptions as exchan
 from rest_framework.renderers import JSONRenderer
@@ -6,7 +6,7 @@ from rest_framework.renderers import JSONRenderer
 from game.consumers.local import LocalConsumer
 import game.enums as enu
 
-from game.lobby import Match, Tournament, LocalTournament, getDefault, LobbyException
+from game.lobby import Match, Tournament, LocalTournament, getDefault
 from game.plaza import plaza, PlazaNotFound
 from game.gamestate import getDefaultState
 
@@ -189,26 +189,12 @@ class RemoteGamer(LocalConsumer):
         elif data['type'] == enu.Game.NEXT:
             await self.send_json(data)
 
-        # match data['type']:
-            # case enu.Game.READY :
-            #     await self.lobby.check(self.username)
-            #     if self.lobby.checked():
-            #         await self.lobby.start()
-            # case enu.Match.UPDATE :
-            #     data['message'] = format_paddle_key(True, data['message'])
-            #     await self.lobby.match_feed(data)
-            # case enu.Match.PAUSE :
-            #     await self.lobby.match_pause(self.username)
-            # case enu.Game.NEXT: await self.send_json(data)
-
     async def mode_playing_match_guest(self, data):
         if data['type'] == enu.Match.UPDATE or data['type'] == enu.Match.RESUME or data['type'] == enu.Match.PAUSE or data['type'] == enu.Game.READY:
             await self.send_cs(self.host, data)
         elif data['type'] == enu.Game.NEXT:
             await self.send_json(data)
-        # match data['type']:
-        #     case enu.Match.UPDATE | enu.Match.RESUME | enu.Match.PAUSE | enu.Game.READY: await self.send_cs(self.host, data)
-        #     case enu.Game.NEXT: await self.send_json(data)
+
 
 # GENERAL (8)
     async def game_invite(self, data):
@@ -281,11 +267,6 @@ class RemoteGamer(LocalConsumer):
                     await self.lobby.start()
         await self.send_json(data)
 
-    async def game_broke(self, data):
-        # host : relay + broadcast + cleanup + set to idle
-        # guest : relay + set to idle
-        await self.send_json(data)
-
     async def game_next(self, data):
         await self.send_json(data)
 
@@ -323,7 +304,6 @@ class RemoteGamer(LocalConsumer):
 # TOURNAMENT (4)
     async def match_result(self, data):
         if data['author'] != self.username and hasattr(self, "master"):
-            # await self.lobby.broadcast(data)
             await self.lobby.update_result(data['message'])
             await self.send_json(data)
 
@@ -372,7 +352,7 @@ async def getInviteAuth(author, user):
         else:
             return {"type":enu.Invitation.ERROR, "error":enu.Errors.INTERN} 
     except httpx.HTTPError as error:
-        logger.warn(f"invitation error : {error}")
+        logger.warning(f"invitation error : {error}")
         return {"type":enu.Invitation.ERROR, "error":enu.Errors.INTERN}
 
 def format_paddle_key(host, key):
