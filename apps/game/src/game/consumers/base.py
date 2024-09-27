@@ -10,7 +10,7 @@ logger = getLogger('base')
 
 class BaseConsumer(AsyncWebsocketConsumer):
     async def dispatch(self, message):
-        if hasattr(self, "username") and hasattr(self, "status") and message['type'] != enu.Game.RELAY:
+        if hasattr(self, "username") and hasattr(self, "status") and message['type'] != enu.Game.RELAY and message['type'] != enu.Match.UPDATE:
             logger.info(f"{self.username} ({self.status}) received : {message}")
         try :
             await super().dispatch(message)

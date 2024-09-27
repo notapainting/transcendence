@@ -82,6 +82,7 @@ class GameState:
         self.reset  = RESET
         self.counter  = COUNTER
         self.running = False
+        self.paused = False
         self.timer = tim.ATimer(verbose=False)
         self.p = pow.PowerUpManager(self.timer)
         self._statused()
@@ -294,7 +295,7 @@ class GameState:
         if (self.status['last_update_time'] == 0):
             delta_time = 1
         else:
-            delta_time = (current_time - self.status['last_update_time']) * 30
+            delta_time = (current_time - self.status['last_update_time']) * 10 # a remettre a 30
         self.status['last_update_time'] = current_time
 
         self.applyBonus()
@@ -324,8 +325,10 @@ class GameState:
                     await asyncio.sleep(0.5)
                     continue
                 await asyncio.sleep(TIME_REFRESH)
-                self.running = await self.update()
-                await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict()}})
+                if (self.paused == False):
+                    logger.info(f"loop {self.paused}")
+                    self.running = await self.update()
+                    await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict()}})
                 if self.reset ==  2:
                     await asyncio.sleep(TIME_PAUSE)
                     self.reset = 0
@@ -350,16 +353,24 @@ class GameState:
         #     await self.task
 
     async def pause(self):
-        if self.running:
-            await self.stop()
+        # if self.running == False
+        #     return
+        if self.paused == False:
+            self.paused = True
+            self.timer.pause()
+            logger.info("pause game")
+            # await self.stop()
             await self._send({"type":enu.Match.PAUSE})
         else:
-            print("resume game", file=sys.stderr)
-            await self.start()
+            self.paused = False
+            self.timer.resume()
+            # print("resume game", file=sys.stderr)
+            logger.info("resume game")
+            # await self.start()
             await self._send({"type":enu.Game.RELAY, "relay":{"type":enu.Match.RESUME}})
 
     async def feed(self, key):
-        if self.running:
+        if self.running and self.paused == False:
             await self.update_player_position(key)
 
     async def feed_bonus(self, bonus):
