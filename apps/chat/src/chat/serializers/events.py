@@ -130,7 +130,7 @@ class ContactUpdate(BaseSerializer):
         elif data['operation'] == enu.Operations.REMOVE:
             data['author'].delete_relation(data['name'])
             target_rel = data['name'].get_relation(data['author'])
-            if target_rel is not None and target_rel != mod.Relation.Types.BLOCK:
+            if target_rel is None or target_rel != mod.Relation.Types.BLOCK:
                 data['name'].delete_relation(data['author'])
                 self.alter_pgroup_if_exist(data['author'], data['name'], mod.GroupShip.Roles.WRITER)
 

@@ -23,8 +23,9 @@ class BaseConsumer(AsyncWebsocketConsumer):
         except ValueError as error:
             logger.warning(error)
             await self.send_json({'type':enu.Event.Errors.HANDLER})
-        except BaseException:
-            raise
+        except BaseException as error:
+            logger.error("general error {error}")
+            await self.send_json({'type':enu.Event.Errors.DATA})
 
     @classmethod
     async def decode_json(cls, text_data):

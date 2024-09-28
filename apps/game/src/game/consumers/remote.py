@@ -46,8 +46,9 @@ class RemoteGamer(LocalConsumer):
             await super().dispatch(message)
         except PlazaNotFound:
             await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.NTF_404})
-        except BaseException:
-            raise 
+        except BaseException as error:
+            logger.error("general error {error}")
+            await self.send_json({'type':enu.Errors.DATA})
 
     async def connect(self):
         self.username = await authenticate(dict(self.scope['headers'])) 
