@@ -26,7 +26,7 @@ export const initGameWebSocket = (path) => {
 
 const _initWebsocket = async (path) => {
     if (gameSocket !== null) return;
-    await isUserAuthenticated();
+    if (await isUserAuthenticated() === false) return;
     gameSocket = new WebSocket(
         'wss://'
         + window.location.host
@@ -35,9 +35,9 @@ const _initWebsocket = async (path) => {
     gameSocket.onmessage = messageHandler;
     gameSocket.onclose = function (e) {
         moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
-        if (path === enu.backendPath.REMOTE) setTimeout(_initWebsocket, 5000, path);
         gameSocket = null;
         clearListInvitation();
+        if (path === enu.backendPath.REMOTE) setTimeout(_initWebsocket, 5000, path);
     };
     document.removeEventListener('keydown', bindKeyPress)
     document.removeEventListener('keyup', bindKeyRelease)

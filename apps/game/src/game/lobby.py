@@ -271,6 +271,9 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
             else:
                 await self.make_phase()
    
+    async def check(self, user):
+        return self._check(user)
+
 
     async def end(self, smooth=True):
         await self.match_stop()
