@@ -72,8 +72,6 @@ export let collisionY = 0;
 export let initialSpeed = 0.8;
 export let drawLinePlane = false;
 
-export let light1;
-export let light2;
 export let light3;
 export let lightBonus;
 export let lightMalus;
@@ -141,14 +139,16 @@ export function gameRenderer(data) {
 		}
 
 		const points = [];
-		points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
-		points.push(new THREE.Vector3(data.width + 5, data.height, 0));
-		points.push(new THREE.Vector3(-data.width - 5, data.height, 0));
-		points.push(new THREE.Vector3(-data.width - 5, -data.height, 0));
-		points.push(new THREE.Vector3(data.width + 5, -data.height, 0));
-		points.push(new THREE.Vector3(0, -data.height, 0));
-		points.push(new THREE.Vector3(data.heigt, 0, 0));
-		points.push(new THREE.Vector3(0, data.height, 0));
+		const height = isNaN(data.height) ? 30 : data.height;
+		const width = isNaN(data.width) ? 50 : data.width;
+		points.push(new THREE.Vector3(width + 5, -height, 0));
+		points.push(new THREE.Vector3(width + 5, height, 0));
+		points.push(new THREE.Vector3(-width - 5, height, 0));
+		points.push(new THREE.Vector3(-width - 5, -height, 0));
+		points.push(new THREE.Vector3(width + 5, -height, 0));
+		points.push(new THREE.Vector3(0, -height, 0));
+		points.push(new THREE.Vector3(0, 0, 0));
+		points.push(new THREE.Vector3(0, height, 0));
 		const geometryLine = new THREE.BufferGeometry().setFromPoints(points);
 		line = new THREE.Line(geometryLine, materialLine);
 
@@ -174,8 +174,12 @@ export function gameRenderer(data) {
 		const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
 		cylinderRight = new THREE.Mesh(geometryR, material);
 		cylinderLeft = new THREE.Mesh(geometryL, material);
-		cylinderRight.position.set(data.rightPaddleX, data.rightPaddleY, 0);
-		cylinderLeft.position.set(data.leftPaddleX, data.leftPaddleY, 0);
+		const rightPaddleX = isNaN(data.rightPaddleX) ? -50 : data.rightPaddleX;
+		const rightPaddleY = isNaN(data.rightPaddleY) ? 0 : data.rightPaddleY;
+		const leftPaddleX = isNaN(data.leftPaddleX) ? 50 : data.leftPaddleX;
+		const leftPaddleY = isNaN(data.leftPaddleY) ? 0 : data.leftPaddleY;
+		cylinderRight.position.set(rightPaddleX, rightPaddleY, 0);
+		cylinderLeft.position.set(leftPaddleX, leftPaddleY, 0);
 		cylinderRight.castShadow = true; 
 		cylinderLeft.castShadow = true; 
 		
@@ -213,12 +217,8 @@ export function gameRenderer(data) {
 		const lightColor = utils.interpolateColor(customData.colorBall); 
 		const lightIntensity = 100;
 		const lightDistance = 80;
-		light1 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
-		light1.position.set(data.width - 5, data.rightPaddleY, cylinderRight.position.z + 5);
-		light2 = new THREE.PointLight(lightColor, lightIntensity, lightDistance); 
-		light2.position.set(-data.width + 5, data.leftPaddleY, cylinderLeft.position.z + 5);
 		light3 = new THREE.PointLight(lightColor, lightIntensity, lightDistance);
-		light3.position.set(data.x, data.y, sphere.position.z);
+		light3.position.set(positionX, positionY, 0);
 		lightBonus = new THREE.PointLight(0x90e0ef, 20, 0);	
 		lightMalus = new THREE.PointLight(0xd62828, 20, 0);
 
@@ -298,16 +298,15 @@ export function gameRenderer(data) {
 	if (gameData.sceneHandler === 1)
     {
 		if (data) {
+			const positionX = isNaN(data.x) ? 0 : data.x;
+			const positionY = isNaN(data.y) ? 0 : data.y;
 			if (gameData.start) {
-				sphere.position.set(data.x, data.y, 0);
+				sphere.position.set(positionX, positionY, 0);
 				scene.add(sphere);
 			} else {
-                sphere.position.set(data.x, data.y, 40);
+                sphere.position.set(positionX, positionY, 40);
 			}
 		}
-
-		scene.add(light2);
-		scene.add(light1);
 		scene.add(light3);
 
 		scene.add(line);

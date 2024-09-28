@@ -142,7 +142,7 @@ export const moveTo = (i) => {
         document.getElementById('bracket-disable-image').innerHTML = '';
     } else if(idx === enu.sceneIdx.END_TR) countDivsWithColumnClass();
     scene[idx].forEach(div => {div.style.display = "flex";});
-    if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6_button.style.display = "flex";
+    if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6_button.style.display = "none"; // ???
 }
 
 /*** banner update ****/
