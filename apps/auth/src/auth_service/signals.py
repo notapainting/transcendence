@@ -1,7 +1,7 @@
 from django.db.models.signals import post_migrate
 from django.conf import settings
 from django.dispatch import receiver
-from auth_service.models import CustomUser  # Assurez-vous que le chemin d'importation est correct
+from auth_service.models import CustomUser
 import requests
 
 @receiver(post_migrate)

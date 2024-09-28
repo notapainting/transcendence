@@ -254,7 +254,7 @@ class RemoteGamer(LocalConsumer):
                 del self.lobby
                 self.set_mode()
         else:
-            await self.set_mode()
+            self.set_mode()
         await self.send_json(data)
 
 
