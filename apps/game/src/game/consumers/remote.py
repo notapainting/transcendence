@@ -83,13 +83,18 @@ class RemoteGamer(LocalConsumer):
 
 
     def set_mode(self, status=None, host=None):
-        logger.info(f"{self.username} ({self.status}): setmode with s:{status}, l:{self.loopback}")
+        logger.info(f"{self.username} ({self.status}): setmode with s:{status}, l:{self.loopback}, h:{host}")
+        if hasattr(self, "host"):
+            logger.info(f"{self.username} ({self.status}): h:{self.host}, l:{self.loopback_host}")
+        if hasattr(self, "loopback_host"):
+            logger.info(f"{self.username} ({self.status}): l:{self.loopback_host}")
+
         if status == None:
             if hasattr(self, "loopback_host"):
                 self.host = self.loopback_host
                 del self.loopback_host
-            elif hasattr(self, "host"):
-                del self.host
+            # elif hasattr(self, "host"):
+            #     del self.host
             self.status = self.loopback
         else:
             if host is not None:
@@ -312,6 +317,8 @@ class RemoteGamer(LocalConsumer):
             await self.send_json(data)
 
     async def tournament_match(self, data):
+        if not hasattr(self, "host") or self.host is None:
+            self.host = data['host_tr']
         match = data['match']
         if match['host'] == self.username:
             self.set_mode(status=enu.Match.HOST, host=self.host)

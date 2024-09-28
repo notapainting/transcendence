@@ -403,7 +403,7 @@ class Tournament(RemoteLobby, BaseTournament):
             if match['host'] == self.host:
                 match['host'] = match['guest']
                 match['guest'] = self.host
-            message = {"type":enu.Tournament.MATCH, "match":match, "settings":self.getSettings()}
+            message = {"type":enu.Tournament.MATCH, "match":match, "settings":self.getSettings(), "host_tr":self.host}
             await self._send(match['host'], message)
             await self._send(match['guest'], message)
             if hasattr(self, "chat_group_id"):
