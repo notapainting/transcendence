@@ -647,9 +647,12 @@ const disableEnableInput = (target, mode) => {
 const deleteGroup = (data) => {
     const groupId = data.id;
     const chatContainer = document.querySelector(`#${groupId}`);
+    console.log(`ID DU GROUP A DELETE: ${groupId}`)
     const personDiv = document.querySelector(`.${groupId}`);
-    personDiv.remove();
-    chatContainer.remove();
+    if (personDiv)
+        personDiv.remove();
+    if (chatContainer)
+        chatContainer.remove();
 }
 
 async function handleMessage(message) {
