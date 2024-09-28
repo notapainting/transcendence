@@ -3,10 +3,8 @@ COLOR_GREEN='\e[1;32m'
 COLOR_RED='\e[1;31m'
 COLOR_RESET='\e[0m'
 
-# Define the URL for Elasticsearch
 KIBANA_URL="https://localhost:5601"
 
-# Define the path to the CA certificate
 CA_CERT="/usr/share/kibana/config/certs/ca/ca.crt"
 
 KIBANA_CERT="/usr/share/kibana/config/certs/kibana-server/kibana-server.crt"
@@ -25,7 +23,6 @@ elif [ x${ELASTIC_PASSWORD} == x ]; then
   exit 1;
 fi
 
-# Creating Data Views
 response=$(curl -X GET "$KIBANA_URL/api/data_views" \
             -u ${ELASTIC_USER}:${ELASTIC_PASSWORD}  \
             --cacert "$CA_CERT"                     \
@@ -40,7 +37,6 @@ if [[ "$response" == *"filebeat-index-*"* ]] && \
 else
   echo -e "${COLOR_GREEN}Creating Data Views...${COLOR_RESET}"
 
-# Creating Nginx Data View
   response=$(curl -X POST "$KIBANA_URL/api/data_views/data_view" \
   -u ${ELASTIC_USER}:${ELASTIC_PASSWORD} \
   --cacert "$CA_CERT" \
@@ -56,7 +52,6 @@ else
     exit 1;
   fi
 
-# Creating Filebeat Data View
   response=$(curl -X POST "$KIBANA_URL/api/data_views/data_view" \
   -u ${ELASTIC_USER}:${ELASTIC_PASSWORD} \
   --cacert "$CA_CERT" \

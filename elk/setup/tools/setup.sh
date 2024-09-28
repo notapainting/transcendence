@@ -75,7 +75,7 @@ find . -type d -exec chmod 750 {} \;
 find . -type f -exec chmod 640 {} \;
 
 if [ ! -f config/certs/logstash/logstash.pkcs8.key ]; then
-    echo -e "/////////////////////////////////////////////////////////////////Convert the Logstash key to pkcs8/////////////////////////////////////////////////////////////////"
+    echo -e "Convert the Logstash key to pkcs8"
     openssl pkcs8 -inform PEM -in config/certs/logstash/logstash.key -topk8 -nocrypt -outform PEM -out config/certs/logstash/logstash.pkcs8.key
 fi;
 
