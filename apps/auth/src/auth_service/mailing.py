@@ -11,7 +11,7 @@ from rest_framework import status
 from django.http import HttpResponse
 import os
 
-host = OS.getenv('host')
+host = os.getenv('host')
 
 
 def GenerateVerificationUrl(request, user, viewname):
@@ -23,7 +23,7 @@ def GenerateVerificationUrl(request, user, viewname):
 	#pour le port 8443 TEMPORAIRE
 	if '8443' not in verification_url:
 		parts = list(urlparse(verification_url))
-		parts[1] = parts[1].replace('{host}', '{host}:8443') 
+		parts[1] = parts[1].replace(f"{host}", f"{host}:8443") 
 		verification_url = urlunparse(parts)
 	return verification_url
 

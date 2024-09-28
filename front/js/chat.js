@@ -371,7 +371,7 @@ let createGroup = async (message) => {
             document.querySelector('.messages').appendChild(messageContainer);
         }
         const newMessageDiv = document.createElement('div');
-        newMessageDiv.classList.add('message', `${message.data.messages[0].author === whoIam ? 'left-message' : 'right-message'}`);
+        newMessageDiv.classList.add('message', `${!message.data.messages[0].author || message.data.messages[0].author !== whoIam ? 'right-message' : 'left-message'}`);
         newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
         messageContainer.appendChild(newMessageDiv);
         const focusedPerson = document.querySelector('.person.focus');

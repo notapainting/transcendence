@@ -377,6 +377,15 @@ const adjustZoom = (event) => {
     
 };
 
+export const loggedOutStatus = () => {
+    document.querySelector(".login-signin-form").style.display = "flex"
+    playBtnElement.removeEventListener("click", playOfflineEvent);
+    playBtnElement.addEventListener("click", playOnlineEvent);
+    document.querySelector(".bubble").style.display = "none";
+    document.querySelector(".chatbox").style.display = "none";
+    document.querySelector(".navbar").style.display= "none";
+}
+
 export let logoutRequest = (event) => {
     event.preventDefault();
     fetch('/auth/logout/', {
@@ -387,8 +396,8 @@ export let logoutRequest = (event) => {
     })
     .then(response => {
         if (response.ok) {
+            loggedOutStatus();
             navigateTo("/");
-            
         } else {
         }
     })

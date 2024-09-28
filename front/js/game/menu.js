@@ -143,6 +143,7 @@ export const moveTo = (i) => {
     } else if(idx === enu.sceneIdx.END_TR) countDivsWithColumnClass();
     scene[idx].forEach(div => {div.style.display = "flex";});
     if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6_button.style.display = "none"; // ???
+    if (idx === enu.sceneIdx.END && status === enu.gameMode.LOCAL) menuM6_button.style.display = "flex"; // !!!
 }
 
 /*** banner update ****/

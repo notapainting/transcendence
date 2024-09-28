@@ -16,9 +16,8 @@ class LocalConsumer(BaseConsumer):
         except LobbyException as error:
             logger.info(error)
             await self.send_json({'type':enu.Error.DATA,'error':enu.Errors.LOBBY})
-        except BaseException as error:
-            logger.error("general error {error}")
-            await self.send_json({'type':enu.Errors.DATA})
+        except BaseException:
+            raise
     
     async def connect(self):
         await self.accept()

@@ -46,14 +46,14 @@ class RemoteGamer(LocalConsumer):
             await super().dispatch(message)
         except PlazaNotFound:
             await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.NTF_404})
-        except BaseException as error:
-            logger.error("general error {error}")
-            await self.send_json({'type':enu.Errors.DATA})
+        except BaseException:
+            raise
 
     async def connect(self):
         self.username = await authenticate(dict(self.scope['headers'])) 
         if self.username is None:
             raise exchan.DenyConnection()
+        # logger.info(f"Users listing : {plaza.listing()}") 
         await self.accept()
         plaza.join(self.username, self.channel_name)
         await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault(), "state":getDefaultState()})
@@ -66,6 +66,8 @@ class RemoteGamer(LocalConsumer):
         for invitor in self.invited_by:
             await self.send_cs(invitor, {'type':enu.Invitation.REJECT})
         plaza.leave(self.username)
+        # logger.info(f"Users listing : {plaza.listing()}")
+
         logger.info(f"QUIT: {self.username} ({self.status})")
 
     async def send_cs(self, target_name, data):
@@ -94,9 +96,17 @@ class RemoteGamer(LocalConsumer):
             if hasattr(self, "loopback_host"):
                 self.host = self.loopback_host
                 del self.loopback_host
-            elif hasattr(self, "host"):
-                del self.host
-            self.status = self.loopback
+            else:
+                if hasattr(self, "host"):
+                    del self.host
+                if hasattr(self, "master"):
+                    self.status = self.loopback
+                else:
+                    self.status = enu.Game.IDLE
+                
+            # elif hasattr(self, "host"):
+            #     del self.host
+            # self.status = self.loopback
         else:
             if host is not None:
                 if hasattr(self, "host"):
@@ -125,10 +135,10 @@ class RemoteGamer(LocalConsumer):
         if json_data['type'] == enu.Errors.DECODE:
             return await self.send_json({'type':enu.Errors.DECODE})
         match json_data['type']:
-            case enu.Game.QUIT: await self.quit()
+            case enu.Game.QUIT: await self.quit(smooth=False)
             case enu.Game.DEFAULT: await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault(), "state":getDefaultState()})
             case _: await self.mode(json_data)
-
+ 
 #  MODE (5)
     async def idle(self, data):
         match data['type']:
@@ -242,9 +252,13 @@ class RemoteGamer(LocalConsumer):
         await self.send_json(data)
 
     async def game_kick(self, data):
+        if hasattr(self, "host") and data['author'] != self.host:
+            return
         if hasattr(self, "lobby"):
-            await self.lobby.quit()
-        await self.send_json(data)
+            await self.lobby.end()
+            del self.lobby
+        self.set_mode()
+        await self.send_json(data) #???
 
     async def game_quit(self, data):
         if hasattr(self, "lobby"):
@@ -337,7 +351,7 @@ class RemoteGamer(LocalConsumer):
         await self.send_json(data)
 
     async def tournament_end(self, data):
-        if hasattr(self, "host") and self.host == data['host_tr']:
+        if hasattr(self, "host") and self.host == data['host_tr'] or self.username == data['host_tr']:
             await self.send_json(data)
             self.set_mode()
             if hasattr(self, "master"):

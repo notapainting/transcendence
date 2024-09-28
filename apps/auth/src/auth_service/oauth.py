@@ -27,7 +27,7 @@ def oauth_callback(request):
 		token_url = "https://api.intra.42.fr/oauth/token"
 		client_id = os.getenv('UID')
 		client_secret = os.getenv('SECRET_KEY')
-		redirect_url = "https://{host}:8443/auth/Oauth/"
+		redirect_url = f"https://{host}:8443/auth/Oauth/"
 		payload = {
 			"grant_type": "authorization_code",
 			"client_id": client_id,
@@ -74,7 +74,7 @@ def oauth_callback(request):
 					requests.post('http://user:8000/signup/', json=account, verify=False)
 				refresh = RefreshToken.for_user(user)
 				access_token_jwt = str(refresh.access_token)
-				response = HttpResponseRedirect('https://{host}:8443/')
+				response = HttpResponseRedirect(f"https://{host}:8443/")
 				response.set_cookie('access', access_token_jwt, httponly=True, secure=True, samesite='Lax')
 				response.set_cookie('refresh', str(refresh), httponly=True, secure=True, samesite='Lax')
 				return response

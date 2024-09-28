@@ -1,6 +1,8 @@
 # game/plaza.py
 
 import httpx
+import channels.exceptions as exchan
+
 
 from logging import getLogger
 logger = getLogger('base')
@@ -22,6 +24,9 @@ class Plaza(metaclass=Singleton):
     _users = {}
 
     def join(self, username, channel_name):
+        if username in Plaza._users:
+            logger.warning(f"user {username} already in plaza")
+            raise exchan.DenyConnection()
         Plaza._users[username] = str(channel_name)
 
     def leave(self, username):

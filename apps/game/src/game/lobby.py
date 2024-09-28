@@ -38,7 +38,7 @@ def getDefault():
     }
 
 async def send_match_to_blockchain(tournament_id, result):
-    logger.info("try to talk to bc")
+    logger.info(f"try to talk to bc with id ; {tournament_id}")
     url = "http://blockchain:8000/register_match/"
 
     data = result
@@ -239,7 +239,6 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
 
     async def _init(self):
         await super()._init()
-        self.id = await tid_count.retrieve()
 
     async def broadcast(self, message):
         message['author'] = self.host
@@ -344,15 +343,11 @@ class RemoteLobby(BaseLobby):
         await self.clear_invitations()
         if smooth is False:
             await self.broadcast({"type":enu.Game.KICK})
-        else:
-            await self.broadcast({"type":enu.Game.QUIT})
+        # else:
+        #     await self.broadcast({"type":enu.Game.QUIT})
         for player_name in self.players:
             await self._chlayer.group_discard(self._id, plaza.translate(player_name, raise_exception=True))
         await super()._end()
-
-    async def quit(self):
-        await self.broadcast({"type":enu.Game.QUIT})
-        await self.end()
 
 class Tournament(RemoteLobby, BaseTournament):
     def __init__(self, host):
