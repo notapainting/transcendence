@@ -15,7 +15,7 @@ class LocalConsumer(BaseConsumer):
             await super().dispatch(message)
         except LobbyException as error:
             logger.info(error)
-            await self.send_json({'type':enu.Error.DATA,'error':enu.Errors.LOBBY})
+            await self.send_json({'type':enu.Errors.DATA,'error':enu.Errors.LOBBY})
         except BaseException:
             raise
     
