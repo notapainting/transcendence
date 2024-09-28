@@ -267,11 +267,12 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
     async def update_result(self, data):
         if await super().update_result(data):
             if self.is_end():
-                await self.broadcast({"type":enu.Tournament.END, "winner":data['winner']})
+                await self.broadcast({"type":enu.Tournament.END, "winner":data['winner'], "host_tr":self.host})
                 self.reset()
             else:
                 await self.make_phase()
    
+
     async def end(self, smooth=True):
         await self.match_stop()
         await super()._end()
@@ -440,7 +441,7 @@ class Tournament(RemoteLobby, BaseTournament):
         await send_match_to_blockchain(self.id, data)
         if await super().update_result(data):
             if self.is_end():
-                await self.broadcast({"type":enu.Tournament.END, "winner":data['winner']})
+                await self.broadcast({"type":enu.Tournament.END, "winner":data['winner'], "host_tr":self.host})
                 await self.end()
             else:
                 await self.make_phase()

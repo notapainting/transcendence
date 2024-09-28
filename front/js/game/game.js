@@ -153,20 +153,24 @@ export function gameRenderer(data) {
 		line = new THREE.Line(geometryLine, materialLine);
 
 		// Background plane
-		const geometryPlane = new THREE.PlaneGeometry((data.width + 5) * 2, data.height * 2);
+		const geometryPlane = new THREE.PlaneGeometry(55 * 2, 30 * 2);
 		const materialPlane = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.5, roughness: 0.5, transparent: true, opacity: 0.5 });
 		plane = new THREE.Mesh(geometryPlane, materialPlane);
 		plane.position.z = -2;
 		plane.receiveShadow = true;
 
 		// Ball
-		geometryBall = new THREE.SphereGeometry(data.ballRadius, 20, 10);
+		const radius = isNaN(data.radius) ? 1 : data.radius;
+		geometryBall = new THREE.SphereGeometry(radius, 20, 10);
 		const materialBall = new THREE.MeshToonMaterial({ color: 0xffffff});
 		sphere = new THREE.Mesh(geometryBall, materialBall);
 		
 		// Paddles
-		const geometryR = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightR - 1, 20);
-		const geometryL = new THREE.CapsuleGeometry(data.paddleWidth, data.paddleHeightL - 1, 20);
+		const paddleWidth = isNaN(data.paddleWidth) ? 1 : data.paddleWidth;
+		const paddleHeightR = isNaN(data.paddleHeightR) ? 10 : data.paddleHeightR;
+		const paddleHeightL = isNaN(data.paddleHeightL) ? 10 : data.paddleHeightL;
+		const geometryR = new THREE.CapsuleGeometry(paddleWidth, Math.max(0, paddleHeightR - 1), 20);
+		const geometryL = new THREE.CapsuleGeometry(paddleWidth, Math.max(0, paddleHeightL - 1), 20);
 		const material = new THREE.MeshToonMaterial({ color: 0xffffff}); 
 		cylinderRight = new THREE.Mesh(geometryR, material);
 		cylinderLeft = new THREE.Mesh(geometryL, material);
@@ -175,7 +179,9 @@ export function gameRenderer(data) {
 		cylinderRight.castShadow = true; 
 		cylinderLeft.castShadow = true; 
 		
-		sphere.position.set(data.x, data.y, 0);
+		const positionX = isNaN(data.x) ? 0 : data.x;
+		const positionY = isNaN(data.y) ? 0 : data.y;
+		sphere.position.set(positionX, positionY, 0);
 		
 		const materialTrail = new THREE.MeshToonMaterial({ color: 0xffffff, transparent:true});
 		if (gameData.start)

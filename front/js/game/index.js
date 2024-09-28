@@ -10,11 +10,20 @@ const   transition = document.getElementById('menu-transition')
 
 
 export const showGame = async () => {
-    await isUserAuthenticated();
-    const data = await getPersInfo();
-    document.title = "bill | game";
-    loggedInStatus(data.profile_picture, data.username);
-    transitionToGame(enu.backendPath.REMOTE);
+    if (await isUserAuthenticated() === true) {
+        try {
+            const data = await getPersInfo();
+            loggedInStatus(data.profile_picture, data.username);
+        }
+        catch (error){
+            navigateTo("/");
+            return
+        }
+        document.title = "bill | game";
+        transitionToGame(enu.backendPath.REMOTE);
+    } else {
+        navigateTo("/");
+    };
 }
 
 export const showGameLocal  = async () => {

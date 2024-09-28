@@ -39,7 +39,7 @@ def getDefaultState():
         'speed':ballSpeedX,
         'collisionX':0,
         'collisionY':0,
-        'radius':1,
+        'radius': 1,
         'width' : WIDTH,
         'height' : HEIGHT,
         'leftPaddleY' : 0,

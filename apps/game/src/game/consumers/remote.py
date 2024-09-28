@@ -85,7 +85,7 @@ class RemoteGamer(LocalConsumer):
     def set_mode(self, status=None, host=None):
         logger.info(f"{self.username} ({self.status}): setmode with s:{status}, l:{self.loopback}, h:{host}")
         if hasattr(self, "host"):
-            logger.info(f"{self.username} ({self.status}): h:{self.host}, l:{self.loopback_host}")
+            logger.info(f"{self.username} ({self.status}): h:{self.host}")
         if hasattr(self, "loopback_host"):
             logger.info(f"{self.username} ({self.status}): l:{self.loopback_host}")
 
@@ -93,8 +93,8 @@ class RemoteGamer(LocalConsumer):
             if hasattr(self, "loopback_host"):
                 self.host = self.loopback_host
                 del self.loopback_host
-            # elif hasattr(self, "host"):
-            #     del self.host
+            elif hasattr(self, "host"):
+                del self.host
             self.status = self.loopback
         else:
             if host is not None:
@@ -317,6 +317,8 @@ class RemoteGamer(LocalConsumer):
             await self.send_json(data)
 
     async def tournament_match(self, data):
+        if hasattr(self, "host") and self.host != data['host_tr']:
+            return
         if not hasattr(self, "host") or self.host is None:
             self.host = data['host_tr']
         match = data['match']
@@ -334,10 +336,11 @@ class RemoteGamer(LocalConsumer):
         await self.send_json(data)
 
     async def tournament_end(self, data):
-        await self.send_json(data)
-        self.set_mode()
-        if hasattr(self, "master"):
-            del self.master
+        if hasattr(self, "host") and self.host == data['host_tr']:
+            await self.send_json(data)
+            self.set_mode()
+            if hasattr(self, "master"):
+                del self.master
 
 
 async def getInviteAuth(author, user):

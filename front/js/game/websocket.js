@@ -242,7 +242,7 @@ const _tournament = (content) => {
 
 const messageHandler = (e) => {
     const content = JSON.parse(e.data);
-    console.log("recv: " + content.type);
+    if (content.type !== enu.Match.UPDATE) console.log("recv: " + content.type);
     if (_match(content) === false)
         if (_invitations(content) === false)
             if (_game(content) === false)
