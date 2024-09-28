@@ -8,11 +8,13 @@ from auth_service.models import CustomUser
 import os
 import uuid
 
+host = os.getenv('HOST');
+
 def authenticate_with_42(request):
 	uid = os.getenv('UID')
 	if uid is None:
 		pass #implementer uen redirection
-	authorization_url = f"https://api.intra.42.fr/oauth/authorize?client_id={uid}&redirect_uri=https://10.13.5.5:8443/auth/Oauth/&response_type=code"
+	authorization_url = f"https://api.intra.42.fr/oauth/authorize?client_id={uid}&redirect_uri=https://{host}:8443/auth/Oauth/&response_type=code"
 	response = JsonResponse({'authorization_url': authorization_url})
 	response["Access-Control-Allow-Origin"] = "*"
 	response["Access-Control-Allow-Methods"] = "GET"
@@ -25,7 +27,7 @@ def oauth_callback(request):
 		token_url = "https://api.intra.42.fr/oauth/token"
 		client_id = os.getenv('UID')
 		client_secret = os.getenv('SECRET_KEY')
-		redirect_url = "https://10.13.5.5:8443/auth/Oauth/"
+		redirect_url = "https://{host}:8443/auth/Oauth/"
 		payload = {
 			"grant_type": "authorization_code",
 			"client_id": client_id,
@@ -72,7 +74,7 @@ def oauth_callback(request):
 					requests.post('http://user:8000/signup/', json=account, verify=False)
 				refresh = RefreshToken.for_user(user)
 				access_token_jwt = str(refresh.access_token)
-				response = HttpResponseRedirect('https://10.13.5.5:8443/')
+				response = HttpResponseRedirect('https://{host}:8443/')
 				response.set_cookie('access', access_token_jwt, httponly=True, secure=True, samesite='Lax')
 				response.set_cookie('refresh', str(refresh), httponly=True, secure=True, samesite='Lax')
 				return response
