@@ -133,8 +133,10 @@ export const moveTo = (i) => {
     if (i === scene.length || i < 0) return ;
     idx = i;
     clearMenu();
-    if (idx === enu.sceneIdx.WELCOME) status = enu.gameMode.LOCAL;
-    else if (idx === enu.sceneIdx.CREATION) {
+    if (idx === enu.sceneIdx.WELCOME) {
+        document.getElementById('game-menu-pause-text').innerHTML = "P A U S E";
+        status = enu.gameMode.LOCAL;
+    } else if (idx === enu.sceneIdx.CREATION) {
         players = [];
         clearGame();
         document.getElementById('bracket-disable-image').innerHTML = '';
