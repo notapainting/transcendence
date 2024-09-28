@@ -16,9 +16,9 @@ DEFAULT_SCORE = 5
 MIN_SCORE = 1
 MAX_SCORE = 15
 
-TIME_PAUSE_START = 2
+TIME_PAUSE_START = 3
 TIME_PAUSE = 0.5
-TIME_REFRESH = 0.02
+TIME_REFRESH = 0.016
 
 WIDTH = 50
 HEIGHT = 30
@@ -295,7 +295,7 @@ class GameState:
         if (self.status['last_update_time'] == 0):
             delta_time = 1
         else:
-            delta_time = (current_time - self.status['last_update_time']) * 10 # a remettre a 30
+            delta_time = (current_time - self.status['last_update_time']) * 30 
         self.status['last_update_time'] = current_time
 
         self.applyBonus()
@@ -326,7 +326,6 @@ class GameState:
                     continue
                 await asyncio.sleep(TIME_REFRESH)
                 if (self.paused == False):
-                    logger.info(f"loop {self.paused}")
                     self.running = await self.update()
                     await self._send({"type":enu.Game.RELAY, "relay":{"type": enu.Match.UPDATE, "message":self.to_dict()}})
                 if self.reset ==  2:
@@ -356,16 +355,16 @@ class GameState:
         # if self.running == False
         #     return
         if self.paused == False:
+            self.status['last_update_time'] = 0
+            self.running = False
             self.paused = True
             self.timer.pause()
-            logger.info("pause game")
             # await self.stop()
             await self._send({"type":enu.Match.PAUSE})
         else:
             self.paused = False
+            self.running = True
             self.timer.resume()
-            # print("resume game", file=sys.stderr)
-            logger.info("resume game")
             # await self.start()
             await self._send({"type":enu.Game.RELAY, "relay":{"type":enu.Match.RESUME}})
 

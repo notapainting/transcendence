@@ -152,7 +152,7 @@ class BaseLobby:
                 self.ready.remove(user)
         return kicked
 
-    def check(self, user):
+    def _check(self, user):
         if user in self.players and user not in self.ready:
             self.ready.append(user)
             return True
@@ -325,7 +325,7 @@ class RemoteLobby(BaseLobby):
         return False
 
     async def check(self, user):
-        if super().check(user):
+        if self._check(user):
             await self.broadcast({"type":enu.Game.READY, "player":user})
             return True
         return False
@@ -343,6 +343,8 @@ class RemoteLobby(BaseLobby):
         await self.clear_invitations()
         if smooth is False:
             await self.broadcast({"type":enu.Game.KICK})
+        else:
+            await self.broadcast({"type":enu.Game.QUIT})
         for player_name in self.players:
             await self._chlayer.group_discard(self._id, plaza.translate(player_name, raise_exception=True))
         await super()._end()
@@ -401,7 +403,7 @@ class Tournament(RemoteLobby, BaseTournament):
             if match['host'] == self.host:
                 match['host'] = match['guest']
                 match['guest'] = self.host
-            message = {"type":enu.Tournament.MATCH, "match":match, "settings":self.getSettings()}
+            message = {"type":enu.Tournament.MATCH, "match":match, "settings":self.getSettings(), "host_tr":self.host}
             await self._send(match['host'], message)
             await self._send(match['guest'], message)
             if hasattr(self, "chat_group_id"):

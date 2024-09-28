@@ -63,15 +63,16 @@ const _game = (content) => {
                 target.parentElement.remove();
             }
             catch (error) {}
+            if (getSceneIdx() === enu.sceneIdx.END || getSceneIdx() === enu.sceneIdx.END_TR || getSceneIdx() === enu.sceneIdx.CREATION) return true;
+            moveTo(enu.sceneIdx.WELCOME);
             return true;
         case enu.Game.START:
             
             return true;
         case enu.Game.BROKE:
         case enu.Game.KICK:
-            if (getSceneIdx() === enu.sceneIdx.END || getSceneIdx() === enu.sceneIdx.END_TR) return;
+            if (getSceneIdx() === enu.sceneIdx.END || getSceneIdx() === enu.sceneIdx.END_TR) return true;
             moveTo(enu.sceneIdx.WELCOME);
-            
             return true;
         case enu.Game.NEXT:
             moveTo(enu.sceneIdx.PREMATCH);
@@ -241,6 +242,7 @@ const _tournament = (content) => {
 
 const messageHandler = (e) => {
     const content = JSON.parse(e.data);
+    console.log("recv: " + content.type);
     if (_match(content) === false)
         if (_invitations(content) === false)
             if (_game(content) === false)

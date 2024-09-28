@@ -46,7 +46,7 @@ export async function animate() {
 				gameData.start = true;
 			} else {
 				time_counter += time_step;
-				game.lightBall.position.set(game.sphere.position.x, game.sphere.position.y, game.sphere.position.z);
+				game.light3.position.set(game.sphere.position.x, game.sphere.position.y, game.sphere.position.z);
 			}
 		}
 		if (gameData.explosion === true) {
