@@ -371,9 +371,6 @@ let createGroup = async (message) => {
             document.querySelector('.messages').appendChild(messageContainer);
         }
         const newMessageDiv = document.createElement('div');
-        try {
-            
-        }
         newMessageDiv.classList.add('message', `${!message.data.messages[0].author || message.data.messages[0].author !== whoIam ? 'right-message' : 'left-message'}`);
         newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
         messageContainer.appendChild(newMessageDiv);
