@@ -360,7 +360,11 @@ class Tournament(RemoteLobby, BaseTournament):
     async def _init(self):
         await super()._init()
         self.id = await tid_count.retrieve()
-        
+
+    async def _send(self, target_name, message):
+        message["host_tr"] = self.host
+        await super()._send(target_name, message)
+
     async def check(self, user=None):
         return False
 
@@ -402,7 +406,7 @@ class Tournament(RemoteLobby, BaseTournament):
             if match['host'] == self.host:
                 match['host'] = match['guest']
                 match['guest'] = self.host
-            message = {"type":enu.Tournament.MATCH, "match":match, "settings":self.getSettings(), "host_tr":self.host}
+            message = {"type":enu.Tournament.MATCH, "match":match, "settings":self.getSettings()}
             await self._send(match['host'], message)
             await self._send(match['guest'], message)
             if hasattr(self, "chat_group_id"):
@@ -439,7 +443,7 @@ class Tournament(RemoteLobby, BaseTournament):
         await send_match_to_blockchain(self.id, data)
         if await super().update_result(data):
             if self.is_end():
-                await self.broadcast({"type":enu.Tournament.END, "winner":data['winner'], "host_tr":self.host})
+                await self.broadcast({"type":enu.Tournament.END, "winner":data['winner']})
             else:
                 await self.make_phase()
         else:

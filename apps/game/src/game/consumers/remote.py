@@ -333,7 +333,7 @@ class RemoteGamer(LocalConsumer):
         if self.host_tr == data['host_tr']:
             await self.send_json(data)
             if self.username == self.host_tr:
-                await self.end()
+                await self.lobby.end()
             self.set_mode(new_status=enu.Game.IDLE)
             self.host = None
             self.host_tr = None
