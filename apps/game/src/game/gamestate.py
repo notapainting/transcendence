@@ -317,6 +317,7 @@ class GameState:
         self.reset = 2
 
     async def _loop(self):
+        logger.info(f"Thread-G-{self.leftPlayer} : ENTER")
         try :
             await asyncio.sleep(TIME_PAUSE_START)
             while self.running:
@@ -329,6 +330,8 @@ class GameState:
                     self.reset = 0
         except BaseException as error:
             logger.critical(f"internal : {error}")
+        logger.info(f"Thread-G-{self.leftPlayer} : EXIT")
+
 
     async def start(self):
         self.running = True
@@ -340,8 +343,6 @@ class GameState:
     async def stop(self):
         self.running = False
         self.timer.pause()
-        if hasattr(self, "game_thread") is False:
-            logger.info(f"Thread-G-{self.leftPlayer} : STOPED")
 
     async def pause(self):
         if self.paused == False:
@@ -362,10 +363,5 @@ class GameState:
         if self.running:
             self.status['randB'] = bonus
 
-    async def _end(self):
-        await self.stop()
-        if hasattr(self, "game_thread"):
-            self.game_thread._stop()
-            logger.info(f"Thread-G-{self.leftPlayer} : KILLED")
 
 
