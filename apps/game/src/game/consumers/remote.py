@@ -109,6 +109,8 @@ class RemoteGamer(LocalConsumer):
         match self.status:
             case enu.Game.IDLE : 
                 self.mode = self.idle
+                self.host = None
+                self.host_tr = None
             case enu.Game.LOCAL : self.mode = self.local
             case enu.Game.HOST : self.mode = self.mode_host
             case enu.Game.GUEST : self.mode = self.mode_guest
@@ -240,14 +242,22 @@ class RemoteGamer(LocalConsumer):
         await self.send_json(data)
 
     async def game_kick(self, data):
-        if data['author'] == self.host:
-            if hasattr(self, "lobby"):
-                await self.lobby.end()
-                del self.lobby
+        if data['author'] != self.username:
+            if data['author'] == self.host_tr:
+                if hasattr(self, "lobby"):
+                    await self.lobby.end(cancelled=True)
+                    del self.lobby
                 self.set_mode(new_status=enu.Game.IDLE)
-            else:
+                await self.send_json(data)
+            elif data['author'] == self.host:
                 self.set_mode()
-            await self.send_json(data)
+                if self.host_tr is None: 
+                    await self.send_json(data)
+
+# if quit from host_tr -> idle
+# if quit from host_ -> setmode
+#if quit from user in match -> cancel match
+#if quit from user in trn -> cheat/remove
 
     async def game_quit(self, data):
         if hasattr(self, "lobby"):
@@ -262,9 +272,13 @@ class RemoteGamer(LocalConsumer):
                 await self.lobby.end(cancelled=True)
                 del self.lobby
                 self.set_mode()
+            await self.send_json(data)
         else:
-            self.set_mode()
-        await self.send_json(data)
+            if self.host_tr == data['author']:
+                self.set_mode(new_status=enu.Game.IDLE)
+            else:
+                self.set_mode()
+            await self.send_json(data)
 
     async def game_ready(self, data):
         if data['author'] == self.username:

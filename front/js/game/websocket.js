@@ -58,13 +58,15 @@ const _game = (content) => {
 
     switch (content.type) {
         case enu.Game.QUIT:
-            try {
-                const target = document.getElementById('invite-status-' + content.author);
-                target.parentElement.remove();
+            if (getSceneIdx() === enu.sceneIdx.CREATION) {
+                try {
+                    const target = document.getElementById('invite-status-' + content.author);
+                    target.parentElement.remove();
+                }
+                catch (error) {}
             }
-            catch (error) {}
-            if (getSceneIdx() === enu.sceneIdx.END || getSceneIdx() === enu.sceneIdx.END_TR || getSceneIdx() === enu.sceneIdx.CREATION) return true;
-            moveTo(enu.sceneIdx.WELCOME);
+            // if (getSceneIdx() === enu.sceneIdx.END || getSceneIdx() === enu.sceneIdx.END_TR || getSceneIdx() === enu.sceneIdx.CREATION) return true;
+            // moveTo(enu.sceneIdx.WELCOME);
             return true;
         case enu.Game.START:
             

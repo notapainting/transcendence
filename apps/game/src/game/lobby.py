@@ -422,6 +422,7 @@ class Tournament(RemoteLobby, BaseTournament):
                 await httpx.AsyncClient().post(url='http://chat:8000/api/v1/messages/', data=JSONRenderer().render(message))
 
     async def cheat(self, user):
+        logger.info(f"base state : {self.players_state()}")
         data = {}
         data['score_l'] = 0
         data['score_w'] = 99
@@ -435,8 +436,8 @@ class Tournament(RemoteLobby, BaseTournament):
                 data['loser'] = match['guest']
                 break
         await self.remove(data['loser'])
-        if hasattr(data, "winner"):
-            await self.update_result(data, cheat=True)
+        logger.info(f"updres with {data}")
+        await self.update_result(data, cheat=True)
         logger.info(f"current state : {self.players_state()}")
 
 
@@ -446,11 +447,13 @@ class Tournament(RemoteLobby, BaseTournament):
     async def update_result(self, data, cheat=False):
         await send_match_to_blockchain(self.id, data)
         if await super().update_result(data):
+            logger.info(f"new phase")
             if self.is_end():
                 await self.broadcast({"type":enu.Tournament.END, "winner":data['winner']})
             else:
                 await self.make_phase()
         else:
+            logger.info(f"old phase")
             await self._send(data['winner'], {"type":enu.Tournament.PHASE, "new":False})
             if cheat is False:
                 await self._send(data['loser'], {"type":enu.Tournament.PHASE, "new":False})
