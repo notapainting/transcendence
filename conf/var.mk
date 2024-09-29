@@ -28,9 +28,9 @@ BASE    =    docker compose \
                 --env-file conf/main.env \
                 --file compose.network.yml 
 
-CMP        =    ${BASE} ${FILE}
+# CMP        =    ${BASE} ${FILE}
 
-CMP_NL     =    ${BASE} ${FILE_NL}
+CMP     =    ${BASE} ${FILE_NL}
 
 
 #========#    colors    #========#
