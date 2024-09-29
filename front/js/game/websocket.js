@@ -230,10 +230,10 @@ const _tournament = (content) => {
             announceMatch(content.match);
             return true;
         case enu.Tournament.END:
+            announceWinner(content)
             moveTo(enu.sceneIdx.END_TR)
             return true;
         case enu.Tournament.RESULT:
-            
             return true;
     };
     return false;

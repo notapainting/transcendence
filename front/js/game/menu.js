@@ -4,7 +4,7 @@ import { fullClear } from './index.js';
 import * as enu from './enums.js'
 import { gameData } from './game.js';
 
-
+let     finalWinner = 'undefined'
 
 
 const   start = document.getElementById('game-menu-start');
@@ -135,11 +135,12 @@ export const moveTo = (i) => {
     clearMenu();
     if (idx === enu.sceneIdx.WELCOME) {
         document.getElementById('game-menu-pause-text').innerHTML = "P A U S E";
+        document.getElementById('bracket-disable-image').innerHTML = '';
         status = enu.gameMode.LOCAL;
     } else if (idx === enu.sceneIdx.CREATION) {
         players = [];
-        clearGame();
         document.getElementById('bracket-disable-image').innerHTML = '';
+        clearGame();
     } else if(idx === enu.sceneIdx.END_TR) countDivsWithColumnClass();
     scene[idx].forEach(div => {div.style.display = "flex";});
     if (idx === enu.sceneIdx.END && status !== enu.gameMode.MATCH) menuM6_button.style.display = "none"; // ???
@@ -157,10 +158,6 @@ export const clearScore = () => {
 }
 
 export const announcePhase = (data) => {
-    // const   banner = document.getElementById('game-menu-banner-end')
-    // const   banner2 = document.getElementById('game-menu-banner-end2')
-    // banner.innerHTML = "Congratulations! Winner is " + data.winner;
-    // banner2.innerHTML = "Congratulations! Winner is " + data.winner;
     document.getElementById('banner-phase-text').innerHTML = '';
     let odd = 0;
     const column = document.createElement('div');
@@ -294,6 +291,7 @@ export const announceWinner = (data) => {
     const   banner2 = document.getElementById('game-menu-banner-end2')
     banner.innerHTML = "Congratulations! Winner is " + data.winner;
     banner2.innerHTML = "Congratulations! Winner is " + data.winner;
+    finalWinner = data.winner
 }
 
 /*** utils ***/
@@ -624,6 +622,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function countDivsWithColumnClass() {
+    const   banner2 = document.getElementById('game-menu-banner-end2')
+    banner2.innerHTML = "Congratulations! Winner is " + finalWinner;
     const divs = document.querySelectorAll('div.column');
 
     if (divs.length === 1) {

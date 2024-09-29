@@ -100,7 +100,7 @@
     overflow:hidden;
   }
 
-  /* Randomized twinkle delays */
+
 .star:nth-child(1):before {
     animation-delay: 0.8s;
   }
@@ -125,7 +125,7 @@
     animation-delay: 0.7s;
   }
   
-  /* Add more star:nth-child(n):before rules for additional stars */
+
   .star:nth-child(7):before {
     animation-delay: 1.3s;
   }
@@ -142,7 +142,7 @@
     animation-delay: 0.5s;
   }
   
-  /* Continue adding star:nth-child(n):before rules for more delays */
+
   .star:nth-child(15):before {
     animation-delay: 0.8s;
   }
@@ -167,7 +167,6 @@
     animation-delay: 0.7s;
   }
   
-  /* Add more star:nth-child(n):before rules for additional stars */
   .star:nth-child(11):before {
     animation-delay: 1.3s;
   }
