@@ -6,7 +6,7 @@ from rest_framework.renderers import JSONRenderer
 from game.consumers.local import LocalConsumer
 import game.enums as enu
 
-from game.lobby import Match, Tournament, LocalTournament, getDefault
+from game.lobby import Match, Tournament, LocalTournament, getDefault, LobbyException
 from game.plaza import plaza, PlazaNotFound
 from game.gamestate import getDefaultState
 

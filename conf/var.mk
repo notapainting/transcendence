@@ -1,6 +1,6 @@
 #========#    general    #========#
 MAKEFLAGS   +=   -s
-MODE=dev
+MODE=prod
 
 
 #========#	env 	#========#

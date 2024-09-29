@@ -380,7 +380,7 @@ class Tournament(RemoteLobby, BaseTournament):
         await super().start()
         message = {
             'author':'tournament',
-            'name': f'{self.host} tournament',
+            'name': f'tournament {self.host}',
             'admins':[],
             'members':self.players,
             'restricts':[],
