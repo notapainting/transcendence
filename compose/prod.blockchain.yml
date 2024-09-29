@@ -1,9 +1,9 @@
 services:
   blockchain:
     container_name: blockchain
-    depends_on:
-     data_views:
-       condition: service_healthy
+    # depends_on:
+    #  data_views:
+    #    condition: service_healthy
     build:
       context: apps/blockchain/
       dockerfile: Dockerfile.prod

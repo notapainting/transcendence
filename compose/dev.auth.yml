@@ -20,9 +20,9 @@ services:
 
   auth-db:
     container_name: auth-db
-    depends_on:
-     data_views:
-       condition: service_healthy
+    # depends_on:
+    #  data_views:
+    #    condition: service_healthy
     build: postgres/
     image: postgres_image
     environment:

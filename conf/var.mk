@@ -1,6 +1,6 @@
 #========#    general    #========#
 MAKEFLAGS   +=   -s
-MODE=dev
+MODE=prod
 
 
 #========#	env 	#========#
@@ -14,18 +14,23 @@ ENV_FILE            =   ${TEMPLATE_FILE:.template=.env}
 DIR_CMP		=	compose/
 RAW_FILE	=	.auth.yml .user.yml .chat.yml .game.yml .blockchain.yml
 OK_FILE     =   compose.proxy.yml compose.elk.yml
+OK_FILE_NL	=   compose.proxy.yml
 LST_FILE    =   ${addprefix ${MODE}, ${RAW_FILE}} ${OK_FILE}
+LST_FILE_NL =   ${addprefix ${MODE}, ${RAW_FILE}} ${OK_FILE_NL}
 
 
 FILE	=	${addprefix --file , ${addprefix ${DIR_CMP}, ${LST_FILE}}}
+FILE_NL	=	${addprefix --file , ${addprefix ${DIR_CMP}, ${LST_FILE_NL}}}
 
 
 BASE    =    docker compose \
-				--parallel -1\
+                --parallel -1\
                 --env-file conf/main.env \
                 --file compose.network.yml 
 
 CMP        =    ${BASE} ${FILE}
+
+CMP_NL     =    ${BASE} ${FILE_NL}
 
 
 #========#    colors    #========#

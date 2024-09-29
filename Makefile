@@ -6,7 +6,7 @@
 #    By: tlegrand <tlegrand@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/10 21:52:05 by tlegrand          #+#    #+#              #
-#    Updated: 2024/09/29 19:18:11 by tlegrand         ###   ########.fr        #
+#    Updated: 2024/09/29 21:44:53 by tlegrand         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -82,7 +82,11 @@ up-fg:	${ENV_FILE}
 down:
 	${CMP} down 
 
+up-nl:
+	${CMP_NL} up --build
 
+down-nl:
+	${CMP_NL} down
 
 #========#	tools rule	#========#
 .PHONY: config ps top mode
