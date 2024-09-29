@@ -20,6 +20,7 @@ const parallaxEffect = (event) => {
     const backThrees = document.querySelector('.back-threes');
     const middleThrees = document.querySelector('.middle-threes');
     const frontThrees = document.querySelector('.front-threes');
+    const titleSite = document.querySelector('.title-site');
 
     const maxOffsetX = 75; 
     const maxOffsetY = 75; 
@@ -33,6 +34,7 @@ const parallaxEffect = (event) => {
     backThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.2}px) calc(50% + ${yAxis * 0.2}px)`;
     middleThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.4}px) calc(50% + ${yAxis * 0.4}px)`;
     frontThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.9}px) calc(50% + ${yAxis * 0.9}px)`;
+    titleSite.style.backgroundPosition = `calc(50% + ${xAxis * 1.4}px) calc(50% + ${yAxis * 1.4}px)`;
 }
 
 function authenticateWith42() {
@@ -67,6 +69,7 @@ const scrollUpEffect = (event, path) => {
     const backgroundThrees = document.querySelector('.background-threes')
     const middleThrees = document.querySelector('.middle-threes');
     const frontThrees = document.querySelector('.front-threes');
+    const titleSite = document.querySelector('.title-site');
     setTimeout(() => {
         for (let i = 0; i < 4; i++){
             setTimeout(() => {
@@ -80,6 +83,8 @@ const scrollUpEffect = (event, path) => {
                         backThrees.style.transform = `scale(${zoomFactor * 0.8})`;
                         middleThrees.style.transform = `scale(${zoomFactor * 1})`;
                         frontThrees.style.transform = `scale(${zoomFactor * 2})`;
+                        titleSite.style.transform = `translateY(-${zoomFactor * 200}px)`;
+                        titleSite.style.opacity = "0"
                         break;
                     case 1:
                         document.querySelectorAll(".banner").forEach(x => x.style.opacity = "0")
@@ -88,6 +93,7 @@ const scrollUpEffect = (event, path) => {
                         middleThrees.style.transform = `scale(${zoomFactor * 2})`;
                         frontThrees.style.transform = `scale(${zoomFactor * 3})`;
                         frontThrees.style.opacity = "0"
+                        titleSite.style.opacity = "0"
                         break;
                     case 2:
                         backThrees.style.transform = `scale(${zoomFactor * 2})`;

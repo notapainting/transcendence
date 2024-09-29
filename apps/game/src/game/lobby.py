@@ -440,7 +440,6 @@ class Tournament(RemoteLobby, BaseTournament):
         if await super().update_result(data):
             if self.is_end():
                 await self.broadcast({"type":enu.Tournament.END, "winner":data['winner'], "host_tr":self.host})
-                await self.end()
             else:
                 await self.make_phase()
         else:

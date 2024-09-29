@@ -51,13 +51,16 @@ function resetHomePage() {
     const backgroundThrees = document.querySelector('.background-threes');
     const middleThrees = document.querySelector('.middle-threes');
     const frontThrees = document.querySelector('.front-threes');
+    const titleSite = document.querySelector('.title-site');
     
     backThrees.style.transform = 'scale(1)';
     backgroundThrees.style.filter = 'blur(0px)';
     middleThrees.style.transform = 'scale(1)';
     frontThrees.style.transform = 'scale(1)';
+    titleSite.style.transform = 'scale(1)';
     
     document.querySelectorAll(".banner").forEach(x => x.style.opacity = "1");
+    titleSite.style.opacity = "1";
     frontThrees.style.opacity = "1";
     middleThrees.style.opacity = "1";
     backThrees.style.opacity = "1";

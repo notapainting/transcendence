@@ -40,6 +40,8 @@ class RemoteGamer(LocalConsumer):
         self.status = enu.Game.IDLE
         self.mode = self.idle
         self.loopback = self.status
+        self.host = None
+        self.host_tr = None
 
     async def dispatch(self, message):
         try :
@@ -47,7 +49,7 @@ class RemoteGamer(LocalConsumer):
         except PlazaNotFound:
             await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.NTF_404})
         except BaseException as error:
-            logger.info(f"ERROR: {self.username} ({self.status}): {error}")
+            # logger.info(f"ERROR: {self.username} ({self.status}): {error}")
             raise
 
     async def connect(self):
@@ -79,52 +81,34 @@ class RemoteGamer(LocalConsumer):
     async def quit(self, smooth=True):
         if hasattr(self, "lobby"):
             await self.lobby.end(smooth)
-        if hasattr(self, "host"):
+        if self.host is not None:
             await self.send_cs(self.host, {"type":enu.Game.QUIT})
-        if hasattr(self, "loopback_host"):
-            await self.send_cs(self.loopback_host, {"type":enu.Game.QUIT})
-        self.set_mode(enu.Game.IDLE)
+        if self.host_tr is not None:
+            await self.send_cs(self.host_tr, {"type":enu.Game.QUIT})
+        self.set_mode(new_status=enu.Game.IDLE)
 
-
-    def set_mode(self, status=None, host=None):
-        logger.info(f"{self.username} ({self.status}): setmode with s:{status}, l:{self.loopback}, h:{host}")
-        if hasattr(self, "host"):
-            logger.info(f"{self.username} ({self.status}): h:{self.host}")
-        if hasattr(self, "loopback_host"):
-            logger.info(f"{self.username} ({self.status}): l:{self.loopback_host}")
-
-        if status == None:
-            if hasattr(self, "loopback_host"):
-                self.host = self.loopback_host
-                del self.loopback_host
-            else:
-                if hasattr(self, "host"):
-                    del self.host
-                if hasattr(self, "master"):
-                    self.status = self.loopback
+    def set_mode(self, new_status=None, new_host=None):
+        logger.info(f"{self.username} ({self.status}): setmode({new_status}, {new_host})")
+        logger.info(f"{self.username} ({self.status}): host({self.host}, {self.host_tr})")
+        if new_status == None: # on veut retourner a l'etat precedant
+            if self.host_tr is not None: # on connait un host de tournoi
+                if self.host_tr == self.username: #on est soit meme l'host de tournoi
+                    self.status = enu.Game.HOST
                 else:
-                    self.status = enu.Game.IDLE
-                
-            # elif hasattr(self, "host"):
-            #     del self.host
-            # self.status = self.loopback
-        else:
-            if host is not None:
-                if hasattr(self, "host"):
-                    self.loopback_host = self.host
-                self.host = host
-            self.loopback = self.status
-            self.status = status
+                    self.host = self.host_tr
+                    self.status = enu.Game.GUEST
+                # on va recuperer lhost de tournoi comme host principal et se remettre en guest
+            else:   # on connait pas de host tr -> pas de tournoir -> match -> reset sur idle
+                self.host = None
+                self.status = enu.Game.IDLE
+        else:   # on veut set un etat
+            self.status = new_status
+            if new_host is not None: # et enregistre un nouveau host
+                self.host = new_host
+
         match self.status:
             case enu.Game.IDLE : 
                 self.mode = self.idle
-                self.loopback = enu.Game.IDLE
-                if hasattr(self, "host"):
-                    del self.host
-                if hasattr(self, "loopback_host"):
-                    del self.loopback_host
-                if hasattr(self, "master"):
-                    del self.master
             case enu.Game.LOCAL : self.mode = self.local
             case enu.Game.HOST : self.mode = self.mode_host
             case enu.Game.GUEST : self.mode = self.mode_guest
@@ -140,20 +124,21 @@ class RemoteGamer(LocalConsumer):
             case enu.Game.DEFAULT: await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault(), "state":getDefaultState()})
             case _: await self.mode(json_data)
  
-#  MODE (5)
+    #  MODE (5)
     async def idle(self, data):
         match data['type']:
             case enu.Game.CREATE:
                 if data['mode'] == enu.Game.MATCH:
                     self.lobby = Match(host=self.username)
-                    self.set_mode(status=enu.Game.HOST)
+                    self.set_mode(new_status=enu.Game.HOST)
                 elif data['mode'] == enu.Game.TRN:
+                    self.host_tr = self.username
                     self.lobby = Tournament(host=self.username)
-                    self.master = True
-                    self.set_mode(status=enu.Game.HOST)
+                    self.set_mode(new_status=enu.Game.HOST)
                 elif data['mode'] == enu.Game.LOCAL:
+                    self.host_tr = self.username
                     self.lobby = LocalTournament(host=self.username, host_channel_name=self.channel_name)
-                    self.set_mode(status=enu.Game.LOCAL)
+                    self.set_mode(new_status=enu.Game.LOCAL)
                 await self.lobby._init()
             case enu.Invitation.ACCEPT | enu.Invitation.REJECT:
                 if data['message'] in self.invited_by:
@@ -212,8 +197,7 @@ class RemoteGamer(LocalConsumer):
         elif data['type'] == enu.Game.NEXT:
             await self.send_json(data)
 
-
-# GENERAL (8)
+    # GENERAL (8)
     async def game_invite(self, data):
         self.invited_by[data['author']] = data['mode']
         await self.send_json(data)
@@ -225,10 +209,12 @@ class RemoteGamer(LocalConsumer):
             return await self.send_json(data)
         if self.status == enu.Game.IDLE and author in self.invited_by:
             data['mode'] = self.invited_by[author]
+            if data['mode'] == enu.Game.TRN:
+                self.host_tr = author
             data['by'] = True
             await self.send_json(data)
             self.host = author
-            self.set_mode(status=enu.Game.GUEST)
+            self.set_mode(new_status=enu.Game.GUEST)
             del self.invited_by[author]
         elif hasattr(self, "lobby"):
             if self.lobby.invited(author) and await self.lobby.add(author):
@@ -278,7 +264,6 @@ class RemoteGamer(LocalConsumer):
             self.set_mode()
         await self.send_json(data)
 
-
     async def game_ready(self, data):
         if data['author'] == self.username:
             return 
@@ -291,12 +276,12 @@ class RemoteGamer(LocalConsumer):
     async def game_next(self, data):
         await self.send_json(data)
 
-# MATCH (3)
+    # MATCH (3)
     async def match_start(self, data):
         if self.status == enu.Game.HOST:
-            self.set_mode(status=enu.Match.HOST)
+            self.set_mode(new_status=enu.Match.HOST)
         elif self.status == enu.Game.GUEST:
-            self.set_mode(status=enu.Match.GUEST)
+            self.set_mode(new_status=enu.Match.GUEST)
         await self.send_json(data)
 
     async def match_go(self, data):
@@ -307,7 +292,7 @@ class RemoteGamer(LocalConsumer):
         if self.status == enu.Game.LOCAL:
             await self.lobby.update_result(data)
         else:
-            if hasattr(self, "lobby") and not hasattr(self, "master"):
+            if hasattr(self, "lobby") and self.username != self.host_tr:
                 await self.lobby.end()
                 del self.lobby
             self.set_mode()
@@ -322,41 +307,37 @@ class RemoteGamer(LocalConsumer):
             await self.lobby.match_pause(data['author'])
         await self.send_json(data)
 
-# TOURNAMENT (4)
+    # TOURNAMENT (4)
     async def match_result(self, data):
-        if data['author'] != self.username and hasattr(self, "master"):
-            await self.lobby.update_result(data['message'])
+        if data['author'] != self.username and self.host_tr == self.username:
             await self.send_json(data)
+            await self.lobby.update_result(data['message'])
 
     async def tournament_phase(self, data):
         if self.status != enu.Game.IDLE:
             await self.send_json(data)
 
     async def tournament_match(self, data):
-        if hasattr(self, "host") and self.host != data['host_tr']:
+        if self.host_tr != data['host_tr']:
             return
-        if not hasattr(self, "host") or self.host is None:
-            self.host = data['host_tr']
         match = data['match']
         if match['host'] == self.username:
-            self.set_mode(status=enu.Match.HOST, host=self.host)
+            self.set_mode(new_status=enu.Match.HOST)
             self.lobby = Match(host=self.username, tournament=self.host, settings=data['settings'])
             await self.lobby._init()
             await self.lobby.add(match['guest'])
         else:
-            if self.status == enu.Game.HOST:
-                self.set_mode(status=enu.Match.GUEST)
-                self.host = match['host']
-            else:
-                self.set_mode(status=enu.Match.GUEST, host=match['host'])
+            self.set_mode(new_status=enu.Match.GUEST, new_host=match['host'])
         await self.send_json(data)
 
-    async def tournament_end(self, data):
-        if hasattr(self, "host") and self.host == data['host_tr'] or self.username == data['host_tr']:
+    async def tournament_end(self, data): #should call lobby.end here not in update_result
+        if self.host_tr == data['host_tr']:
             await self.send_json(data)
-            self.set_mode()
-            if hasattr(self, "master"):
-                del self.master
+            self.set_mode(new_status=enu.Game.IDLE)
+            self.host = None
+            self.host_tr = None
+            logger.info(f"{self.username} ({self.status}): trn end")
+
 
 
 async def getInviteAuth(author, user):

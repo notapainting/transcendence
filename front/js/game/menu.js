@@ -157,6 +157,10 @@ export const clearScore = () => {
 }
 
 export const announcePhase = (data) => {
+    // const   banner = document.getElementById('game-menu-banner-end')
+    // const   banner2 = document.getElementById('game-menu-banner-end2')
+    // banner.innerHTML = "Congratulations! Winner is " + data.winner;
+    // banner2.innerHTML = "Congratulations! Winner is " + data.winner;
     document.getElementById('banner-phase-text').innerHTML = '';
     let odd = 0;
     const column = document.createElement('div');

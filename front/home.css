@@ -191,9 +191,6 @@ input:focus::placeholder {
     background-color: red;
 }
 
-.profile {
-
-}
 
 
 .back-threes,
@@ -210,9 +207,23 @@ input:focus::placeholder {
     transition: transform 2s ease, opacity 1.5s ease;
 }
 
+.title-site {
+   background-image: url("img/title.png");
+    position: absolute;
+    bottom: 35%; 
+    height: 100%;
+    width: 100%;
+    /* background-size: cover; */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 80% auto;
+    transition: transform 2s ease, opacity 1.5s ease;
+}
+
+
 .banner {
     background-color: #0C3452;
-    height: 70px;
+    height: 45px;
     width: 100%;
     position: absolute;
     transition: opacity 0.1s linear;
@@ -241,6 +252,8 @@ input:focus::placeholder {
 .front-threes {
     background-image: url("img/3.png");
 }
+
+
 
 /* separator */
 
@@ -713,35 +726,47 @@ button[disabled]::after {
     transform: translateX(-50%);
   }
 
-a {
-    text-decoration: none;
-  }
-  .main__scroll-text {
-    color: rgb(4 29 47);
-    margin-left: 5px;
-  }
-  
-  .main__action:hover .main__scroll-box {
-    animation: scroll-down 3s infinite;
-  }
-
-  @keyframes scroll-down {
-    0%, 100% {
-      transform: translateY(0rem);
-      opacity: 1;
-    }
-  
-    35% {
-      transform: translateY(1rem);
-      opacity: 0;
-    }
-  
-    70% {
-      transform: translateY(-1rem);
-      opacity: 0;
-    }
-  }
-
-  .svg-scroll path:nth-child(2) {
-    fill: rgb(4 29 47);
+.btn-scroll {
+  width: 25px;
+  height: 40px;
+  margin-top: 43%;
+  margin-left: 50%;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  outline: 2px solid rgb(39 155 253);
+  box-shadow: 0px 0px 10px rgb(206 232 255);
+  position: relative;
 }
+
+.scroll {
+  width: 5px;
+  height: 10px;
+  border-radius: 10px;
+  background-color: rgb(39 155 253);
+  box-shadow: 0px 0px 10px rgb(178 189 255);
+  animation: scroll_4013 2s linear infinite;
+  transform: translateY(40%);
+}
+
+.btn-scroll:after {
+  content: 'scroll';
+  position: absolute;
+  top: 125%;
+  color: rgb(51 161 255);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@keyframes scroll_4013 {
+  0% {
+    transform: translateY(40%);
+  }
+
+  50% {
+    transform: translateY(90%);
+  }
+};
