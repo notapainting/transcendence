@@ -319,11 +319,7 @@ class GameState:
     async def _loop(self):
         try :
             await asyncio.sleep(TIME_PAUSE_START)
-            # while self.running:
-            while True:
-                if (self.running == False):
-                    await asyncio.sleep(0.5)
-                    continue
+            while self.running:
                 await asyncio.sleep(TIME_REFRESH)
                 if (self.paused == False):
                     self.running = await self.update()
@@ -331,41 +327,31 @@ class GameState:
                 if self.reset ==  2:
                     await asyncio.sleep(TIME_PAUSE)
                     self.reset = 0
-        except asyncio.CancelledError:
-            pass
         except BaseException as error:
             logger.critical(f"internal : {error}")
 
     async def start(self):
         self.running = True
         self.timer.resume()
-        # self.task = asyncio.create_task(self._loop())
-        # self.status['last_update_time'] = time.time()
-        self.task = threading.Thread(target=lambda: asyncio.run(self._loop()))
-        self.task.start()
+        self.game_thread = threading.Thread(target=lambda: asyncio.run(self._loop()), name=f"Thread-G-{self.leftPlayer}")
+        self.game_thread.start()
+        logger.info(f"Thread-G-{self.leftPlayer} : STARTED")
 
     async def stop(self):
         self.running = False
         self.timer.pause()
-        # if self.task is not None:
-        #     # self.task._stop()
-        #     await self.task
+        if hasattr(self, "game_thread") is False:
+            logger.info(f"Thread-G-{self.leftPlayer} : STOPED")
 
     async def pause(self):
-        # if self.running == False
-        #     return
         if self.paused == False:
             self.status['last_update_time'] = 0
-            self.running = False
             self.paused = True
             self.timer.pause()
-            # await self.stop()
             await self._send({"type":enu.Match.PAUSE})
         else:
             self.paused = False
-            self.running = True
             self.timer.resume()
-            # await self.start()
             await self._send({"type":enu.Game.RELAY, "relay":{"type":enu.Match.RESUME}})
 
     async def feed(self, key):
@@ -377,9 +363,9 @@ class GameState:
             self.status['randB'] = bonus
 
     async def _end(self):
-        if self.task is not None:
-            # self.task.cancel()
-            self.task._stop()
-            # await self.task
+        await self.stop()
+        if hasattr(self, "game_thread"):
+            self.game_thread._stop()
+            logger.info(f"Thread-G-{self.leftPlayer} : KILLED")
 
 

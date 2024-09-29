@@ -365,6 +365,10 @@ class Tournament(RemoteLobby, BaseTournament):
         message["host_tr"] = self.host
         await super()._send(target_name, message)
 
+    async def broadcast(self, message):
+        message["host_tr"] = self.host
+        await super().broadcast(message)
+
     async def check(self, user=None):
         return False
 
