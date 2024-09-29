@@ -11,7 +11,11 @@ from rest_framework import status
 from django.http import HttpResponse
 import os
 
-host = os.getenv('host')
+import logging
+logger = logging.getLogger('base')
+
+host = os.getenv('HOST', 'localhost')
+https_port = os.getenv('PORT_HTTPS', None)
 
 
 def GenerateVerificationUrl(request, user, viewname):
@@ -19,12 +23,13 @@ def GenerateVerificationUrl(request, user, viewname):
 	uid = urlsafe_base64_encode(force_bytes(user.pk))
 	path = reverse(viewname, kwargs={'uidb64': uid, 'token': token})
 	verification_url = request.build_absolute_uri(path)
-     
-	#pour le port 8443 TEMPORAIRE
-	if '8443' not in verification_url:
-		parts = list(urlparse(verification_url))
-		parts[1] = parts[1].replace(f"{host}", f"{host}:8443") 
-		verification_url = urlunparse(parts)
+
+	parts = list(urlparse(verification_url))
+	if https_port is not None:
+		parts[1] = f"{host}:{https_port}"
+	else:
+		parts[1] = f"{host}"
+	verification_url = urlunparse(parts)
 	return verification_url
 
 def send_verification_email(email, verification_url):

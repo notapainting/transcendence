@@ -13,6 +13,9 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from auth_service.utils import get_user_from_access_token
 from auth_service.models import CustomUser
 
+import logging
+logger = logging.getLogger('base')
+
 class ValidateTokenView(APIView):
 	authentication_classes = [JWTAuthentication]
 	def post(self, request):
@@ -29,9 +32,9 @@ class CustomTokenRefreshView(TokenRefreshView):
 			return Response({'error': 'Refresh token cookie not found'}, status=status.HTTP_400_BAD_REQUEST)
 		try:
 			refresh_token = RefreshToken(refresh_token_cookie)
-			print(refresh_token)
+			logger.debug(refresh_token)
 			access_token = refresh_token.access_token
-			print(access_token)
+			logger.debug(access_token)
 			user_id = access_token['user_id']
 			user = CustomUser.objects.get(id=user_id)
 			username = user.username
@@ -39,8 +42,10 @@ class CustomTokenRefreshView(TokenRefreshView):
 			response = Response({'username': username}, status=status.HTTP_200_OK)
 			response.set_cookie('access', str(access_token), httponly=True, secure=True)
 			return response
+		except CustomUser.DoesNotExist:
+			raise AuthenticationFailed("User not found")
 		except Exception as e:
-			print(e)
+			logger.error(e)
 			return Response({'error': 'Failed to refresh access token'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

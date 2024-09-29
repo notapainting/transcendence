@@ -116,9 +116,10 @@ ROOT_URLCONF = 'auth_service.urls'
 
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
-ADMIN_USERNAME = 'admin'
-ADMIN_EMAIL = 'admin@admin.com'
-ADMIN_PASSWORD = 'adminpassword'
+ADMIN_USERNAME = os.getenv('DJANGO_AUTH_ADMIN_USERNAME', 'admin')
+ADMIN_EMAIL = os.getenv('DJANGO_AUTH_ADMIN_MAIL', 'admin@localhost')
+ADMIN_PASSWORD = os.getenv('DJANGO_AUTH_ADMIN_PASSWORD', 'admin_password')
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -200,10 +201,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-ADMIN_USERNAME = 'admin'
-ADMIN_EMAIL = 'admin@admin.com'
-ADMIN_PASSWORD = 'adminpassword'
 
 LOGGING = {
     "version": 1,
