@@ -21,17 +21,22 @@ let default_game_data = null;
 function askNext() { gameSocket.send(JSON.stringify({ 'type': enu.Game.NEXT })) }
 
 export const initGameWebSocket = (path) => {
+	console.log("initgws on:" + path);
     _initWebsocket(path)
 }
 
 const _initWebsocket = async (path) => {
     if (gameSocket !== null) return;
-    if (await isUserAuthenticated() === false) return;
-    gameSocket = new WebSocket(
+	if (path === enu.backendPath.REMOTE) {
+		if (await isUserAuthenticated() === false) return;
+	}
+		gameSocket = new WebSocket(
         'wss://'
         + window.location.host
         + path
     );
+	gameSocket.onopen = function () {console.log("gws: open")};
+	gameSocket.onerror = function () {console.log("gws: error")};
     gameSocket.onmessage = messageHandler;
     gameSocket.onclose = function (e) {
         moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
@@ -205,7 +210,11 @@ const _match = (content) => {
             document.removeEventListener('keydown', bindKeyPress)
             document.removeEventListener('keyup', bindKeyRelease)
             announceWinner(content);
-            if (getGameStatus() === enu.gameMode.LOCAL) timeout_asknext = setTimeout(askNext, 3000);
+            if (getGameStatus() === enu.gameMode.LOCAL) {
+				timeout_asknext = setTimeout(askNext, 3000);
+				const   menuM6_button = document.getElementById('menu-m6-button');
+				menuM6_button.style.display = "none";
+			}
             return true;
     };
     return false;

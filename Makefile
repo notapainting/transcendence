@@ -6,7 +6,7 @@
 #    By: tlegrand <tlegrand@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/10 21:52:05 by tlegrand          #+#    #+#              #
-#    Updated: 2024/09/18 19:20:40 by tlegrand         ###   ########.fr        #
+#    Updated: 2024/09/29 19:18:11 by tlegrand         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ fclean:
 re:	fclean up-fg
 
 init: ${ENV_FILE} vmmax 
-
+	@mkdir -p certs
 
 
 #========#	build rule	#========#
@@ -99,6 +99,12 @@ top:
 mode:
 	@echo "Mode is ${MODE}"
 
+gen-keys:
+	@openssl rand -base64 32
+	@openssl rand -base64 32
+	@openssl rand -base64 32
+	@openssl rand -base64 32
+	@openssl rand -base64 32
 
 #========#	container access	#========#
 .PHONY: reload proxy chat game auth user
