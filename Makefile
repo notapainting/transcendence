@@ -6,7 +6,7 @@
 #    By: tlegrand <tlegrand@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/10 21:52:05 by tlegrand          #+#    #+#              #
-#    Updated: 2024/09/29 21:44:53 by tlegrand         ###   ########.fr        #
+#    Updated: 2024/09/29 21:52:47 by tlegrand         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ fclean:
 
 re:	fclean up-fg
 
-init: ${ENV_FILE} vmmax 
+init: ${ENV_FILE} 
 	@mkdir -p certs
 
 
