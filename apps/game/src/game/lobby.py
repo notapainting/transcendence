@@ -490,7 +490,7 @@ class Match(RemoteLobby, BaseMatch):
             result = self.game_state.result
             await httpx.AsyncClient().post(url='http://user:8000/user/match_history/new/', data=JSONRenderer().render(result))
             if self.tournament is not None:
-                await self._send(self.tournament, {"type":enu.Match.RESULT, "message":result})
+                await self._send(self.tournament, {"type":enu.Match.RESULT, "message":result, "host_tr":self.tournament})
             else:
                 await send_match_to_blockchain(0, result)
         await super().end(smooth=smooth)

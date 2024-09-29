@@ -309,30 +309,31 @@ class RemoteGamer(LocalConsumer):
 
     # TOURNAMENT (4)
     async def match_result(self, data):
-        if data['author'] != self.username and self.host_tr == self.username:
+        if self.host_tr == data['host_tr'] and self.host_tr == self.username:
             await self.send_json(data)
             await self.lobby.update_result(data['message'])
 
     async def tournament_phase(self, data):
-        if self.status != enu.Game.IDLE:
+        if self.host_tr == data['host_tr']:
             await self.send_json(data)
 
     async def tournament_match(self, data):
-        if self.host_tr != data['host_tr']:
-            return
-        match = data['match']
-        if match['host'] == self.username:
-            self.set_mode(new_status=enu.Match.HOST)
-            self.lobby = Match(host=self.username, tournament=self.host, settings=data['settings'])
-            await self.lobby._init()
-            await self.lobby.add(match['guest'])
-        else:
-            self.set_mode(new_status=enu.Match.GUEST, new_host=match['host'])
-        await self.send_json(data)
+        if self.host_tr == data['host_tr']:
+            match = data['match']
+            if match['host'] == self.username:
+                self.set_mode(new_status=enu.Match.HOST)
+                self.lobby = Match(host=self.username, tournament=self.host, settings=data['settings'])
+                await self.lobby._init()
+                await self.lobby.add(match['guest'])
+            else:
+                self.set_mode(new_status=enu.Match.GUEST, new_host=match['host'])
+            await self.send_json(data)
 
     async def tournament_end(self, data): #should call lobby.end here not in update_result
         if self.host_tr == data['host_tr']:
             await self.send_json(data)
+            if self.username == self.host_tr:
+                await self.end()
             self.set_mode(new_status=enu.Game.IDLE)
             self.host = None
             self.host_tr = None
