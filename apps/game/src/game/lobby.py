@@ -274,8 +274,7 @@ class LocalTournament(BaseLobby, BaseTournament, BaseMatch):
     async def check(self, user):
         return self._check(user)
 
-
-    async def end(self, smooth=True):
+    async def end(self, smooth=True, cancelled=False):
         await self.match_stop()
         await super()._end()
 
@@ -391,7 +390,7 @@ class Tournament(RemoteLobby, BaseTournament):
             self.chat_group_id = promise.json()['id']
         await self.make_phase()
 
-    async def end(self, smooth=True):
+    async def end(self, smooth=True, cancelled=False):
         if hasattr(self, "chat_group_id"):
             url = f'http://chat:8000/api/v1/groups/{self.chat_group_id}/'
             await httpx.AsyncClient().delete(url=url)

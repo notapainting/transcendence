@@ -14,6 +14,7 @@ from logging import getLogger
 logger = getLogger('base')
 
 CONTACT_ALL = 'contacts blockeds blocked_by invitations invited_by'
+CHAN_EXCEPT = (exchan.AcceptConnection, exchan.DenyConnection,exchan.StopConsumer)
 
 
 class BaseConsumer(AsyncWebsocketConsumer):
@@ -23,10 +24,11 @@ class BaseConsumer(AsyncWebsocketConsumer):
         except ValueError as error:
             logger.warning(error)
             await self.send_json({'type':enu.Event.Errors.HANDLER})
-        except BaseException:
+        except CHAN_EXCEPT:
             raise
-            # logger.error("general error {error}")
-            # await self.send_json({'type':enu.Event.Errors.DATA})
+        except BaseException as error:
+            logger.info(f"ERROR: {self.username} ({self.status}): {error}")
+            await self.send_json({'type':enu.Event.Errors.DATA})
 
     @classmethod
     async def decode_json(cls, text_data):

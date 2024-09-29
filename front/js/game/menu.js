@@ -640,9 +640,6 @@ function countDivsWithColumnClass() {
     }
 }
 
-
-
-
 const activateAniM1 = () => {
     document.getElementById('game-menu-invitationBox').style.opacity = 0;
     document.getElementById('game-menu-invitationBox2').style.opacity = 0;

@@ -13,6 +13,8 @@ from game.gamestate import getDefaultState
 from logging import getLogger
 logger = getLogger('base')
 
+CHAN_EXCEPT = (exchan.AcceptConnection, exchan.DenyConnection,exchan.StopConsumer)
+
 async def authenticate(headers):
     try :
         promise = await httpx.AsyncClient().post(url='http://auth:8000/auth/validate_token/', headers=headers)
@@ -28,9 +30,6 @@ async def authenticate(headers):
         logger.error(error)
     return user
 
-class ErrorDecode(Exception):
-    pass
-
 
 class RemoteGamer(LocalConsumer):
     def __init__(self):
@@ -39,18 +38,22 @@ class RemoteGamer(LocalConsumer):
         self.invited_by = {}
         self.status = enu.Game.IDLE
         self.mode = self.idle
-        self.loopback = self.status
         self.host = None
         self.host_tr = None
 
     async def dispatch(self, message):
         try :
             await super().dispatch(message)
+        except LobbyException as error:
+            logger.info(error)
+            await self.send_json({'type':enu.Errors.DATA,'error':enu.Errors.LOBBY})
         except PlazaNotFound:
             await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.NTF_404})
-        except BaseException as error:
-            # logger.info(f"ERROR: {self.username} ({self.status}): {error}")
+        except CHAN_EXCEPT:
             raise
+        except BaseException as error:
+            logger.info(f"ERROR: {self.username} ({self.status}): {error}")
+  
 
     async def connect(self):
         self.username = await authenticate(dict(self.scope['headers'])) 
@@ -70,7 +73,6 @@ class RemoteGamer(LocalConsumer):
             await self.send_cs(invitor, {'type':enu.Invitation.REJECT})
         plaza.leave(self.username)
         # logger.info(f"Users listing : {plaza.listing()}")
-
         logger.info(f"QUIT: {self.username} ({self.status})")
 
     async def send_cs(self, target_name, data):
@@ -78,9 +80,10 @@ class RemoteGamer(LocalConsumer):
         target = plaza.translate(target_name, raise_exception=True)
         await self.channel_layer.send(target, data)
 
-    async def quit(self, smooth=True):
+    async def quit(self, smooth=True, cancelled=False):
+        logger.info(f"QUITFUNC: {self.username} ({self.status})")
         if hasattr(self, "lobby"):
-            await self.lobby.end(smooth)
+            await self.lobby.end(smooth=smooth, cancelled=cancelled)
         if self.host is not None:
             await self.send_cs(self.host, {"type":enu.Game.QUIT})
         if self.host_tr is not None:
@@ -122,13 +125,12 @@ class RemoteGamer(LocalConsumer):
         if json_data['type'] == enu.Errors.DECODE:
             await self.send_json({'type':enu.Errors.DECODE})
         elif json_data['type'] == enu.Game.QUIT: 
-            await self.quit(smooth=False)
+            await self.quit(smooth=False, cancelled=True)
         elif json_data['type'] == enu.Game.DEFAULT:
             await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault(), "state":getDefaultState()})
         else:
             await self.mode(json_data)
 
- 
     #  MODE (5)
     async def idle(self, data):
         match data['type']:
@@ -272,6 +274,8 @@ class RemoteGamer(LocalConsumer):
                 await self.lobby.end(cancelled=True)
                 del self.lobby
                 self.set_mode()
+                if self.status == enu.Game.IDLE:
+                    await self.send_json({'type':enu.Game.KICK, 'author':self.username})
             await self.send_json(data)
         else:
             if self.host_tr == data['author']:

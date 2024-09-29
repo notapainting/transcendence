@@ -1,5 +1,8 @@
 # game/consumers/local.py
 
+import channels.exceptions as exchan
+
+
 import game.enums as enu
 
 from game.consumers.base import BaseConsumer
@@ -9,6 +12,8 @@ from game.gamestate import getDefaultState
 from logging import getLogger
 logger = getLogger('base')
 
+CHAN_EXCEPT = (exchan.AcceptConnection, exchan.DenyConnection,exchan.StopConsumer)
+
 class LocalConsumer(BaseConsumer):
     async def dispatch(self, message):
         try :
@@ -16,8 +21,10 @@ class LocalConsumer(BaseConsumer):
         except LobbyException as error:
             logger.info(error)
             await self.send_json({'type':enu.Errors.DATA,'error':enu.Errors.LOBBY})
-        except BaseException:
+        except CHAN_EXCEPT:
             raise
+        except BaseException as error:
+            logger.info(f"ERROR: {self.username} ({self.status}): {error}")
     
     async def connect(self):
         await self.accept()
