@@ -24,7 +24,7 @@ const parallaxEffect = (event) => {
     const titleSite = document.querySelector('.title-site');
 
     const maxOffsetX = 75; 
-    const maxOffsetY = 75; 
+    const maxOffsetY = 25; 
 
     let xAxis = (window.innerWidth / 2 - event.pageX) / 10;
     let yAxis = (window.innerHeight / 2 - event.pageY) / 10;
@@ -35,7 +35,7 @@ const parallaxEffect = (event) => {
     backThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.2}px) calc(50% + ${yAxis * 0.2}px)`;
     middleThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.4}px) calc(50% + ${yAxis * 0.4}px)`;
     frontThrees.style.backgroundPosition = `calc(50% + ${xAxis * 0.9}px) calc(50% + ${yAxis * 0.9}px)`;
-    titleSite.style.backgroundPosition = `calc(50% + ${xAxis * 1.4}px) calc(50% + ${yAxis * 1.4}px)`;
+    titleSite.style.backgroundPosition = `calc(50% + ${xAxis * 1}px) calc(50% + ${yAxis * 1}px)`;
 }
 
 function authenticateWith42() {
