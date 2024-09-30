@@ -445,6 +445,7 @@
     gap: 30px;
     align-items: center;
     justify-content: center;
+    overflow-y: auto;
 }
 
 #menu-m7-button {
