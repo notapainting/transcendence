@@ -370,21 +370,26 @@ let createGroup = async (message) => {
             messageContainer.setAttribute('id', message.data.id);
             document.querySelector('.messages').appendChild(messageContainer);
         }
-        const newMessageDiv = document.createElement('div');
-        newMessageDiv.classList.add('message', `${!message.data.messages[0].author || message.data.messages[0].author !== whoIam ? 'right-message' : 'left-message'}`);
-        newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
-        messageContainer.appendChild(newMessageDiv);
+        if (message.data.messages.length !== 0) {
+            const newMessageDiv = document.createElement('div');
+            const classMessage = `${!message.data.messages[0].author || message.data.messages[0].author !== whoIam ? 'right-message' : 'left-message'}`
+            newMessageDiv.classList.add('message', classMessage);
+            newMessageDiv.innerHTML = `<p>${message.data.messages[0].body}</p><span>${formatDate(message.data.messages[0].date)}</span>`;   
+            messageContainer.appendChild(newMessageDiv);
+        }
         const focusedPerson = document.querySelector('.person.focus');
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-        if (focusedPerson.getAttribute('data-username') === sanitizedTarget){
-            messageContainer.style.display = 'flex';
+        if (focusedPerson !== null) {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            if (focusedPerson.getAttribute('data-username') === sanitizedTarget){
+                messageContainer.style.display = 'flex';
+            }
+            messageInput.value = ``;
         }
         if (Notification.permission === 'granted') {
             const notification = new Notification("Tournament", {
                 body: `${message.data.name}`,
               });
         }  
-        messageInput.value = ``;
     }
 }
 
@@ -645,14 +650,14 @@ const disableEnableInput = (target, mode) => {
 }
 
 const deleteGroup = (data) => {
-    const groupId = data.id;
-    const chatContainer = document.querySelector(`#${groupId}`);
+    const groupId = data;
     console.log(`ID DU GROUP A DELETE: ${groupId}`)
-    const personDiv = document.querySelector(`.${groupId}`);
-    if (personDiv)
-        personDiv.remove();
+    const chatContainer = document.getElementById(`${groupId}`);
+    const personDiv = document.getElementsByClassName(`${groupId}`);
     if (chatContainer)
         chatContainer.remove();
+    // if (personDiv)
+    //     personDiv.remove(); // parenteleemnt??
 }
 
 async function handleMessage(message) {

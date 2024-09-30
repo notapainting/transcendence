@@ -20,9 +20,28 @@ let default_game_data = null;
 
 function askNext() { gameSocket.send(JSON.stringify({ 'type': enu.Game.NEXT })) }
 
-export const initGameWebSocket = (path) => {
+export const initGameWebSocket = async (path) => {
 	console.log("initgws on:" + path);
-    _initWebsocket(path)
+    if (gameSocket !== null) return;
+	if (path === enu.backendPath.REMOTE) {
+		if (await isUserAuthenticated() === false) return;
+	}
+		gameSocket = new WebSocket(
+        'wss://'
+        + window.location.host
+        + path
+    );
+	gameSocket.onopen = function () {console.log("gws: open")};
+	gameSocket.onerror = function () {console.log("gws: error")};
+    gameSocket.onmessage = messageHandler;
+    gameSocket.onclose = function (e) {
+        moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
+        gameSocket = null;
+        clearListInvitation();
+        if (path === enu.backendPath.REMOTE) setTimeout(initGameWebSocket, 5000, path);
+    };
+    document.removeEventListener('keydown', bindKeyPress)
+    document.removeEventListener('keyup', bindKeyRelease)
 }
 
 const _initWebsocket = async (path) => {
