@@ -38,7 +38,7 @@ export const showGameLocal  = async () => {
 const transitionToGame = (path) => {
     clearView();
     fullClear();
-    initGameWebSocket(path);
+    if (path === enu.backendPath.LOCAL) initGameWebSocket(path);
     document.querySelector("body").style.backgroundColor = "#34A0A4"
     document.querySelector("#game").style.display = " block"
     setTimeout(()=> {

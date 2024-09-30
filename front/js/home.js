@@ -1,6 +1,7 @@
 import { navigateTo, whoIam } from "./index.js";
 import { clearView, isUserAuthenticated } from "./index.js";
-import { fetchUsers, initializeWebSocket, showChat } from "./chat.js";
+import { fetchUsers, initializeWebSocket, showChat, socket, cs_timemout } from "./chat.js";
+import { gameSocket, gs_timeout } from "./game/websocket.js";
 
 export const getPersInfo = () => {
     return fetch('/auth/get_pers_infos/', {
@@ -188,6 +189,7 @@ const playOnlineEvent = (event) => {
     scrollUpEffect(event, "/play");
 }
 
+playBtnElement.removeEventListener("click", playOfflineEvent);
 playBtnElement.addEventListener("click", playOfflineEvent);
 
 const messageBox = document.querySelector(".message-box");
@@ -385,8 +387,14 @@ const adjustZoom = (event) => {
 
 export const loggedOutStatus = () => {
     document.querySelector(".login-signin-form").style.display = "flex"
-    playBtnElement.removeEventListener("click", playOfflineEvent);
-    playBtnElement.addEventListener("click", playOnlineEvent);
+    var buttonLogout = document.querySelector('.menu-logout');
+    var buttonSettings = document.querySelector('.menu-settings');
+    playBtnElement.removeEventListener("click", playOnlineEvent);
+    playBtnElement.addEventListener("click", playOfflineEvent);
+    buttonLogout.setAttribute('disabled', '');
+    buttonSettings.setAttribute('disabled', '');
+    buttonLogout.classList.remove('clickable');
+    buttonSettings.classList.remove('clickable');
     document.querySelector(".bubble").style.display = "none";
     document.querySelector(".chatbox").style.display = "none";
     document.querySelector(".navbar").style.display= "none";
@@ -394,6 +402,19 @@ export const loggedOutStatus = () => {
 
 export let logoutRequest = (event) => {
     event.preventDefault();
+    playBtnElement.removeEventListener("click", playOnlineEvent);
+    playBtnElement.addEventListener("click", playOfflineEvent);
+
+    if (gameSocket !== null){
+        gameSocket.close()
+    }
+    if (gs_timeout !== null) {
+        clearTimeout(gs_timeout)
+    }
+    socket.close()
+    if (cs_timemout !== null) {
+        clearTimeout(cs_timemout)
+    }
     fetch('/auth/logout/', {
         method: 'POST',
         headers: {

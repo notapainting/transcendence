@@ -14,7 +14,8 @@ const messageInput = document.querySelector(".message-input");
 let host = window.location.host;
 let contactSummary = null;
 
-let socket;
+export let socket;
+export let cs_timemout;
 
 let cpt = 0;
 
@@ -81,14 +82,15 @@ let currentPictureChatClickHandler;
 let currentTarget = null;
 const inviteButton =  document.querySelector(".invite-button");
 
-const displayFocusedPerson = (personDiv, target, profile_picture) => {
+const displayFocusedPerson = (personDiv, target, profile_picture, flg = null) => {
     document.querySelectorAll('.person').forEach(elem => {
         elem.classList.remove('focus');
     });
-    inviteButton.style.display = "flex";
+    if (!flg)
+        inviteButton.style.display = "flex";
     personDiv.classList.add('focus');
 
-    if (currentTarget){
+    if (currentTarget && !flg){
         inviteButton.removeEventListener("click", currentTarget);
     }
     currentTarget = () => {
@@ -100,8 +102,9 @@ const displayFocusedPerson = (personDiv, target, profile_picture) => {
             }, 3000)   
         }
     };
-    
-    inviteButton.addEventListener('click', currentTarget);
+    if (!flg){
+        inviteButton.addEventListener('click', currentTarget);
+    }
     const username = personDiv.getAttribute('data-username');
     const pictureChat = document.querySelector(".picture-chat");
     const usernameTitle = document.querySelector(".username-title");
@@ -236,8 +239,8 @@ const addTournamentToMenu = (target, profile_picture, id = null) => {
                                      `;
     personDiv.append(picturePersonDiv, descriptionPersonDiv);
     displayMenu.insertBefore(personDiv, displayMenu.children[1]);
-    personDiv.removeEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
-    personDiv.addEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture));
+    personDiv.removeEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture, true));
+    personDiv.addEventListener("click", (event) => displayFocusedPerson(personDiv, target, profile_picture, true));
 }
 
 
@@ -653,11 +656,14 @@ const deleteGroup = (data) => {
     const groupId = data;
     console.log(`ID DU GROUP A DELETE: ${groupId}`)
     const chatContainer = document.getElementById(`${groupId}`);
-    const personDiv = document.getElementsByClassName(`${groupId}`);
+    const personDiv = document.querySelector(`.${groupId}`);
+    console.log('AHhHHHHHH')
+    console.log(personDiv);
+    console.log(chatContainer);
     if (chatContainer)
         chatContainer.remove();
-    // if (personDiv)
-    //     personDiv.remove(); // parenteleemnt??
+    if (personDiv)
+        personDiv.remove(); // parenteleemnt??
 }
 
 async function handleMessage(message) {
@@ -668,16 +674,22 @@ async function handleMessage(message) {
         contactSummaryPromiseResolve();
     }
     else if (message.type === 'group.summary'){
-                await contactSummaryPromise;
+        await contactSummaryPromise;
         await statusPromise;
+        console.log(message);
         while (displayMenu.children.length > 1) {
             displayMenu.removeChild(displayMenu.children[1]);
         }
         let personList = await fetchUsers();
-        
         message.data.forEach(group => {
             let id = group.id;
-            let person = group.members.find(value => value !== whoIam);
+            let person = null
+            if (group.members.length > 0) {
+                person = group.members.find(value => value !== whoIam);
+            }
+            else {
+                person = group.restricts.find(value => value !== whoIam);
+            }
             let messages = group.messages;
             displayHistoryConversations(id, person, messages, personList);
         })
@@ -755,7 +767,7 @@ let flg = 0;
 
 export async function initializeWebSocket() {
     flg = 1;
-    await isUserAuthenticated();
+    if (await isUserAuthenticated() === false) return ;
     socket = new WebSocket('wss://' + host + '/chat/');
 
     socket.onopen = function() {
@@ -771,7 +783,7 @@ export async function initializeWebSocket() {
     };
 
     socket.onclose = function() {
-        setTimeout(initializeWebSocket, 5000);
+        cs_timemout = setTimeout(initializeWebSocket, 5000);
     };
 }
 

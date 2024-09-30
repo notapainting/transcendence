@@ -48,6 +48,7 @@ You need to create .env for your container and augment `vm.max_map_count`[¹](ht
 
 This will generate .env file based on template in conf/, please provide your own API key, certificats and change the default value of secrets keys, users, passwords, etc
 
+If you just want to test the project, certificats and defaults key, users, password are provided
 
 ## Deployment
 To deploy this project run

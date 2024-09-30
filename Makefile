@@ -73,10 +73,10 @@ vmmax:
 #========#	start/stop rule	#========#
 .PHONY: up up-fg down clear
 
-up:		${ENV_FILE}
+up:
 	${CMP} up --build -d
 
-up-fg:	${ENV_FILE}
+up-fg:
 	${CMP} up --build
 
 down:

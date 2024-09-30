@@ -15,6 +15,7 @@ function updateTimer() {
 }
 
 export let gameSocket = null;
+export let gs_timeout = null;
 
 let default_game_data = null;
 
@@ -22,11 +23,14 @@ function askNext() { gameSocket.send(JSON.stringify({ 'type': enu.Game.NEXT })) 
 
 export const initGameWebSocket = async (path) => {
 	console.log("initgws on:" + path);
-    if (gameSocket !== null) return;
+    if (gameSocket !== null) {
+        console.log("alreday open")
+        return;
+    };
 	if (path === enu.backendPath.REMOTE) {
 		if (await isUserAuthenticated() === false) return;
 	}
-		gameSocket = new WebSocket(
+    gameSocket = new WebSocket(
         'wss://'
         + window.location.host
         + path
@@ -38,34 +42,12 @@ export const initGameWebSocket = async (path) => {
         moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
         gameSocket = null;
         clearListInvitation();
-        if (path === enu.backendPath.REMOTE) setTimeout(initGameWebSocket, 5000, path);
+        if (path === enu.backendPath.REMOTE) gs_timeout = setTimeout(initGameWebSocket, 5000, path);
     };
     document.removeEventListener('keydown', bindKeyPress)
     document.removeEventListener('keyup', bindKeyRelease)
 }
 
-const _initWebsocket = async (path) => {
-    if (gameSocket !== null) return;
-	if (path === enu.backendPath.REMOTE) {
-		if (await isUserAuthenticated() === false) return;
-	}
-		gameSocket = new WebSocket(
-        'wss://'
-        + window.location.host
-        + path
-    );
-	gameSocket.onopen = function () {console.log("gws: open")};
-	gameSocket.onerror = function () {console.log("gws: error")};
-    gameSocket.onmessage = messageHandler;
-    gameSocket.onclose = function (e) {
-        moveTo((path === enu.backendPath.LOCAL) ? enu.sceneIdx.CREATION : enu.sceneIdx.WELCOME)
-        gameSocket = null;
-        clearListInvitation();
-        if (path === enu.backendPath.REMOTE) setTimeout(_initWebsocket, 5000, path);
-    };
-    document.removeEventListener('keydown', bindKeyPress)
-    document.removeEventListener('keyup', bindKeyRelease)
-}
 
 
 export const startMatch = () => {
