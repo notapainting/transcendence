@@ -9,7 +9,6 @@ This microservice handles user authentication, including registration, login, pa
 - [JWT Tokens](#jwt-tokens)
 - [OAuth Integration](#oauth-integration)
 - [Two-Factor Authentication](#two-factor-authentication)
-- [Installation and Setup](#installation-and-setup)
 - [Environment Variables](#environment-variables)
 
 ## Routes
