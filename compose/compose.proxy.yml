@@ -15,8 +15,8 @@ services:
     env_file:
       - conf/proxy.env
     ports:
-     - "443:8443"
-     - "80:8080"
+     - "8443:8443"
+     - "8080:8080"
     networks: 
       - app_network
     volumes:
