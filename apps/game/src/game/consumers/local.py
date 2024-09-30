@@ -4,7 +4,7 @@ import channels.exceptions as exchan
 
 
 import game.enums as enu
-
+from game.plaza import plaza, PlazaNotFound
 from game.consumers.base import BaseConsumer
 from game.lobby import getDefault, LocalTournament, LobbyException
 from game.gamestate import getDefaultState
@@ -21,10 +21,13 @@ class LocalConsumer(BaseConsumer):
         except LobbyException as error:
             logger.info(error)
             await self.send_json({'type':enu.Errors.DATA,'error':enu.Errors.LOBBY})
+        except PlazaNotFound:
+            await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.NTF_404})
         except CHAN_EXCEPT:
             raise
         except BaseException as error:
             logger.info(f"ERROR: {self.username} ({self.status}): {error}")
+
     
     async def connect(self):
         await self.accept()

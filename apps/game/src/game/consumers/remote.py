@@ -41,25 +41,10 @@ class RemoteGamer(LocalConsumer):
         self.host = None
         self.host_tr = None
 
-    async def dispatch(self, message):
-        try :
-            await super().dispatch(message)
-        except LobbyException as error:
-            logger.info(error)
-            await self.send_json({'type':enu.Errors.DATA,'error':enu.Errors.LOBBY})
-        except PlazaNotFound:
-            await self.send_json({'type':enu.Errors.DATA, 'error':enu.Errors.NTF_404})
-        except CHAN_EXCEPT:
-            raise
-        except BaseException as error:
-            logger.info(f"ERROR: {self.username} ({self.status}): {error}")
-  
-
     async def connect(self):
         self.username = await authenticate(dict(self.scope['headers'])) 
         if self.username is None:
             raise exchan.DenyConnection()
-        # logger.info(f"Users listing : {plaza.listing()}") 
         await self.accept()
         plaza.join(self.username, self.channel_name)
         await self.send_json({"type":enu.Game.DEFAULT, "message":getDefault(), "state":getDefaultState()})
@@ -72,7 +57,6 @@ class RemoteGamer(LocalConsumer):
         for invitor in self.invited_by:
             await self.send_cs(invitor, {'type':enu.Invitation.REJECT})
         plaza.leave(self.username)
-        # logger.info(f"Users listing : {plaza.listing()}")
         logger.info(f"QUIT: {self.username} ({self.status})")
 
     async def send_cs(self, target_name, data):
@@ -81,7 +65,6 @@ class RemoteGamer(LocalConsumer):
         await self.channel_layer.send(target, data)
 
     async def quit(self, smooth=True, cancelled=False):
-        logger.info(f"QUITFUNC: {self.username} ({self.status})")
         if hasattr(self, "lobby"):
             await self.lobby.end(smooth=smooth, cancelled=cancelled)
         if self.host is not None:
@@ -91,22 +74,21 @@ class RemoteGamer(LocalConsumer):
         self.set_mode(new_status=enu.Game.IDLE)
 
     def set_mode(self, new_status=None, new_host=None):
-        logger.info(f"{self.username} ({self.status}): setmode({new_status}, {new_host})")
-        logger.info(f"{self.username} ({self.status}): host({self.host}, {self.host_tr})")
-        if new_status == None: # on veut retourner a l'etat precedant
-            if self.host_tr is not None: # on connait un host de tournoi
-                if self.host_tr == self.username: #on est soit meme l'host de tournoi
+        logger.debug(f"{self.username} ({self.status}): setmode({new_status}, {new_host})")
+        logger.debug(f"{self.username} ({self.status}): host({self.host}, {self.host_tr})")
+        if new_status == None: 
+            if self.host_tr is not None:
+                if self.host_tr == self.username:
                     self.status = enu.Game.HOST
                 else:
                     self.host = self.host_tr
                     self.status = enu.Game.GUEST
-                # on va recuperer lhost de tournoi comme host principal et se remettre en guest
-            else:   # on connait pas de host tr -> pas de tournoir -> match -> reset sur idle
+            else:
                 self.host = None
                 self.status = enu.Game.IDLE
-        else:   # on veut set un etat
+        else:
             self.status = new_status
-            if new_host is not None: # et enregistre un nouveau host
+            if new_host is not None:
                 self.host = new_host
 
         match self.status:
@@ -153,7 +135,7 @@ class RemoteGamer(LocalConsumer):
 
     async def mode_host(self, data):
         match data['type']:
-            case enu.Game.NEXT: logger.info(f"PING: {self.username} ({self.status})")
+            case enu.Game.NEXT: logger.debug(f"PING: {self.username} ({self.status})")
             case enu.Game.SETTING:
                 settings = self.lobby.changeSettings(settings=data['message'])
                 await self.lobby.broadcast({"type":enu.Game.RELAY, "relay":{"type":enu.Game.SETTING, "message":settings, "state":getDefaultState()}})
@@ -256,19 +238,15 @@ class RemoteGamer(LocalConsumer):
                 if self.host_tr is None: 
                     await self.send_json(data)
 
-# if quit from host_tr -> idle
-# if quit from host_ -> setmode
-#if quit from user in match -> cancel match
-#if quit from user in trn -> cheat/remove
 
     async def game_quit(self, data):
         if hasattr(self, "lobby"):
             if isinstance(self.lobby, Tournament):
                 if hasattr(self.lobby, "current") and data['author'] in self.lobby.players:
-                    logger.info(f"{self.username} ({self.status}): should cheat and make {data['author']} loose")
+                    logger.debug(f"{self.username} ({self.status}): should cheat and make {data['author']} loose")
                     await self.lobby.cheat(data['author'])
                 else:
-                    logger.info(f"{self.username} ({self.status}): should quietly remove {data['author']}")
+                    logger.debug(f"{self.username} ({self.status}): should quietly remove {data['author']}")
                     await self.lobby.remove(data['author'])
             elif isinstance(self.lobby, Match):
                 await self.lobby.end(cancelled=True)
@@ -353,7 +331,6 @@ class RemoteGamer(LocalConsumer):
             self.set_mode(new_status=enu.Game.IDLE)
             self.host = None
             self.host_tr = None
-            logger.info(f"{self.username} ({self.status}): trn end")
 
 
 

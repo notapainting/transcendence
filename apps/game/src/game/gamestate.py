@@ -317,7 +317,7 @@ class GameState:
         self.reset = 2
 
     async def _loop(self):
-        logger.info(f"Thread-G-{self.leftPlayer} : ENTER")
+        logger.debug(f"Thread-G-{self.leftPlayer} : ENTER")
         try :
             await asyncio.sleep(TIME_PAUSE_START)
             while self.running:
@@ -330,7 +330,7 @@ class GameState:
                     self.reset = 0
         except BaseException as error:
             logger.critical(f"internal : {error}")
-        logger.info(f"Thread-G-{self.leftPlayer} : EXIT")
+        logger.debug(f"Thread-G-{self.leftPlayer} : EXIT")
 
 
     async def start(self):
@@ -338,7 +338,7 @@ class GameState:
         self.timer.resume()
         self.game_thread = threading.Thread(target=lambda: asyncio.run(self._loop()), name=f"Thread-G-{self.leftPlayer}")
         self.game_thread.start()
-        logger.info(f"Thread-G-{self.leftPlayer} : STARTED")
+        logger.debug(f"Thread-G-{self.leftPlayer} : STARTED")
 
     async def stop(self):
         self.running = False

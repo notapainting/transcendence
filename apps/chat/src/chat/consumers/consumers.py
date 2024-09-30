@@ -108,7 +108,6 @@ class ChatConsumer(BaseConsumer):
         logger.info("%s Quit...", self.user.name)
 
     async def receive_json(self, json_data, **kwargs):
-        # logger.info(f'text : {json_data}')
         if json_data['type'] == enu.Event.Errors.DECODE:
             await self.send_json(json_data)
             return

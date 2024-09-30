@@ -60,7 +60,6 @@ class UpdateClientInfo(APIView):
 										status=status.HTTP_400_BAD_REQUEST)
 				except Exception as e:
 					return Response({"error": "Invalid image file"}, status=status.HTTP_400_BAD_REQUEST)
-				# Si la clé est 'profile_picture'
 				user.profile_picture.delete(save=False)
 				user.profile_picture.save(f"{user.username}.jpg", value, save=True)
 				user.save()

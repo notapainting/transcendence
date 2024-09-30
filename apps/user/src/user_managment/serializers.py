@@ -22,7 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
 	def validate(self, data):
 		errors = {}
 
-		# Validation du champ 'username'
 		if 'username' in data:
 			username = data['username']
 			if not username:
@@ -31,7 +30,6 @@ class UserSerializer(serializers.ModelSerializer):
 				print("ERROR USERNAME")
 				errors['username'] = "Username should contain only alphanumeric characters."
 		
-		# Validation du champ 'email'
 		if 'email' in data:
 			email = data['email']
 			if email:
@@ -41,7 +39,6 @@ class UserSerializer(serializers.ModelSerializer):
 					print("ERROR EMAIL")
 					errors['email'] = "Invalid email format."
 
-		# Validation du champ 'date_of_birth'
 		if 'date_of_birth' in data:
 			date_of_birth = data['date_of_birth']
 			if date_of_birth:
@@ -51,7 +48,6 @@ class UserSerializer(serializers.ModelSerializer):
 					print("ERROR DATE OF BIRTH")
 					errors['date_of_birth'] = str(e)
 
-		# Validation du champ 'gender'
 		if 'gender' in data:
 			gender = data['gender']
 			if gender:

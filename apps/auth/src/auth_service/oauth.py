@@ -13,7 +13,7 @@ host = os.getenv('HOST');
 def authenticate_with_42(request):
 	uid = os.getenv('UID')
 	if uid is None:
-		pass #implementer uen redirection
+		pass
 	authorization_url = f"https://api.intra.42.fr/oauth/authorize?client_id={uid}&redirect_uri=https://{host}:8443/auth/Oauth/&response_type=code"
 	response = JsonResponse({'authorization_url': authorization_url})
 	response["Access-Control-Allow-Origin"] = "*"
