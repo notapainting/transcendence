@@ -7,10 +7,10 @@ Our 3D Pong game is a modern reimagining of the classic Pong game, developed usi
 ## Features
 
 - Smooth 3D rendering with Three.js
-- Single-player mode against AI
 - Real-time multiplayer mode
 - Scoring and leaderboard system
-- Customizable paddles and playfield
+- Tournament system
+  
 ## Tech Stack
 
 **Client:** ThreeJS, HTML, CSS
