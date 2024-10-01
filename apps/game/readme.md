@@ -40,7 +40,7 @@ The game features a variety of power-ups that add an exciting layer of strategy 
 **Examples of Power-ups:**
 
 - Size Change: Temporarily increases or decreases the size of a player's paddle, affecting their ability to hit the ball.
-- Speed Reduction: Slows down the ball's speed, making it easier to react and control during intense moments.
+- Speed Reduction: Slows down the paddle's speed, making it harder to react and control during intense moments.
 ## Backend (Django)
 
 - Manages user data, game states, and tournament logistics.
