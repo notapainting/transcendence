@@ -12,7 +12,7 @@ Our last common core projects at 42 school
 - A woody Pong game
 - Play locally or with your friend all over the internet !!!
 - Tournament up to 16 players! 
-- Magnicent transition between each page
+- Magnificent transition between each page
 - Creating an account to access more features like : 
     - Match history
     - Live Chat
