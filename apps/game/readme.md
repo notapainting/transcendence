@@ -17,7 +17,7 @@ Our 3D Pong game is a modern reimagining of the classic Pong game, developed usi
 
 **Server:** Django 5.0.2, Django Channels 4.0.0
 
-
+![preview of the game](https://github.com/notapainting/transcendence/blob/main/img/doc/gamePreview.png)
 ## Game Modes
 
 **Local Play (Offline)**: Enjoy the game without an internet connection, perfect for quick matches or practice sessions.
@@ -52,4 +52,3 @@ The game features a variety of power-ups that add an exciting layer of strategy 
 - Manages local game logic for offline play.
 - Communicates with the backend for online features.
 This architecture allows for a scalable, feature-rich gaming experience that caters to both casual and competitive players. The combination of local and online play, along with the tournament and matchmaking systems, provides a diverse and engaging Pong 3D experience.
-
