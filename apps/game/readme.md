@@ -23,6 +23,12 @@ Our 3D Pong game is a modern reimagining of the classic Pong game, developed usi
 **Local Play (Offline)**: Enjoy the game without an internet connection, perfect for quick matches or practice sessions.
 
 **Online Play**: Compete with players worldwide, leveraging our user management module for seamless online interactions.
+
+## Controls
+
+In Local mode, You can use `w/s` or `ArroyUp/Arroydown` to move the paddle on left and right side respectively. If you play online any of theses key will move your paddle
+
+
 ## Tournament System
 
 We've implemented a comprehensive tournament system with the following features:
