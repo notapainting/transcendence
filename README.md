@@ -2,6 +2,8 @@
 # Transcendence
 Our last common core projects at 42 school
 
+![Score](https://img.shields.io/badge/Score-125%2F100-brightgreen)
+![Outstanding Project](https://img.shields.io/badge/Project-Outstanding-blue)
 
 ## Demo
 ![gif of the site landing page](https://raw.githubusercontent.com/notapainting/transcendence/main/img/doc/demo.gif)
