@@ -2,8 +2,10 @@
 # Transcendence
 Our last common core projects at 42 school
 
-![Score](https://img.shields.io/badge/Score-125%2F100-brightgreen)
-![Outstanding Project](https://img.shields.io/badge/Project-Outstanding-blue)
+![Score](https://img.shields.io/badge/Score-125%2F100-ff69b4?style=for-the-badge&logo=42&logoColor=white)
+![Outstanding Project](https://img.shields.io/badge/Project-Outstanding-blueviolet?style=for-the-badge&logo=star&logoColor=white)
+
+🎉 This project was completed with a perfect score of **125/100** and received the **Outstanding Project** award at École 42 Lyon!
 
 ## Demo
 ![gif of the site landing page](https://raw.githubusercontent.com/notapainting/transcendence/main/img/doc/demo.gif)
