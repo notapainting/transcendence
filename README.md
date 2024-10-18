@@ -9,7 +9,7 @@ Our last common core projects at 42 school
 
 ## Demo
 
-[Regarder la vidéo](https://www.youtube.com/watch?v=8pcQhdSwoC0)
+![Demo GIF](img/doc/demo.gif)
 
 ## Features
 
