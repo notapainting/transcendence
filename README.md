@@ -8,7 +8,8 @@ Our last common core projects at 42 school
 🎉 This project was completed with a perfect score of **125/100** and received the **Outstanding Project** award at École 42 Lyon!
 
 ## Demo
-![gif of the site landing page](https://raw.githubusercontent.com/notapainting/transcendence/main/img/doc/demo.gif)
+
+[Regarder la vidéo](https://www.youtube.com/watch?v=8pcQhdSwoC0)
 
 ## Features
 
